@@ -2,8 +2,9 @@
 title: '按时段和人数找到可用房间'
 type: feature
 created: '2026-11-12'
-status: ready-for-dev
+status: in-progress
 route: dispatch
+baseline_commit: ea3fba136e8b6c3cbd5bc373c167a8527376981f
 story_key: 1-3-availability
 review_loop_iteration: 0
 context:
