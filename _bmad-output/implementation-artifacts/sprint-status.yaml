@@ -38,7 +38,7 @@ development_status:
   epic-1: in-progress
   1-1-account-access: done
   1-2-room-schedule: done
-  1-3-availability: backlog
+  1-3-availability: ready-for-dev
   epic-1-retrospective: optional
 
   epic-2: backlog
