@@ -2,8 +2,9 @@
 title: '创建停用并查询完整管理记录'
 type: feature
 created: '2026-11-12'
-status: ready-for-dev
+status: in-progress
 route: dispatch
+baseline_commit: 4747ea2add89c06299246a1f60a06b2ecebad2a3
 story_key: 3-2-maintenance-block
 review_loop_iteration: 0
 context:
