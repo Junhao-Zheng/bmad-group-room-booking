@@ -47,3 +47,4 @@
 {"timestamp": "2026-11-12T12:17:43.264740+00:00", "story": "3-2-maintenance-block", "from": "ready-for-dev", "to": "in-progress", "actor": "AI root", "head": "4747ea2add89c06299246a1f60a06b2ecebad2a3", "post_done_rework": false}
 {"timestamp": "2026-11-12T12:36:31.901526+00:00", "story": "3-2-maintenance-block", "from": "in-progress", "to": "review", "actor": "AI root", "head": "78358925e410763f7a6f76e6cc7a0004f1231add", "post_done_rework": false}
 {"timestamp": "2026-11-12T13:04:30.443670+00:00", "story": "3-2-maintenance-block", "from": "review", "to": "done", "actor": "AI root", "head": "78358925e410763f7a6f76e6cc7a0004f1231add", "post_done_rework": false}
+{"timestamp": "2026-11-12T13:04:54.768995+00:00", "story": "2-5-admin-cancel", "from": "backlog", "to": "ready-for-dev", "actor": "AI root", "head": "78317a7b9722ad180d37c450c4ad2c441605b131", "post_done_rework": false}
