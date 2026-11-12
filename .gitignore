@@ -1,0 +1,13 @@
+.DS_Store
+.tools/
+.venv/
+.uv-cache/
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
+_bmad/config.user.toml
+_bmad/custom/config.user.toml
+_bmad/render/
+
