@@ -5,3 +5,8 @@
 #
 # [agents.bmad-agent-pm]
 # description = "Prefers short, bulleted PRDs over narrative drafts."
+
+[core]
+user_name = "课程项目组"
+communication_language = "Chinese"
+document_output_language = "Chinese"

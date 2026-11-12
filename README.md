@@ -4,6 +4,17 @@
 
 本仓库按实际发生的工作保存 BMAD 产物和过程证据。实验 B 按用户转述的教师要求免做，实验 A 保留。人数和截止日期不作为当前阶段的阻塞条件。
 
+## 当前材料
+
+- [产品简述草案](_bmad-output/planning-artifacts/product-brief.md)：使用对象、问题假设、范围和验证目标。
+- [补充规则](_bmad-output/planning-artifacts/briefs/brief-group-room-booking-2026-11-12/addendum.md)：11 项假设、边界案例和实验 A 准备要求。
+- [人机决策日志](decision-log.md)：目前 3 条真实人工决定，尚无人工技术否决。
+- [课程要求与状态](docs/course-scope.md)：逐项区分已做与待做。
+- [下一会话交接](docs/next-session-prd.md)：在独立会话中执行 PRD 工作流的输入说明。
+- [初始化证据](docs/evidence/setup-2026-11-12.md)与[用户输入摘录](docs/evidence/user-inputs.md)。
+
+当前只完成分析草案。PRD、架构、故事、冲刺、实验 A 和应用实现尚未完成；M1 尚未评审。
+
 ## 环境
 
 - BMAD Core 与 BMad Method：6.12.1，与讲义参考版本一致。
