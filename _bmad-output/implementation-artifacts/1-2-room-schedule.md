@@ -2,8 +2,9 @@
 title: '查看会议室和共享日程'
 type: feature
 created: '2026-11-12'
-status: ready-for-dev
+status: in-progress
 route: dispatch
+baseline_commit: 3f0349edf4cb0dedd85e269fdb1530cd67aa95d5
 story_key: 1-2-room-schedule
 review_loop_iteration: 0
 context:
