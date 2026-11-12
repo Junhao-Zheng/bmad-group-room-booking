@@ -1,0 +1,23 @@
+{
+  "scope": "文档静态合同检查，非应用/安全/并发/NFR测试",
+  "json_parse": "pass",
+  "examples_checked": [
+    "booking_created",
+    "booking_replayed",
+    "booking_cancelled_by_admin_visible_to_owner",
+    "booking_cancelled_by_member",
+    "booking_replayed_after_cancellation",
+    "block_created",
+    "block_revoked",
+    "block_revoke_repeated",
+    "admin_bookings",
+    "admin_blocks",
+    "audit_list",
+    "mixed_schedule"
+  ],
+  "single_http_wrapper": "pass",
+  "booking_full_exact_keys": "pass",
+  "block_full_exact_keys": "pass",
+  "shared_schedule_discriminator_and_privacy": "pass",
+  "audit_before_after_objects": "pass"
+}

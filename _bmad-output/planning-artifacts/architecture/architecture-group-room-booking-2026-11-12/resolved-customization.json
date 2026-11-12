@@ -1,0 +1,20 @@
+{
+  "workflow": {
+    "activation_steps_prepend": [],
+    "activation_steps_append": [],
+    "persistent_facts": [],
+    "on_complete": "",
+    "spine_template": "assets/spine-template.md",
+    "spine_output_path": "{planning_artifacts}/architecture",
+    "run_folder_pattern": "architecture-{project_name}-{date}",
+    "doc_standards": [
+      "skill:bmad-review lenses=structure,prose"
+    ],
+    "external_sources": [],
+    "external_handoffs": [],
+    "finalize_reviewers": [
+      "Verify every committed decision was web-researched or reality-checked rather than asserted from training data: current library/framework versions, that each named technology still exists and fits, and — greenfield — the live defaults of any starter it leans on. Flag anything that could be out of date and wasn't confirmed against the web, the existing project, or the current starter.",
+      "Attack the spine as an adversary: construct two units one level down that each obey every AD to the letter yet still build incompatibly — clashing shared-data shapes, two owners of one entity, conflicting state-mutation paths. Every pair you find is a hole to close with a new or tightened AD."
+    ]
+  }
+}

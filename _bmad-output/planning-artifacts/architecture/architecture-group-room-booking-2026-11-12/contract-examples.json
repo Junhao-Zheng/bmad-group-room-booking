@@ -1,0 +1,428 @@
+{
+  "_meta": {
+    "purpose": "精确合同样例；各案例独立，非实测响应或同一数据库同时状态",
+    "clock_at": 1794456000,
+    "clock_local": "2026-11-12T12:00:00+08:00",
+    "contract": "architecture.md §§4—7"
+  },
+  "booking_created": {
+    "http_status": 201,
+    "body": {
+      "ok": true,
+      "data": {
+        "booking": {
+          "id": 42,
+          "room": {
+            "id": 1,
+            "name": "讨论室A",
+            "location": "科研楼301",
+            "capacity": 12
+          },
+          "title": "论文讨论",
+          "purpose": "讨论实验结果",
+          "attendees": 6,
+          "owner_id": 1,
+          "owner_display_name": "成员甲",
+          "start_at": 1794531600,
+          "start_local": "2026-11-13T09:00:00+08:00",
+          "end_at": 1794535200,
+          "end_local": "2026-11-13T10:00:00+08:00",
+          "status": "pending",
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "cancelled_at": null,
+          "cancelled_local": null,
+          "cancelled_by_id": null,
+          "cancelled_by_display_name": null,
+          "cancel_reason": null
+        },
+        "replayed": false
+      }
+    }
+  },
+  "booking_replayed": {
+    "http_status": 200,
+    "body": {
+      "ok": true,
+      "data": {
+        "booking": {
+          "id": 42,
+          "room": {
+            "id": 1,
+            "name": "讨论室A",
+            "location": "科研楼301",
+            "capacity": 12
+          },
+          "title": "论文讨论",
+          "purpose": "讨论实验结果",
+          "attendees": 6,
+          "owner_id": 1,
+          "owner_display_name": "成员甲",
+          "start_at": 1794531600,
+          "start_local": "2026-11-13T09:00:00+08:00",
+          "end_at": 1794535200,
+          "end_local": "2026-11-13T10:00:00+08:00",
+          "status": "pending",
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "cancelled_at": null,
+          "cancelled_local": null,
+          "cancelled_by_id": null,
+          "cancelled_by_display_name": null,
+          "cancel_reason": null
+        },
+        "replayed": true
+      }
+    }
+  },
+  "booking_cancelled_by_admin_visible_to_owner": {
+    "http_status": 200,
+    "body": {
+      "ok": true,
+      "data": {
+        "id": 42,
+        "room": {
+          "id": 1,
+          "name": "讨论室A",
+          "location": "科研楼301",
+          "capacity": 12
+        },
+        "title": "论文讨论",
+        "purpose": "讨论实验结果",
+        "attendees": 6,
+        "owner_id": 1,
+        "owner_display_name": "成员甲",
+        "start_at": 1794531600,
+        "start_local": "2026-11-13T09:00:00+08:00",
+        "end_at": 1794535200,
+        "end_local": "2026-11-13T10:00:00+08:00",
+        "status": "cancelled",
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "cancelled_at": 1794454200,
+        "cancelled_local": "2026-11-12T11:30:00+08:00",
+        "cancelled_by_id": 3,
+        "cancelled_by_display_name": "管理员",
+        "cancel_reason": "课程会议调整"
+      }
+    }
+  },
+  "booking_cancelled_by_member": {
+    "http_status": 200,
+    "body": {
+      "ok": true,
+      "data": {
+        "id": 44,
+        "room": {
+          "id": 1,
+          "name": "讨论室A",
+          "location": "科研楼301",
+          "capacity": 12
+        },
+        "title": "论文讨论",
+        "purpose": "讨论实验结果",
+        "attendees": 6,
+        "owner_id": 1,
+        "owner_display_name": "成员甲",
+        "start_at": 1794531600,
+        "start_local": "2026-11-13T09:00:00+08:00",
+        "end_at": 1794535200,
+        "end_local": "2026-11-13T10:00:00+08:00",
+        "status": "cancelled",
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "cancelled_at": 1794454200,
+        "cancelled_local": "2026-11-12T11:30:00+08:00",
+        "cancelled_by_id": 1,
+        "cancelled_by_display_name": "成员甲",
+        "cancel_reason": null
+      }
+    }
+  },
+  "booking_replayed_after_cancellation": {
+    "http_status": 200,
+    "body": {
+      "ok": true,
+      "data": {
+        "booking": {
+          "id": 42,
+          "room": {
+            "id": 1,
+            "name": "讨论室A",
+            "location": "科研楼301",
+            "capacity": 12
+          },
+          "title": "论文讨论",
+          "purpose": "讨论实验结果",
+          "attendees": 6,
+          "owner_id": 1,
+          "owner_display_name": "成员甲",
+          "start_at": 1794531600,
+          "start_local": "2026-11-13T09:00:00+08:00",
+          "end_at": 1794535200,
+          "end_local": "2026-11-13T10:00:00+08:00",
+          "status": "cancelled",
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "cancelled_at": 1794454200,
+          "cancelled_local": "2026-11-12T11:30:00+08:00",
+          "cancelled_by_id": 3,
+          "cancelled_by_display_name": "管理员",
+          "cancel_reason": "课程会议调整"
+        },
+        "replayed": true
+      }
+    }
+  },
+  "block_created": {
+    "http_status": 201,
+    "body": {
+      "ok": true,
+      "data": {
+        "id": 43,
+        "room": {
+          "id": 1,
+          "name": "讨论室A",
+          "location": "科研楼301",
+          "capacity": 12
+        },
+        "creator_id": 3,
+        "creator_display_name": "管理员",
+        "reason": "设备维护",
+        "start_at": 1794535200,
+        "start_local": "2026-11-13T10:00:00+08:00",
+        "end_at": 1794538800,
+        "end_local": "2026-11-13T11:00:00+08:00",
+        "status": "pending",
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "revoked_at": null,
+        "revoked_local": null,
+        "revoked_by_id": null,
+        "revoked_by_display_name": null,
+        "revoke_reason": null
+      }
+    }
+  },
+  "block_revoked": {
+    "http_status": 200,
+    "body": {
+      "ok": true,
+      "data": {
+        "id": 43,
+        "room": {
+          "id": 1,
+          "name": "讨论室A",
+          "location": "科研楼301",
+          "capacity": 12
+        },
+        "creator_id": 3,
+        "creator_display_name": "管理员",
+        "reason": "设备维护",
+        "start_at": 1794535200,
+        "start_local": "2026-11-13T10:00:00+08:00",
+        "end_at": 1794538800,
+        "end_local": "2026-11-13T11:00:00+08:00",
+        "status": "revoked",
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "revoked_at": 1794454800,
+        "revoked_local": "2026-11-12T11:40:00+08:00",
+        "revoked_by_id": 3,
+        "revoked_by_display_name": "管理员",
+        "revoke_reason": "设备维护已另行安排"
+      }
+    }
+  },
+  "block_revoke_repeated": {
+    "http_status": 200,
+    "body": {
+      "ok": true,
+      "data": {
+        "id": 43,
+        "room": {
+          "id": 1,
+          "name": "讨论室A",
+          "location": "科研楼301",
+          "capacity": 12
+        },
+        "creator_id": 3,
+        "creator_display_name": "管理员",
+        "reason": "设备维护",
+        "start_at": 1794535200,
+        "start_local": "2026-11-13T10:00:00+08:00",
+        "end_at": 1794538800,
+        "end_local": "2026-11-13T11:00:00+08:00",
+        "status": "revoked",
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "revoked_at": 1794454800,
+        "revoked_local": "2026-11-12T11:40:00+08:00",
+        "revoked_by_id": 3,
+        "revoked_by_display_name": "管理员",
+        "revoke_reason": "设备维护已另行安排"
+      }
+    }
+  },
+  "admin_bookings": {
+    "http_status": 200,
+    "body": {
+      "ok": true,
+      "data": {
+        "items": [
+          {
+            "id": 42,
+            "room": {
+              "id": 1,
+              "name": "讨论室A",
+              "location": "科研楼301",
+              "capacity": 12
+            },
+            "title": "论文讨论",
+            "purpose": "讨论实验结果",
+            "attendees": 6,
+            "owner_id": 1,
+            "owner_display_name": "成员甲",
+            "start_at": 1794531600,
+            "start_local": "2026-11-13T09:00:00+08:00",
+            "end_at": 1794535200,
+            "end_local": "2026-11-13T10:00:00+08:00",
+            "status": "cancelled",
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "cancelled_at": 1794454200,
+            "cancelled_local": "2026-11-12T11:30:00+08:00",
+            "cancelled_by_id": 3,
+            "cancelled_by_display_name": "管理员",
+            "cancel_reason": "课程会议调整"
+          }
+        ],
+        "total": 1
+      }
+    }
+  },
+  "admin_blocks": {
+    "http_status": 200,
+    "body": {
+      "ok": true,
+      "data": {
+        "items": [
+          {
+            "id": 43,
+            "room": {
+              "id": 1,
+              "name": "讨论室A",
+              "location": "科研楼301",
+              "capacity": 12
+            },
+            "creator_id": 3,
+            "creator_display_name": "管理员",
+            "reason": "设备维护",
+            "start_at": 1794535200,
+            "start_local": "2026-11-13T10:00:00+08:00",
+            "end_at": 1794538800,
+            "end_local": "2026-11-13T11:00:00+08:00",
+            "status": "revoked",
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "revoked_at": 1794454800,
+            "revoked_local": "2026-11-12T11:40:00+08:00",
+            "revoked_by_id": 3,
+            "revoked_by_display_name": "管理员",
+            "revoke_reason": "设备维护已另行安排"
+          }
+        ],
+        "total": 1
+      }
+    }
+  },
+  "audit_list": {
+    "http_status": 200,
+    "body": {
+      "ok": true,
+      "data": {
+        "items": [
+          {
+            "id": 7,
+            "actor_id": 3,
+            "actor_display_name": "管理员",
+            "action": "booking.cancelled_by_admin",
+            "target_type": "booking",
+            "target_id": 42,
+            "occurred_at": 1794454200,
+            "occurred_local": "2026-11-12T11:30:00+08:00",
+            "before": {
+              "id": 42,
+              "owner_id": 1,
+              "title": "论文讨论",
+              "purpose": "讨论实验结果",
+              "attendees": 6,
+              "start_at": 1794531600,
+              "end_at": 1794535200,
+              "created_at": 1794448800,
+              "cancelled_at": null,
+              "cancelled_by_id": null,
+              "cancel_reason": null,
+              "room_id": 1
+            },
+            "after": {
+              "id": 42,
+              "owner_id": 1,
+              "title": "论文讨论",
+              "purpose": "讨论实验结果",
+              "attendees": 6,
+              "start_at": 1794531600,
+              "end_at": 1794535200,
+              "created_at": 1794448800,
+              "cancelled_at": 1794454200,
+              "cancelled_by_id": 3,
+              "cancel_reason": "课程会议调整",
+              "room_id": 1
+            },
+            "reason": "课程会议调整"
+          }
+        ],
+        "total": 1
+      }
+    }
+  },
+  "mixed_schedule": {
+    "http_status": 200,
+    "body": {
+      "ok": true,
+      "data": {
+        "items": [
+          {
+            "kind": "booking",
+            "record": {
+              "title": "论文讨论",
+              "owner_display_name": "成员甲",
+              "start_at": 1794531600,
+              "start_local": "2026-11-13T09:00:00+08:00",
+              "end_at": 1794535200,
+              "end_local": "2026-11-13T10:00:00+08:00",
+              "status": "pending",
+              "room_id": 1,
+              "room_name": "讨论室A"
+            }
+          },
+          {
+            "kind": "block",
+            "record": {
+              "id": 43,
+              "start_at": 1794535200,
+              "start_local": "2026-11-13T10:00:00+08:00",
+              "end_at": 1794538800,
+              "end_local": "2026-11-13T11:00:00+08:00",
+              "status": "pending",
+              "reason": "设备维护",
+              "room_id": 1,
+              "room_name": "讨论室A"
+            }
+          }
+        ],
+        "total": 2
+      }
+    }
+  }
+}
