@@ -102,3 +102,7 @@ B1只保护本次新增停用创建的错房间风险；不以本故事宣称已
 ## 本轮接受结果
 
 156项唯一Python、208项JS及真实HTTP/浏览器验证通过，11项修补闭环，0defer。AI技术接受；[最终核验](../../docs/evidence/story-3.2-review-fixes/parent-final-qa.json)。
+
+## Epic 3 复盘后修补
+
+本卡完成后重新打开，8组共享修补按实际状态关闭。208 Python/376 JS和双视口管理/审计验证通过；最后独立复核受429限制未完成，按open item披露。[最终核验](../../docs/evidence/epic-3-followup/verification.md)。不改写本卡首次验收指标。

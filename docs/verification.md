@@ -89,11 +89,17 @@ npm install --prefix work/browser-tools --no-save playwright@1.58.2
 .venv/bin/python -m scripts.verify_audit_browser --browser-executable '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --output-dir work/rerun/audit-browser
 ```
 
-最终完整回归为208项唯一Python、313项JS、0跳过，见[父流程最终核验](evidence/story-3.4-review-fixes/parent-final-qa.json)。接受源码提交为`82b4b567f27c788e062a7bc8310d0c660c69d666`。修补后138项路由权限、真实重启与双视口精确显示验证各自保存58项源码哈希并已复算。
+3.4首次接受时完整回归为208项唯一Python、313项JS、0跳过，见[父流程最终核验](evidence/story-3.4-review-fixes/parent-final-qa.json)。接受源码提交为`82b4b567f27c788e062a7bc8310d0c660c69d666`。修补后138项路由权限、真实重启与双视口精确显示验证各自保存58项源码哈希并已复算。
 
-初版的[联合NFR与浏览器报告索引](evidence/story-3.4/acceptance-summary.json)仍按原哈希保留，其中NFR03为21.500958ms/200样本/0错误。本次修补仅涉及audit DTO/页面、备份CLI与验证脚本，未改可用性或占用写事务；不把历史报告的全部源码哈希当成当前版本。最终交付还会从新副本安装运行，结果单独列明。
+初版的[联合NFR与浏览器报告索引](evidence/story-3.4/acceptance-summary.json)仍按原哈希保留，其中NFR03为21.500958ms/200样本/0错误。本次修补仅涉及audit DTO/页面、备份CLI与验证脚本，未改可用性或占用写事务；不把历史报告的全部源码哈希当成当前版本。最终交付另从新副本安装运行，结果单独列明。
 
 
 ## 解释范围
 
 这是本机、合成数据、所列浏览器及规定负载的实测证据，不证明生产稳定性。JS使用Number，超出安全整数的极大数据库ID在管理操作中明确拒绝，API仍按正64位ID合同校验；首版不为这种不现实的演示数据改全部JSON合同。没有人为身份信息、真实口令、Cookie或运行数据库需要交到仓库。
+
+## 最终史诗修补
+
+最新全量208唯一Python、376 JS、0skip；[父流程核验](evidence/epic-3-followup/parent-final-qa.json)。真实管理联动/禁JS/脚本失败与审计双视口报告各61项源码哈希已复算。后端未改，历史138权限/重启/并发/性能按原报告保留。最后独立3镜头429无结果，父流程检查不能替代独立性，复盘保留open item。
+
+新增管理复跑：`.venv/bin/python -m scripts.verify_epic3_followup_browser --browser-executable '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --output-dir work/rerun/admin-followup`。

@@ -107,3 +107,16 @@ test('filter invalidation prevents a late old response restoring rows',async()=>
   ui.n['audit-date'].value='2026-11-13';ui.n['audit-date'].handlers.input();release(ok());await pending;restored(ui);
   assert.equal(ui.n['audit-items'].children.length,0);assert.match(ui.n['audit-feedback'].textContent,/重新查询/);
 });
+for(const field of ['id','actor_id','target_id','occurred_at'])test(`unsafe audit event ${field} rejects all rows and preserves filters`,async()=>{
+  const ui=harness();ui.n['audit-target_type'].value='room';ui.n['audit-date'].value='2026-11-12';
+  ui.setFetch(async()=>ok([event,{...event,[field]:Number('9007199254740993')}]));await ui.submit();restored(ui);
+  assert.equal(ui.n['audit-items'].children.length,0);assert.equal(ui.n['audit-results'].hidden,true);assert.match(ui.n['audit-feedback'].textContent,/未能读取.*条件已保留/);
+  assert.equal(ui.n['audit-target_type'].value,'room');assert.equal(ui.n['audit-date'].value,'2026-11-12');
+  ui.setFetch(async()=>ok());await ui.submit();assert.equal(ui.n['audit-items'].children.length,1);
+});
+for(const fixture of displayedFixtures)for(const side of ['before','after'])for(const field of Object.keys(fixture[side]).filter(k=>typeof fixture[side][k]==='number'||k.endsWith('_at')||k.endsWith('_id')))test(`unsafe ${fixture.target_type} ${side}.${field} snapshot cannot display rounded evidence`,async()=>{
+  const ui=harness();ui.n['audit-date'].value='2026-11-12';
+  const malformed={...fixture,[side]:{...fixture[side],[field]:Number('9223372036854775807')}};
+  ui.setFetch(async()=>ok([event,malformed]));await ui.submit();restored(ui);
+  assert.equal(ui.n['audit-items'].children.length,0);assert.match(ui.n['audit-feedback'].textContent,/未能读取.*条件已保留/);assert.equal(ui.n['audit-date'].value,'2026-11-12');
+});

@@ -18,12 +18,12 @@
   const textFields = new Set(["name","location","title","purpose","reason","cancel_reason","revoke_reason"]);
   function snapshotShape(value, type) {
     return keys(value,snapshots[type]) && Object.entries(value).every(([field,item]) =>
-      item === null ? nullableFields.has(field) : textFields.has(field) ? typeof item === "string" : Number.isInteger(item));
+      item === null ? nullableFields.has(field) : textFields.has(field) ? typeof item === "string" : Number.isSafeInteger(item));
   }
   function eventShape(row) {
     return keys(row,"id,actor_id,actor_display_name,action,target_type,target_id,occurred_at,occurred_local,before,after,reason") &&
-      [row.id,row.actor_id,row.target_id].every(value => Number.isInteger(value) && value > 0) &&
-      Number.isInteger(row.occurred_at) && typeof row.actor_display_name === "string" &&
+      [row.id,row.actor_id,row.target_id].every(value => Number.isSafeInteger(value) && value > 0) &&
+      Number.isSafeInteger(row.occurred_at) && typeof row.actor_display_name === "string" &&
       Object.hasOwn(actions,row.action) && row.action.split(".")[0] === row.target_type &&
       typeof row.occurred_local === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+08:00$/.test(row.occurred_local) &&
       (row.before === null || snapshotShape(row.before,row.target_type)) && snapshotShape(row.after,row.target_type) &&

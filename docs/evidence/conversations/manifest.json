@@ -1,358 +1,400 @@
 {
-  "created_at_utc": "2026-11-12T15:07:51.168919+00:00",
+  "created_at_utc": "2026-11-12T15:55:04.173913+00:00",
   "files": [
     {
       "file": "root-visible-messages.selected.json",
       "messages": 63,
-      "sha256": "babd344b01bed9e98d98a70c830e9b7d87cb03b716e8b1b750d7efd028f5ebef",
+      "sha256": "e4c4f24eec9a14dec739e2d6faf31fd02b57faf2b6a2c72f6355045cd76b0c1e",
       "redactions": 0
     },
     {
       "file": "root-visible-latest.selected.json",
       "messages": 17,
-      "sha256": "0a06057449bca231266794ad8ee094e2c953ef12ed8f336e15f9849ddf78e465",
+      "sha256": "485b237b3152e79a604c0a18f354c7d779ea2275a877de3f88369be6a4a05be2",
       "redactions": 0
     },
     {
       "file": "root-visible-resumed.selected.json",
       "messages": 1,
-      "sha256": "86b44fbe13f293afe77a46c89e255ab0702c57775edc6665539c350d340008e2",
+      "sha256": "21d39eedc2a3c428f25d12944afa9126995e93aeb6edce3ca29a17580d6966e6",
       "redactions": 0
     },
     {
       "file": "conversation-architecture_stage.selected.json",
       "messages": 8,
-      "sha256": "9a0d0e4a7e02cbed3fcfbd805bb4ba5fd5493536f6a1ca2b1eaab9cb6d522bb8",
+      "sha256": "201011646c2b80aaa3b6448015896ddab1faa37579b5b928b95de25af9c62528",
       "redactions": 0
     },
     {
       "file": "conversation-brief_grounding.selected.json",
       "messages": 4,
-      "sha256": "242376aa578bfec5757c1b1c32e903d57a0fa9f65d6005a56fc5eae224ee7bfa",
+      "sha256": "cbf96c343fa846d4f1dcdc0ef0177f5b16ef70533931550959388f41ff86132a",
       "redactions": 0
     },
     {
       "file": "conversation-prd_review.selected.json",
       "messages": 2,
-      "sha256": "83a9ad0f983b8f9c18ddda7cb16326499f23c2c112773dbdeaed80920f7361b0",
+      "sha256": "8083b6802de0e0f07dc4e13f3c953376bbec9feff9e4074055ce61d82b5d8a2d",
       "redactions": 0
     },
     {
       "file": "conversation-review_1_1_blind.selected.json",
       "messages": 1,
-      "sha256": "9d79c6afdcf741e34531b14de5a0e39c6b9124c5b3b474410755ff334b8a2461",
+      "sha256": "7d51222ce927d4064729806d2ed10ab6b8c425185c2540556eace5de307b8d1a",
       "redactions": 0
     },
     {
       "file": "conversation-review_1_1_edge.selected.json",
       "messages": 1,
-      "sha256": "b6c6bcbd008b90d7e97f5a5219664b63bc2b2406892339cfc00b6668be0f9fd5",
+      "sha256": "2ada97d07cf363a88e0f94f37c7d1d386ff6e8ec0d8799b0d0807124b351014f",
       "redactions": 0
     },
     {
       "file": "conversation-review_1_1_verification.selected.json",
       "messages": 1,
-      "sha256": "a6c30abc0e22074e9d60898b83626dd73d0d648687ba042e66d623612a9f29e1",
+      "sha256": "42f6bc6289a9bbcb59ae228e58d7181ea3a4153697f594afd437c004e10530ef",
       "redactions": 0
     },
     {
       "file": "conversation-review_1_2_blind.selected.json",
       "messages": 3,
-      "sha256": "459e344b98d415a67848942fe2def8b292bc02e197c1ee8e4cb1e7efbf052353",
+      "sha256": "70ea42062222bb9b057666e7346dcdeba82c795a02d5deb842aab9b0ce6360e7",
       "redactions": 0
     },
     {
       "file": "conversation-review_1_2_edge.selected.json",
       "messages": 1,
-      "sha256": "fa591fd9891e3f0e04e99e4b77736420001e609c2597cb56881010ea077d5daa",
+      "sha256": "21b67a8d14f5744c30499e8f71486706fdcc594ad864a7fa8a208f0f35754982",
       "redactions": 0
     },
     {
       "file": "conversation-review_1_2_verification.selected.json",
       "messages": 3,
-      "sha256": "bbe0c6159a1d7dcaf288fbd11874c5d7af5f20e2aada82bdf917d3a64bc897d1",
+      "sha256": "0a1a30ce6550719accd5fb2975a5a8654f2a9ff5e8bafc5ebd6df4b7c4e73a88",
       "redactions": 0
     },
     {
       "file": "experiment_x_completed.selected.json",
       "messages": 16,
-      "sha256": "cc8c33cb3568a0079e4a9e1f42c0a672605596701c5e072026ed41ce02107d9c",
+      "sha256": "8707183faf5b4de43c35abe68a14bff6b1ab7406b62553517cf5730a5485ede3",
       "redactions": 0
     },
     {
       "file": "experiment_x_initial.selected.json",
       "messages": 9,
-      "sha256": "363e22204da597ec4cc377c943aa3f8069f7e9639c5d4c36d3b34c802278f6e0",
+      "sha256": "1a939213ab6183eb83487b858962909f99bab08e73477ff8e3c4fcf8126d1a9f",
       "redactions": 0
     },
     {
       "file": "experiment_y_completed.selected.json",
       "messages": 11,
-      "sha256": "d7c6496f6be3ad1c9dea6fd2d59994bbe44b47e75b4f85a090110924e3d21be7",
+      "sha256": "2d950573e12ff52083a1e8d9c8c8a6b6c3e96c53b0c6228693b043e7b1047792",
       "redactions": 0
     },
     {
       "file": "experiment_y_initial.selected.json",
       "messages": 6,
-      "sha256": "fd49d0322244ad9526daa812bd33d0c1c9ef57c5a03425cc2205c95fdf57516f",
+      "sha256": "628e0519e55cfaaa70b97acf2434f96cb89c5a3bb161e1b872bd0f1acf463980",
       "redactions": 0
     },
     {
       "file": "implement-2-3.selected.json",
       "messages": 3,
-      "sha256": "b3d60fdb46782dbc853b70938a5c5e5a923d486c356e5cc19ba684c7d130168d",
+      "sha256": "59189667b2743f2742f194d938938e22cd76a1daa4cf214e2486aa925a78045c",
       "redactions": 0
     },
     {
       "file": "implement-2.2.selected.json",
       "messages": 9,
-      "sha256": "ddb07b2d14fba5cc83da643921e39298437bc4c857ecbf879aa83e819955d9f0",
+      "sha256": "da6e669768253d9623baa2622e13e01f2e4411e7b1087154c5fcc50af1b36c0b",
       "redactions": 0
     },
     {
       "file": "implement_2_4.selected.json",
       "messages": 0,
-      "sha256": "9de42aeb5e43f00ecea9df34dd1a0466e735f35d6adee08f25c0046ac0c278fd",
+      "sha256": "7a2dda9e6981e61fc281ad9c01cc471581f53447d4f7fcaca0c20f2b5736ef63",
       "redactions": 0
     },
     {
       "file": "implement_2_4_retry.selected.json",
       "messages": 10,
-      "sha256": "2460aa6f8989d7ce8c789d1bade78733b4f37d30291f9dcfdccb4b9f7759c807",
+      "sha256": "24f227abf3798db4007f4d4554cd3f239da8a10ee4504ad49f300dcff7e6c652",
       "redactions": 0
     },
     {
       "file": "implement_3_1.selected.json",
       "messages": 10,
-      "sha256": "4746cda55003bb5eb6cb8aa64ab5efaa3a00c58a5d0712aae31432852d14d61a",
+      "sha256": "51bb60b78a10737cea8b06226de3c0f6e9d829dc868c946d612b2f4483d934ca",
       "redactions": 0
     },
     {
       "file": "implement_3_2.selected.json",
       "messages": 11,
-      "sha256": "af53c3e428d826a16f81f665528c52766af8b1c647030fb5e3b3f9de9c581dbd",
+      "sha256": "b7dd66efa40ab4180d92b98c8debb8921aa988d4b129d59bf2dd8dca3c39953e",
       "redactions": 0
     },
     {
       "file": "implement_3_4_complete.selected.json",
       "messages": 13,
-      "sha256": "8ebe8a9ac5bd6dc3b6ed5f2da6fdd17901e58a6c8bbf1de6047e29230aff4296",
+      "sha256": "1bc6c0586f6de9c5bfcda6b1d0feaa4bcf2f9f8c6a773faafb2df3c95f9d39a6",
       "redactions": 0
     },
     {
       "file": "implement_3_4_initial.selected.json",
       "messages": 8,
-      "sha256": "6d8f73d850cf90ca2f191544ac03ef27504407ca59ee335c7c155b4641446ee3",
+      "sha256": "65d69a6431f420f5e69eae9534e8c2262199096488a097fe0f345dbd02c46225",
       "redactions": 0
     },
     {
       "file": "implement_epic1_followup.selected.json",
       "messages": 1,
-      "sha256": "948bed39853ef049e4810138d8e4efb9fdfc10ff04ccde78bef91e3317e40e8c",
+      "sha256": "a3949120eb9361db75842f1e71d8d451f17f622923ffb5075c4969ebdde8c2d7",
       "redactions": 0
     },
     {
       "file": "retro-epic1-adversarial.selected.json",
       "messages": 1,
-      "sha256": "39b5bb34e4bd0871bb1361870305bd7e4cfa03153b6e8bb6f9891655a4109022",
+      "sha256": "6635b9a38374e00ca91fd0f0a1df1e504de702a6e65e4d8c8a83ff786f163039",
       "redactions": 0
     },
     {
       "file": "retro-epic1-architecture.selected.json",
       "messages": 1,
-      "sha256": "597a3e428fa6d35a617dfaf506b66845edbac3408e95dc823694fe048c5ff368",
+      "sha256": "2d97ebc2213f2860cf2b0004568030b4a661903d0c239235b546e8512f793f8c",
       "redactions": 0
     },
     {
       "file": "retro-epic1-edge.selected.json",
       "messages": 1,
-      "sha256": "b3d6c46129dc8972e32929006174282588b9c5dc7015ecd3de0e9b546d03ccdb",
+      "sha256": "7ed8ac1acbe919f327c5dde478a2f12a09b7f03e73afcf672aa92c45817910e5",
       "redactions": 0
     },
     {
       "file": "retro-epic1-reconciliation.selected.json",
       "messages": 4,
-      "sha256": "ff494e9d10d00d269af14f6b9dd8ab8049a77a1a8809ce767c7772d05ff104a8",
+      "sha256": "b4cea599c1871ebfd690b3a12842ae92adc3338e8c16d88ab8f972ebc7647e98",
       "redactions": 0
     },
     {
       "file": "retro-epic1-verification.selected.json",
       "messages": 1,
-      "sha256": "cfad4bda98e6764a8292ea3a6b914ac68d4d88f81a9841f3f6142d80ffc3d790",
+      "sha256": "cfa8c976de8d8a3888100dfcf6651760428a69c428d8fd7b2bae47ef6aba5845",
+      "redactions": 0
+    },
+    {
+      "file": "retro3_adversarial.selected.json",
+      "messages": 1,
+      "sha256": "3f81a3e4034ffc07042a73e4759003ad7c13da6d47b0aff50280c293c77b08c1",
+      "redactions": 0
+    },
+    {
+      "file": "retro3_aggregate.selected.json",
+      "messages": 3,
+      "sha256": "ec86a1198751fe5e1300e7500a60b494133e2c7394c817890c2f157c9a5f34ee",
+      "redactions": 0
+    },
+    {
+      "file": "retro3_edge.selected.json",
+      "messages": 1,
+      "sha256": "d020096d71e5eeb563b86003a94c20cce630d5980e191f7eeb62b947ce6da954",
+      "redactions": 0
+    },
+    {
+      "file": "retro3_verification.selected.json",
+      "messages": 1,
+      "sha256": "752c975605a2277b86559454790fd5fe0825a94e844c1a2f28695c943be26a67",
       "redactions": 0
     },
     {
       "file": "review-2-3-blind.selected.json",
       "messages": 4,
-      "sha256": "54b35474cd97daf5f7638b22847913fa47dbc07cf8fcbc5eebef9dbbf5bde72e",
+      "sha256": "0ea0fb957b96519e4cee143f9ef363146d562793240e91bea03cf27041729f66",
       "redactions": 0
     },
     {
       "file": "review-2-3-edge.selected.json",
       "messages": 1,
-      "sha256": "6990ec2c5527585248ef3e0ebbacd6afcff0391a5c5d8d2f508f18ed7d7cba7a",
+      "sha256": "9e96f0c920cbb89b16629ddf63d58d9f891112a968c59fa98392b8b78f30821d",
       "redactions": 0
     },
     {
       "file": "review-2-3-verification.selected.json",
       "messages": 1,
-      "sha256": "0e94f3753a26af8b26bf195add5ad4b6e81876ed61f8f7bc630813a1b5c60431",
+      "sha256": "a9821999a7d6b5c4f41d25220f759e130284cc02b4441d04b83969ba08ff096d",
       "redactions": 0
     },
     {
       "file": "review-2.2-blind.selected.json",
       "messages": 1,
-      "sha256": "aa07bba04de14fa5bd54c5e40f53650fe017c9b010bf98cb909f50e64afc85d0",
+      "sha256": "c4add0f51b09dfea1522bee094cdc6e8fc9a9ccbb25487285b497bb0e43ba3c8",
       "redactions": 0
     },
     {
       "file": "review-2.2-edge.selected.json",
       "messages": 1,
-      "sha256": "ae7990d22a8f38aee54a9846aff58297efaa1ff7a149101c6f14c8301ba9aeb0",
+      "sha256": "ea23b0e91f9a4f491aae6e209177a2dfeb54b557ba239abfb6412be3583215c7",
       "redactions": 0
     },
     {
       "file": "review-2.2-verification.selected.json",
       "messages": 1,
-      "sha256": "929d02d07e5bb7a27e07ca22c25c5ed5aad71f5f377c56461e05d1faa99fae90",
+      "sha256": "d67c7d6036c38a764cdc5b7838c246de099bfab78904841c1c8fd102f3c2e2d9",
       "redactions": 0
     },
     {
       "file": "review_2_4_blind.selected.json",
       "messages": 4,
-      "sha256": "a981dd5a856396e721493ba9e19e49b87b2a69fb48f9f3b38b8f9e282746a6a8",
+      "sha256": "ac1d1e7eb92863f7ca666833fdd616636bb6c92c2884a4d9b4249ba2541d243a",
       "redactions": 0
     },
     {
       "file": "review_2_4_edge.selected.json",
       "messages": 1,
-      "sha256": "4d69a20e0d63e4da5ad91044db92e145a14b47e03310a991a3427777f75fc8cd",
+      "sha256": "10ec284db67d0f8f26cfef635431e1dbbeda5091da3de5a485dd765abd1b1da2",
       "redactions": 0
     },
     {
       "file": "review_2_4_verification.selected.json",
       "messages": 1,
-      "sha256": "196f2e0857aa0bb07d1792b840acf3a2cc7977d9cad5d4350e15466b90b240f5",
+      "sha256": "f547f5f2c50cb09d4b74fd59911f3a1816c5fdb3d665a394af3a82b896b2484d",
       "redactions": 0
     },
     {
       "file": "review_2_5_blind.selected.json",
       "messages": 3,
-      "sha256": "838a6c3440633f8c2304a326a924564b4a4f9b1d2cd71cffd6dc206ceb8e59ed",
+      "sha256": "c61ccff5bece337a913f544c830e21df16d06934f99af01dd0257903db965cc9",
       "redactions": 0
     },
     {
       "file": "review_2_5_edge.selected.json",
       "messages": 1,
-      "sha256": "4866104366327fca42b3eb908831652713c13d8716be590053bb5757a4d538d5",
+      "sha256": "c82c3c27650fff67f60c41296b70a44e31399e51cc881341792cb9f8b8d1563c",
       "redactions": 0
     },
     {
       "file": "review_2_5_verification.selected.json",
       "messages": 1,
-      "sha256": "2aa2086ca91977418e06bc20807bea53383245097f74ce0bab1c17d5b69848f4",
+      "sha256": "509032bc8f76b962722bb1e0423bb5ec133c59433254a12601e54316a3d7b02d",
       "redactions": 0
     },
     {
       "file": "review_3_1_blind.selected.json",
       "messages": 4,
-      "sha256": "bbac7481732724c6420b1b1029eb642a272acb130d366cf73ebeb16501747c66",
+      "sha256": "388c3a3a3c019a538b554491ff8a9ce100d40f50b7be62eaf0ce1ae7761282da",
       "redactions": 0
     },
     {
       "file": "review_3_1_edge.selected.json",
       "messages": 1,
-      "sha256": "03f472ec1fabf7a96516afc95b8c31557bf67665d8c5250e23231abd0158445d",
+      "sha256": "fcae7711fed454dc8e4d036e38420384f550a5ca78abf92e4909abacc79a3537",
       "redactions": 0
     },
     {
       "file": "review_3_1_verification.selected.json",
       "messages": 1,
-      "sha256": "00585604a42d4360408795016d42c78f42ff98cd0129a818ba4b9577f390a47e",
+      "sha256": "7b59f2c8f6c49a961b42b1133b0437fe84a904054faac84b37cfb7aeb9ec57a2",
       "redactions": 0
     },
     {
       "file": "review_3_2_blind.selected.json",
       "messages": 3,
-      "sha256": "7bafb10241ec1f631b6fd66eeb6ce52c93a159f2b42fe1279cbc1ee82762007e",
+      "sha256": "bced44d15d5fe539860ff05fbd6e812bffb5ae351a86b00f3b6f93284a7f17fb",
       "redactions": 0
     },
     {
       "file": "review_3_2_edge.selected.json",
       "messages": 1,
-      "sha256": "3b6b989526a62ce1d880e3be6a6cb8d0a9192fe1d09f3042a96624edc00d5b2c",
+      "sha256": "291be97d88d9da8241c8ad0a295a73600ae03c9dc8897a8cacc5bf4362a6d2e0",
       "redactions": 0
     },
     {
       "file": "review_3_2_verification.selected.json",
       "messages": 1,
-      "sha256": "89582a280a3a5da1666b822bdf36d42a36245e3f9914434f693712788c36944e",
+      "sha256": "0d568e89fd10e624edb5f4ec31bddd87d52c9c8ca120f725ba72eb42ddeaacb1",
       "redactions": 0
     },
     {
       "file": "review_3_3_blind.selected.json",
       "messages": 1,
-      "sha256": "3f5966453602f37a1c17cccd913fb5cc5869eaccc8dd5bca1ffe2325db88fa73",
+      "sha256": "86602539a89d35c79eab6f5b434d3824b801a579bda7bba02dba41bc370b0c01",
       "redactions": 0
     },
     {
       "file": "review_3_3_edge.selected.json",
       "messages": 1,
-      "sha256": "a1c47f780377cde1d9a35bc545080519c986ed5e27bf9303370dad2566db124d",
+      "sha256": "92fcca04dc3b04a16c7b26a12e30809b9b7c1a6bcdaa659d55dc4db255a4256c",
       "redactions": 0
     },
     {
       "file": "review_3_3_verification.selected.json",
       "messages": 1,
-      "sha256": "102ee198d6ef1c85cbcf7c9de3dae4172257d86fde99da50e7691f146df42b5e",
+      "sha256": "9ec3d256af53981e1e40021daee98ed2b184adf6f1d55330ed7b1d858988e565",
       "redactions": 0
     },
     {
       "file": "review_3_4_blind.selected.json",
       "messages": 4,
-      "sha256": "f534af2112d1846df16be83b7dff950c70cf7dde627b7f96e094d63fc3df8358",
+      "sha256": "9450248e526d858f77f498797985e7bc5ca0adae9cd58322322240446f6dfb78",
       "redactions": 0
     },
     {
       "file": "review_3_4_edge.selected.json",
       "messages": 1,
-      "sha256": "25b91193ab8331b3c91278661aaba135a58f4f95672bfc5b623f30ccbba6eb2b",
+      "sha256": "cdebafbdbf6c3a4a82c032e7343d7f277be0fb325373c93f8a6d956a639fa02b",
       "redactions": 0
     },
     {
       "file": "review_3_4_verification.selected.json",
       "messages": 1,
-      "sha256": "d108197ff1b95a287f79dac8fbd995f17b37bbb5e7b89ff136f083cd92a4d003",
+      "sha256": "d564642c5bf919a8e78032777d8fb36a6e113b05bed91cc208ee1b3878ee0743",
       "redactions": 0
     },
     {
       "file": "review_epic1_followup_blind.selected.json",
       "messages": 4,
-      "sha256": "b9c90f39139286d96ac1a3034ae4935dc456682dfa2ee93da35bdb9cb1178623",
+      "sha256": "0fc260e940d80b105d644a85a97dd8e5208a4598e2e34e3af7780aacbfa60f51",
       "redactions": 0
     },
     {
       "file": "review_epic1_followup_edge.selected.json",
       "messages": 1,
-      "sha256": "f74d89f006cc7c3133978a01f796fd584b06eee4b122d6a8feb232a3af3cc879",
+      "sha256": "1e040cfb521a9bf02d1d9475e6dcfc001ae6ff36a59a9f9871dfcb665d886916",
       "redactions": 0
     },
     {
       "file": "review_epic1_followup_verification.selected.json",
       "messages": 2,
-      "sha256": "269965da35377b01ec9744be6a846b03bdabad19ce4a76ade34f1680a96e0d82",
+      "sha256": "fada3451a628a086b2030cba2d067e9eab5cfbcd94019a6dec0d4c0bcd70f221",
       "redactions": 0
     },
     {
       "file": "review_epic1_followup_verification_retry.selected.json",
       "messages": 1,
-      "sha256": "42e8fb006ae0a3cd57f10fee30493f8141547dcb6d80ba2fde87d0812e35ee84",
+      "sha256": "f5fda57911057710da99cafd06a9a62c135951bad9b7d2bbb2400d83e0c54f8b",
+      "redactions": 0
+    },
+    {
+      "file": "root-final-in-progress.selected.json",
+      "messages": 113,
+      "sha256": "cf761d6797e07b29127c7e7766b6a9841db0ea65dec071ffaab4dafee64c8f14",
+      "redactions": 0
+    },
+    {
+      "file": "root-final-pre-video.selected.json",
+      "messages": 1,
+      "sha256": "dfce20220697a66ad7877e236475981f930bf5eb40489b12e0a9938d31999a1a",
+      "redactions": 0
+    },
+    {
+      "file": "root-final-retro-in-progress.selected.json",
+      "messages": 11,
+      "sha256": "ecc6304534da3970a3f351832bfd72fc0715e51b388ac8eedf9bbf091a3157be",
       "redactions": 0
     },
     {
       "file": "root-through-story-3-1.selected.json",
       "messages": 66,
-      "sha256": "1450d1ef4ae653d65a8060490ad8420384a9e1031dc11dfdf9224218bda7971a",
+      "sha256": "70ced63d1f85f1977a8119b1c4ac766e7e72674b062c6a151e62f1645b93773a",
       "redactions": 0
     }
   ],

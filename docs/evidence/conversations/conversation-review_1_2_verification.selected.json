@@ -2,7 +2,7 @@
   "export_kind": "selected_visible_messages",
   "source_export": "conversation-review_1_2_verification.json",
   "source_sha256": "5c36dc4fe167d68b041c19ebbf6b3403c9bbd495024bb5edb2b992c5c1596787",
-  "prepared_at_utc": "2026-11-12T15:07:51.146614+00:00",
+  "prepared_at_utc": "2026-11-12T15:55:04.149708+00:00",
   "scope": "从已取得导出中选取可见用户/助手消息；不含内部推理、工具日志或授权码。不声称完整平台记录；保留来源顺序，文件之间可能重叠。子代理初始指令未必由导出接口返回；不能据助手回复条数推定实现调用次数。",
   "messages": [
     {

@@ -208,7 +208,10 @@ class RoomManagementTests(unittest.TestCase):
         self.assertEqual(anonymous.get('/admin',base_url=ORIGIN).status_code,302)
         self.assertNotIn('href="/admin"',member.get('/',base_url=ORIGIN).text)
         page=self.client.get('/admin',base_url=ORIGIN);self.assertEqual(page.status_code,200)
-        for text in ['href="/admin"','id="room-form"','for="room-name"','for="room-location"','for="room-capacity"','id="room-confirm"']:
+        for text in ['href="/admin"','id="room-form"','for="room-name"','for="room-location"','for="room-capacity"','id="room-confirm"',
+                     '<fieldset id="room-fields" disabled>', 'id="room-script-unavailable"',
+                     'id="room-submit" class="button-primary" type="submit" disabled',
+                     '停用原因（1—500 字，所有已登录成员可见）']:
             self.assertIn(text,page.text)
         for value in ('0','01','-1','1.0','abc',str(2**63),'9'*5000):self.error(self.post(room_id=value),400,'INVALID_INPUT')
         self.error(self.post(room_id=2**63-1),404,'NOT_FOUND')

@@ -9,6 +9,7 @@
   const conflicts = find("room-conflicts"), relogin = find("room-relogin");
   const inputs = ["name", "location", "capacity"].map(name => form.elements.namedItem(name));
   let editing = null, busy = false, blocked = false, savedMessage = "";
+  const invalidEdits = new WeakSet();
   const displayed = new Map();
   function fillInputs(room) {
     for (const input of inputs) {
@@ -28,7 +29,7 @@
   };
   function controls(value) {
     busy = value;
-    [...inputs, confirm, submit, cancel, refresh, ...list.querySelectorAll("button")].forEach(node => { node.disabled = value || blocked; });
+    [...inputs, confirm, submit, cancel, refresh, ...list.querySelectorAll("button")].forEach(node => { node.disabled = value || blocked || invalidEdits.has(node); });
     if (value) form.setAttribute("aria-busy", "true"); else form.removeAttribute("aria-busy");
   }
   function clearErrors() {
@@ -39,6 +40,11 @@
   }
   function setEditing(room) {
     if (busy || blocked) return;
+    if (room !== null && !roomShape(room)) {
+      confirm.checked = false;
+      say(feedback, "会议室资料或编号无法安全读取，不能编辑。请刷新目录核对。", true);
+      return;
+    }
     editing = room;
     savedMessage = "";
     fillInputs(room);
@@ -47,13 +53,19 @@
     submit.textContent = room ? "确认保存会议室" : "确认新增会议室";
     say(feedback, ""); heading.focus();
   }
-  function bindEdit(button, room) { button.addEventListener("click", () => setEditing(room)); }
+  function bindEdit(button, room) {
+    if (!roomShape(room)) { invalidEdits.add(button); button.disabled = true; }
+    button.addEventListener("click", () => setEditing(roomShape(room) ? room : undefined));
+  }
   for (const button of list.querySelectorAll("button")) {
-    bindEdit(button, JSON.parse(button.dataset.room));
+    let room;
+    try { room = JSON.parse(button.dataset.room); } catch (_) { /* Reject only this malformed entry. */ }
+    bindEdit(button, room);
+    if (!roomShape(room)) say(directoryFeedback, "部分会议室资料或编号无法安全读取，已禁止编辑这些条目。请刷新目录核对。", true);
   }
   function roomShape(room) {
-    return room && Object.keys(room).sort().join(",") === "capacity,id,location,name" &&
-      Number.isInteger(room.id) && room.id > 0 && typeof room.name === "string" &&
+    return room && typeof room === "object" && !Array.isArray(room) && Object.keys(room).sort().join(",") === "capacity,id,location,name" &&
+      Number.isSafeInteger(room.id) && room.id > 0 && typeof room.name === "string" &&
       typeof room.location === "string" && Number.isInteger(room.capacity) && room.capacity >= 1 && room.capacity <= 1000;
   }
   const object = value => value !== null && typeof value === "object" && !Array.isArray(value);
@@ -62,7 +74,7 @@
     return object(error) && typeof error.code === "string" && typeof error.message === "string" &&
       object(error.fields) && Object.values(error.fields).every(value => typeof value === "string") &&
       Array.isArray(error.conflicts) && error.conflicts.every(row => object(row) &&
-        Number.isInteger(row.id) && row.id > 0 && Number.isInteger(row.attendees) && row.attendees > 0 &&
+        Number.isSafeInteger(row.id) && row.id > 0 && Number.isSafeInteger(row.attendees) && row.attendees > 0 &&
         localTimestamp(row.start_local) && localTimestamp(row.end_local) && ["pending", "in_progress"].includes(row.status));
   }
   async function request(url, values) {
@@ -81,7 +93,7 @@
     const identityLost = ["AUTH_REQUIRED", "FORBIDDEN"].includes(error.code);
     if (identityLost) {
       const firstLoss = !blocked;
-      blocked = true; list.replaceChildren(); conflicts.replaceChildren();
+      blocked = true; confirm.checked = false; list.replaceChildren(); conflicts.replaceChildren();
       say(directoryFeedback, error.code === "AUTH_REQUIRED" ? "登录已失效，请重新登录后打开管理页。表单输入已保留。" :
         "当前无管理权限，请以管理员身份重新登录后打开管理页。表单输入已保留。", true);
       say(feedback, `${savedMessage}${directoryFeedback.textContent}`, true);
@@ -110,6 +122,10 @@
   const canFocus = () => !document.activeElement || document.activeElement === document.body || form.contains(document.activeElement);
   form.addEventListener("submit", async event => {
     event.preventDefault(); if (busy || blocked || !confirm.checked) return;
+    if (editing !== null && !roomShape(editing)) {
+      confirm.checked = false;
+      say(feedback, "会议室编号无法安全提交，请刷新目录核对后重新选择。", true); return;
+    }
     const capacity = Number(inputs[2].value);
     if (!inputs[2].value.trim() || !Number.isInteger(capacity) || capacity < 1 || capacity > 1000) {
       clearErrors(); inputs[2].setAttribute("aria-invalid", "true");
@@ -124,11 +140,13 @@
     try {
       const room = await request(roomId ? `/api/admin/rooms/${roomId}` : "/api/admin/rooms", values);
       if (!roomShape(room) || (roomId && room.id !== roomId)) throw new Error("Invalid room");
-      if (blocked) return;
+      savedMessage = "会议室资料已保存。";
+      confirm.checked = false;
+      document.dispatchEvent(new CustomEvent("admin-room-directory-changed", {detail:{}}));
+      if (blocked) { say(feedback, `${savedMessage}请重新登录后打开管理页核对。`, true); return; }
       editing = room; cancel.hidden = false; heading.textContent = `编辑会议室 ${room.id}`;
       fillInputs(room);
       confirm.checked = false;
-      savedMessage = "会议室资料已保存。";
       say(feedback, `会议室 ${room.id} 已保存。相同资料重复保存不会新增操作记录。`);
       try { await loadRooms(); }
       catch (error) {
@@ -151,7 +169,8 @@
           conflicts.append(item);
         }
       } else {
-        say(feedback, "未能确认保存结果，输入已保留。请先刷新目录核对，再手动提交；不会自动重试。", true);
+        confirm.checked = false;
+        say(feedback, "未能确认保存结果，输入已保留。请先刷新目录核对，再重新勾选确认后手动提交；不会自动重试。", true);
       }
     } finally {
       controls(false); submit.textContent = editing ? "确认保存会议室" : "确认新增会议室";
@@ -175,4 +194,7 @@
       }
     }
   });
+  controls(false);
+  find("room-fields").disabled = blocked;
+  find("room-script-unavailable").hidden = true;
 })();

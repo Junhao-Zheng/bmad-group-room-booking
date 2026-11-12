@@ -1,0 +1,23 @@
+{
+  "export_kind": "selected_visible_messages",
+  "source_export": "root-final-pre-video.json",
+  "source_sha256": "078ce752648a18baade286bbb5fc18e960fb0bef6b0edcaae09f09d66ecf1a8b",
+  "prepared_at_utc": "2026-11-12T15:55:04.172228+00:00",
+  "scope": "从已取得导出中选取可见用户/助手消息；不含内部推理、工具日志或授权码。不声称完整平台记录；保留来源顺序，文件之间可能重叠。子代理初始指令未必由导出接口返回；不能据助手回复条数推定实现调用次数。",
+  "messages": [
+    {
+      "id": "msg_0571faf93628295f016af5e13f86a087d19737bd0de11baf25",
+      "role": "assistant",
+      "text": "最终复盘已经写完，结论是“验收通过，保留待办”：功能与验证完成，最后一批修补的独立复核因限流未取得结果。现在开始冻结演示版本，录制包含需求、架构、两轮迭代、实际操作、实验 A 和过程指标的 10 分钟视频。",
+      "turn_id": "01a1d075-7fac-7b13-ad12-8e531ce6b819"
+    }
+  ],
+  "redactions": 0,
+  "thread_id": "01a1cd9b-941f-7323-8e69-b9be60d567ad",
+  "page": {
+    "order": "newest_first",
+    "limit": 1,
+    "nextCursor": "{\"requestedThreadId\":\"01a1cd9b-941f-7323-8e69-b9be60d567ad\",\"rolloutOrdinal\":9674,\"includeAnchor\":false,\"scope\":{\"kind\":\"turns\"}}",
+    "hasMore": true
+  }
+}

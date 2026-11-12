@@ -39,7 +39,7 @@ function harness({combined=false,transform=source=>source}={}){
     window:{setTimeout(fn,ms){timers.set(++timer,{fn,ms});return timer;},clearTimeout(id){timers.delete(id);}},
     fetch:(url,options)=>{fetches.push({url,options});return impl(url,options);}};
   if(combined){
-    for(const id of ['room-form','admin-rooms','room-form-title','room-submit','room-cancel','room-confirm','rooms-refresh','room-feedback','rooms-feedback','room-conflicts','room-relogin'])n[id]=node(id);
+    for(const id of ['room-fields','room-script-unavailable','room-form','admin-rooms','room-form-title','room-submit','room-cancel','room-confirm','rooms-refresh','room-feedback','rooms-feedback','room-conflicts','room-relogin'])n[id]=node(id);
     for(const name of ['name','location','capacity']){const input=n['room-'+name]=node('room-'+name);input.name=name;input.value=String(block.room[name]);n['room-'+name+'-error']=node();n['room-form'].append(input);}
     n['room-form'].append(n['room-submit'],n['room-cancel'],n['room-confirm']);n['room-form'].elements={namedItem:name=>n['room-'+name]};
     const edit=node('edit','button');edit.dataset.room=JSON.stringify(block.room);n['admin-rooms'].append(edit);
@@ -167,25 +167,69 @@ for(const direction of ['rooms','blocks'])for(const code of ['AUTH_REQUIRED','FO
   assert.equal(ui.n['block-submit'].disabled,true);assert.equal(ui.n['room-submit'].disabled,true);assert.equal(ui.n['admin-rooms'].children.length,0);assert.equal(ui.n['admin-blocks-items'].children.length,0);
   assert.deepEqual(ui.inputs.map(i=>i.value),draft);assert.equal(ui.n['room-name'].value,roomDraft);assert.equal(ui.n['room-relogin'].hidden,false);assert.equal(ui.n['block-relogin'].hidden,false);
 });
-for(const late of ['room-directory','block-list','room-write','block-write'])test(`late ${late} success cannot repopulate results after the other panel loses identity`,async()=>{
+for(const code of ['AUTH_REQUIRED','FORBIDDEN'])for(const late of ['room-directory','block-list','room-write','block-write'])test(`late ${late} success cannot repopulate results after the other panel reports ${code}`,async()=>{
   const ui=harness({combined:true});let release;ui.setFetch(async(url,options)=>{
     if(late==='room-directory'&&url==='/api/rooms')return new Promise(r=>{release=r;});
     if(late==='block-list'&&url.startsWith('/api/admin/blocks?'))return new Promise(r=>{release=r;});
     if(late==='room-write'&&url==='/api/admin/rooms')return new Promise(r=>{release=r;});
     if(late==='block-write'&&url==='/api/admin/blocks')return new Promise(r=>{release=r;});
-    return fail('AUTH_REQUIRED');
+    return fail(code);
   });
   let pending;
   if(late==='room-directory')pending=ui.n['rooms-refresh'].handlers.click();else if(late==='room-write')pending=ui.roomSubmit();else if(late==='block-write')pending=ui.submit();else pending=ui.load();
   if(late.startsWith('room'))await ui.load();else await ui.roomSubmit();
   release(ok(late==='room-directory'?{items:[block.room],total:1}:late==='block-list'?{items:[block],total:1}:late==='room-write'?block.room:block));await pending;
   assert.equal(ui.n['admin-rooms'].children.length,0);assert.equal(ui.n['admin-blocks-items'].children.length,0);assert.equal(ui.n['block-submit'].disabled,true);assert.equal(ui.n['room-submit'].disabled,true);
+  if(late==='room-write'||late==='block-write'){
+    const feedback=ui.n[late==='room-write'?'room-feedback':'block-feedback'].textContent;
+    assert.match(feedback,late==='room-write'?/已保存.*重新登录/:/停用 120 已创建.*重新登录/);
+    assert.equal(ui.fetches.length,2,'late success cannot start a private-data refresh');
+  }
 });
-for(const saved of ['room','block'])test(`confirmed ${saved} success survives identity loss in the other panel`,async()=>{
+for(const code of ['AUTH_REQUIRED','FORBIDDEN'])for(const saved of ['room','block'])test(`confirmed ${saved} success survives ${code} in the other panel`,async()=>{
   const ui=harness({combined:true});ui.setFetch(async(url,options)=>ok(url==='/api/rooms'?{items:[block.room],total:1}:options.method?(url==='/api/admin/rooms'?block.room:block):{items:[block],total:1}));
   if(saved==='room')await ui.roomSubmit();else await ui.submit();
-  ui.setFetch(async()=>fail('FORBIDDEN'));if(saved==='room')await ui.load();else await ui.roomSubmit();
+  ui.setFetch(async()=>fail(code));if(saved==='room')await ui.load();else await ui.roomSubmit();
   assert.match(ui.n[saved==='room'?'room-feedback':'block-feedback'].textContent,saved==='room'?/资料已保存.*重新登录/:/停用 120 已创建.*重新登录/);
+  assert.equal(ui.n['admin-rooms'].children.length,0);assert.equal(ui.n['admin-blocks-items'].children.length,0);
+  assert.equal(ui.n['room-submit'].disabled,true);assert.equal(ui.n['block-submit'].disabled,true);
+});
+test('room save invalidates block confirmation until an explicit successful option refresh',async()=>{
+  const ui=harness({combined:true}),draft=ui.inputs.map(i=>i.value),changed={...block.room,name:'新名称'};
+  ui.n['block-confirm'].checked=true;ui.setFetch(async(url,options)=>ok(url==='/api/rooms'?{items:[changed],total:1}:options.method?changed:{items:[],total:0}));
+  await ui.roomSubmit();assert.deepEqual(ui.inputs.map(i=>i.value),draft);assert.equal(ui.n['block-confirm'].checked,false);
+  assert.equal(ui.n['block-confirm'].disabled,true);assert.equal(ui.n['block-submit'].disabled,true);assert.equal(ui.n['block-rooms-refresh'].disabled,false);
+  assert.match(ui.n['block-rooms-feedback'].textContent,/旧核对已失效.*刷新会议室选项/);assert.match(ui.n['block-summary'].textContent,/选项已过期/);
+  const previous=ui.fetches.length;await ui.submit();assert.equal(ui.fetches.length,previous);
+  ui.setFetch(async()=>{throw Error();});await ui.refresh();assert.equal(ui.n['block-confirm'].disabled,true);assert.match(ui.n['block-rooms-feedback'].textContent,/旧核对仍已失效/);
+  ui.inputs[3].handlers.input();await ui.submit();assert.equal(ui.fetches.length,previous+1);
+  ui.setFetch(async(url,options)=>ok(url==='/api/rooms'?{items:[changed],total:1}:options.method?block:{items:[block],total:1}));
+  await ui.refresh();restored(ui);assert.equal(ui.n['block-confirm'].checked,false);assert.equal(ui.n['block-confirm'].disabled,false);
+  for(const id of ['block-room_id','admin-bookings-room_id','admin-blocks-room_id'])assert.match(ui.n[id].children[1].textContent,/新名称/);
+  await ui.n['block-form'].handlers.submit({preventDefault(){}});assert.equal(ui.fetches.length,previous+2);
+  await ui.submit();assert.match(ui.n['block-feedback'].textContent,/已创建/);restored(ui);
+});
+test('room change during option refresh cannot certify an older directory response',async()=>{
+  const ui=harness({combined:true});let release;ui.setFetch(()=>new Promise(r=>{release=r;}));const pending=ui.refresh();
+  ui.document.dispatchEvent({type:'admin-room-directory-changed'});release(ok({items:[block.room],total:1}));await pending;
+  assert.equal(ui.n['block-confirm'].disabled,true);assert.match(ui.n['block-rooms-feedback'].textContent,/再次更改.*重新刷新/);
+  ui.setFetch(async()=>ok({items:[block.room],total:1}));await ui.refresh();restored(ui);assert.equal(ui.n['block-confirm'].checked,false);
+});
+for(const outcome of ['success','conflict','unknown'])test(`room save does not cancel or hide in-flight block ${outcome}`,async()=>{
+  const ui=harness({combined:true});let release;ui.setFetch(async(url,options)=>{
+    if(url==='/api/admin/blocks'&&options.method)return new Promise(r=>{release=r;});
+    return ok(url==='/api/rooms'?{items:[block.room],total:1}:url==='/api/admin/rooms'?block.room:{items:[block],total:1});
+  });const pending=ui.submit(),signal=ui.fetches[0].options.signal;await ui.roomSubmit();
+  assert.equal(signal.aborted,false);assert.equal(ui.n['block-form'].getAttribute('aria-busy'),'true');
+  release(outcome==='success'?ok(block):outcome==='conflict'?fail('OCCUPANCY_CONFLICT',{},[conflict]):ok({invalid:true}));await pending;
+  assert.match(ui.n['block-feedback'].textContent,outcome==='success'?/停用 120 已创建/:outcome==='conflict'?/合成错误/:/未能确认/);
+  assert.equal(ui.n['block-confirm'].disabled,true);assert.equal(ui.n['block-submit'].disabled,true);assert.equal(ui.n['block-rooms-refresh'].disabled,false);
+});
+test('block summary discloses member visibility and unknown retry includes revoked history and new-create semantics',async()=>{
+  const ui=harness();ui.inputs[3].handlers.input();assert.match(ui.n['block-summary'].textContent,/停用原因（所有已登录成员可见）/);
+  ui.setFetch(async()=>{throw Error();});await ui.submit();
+  assert.match(ui.n['block-feedback'].textContent,/包含已撤销历史.*全部状态.*再次提交是新建停用.*并非原请求重放.*重新核对并勾选确认/);
+  assert.equal(ui.n['block-confirm'].checked,false);await ui.n['block-form'].handlers.submit({preventDefault(){}});assert.equal(ui.fetches.length,1);
 });
 const {assertRendered}=require('./maintenance_render_contract.cjs');
 function visibleRows(ui,kind){return ui.n[`admin-${kind}-items`].children.map(item=>({title:item.children[0].textContent,pairs:item.children[1].children.reduce((pairs,node,i,all)=>{if(i%2===0)pairs.push([node.textContent,all[i+1].textContent]);return pairs;},[])}));}

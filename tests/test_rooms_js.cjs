@@ -4,7 +4,7 @@ const room={id:1,name:'<img src=x onerror="evil()">',location:'合成楼',capaci
 const ok=data=>({ok:true,json:async()=>({ok:true,data})});
 const fail=(code,fields={},conflicts=[])=>({ok:false,json:async()=>({ok:false,error:{code,message:'合成错误',fields,conflicts}})});
 const tick=()=>new Promise(setImmediate);
-function harness(initialRoom=room){
+function harness(initialRoom=room, initialJSON=JSON.stringify(initialRoom)){
   let active,impl=async url=>ok(url==='/api/rooms'?{items:[room],total:1}:room),timer=0;
   const timers=new Map(),fetches=[],events=new Map();
   function node(id='',tag=''){
@@ -18,13 +18,16 @@ function harness(initialRoom=room){
       addEventListener(k,f){handlers[k]=f;},querySelectorAll(tag){return this.children.flatMap(c=>[...(c.tag===tag?[c]:[]),...c.querySelectorAll(tag)]);},
       contains(target){return this===target||this.children.some(c=>c.contains(target));},focus(){if(!disabled)active=this;}};
   }
-  const ids=['room-form','admin-rooms','room-form-title','room-submit','room-cancel','room-confirm','rooms-refresh','room-feedback','rooms-feedback',
+  const ids=['room-fields','room-script-unavailable','room-form','admin-rooms','room-form-title','room-submit','room-cancel','room-confirm','rooms-refresh','room-feedback','rooms-feedback',
     'room-conflicts','room-relogin','room-name','room-location','room-capacity','room-name-error','room-location-error','room-capacity-error','logout-form'];
   const n=Object.fromEntries(ids.map(id=>[id,node(id)]));
   const inputs=['name','location','capacity'].map(name=>{const input=n['room-'+name];input.name=name;input.value=String(initialRoom[name]);return input;});
   n['room-form'].elements={namedItem:name=>n['room-'+name]};n['room-form'].append(...inputs,n['room-submit'],n['room-cancel'],n['room-confirm']);
   n['logout-form'].elements={csrf_token:{value:'synthetic'}};
-  const edit=node('edit','button');edit.dataset={room:JSON.stringify(initialRoom)};n['admin-rooms'].append(edit);
+  const edits=(Array.isArray(initialJSON)?initialJSON:[initialJSON]).map(raw=>{
+    const button=node('edit','button');button.dataset={room:raw};n['admin-rooms'].append(button);return button;
+  }),edit=edits[0];
+  n['room-fields'].disabled=true;n['room-submit'].disabled=true;
   const body=node('body');
   vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../booking_app/static/rooms.js'),'utf8'),{
     AbortController,CustomEvent:class {constructor(type,options){this.type=type;this.detail=options.detail;}},document:{addEventListener(name,handler){if(!events.has(name))events.set(name,[]);events.get(name).push(handler);},dispatchEvent(event){for(const handler of events.get(event.type)||[])handler(event);},getElementById:id=>n[id],querySelector:s=>n[s.slice(1)],createElement:t=>node('',t),body,get activeElement(){return active;}},
@@ -43,11 +46,14 @@ for(const phase of ['headers','body'])test(`room ${phase} timeout restores input
   const pending=ui.submit();await tick();assert.equal(ui.n['room-submit'].disabled,true);await ui.submit();assert.equal(ui.fetches.length,1);
   const timer=[...ui.timers.values()][0];assert.equal(timer.ms,20000);timer.fn();await pending;restored(ui);
   assert.match(ui.n['room-feedback'].textContent,/未能确认.*输入已保留.*不会自动重试/);assert.equal(ui.inputs[0].value,room.name);
+  assert.equal(ui.n['room-confirm'].checked,false);assert.match(ui.n['room-feedback'].textContent,/刷新目录核对.*重新勾选确认/);
+  await ui.n['room-form'].handlers.submit({preventDefault(){}});assert.equal(ui.fetches.length,1);
   assert.equal(ui.active,ui.n['room-feedback']);assert.equal(ui.fetches.length,1);
 });
 for(const failure of ['network','bad-json','bad-room'])test(`room ${failure} is unknown and keeps complete draft`,async()=>{
   const ui=harness();ui.setFetch(async()=>{if(failure==='network')throw new Error();if(failure==='bad-json')return {ok:true,json:async()=>{throw new Error();}};return ok({...room,extra:'leak'});});
   await ui.submit();restored(ui);assert.match(ui.n['room-feedback'].textContent,/未能确认/);assert.equal(ui.inputs[0].value,room.name);assert.equal(ui.fetches.length,1);
+  assert.equal(ui.n['room-confirm'].checked,false);await ui.n['room-form'].handlers.submit({preventDefault(){}});assert.equal(ui.fetches.length,1);
 });
 test('field errors focus enabled input; retry creates then uses stable update ID',async()=>{
   const ui=harness();ui.setFetch(async()=>fail('INVALID_INPUT',{name:'名称过长'}));await ui.submit();restored(ui);
@@ -136,4 +142,34 @@ test('STORE_BUSY keeps draft and restores controls; only deliberate retry saves'
   assert.equal(ui.inputs[0].value,room.name);assert.match(ui.n['room-feedback'].textContent,/输入已保留/);assert.equal(ui.fetches.length,1);
   ui.setFetch(async url=>ok(url==='/api/rooms'?{items:[room],total:1}:room));await ui.submit();restored(ui);
   assert.equal(ui.fetches.filter(row=>row.options.method==='POST').length,2);assert.match(ui.n['room-feedback'].textContent,/已保存/);
+});
+test('room form unlocks only after actual script initialization completes',()=>{
+  const ui=harness();assert.equal(ui.n['room-fields'].disabled,false);assert.equal(ui.n['room-script-unavailable'].hidden,true);restored(ui);
+});
+for(const raw of ['{broken','null','[]',JSON.stringify({...room,id:Number('9007199254740993')}),JSON.stringify({...room,id:Number('9223372036854775807')})])test(`invalid initial room data is isolated and never used for editing: ${raw}`,async()=>{
+  const ui=harness(room,raw);const edit=ui.n['admin-rooms'].querySelectorAll('button')[0];assert.equal(edit.disabled,true);
+  ui.n['room-confirm'].checked=true;ui.edit();assert.equal(ui.n['room-confirm'].checked,false);
+  await ui.n['room-form'].handlers.submit({preventDefault(){}});assert.equal(ui.fetches.length,0);
+  assert.match(ui.n['rooms-feedback'].textContent,/无法安全读取/);
+  await ui.refresh();ui.n['admin-rooms'].querySelectorAll('button')[0].handlers.click();await ui.submit();
+  assert.equal(ui.fetches.find(row=>row.options.method==='POST').url,'/api/admin/rooms/1');restored(ui);
+});
+test('unsafe refreshed room IDs never become clickable rounded targets; safe entries still edit normally',async()=>{
+  const ui=harness();ui.setFetch(async()=>ok({items:[room,{...room,id:Number('9007199254740993')}],total:2}));
+  await ui.refresh();assert.match(ui.n['rooms-feedback'].textContent,/刷新失败/);
+  assert.deepEqual(ui.n['admin-rooms'].querySelectorAll('button').map(b=>b.dataset.room),[JSON.stringify(room)]);
+  ui.edit();ui.setFetch(async url=>ok(url==='/api/rooms'?{items:[room],total:1}:room));await ui.submit();
+  assert.equal(ui.fetches.find(row=>row.options.method==='POST').url,'/api/admin/rooms/1');restored(ui);
+});
+test('largest safe initial room ID is submitted exactly',async()=>{
+  const safe={...room,id:Number.MAX_SAFE_INTEGER},ui=harness(safe);ui.edit();
+  ui.setFetch(async url=>ok(url==='/api/rooms'?{items:[safe],total:1}:safe));await ui.submit();
+  assert.equal(ui.fetches[0].url,'/api/admin/rooms/9007199254740991');restored(ui);
+});
+test('one malformed initial room cannot break safe editing or the authorization guard',async()=>{
+  const ui=harness(room,['{broken',JSON.stringify(room)]),buttons=ui.n['admin-rooms'].querySelectorAll('button');
+  assert.equal(buttons[0].disabled,true);assert.equal(buttons[1].disabled,false);
+  buttons[1].handlers.click();await ui.submit();assert.equal(ui.fetches[0].url,'/api/admin/rooms/1');
+  ui.setFetch(async()=>fail('AUTH_REQUIRED'));await ui.refresh();
+  assert.equal(ui.n['room-submit'].disabled,true);assert.equal(ui.n['admin-rooms'].children.length,0);assert.match(ui.n['room-feedback'].textContent,/已保存.*重新登录/);
 });

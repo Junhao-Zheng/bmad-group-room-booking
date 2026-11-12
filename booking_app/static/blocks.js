@@ -8,6 +8,7 @@
   const conflicts = find("block-conflicts"), relogin = find("block-relogin"), refresh = find("block-rooms-refresh");
   const statuses = {pending:"待开始", in_progress:"进行中", ended:"已结束", cancelled:"已取消", revoked:"已撤销"};
   let creating = false, refreshing = false, blocked = false, createdMessage = "";
+  let roomsStale = false, roomsRevision = 0;
   const cancelForm = find("admin-cancel-form"), cancelReason = find("admin-cancel-reason"), cancelConfirm = find("admin-cancel-confirm");
   const cancelFeedback = find("admin-cancel-feedback");
   let cancelling = false, selectedBooking = null, cancelledMessage = "";
@@ -65,6 +66,7 @@
   function controls() {
     const busy = creating || refreshing || revoking || cancelling || lists.some(list => list.busy);
     [...inputs,confirm,submit].forEach(node => { node.disabled = blocked || busy; });
+    confirm.disabled = submit.disabled = blocked || busy || roomsStale;
     refresh.disabled = blocked || busy;
     [...selectButtons,revokeReason,revokeConfirm,revokeSubmit].forEach(node => {
       node.disabled = blocked || busy || ([revokeReason,revokeConfirm,revokeSubmit].includes(node) && (!selected || !["pending","in_progress"].includes(selected.status)));
@@ -86,7 +88,7 @@
     }
     if (!["AUTH_REQUIRED","FORBIDDEN"].includes(error.code)) return false;
     const firstLoss = !blocked;
-    blocked = true; conflicts.replaceChildren();
+    blocked = true; confirm.checked = false; conflicts.replaceChildren();
     const message = error.code === "AUTH_REQUIRED" ? "登录已失效，请重新登录后打开管理页。" : "当前无管理权限，请以管理员身份重新登录。";
     say(feedback, `${createdMessage}${message} 表单输入已保留，不会自动提交。`, true);
     say(find("block-rooms-feedback"),message,true);
@@ -109,8 +111,12 @@
   function summary() {
     confirm.checked = false;
     const room = inputs[0].options[inputs[0].selectedIndex]?.textContent || "未选择会议室";
-    find("block-summary").textContent = `会议室：${room}\n北京时间：${inputs[1].value || "未填开始"} 至 ${inputs[2].value || "未填结束"}\n停用原因：${inputs[3].value || "未填写"}`;
+    find("block-summary").textContent = `${roomsStale ? "会议室资料已更改，当前选项已过期。请先刷新会议室选项，再重新核对。\n" : ""}会议室：${room}\n北京时间：${inputs[1].value || "未填开始"} 至 ${inputs[2].value || "未填结束"}\n停用原因（所有已登录成员可见）：${inputs[3].value || "未填写"}`;
   }
+  document.addEventListener("admin-room-directory-changed", () => {
+    roomsStale = true; roomsRevision++; summary(); controls();
+    if (!blocked) say(find("block-rooms-feedback"), "会议室资料已保存，旧核对已失效。请刷新会议室选项，成功后再重新核对并勾选确认。", true);
+  });
   for (const input of inputs) for (const event of ["input","change"]) input.addEventListener(event,summary);
   const formatted = value => value.replace("T"," ").slice(0,19);
   const focusAllowed = owner => !document.activeElement || document.activeElement === document.body || owner.contains(document.activeElement);
@@ -224,7 +230,7 @@
     event.preventDefault(); if (!creating && !cancelling && !revoking && !refreshing) return load(list);
   });
   form.addEventListener("submit", async event => {
-    event.preventDefault(); if (creating || cancelling || revoking || refreshing || blocked || lists.some(list => list.busy) || !confirm.checked) return;
+    event.preventDefault(); if (creating || cancelling || revoking || refreshing || blocked || roomsStale || lists.some(list => list.busy) || !confirm.checked) return;
     const values = {room_id:Number(inputs[0].value), start:inputs[1].value, end:inputs[2].value, reason:inputs[3].value};
     const initiatedHere = form.contains(document.activeElement); let focusTarget = feedback;
     for (const input of inputs) { input.removeAttribute("aria-invalid"); find(`block-${input.name}-error`).textContent = ""; }
@@ -238,9 +244,9 @@
     try {
       const record = await request("/api/admin/blocks",values);
       if (!recordShape(record,"blocks")) throw new Error("Invalid block");
-      if (blocked) return;
       confirm.checked = false;
       createdMessage = `停用 ${record.id} 已创建。`;
+      if (blocked) { say(feedback, `${createdMessage}请重新登录后打开管理页查看详情。`, true); return; }
       say(feedback,`${createdMessage}北京时间 ${formatted(record.start_local)} 至 ${formatted(record.end_local)}。`);
       await load(lists[1],true);
     } catch (failure) {
@@ -258,7 +264,7 @@
         }
       } else if (!blocked) {
         confirm.checked = false;
-        say(feedback,"未能确认创建结果，输入已保留。请先查询停用记录核对；再次提交前须重新核对并勾选确认，不会自动重试。",true);
+        say(feedback,"未能确认创建结果，输入已保留。请先查询停用记录核对，包含已撤销历史（选择全部状态并核对会议室、日期条件）；再次提交是新建停用，并非原请求重放，须重新核对并勾选确认，不会自动重试。",true);
       }
     } finally {
       creating = false; controls(); if (initiatedHere && focusAllowed(form)) focusTarget.focus();
@@ -266,21 +272,24 @@
   });
   refresh.addEventListener("click", async () => {
     if (blocked || refreshing || creating || cancelling || revoking || lists.some(list => list.busy)) return;
-    const initiatedHere = document.activeElement === refresh; refreshing = true; controls();
+    const initiatedHere = document.activeElement === refresh, revision = roomsRevision; refreshing = true; confirm.checked = false; controls();
     const output = find("block-rooms-feedback"); say(output,"正在刷新会议室选项…");
     try {
       const data = await request("/api/rooms");
       if (!exact(data,"items,total") || !Array.isArray(data.items) || data.total !== data.items.length || !data.items.every(roomShape)) throw new Error("Invalid rooms");
       if (blocked) return;
+      if (revision !== roomsRevision) {
+        say(output,"刷新期间会议室资料再次更改，请重新刷新会议室选项后再确认。",true); return;
+      }
       for (const select of [inputs[0],...lists.map(list => fields(list)[0])]) {
         const previous = select.value, first = document.createElement("option"); first.value = "";
         first.textContent = select === inputs[0] ? "请选择会议室" : "全部会议室"; select.replaceChildren(first);
         for (const room of data.items) { const option = document.createElement("option"); option.value = String(room.id); option.textContent = `${room.name} · ${room.location}`; select.append(option); }
         select.value = previous;
       }
-      summary(); say(output,"会议室选项已刷新，请重新核对创建信息。");
+      roomsStale = false; summary(); say(output,"会议室选项已刷新，请重新核对创建信息。");
     } catch (failure) {
-      if (!(failure.serverError && identityError(failure.serverError)) && !blocked) say(output,"会议室选项刷新失败，输入已保留，请手动重试。",true);
+      if (!(failure.serverError && identityError(failure.serverError)) && !blocked) say(output,`会议室选项刷新失败，输入已保留，请手动重试。${roomsStale ? "旧核对仍已失效，刷新成功后才能再次确认。" : ""}`,true);
     } finally {
       refreshing = false; controls();
       if (initiatedHere && (!document.activeElement || document.activeElement === document.body)) (blocked ? feedback : refresh).focus();

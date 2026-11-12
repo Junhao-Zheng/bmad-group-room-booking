@@ -1,0 +1,23 @@
+{
+  "checked_at_utc": "2026-11-12T15:52:57.233134+00:00",
+  "result": "PASS",
+  "python_tests": 208,
+  "unique_python_ids": 208,
+  "javascript_tests": 376,
+  "skips": 0,
+  "reports": [
+    {
+      "path": "browser/runs/422d77e8a90fc2ce7ddf011fe708b130/result.json",
+      "run_id": "422d77e8a90fc2ce7ddf011fe708b130",
+      "verified_source_hashes": 61
+    },
+    {
+      "path": "audit-browser/result.json",
+      "run_id": "28d73eaba249b562e757632031c9e279",
+      "verified_source_hashes": 61
+    }
+  ],
+  "visual_qa": "父流程实际查看390px失效/刷新后未确认截图与1280px禁JS截图，提示完整、控件状态可见、无溢出。",
+  "review_limit": "本轮独立3镜头调用全部429重试耗尽；无独立审查结果。父流程阅读全部产品/测试差异、新runner与R1—R8覆盖，未发现新的阻断缺陷；不冒充独立或盲审。",
+  "backend_scope": "本轮仅JS/template及验证；后端源与82b4b56一致，原138权限/并发/真实重启/NFR证据按原哈希保留。"
+}

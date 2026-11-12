@@ -23,13 +23,16 @@
   </section>
   <section class="card" aria-labelledby="room-form-title">
     <h2 id="room-form-title" tabindex="-1">新增会议室</h2>
+    <p id="room-script-unavailable" class="notice">会议室保存尚未启用。请等待脚本加载；若未启用 JavaScript 或脚本加载失败，请启用后重新打开管理页。</p>
     <form id="room-form">
+      <fieldset id="room-fields" disabled>
       <div class="form-field"><label for="room-name">名称</label><textarea id="room-name" name="name" rows="2" required aria-describedby="room-name-error"></textarea><p id="room-name-error" class="field-error"></p></div>
       <div class="form-field"><label for="room-location">地点</label><textarea id="room-location" name="location" rows="2" required aria-describedby="room-location-error"></textarea><p id="room-location-error" class="field-error"></p></div>
       <div class="form-field"><label for="room-capacity">容量（1—1000 人）</label><input id="room-capacity" name="capacity" type="number" min="1" max="1000" step="1" required aria-describedby="room-capacity-error"><p id="room-capacity-error" class="field-error"></p></div>
       <label class="room-confirm-label" for="room-confirm"><input id="room-confirm" type="checkbox" required>我已核对资料，确认提交</label>
-      <button id="room-submit" class="button-primary" type="submit">确认新增会议室</button>
+      <button id="room-submit" class="button-primary" type="submit" disabled>确认新增会议室</button>
       <button id="room-cancel" class="button-secondary" type="button" hidden>取消编辑，填写新增</button>
+      </fieldset>
     </form>
     <p id="room-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>
     <a id="room-relogin" class="relogin-link" href="{{ url_for('web.login_page') }}" hidden>重新登录（不会自动提交）</a>
@@ -50,8 +53,8 @@
       <div class="form-field"><label for="block-start">开始（北京时间）</label><input id="block-start" name="start" type="datetime-local" step="1800" required aria-describedby="block-start-error"><p id="block-start-error" class="field-error"></p></div>
       <div class="form-field"><label for="block-end">结束（北京时间）</label><input id="block-end" name="end" type="datetime-local" step="1800" required aria-describedby="block-end-error"><p id="block-end-error" class="field-error"></p></div>
     </div>
-    <div class="form-field"><label for="block-reason">停用原因（1—500 字）</label><textarea id="block-reason" name="reason" rows="3" required aria-describedby="block-reason-error"></textarea><p id="block-reason-error" class="field-error"></p></div>
-    <p id="block-summary" class="notice">请填写会议室、起止时间和原因后核对。</p>
+    <div class="form-field"><label for="block-reason">停用原因（1—500 字，所有已登录成员可见）</label><textarea id="block-reason" name="reason" rows="3" required aria-describedby="block-reason-error"></textarea><p id="block-reason-error" class="field-error"></p></div>
+    <p id="block-summary" class="notice">请填写会议室、起止时间和原因后核对。停用原因对所有已登录成员可见。</p>
     <label class="room-confirm-label" for="block-confirm"><input id="block-confirm" type="checkbox" required>我已核对上述会议室、北京时间和停用原因，确认创建</label>
     <button id="block-submit" class="button-primary" type="submit" disabled>确认创建停用</button>
     </fieldset>

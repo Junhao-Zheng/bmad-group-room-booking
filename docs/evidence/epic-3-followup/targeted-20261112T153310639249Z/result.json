@@ -1,0 +1,45 @@
+{
+  "result": "PASS",
+  "commands": [
+    [
+      "node",
+      "--test",
+      "tests/test_rooms_js.cjs",
+      "tests/test_blocks_js.cjs",
+      "tests/test_audit_js.cjs"
+    ],
+    [
+      ".venv/bin/python",
+      "-m",
+      "unittest",
+      "tests.test_room_management",
+      "tests.test_maintenance_block"
+    ]
+  ],
+  "source_sha256_before": {
+    "booking_app/templates/admin.html": "6043cfb2b66519397f06ba5e5ee7c318a94703f655e8298d0630f8ce4dc62639",
+    "booking_app/static/rooms.js": "0a3ce7fcb3c73b68ad15c76b0ac96fab57a3ba591f54091127bfa913f88f01eb",
+    "booking_app/static/blocks.js": "37906f19a5d9ae7cdea48521d9504a931656a383707069fced17e13bc5b27df1",
+    "booking_app/static/audit.js": "89c82aa87df0a64272773ede27c43d7dba6e49df0133b9d0771b98bcd5c51bd3",
+    "tests/test_rooms_js.cjs": "ff0a0e72de221a042f7a9df8e841ee64b253f57ea4b452ddc3d77b6a75121f89",
+    "tests/test_blocks_js.cjs": "01ff9625e834e6f1e81e7e96326815cd71954b9ca06ba7c94e56cac9c8fc9121",
+    "tests/test_audit_js.cjs": "0d0105d9df033220d40d0bae4a7580f180cc243010111d39b998e6151f1c4a9c",
+    "tests/test_room_management.py": "6c78eaf913b42f4515881325953e73488ddb3c23274dc93c4b0d691247aec25f",
+    "tests/test_maintenance_block.py": "88838fed4508b5ee003ae186cf58ce574af4ba5eedb36d1adf987436ecb0ab9a"
+  },
+  "source_sha256_after": {
+    "booking_app/templates/admin.html": "6043cfb2b66519397f06ba5e5ee7c318a94703f655e8298d0630f8ce4dc62639",
+    "booking_app/static/rooms.js": "0a3ce7fcb3c73b68ad15c76b0ac96fab57a3ba591f54091127bfa913f88f01eb",
+    "booking_app/static/blocks.js": "37906f19a5d9ae7cdea48521d9504a931656a383707069fced17e13bc5b27df1",
+    "booking_app/static/audit.js": "89c82aa87df0a64272773ede27c43d7dba6e49df0133b9d0771b98bcd5c51bd3",
+    "tests/test_rooms_js.cjs": "ff0a0e72de221a042f7a9df8e841ee64b253f57ea4b452ddc3d77b6a75121f89",
+    "tests/test_blocks_js.cjs": "01ff9625e834e6f1e81e7e96326815cd71954b9ca06ba7c94e56cac9c8fc9121",
+    "tests/test_audit_js.cjs": "0d0105d9df033220d40d0bae4a7580f180cc243010111d39b998e6151f1c4a9c",
+    "tests/test_room_management.py": "6c78eaf913b42f4515881325953e73488ddb3c23274dc93c4b0d691247aec25f",
+    "tests/test_maintenance_block.py": "88838fed4508b5ee003ae186cf58ce574af4ba5eedb36d1adf987436ecb0ab9a"
+  },
+  "exit_codes": [
+    0,
+    0
+  ]
+}

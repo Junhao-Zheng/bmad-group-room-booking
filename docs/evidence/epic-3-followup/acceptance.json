@@ -1,0 +1,158 @@
+{
+  "result": "PASS",
+  "scope": "仅 epic-3-followup R1—R8；全量回归和审计浏览器另由父流程执行。",
+  "spec": "_bmad-output/implementation-artifacts/epic-3-followup.md",
+  "product_files": [
+    "booking_app/templates/admin.html",
+    "booking_app/static/rooms.js",
+    "booking_app/static/blocks.js",
+    "booking_app/static/audit.js"
+  ],
+  "targeted_tests": {
+    "directory": "docs/evidence/epic-3-followup/targeted-20261112T153310639249Z",
+    "javascript_tests_passed": 287,
+    "python_tests_passed": 30,
+    "source_hashes_stable": true
+  },
+  "real_browser": {
+    "directory": "docs/evidence/epic-3-followup/browser/runs/422d77e8a90fc2ce7ddf011fe708b130",
+    "browser_version": "157.0.8103.51",
+    "source_hashes_stable": true,
+    "viewports": [
+      {
+        "width": 1280,
+        "height": 900,
+        "room_save": true,
+        "confirmation_invalidated": true,
+        "failed_refresh_remains_stale": true,
+        "explicit_refresh_and_reconfirm": true,
+        "disabled_js_guard": true,
+        "failed_script_guard": true,
+        "no_native_get": true,
+        "reason_visibility": true,
+        "unknown_save_clears_confirmation": true,
+        "page_errors": []
+      },
+      {
+        "width": 390,
+        "height": 844,
+        "room_save": true,
+        "confirmation_invalidated": true,
+        "failed_refresh_remains_stale": true,
+        "explicit_refresh_and_reconfirm": true,
+        "disabled_js_guard": true,
+        "failed_script_guard": true,
+        "no_native_get": true,
+        "reason_visibility": true,
+        "unknown_save_clears_confirmation": true,
+        "page_errors": []
+      }
+    ],
+    "screenshots": [
+      "docs/evidence/epic-3-followup/browser/runs/422d77e8a90fc2ce7ddf011fe708b130/confirmation-invalidated-1280.png",
+      "docs/evidence/epic-3-followup/browser/runs/422d77e8a90fc2ce7ddf011fe708b130/confirmation-invalidated-390.png",
+      "docs/evidence/epic-3-followup/browser/runs/422d77e8a90fc2ce7ddf011fe708b130/created-1280.png",
+      "docs/evidence/epic-3-followup/browser/runs/422d77e8a90fc2ce7ddf011fe708b130/created-390.png",
+      "docs/evidence/epic-3-followup/browser/runs/422d77e8a90fc2ce7ddf011fe708b130/no-js-1280.png",
+      "docs/evidence/epic-3-followup/browser/runs/422d77e8a90fc2ce7ddf011fe708b130/no-js-390.png",
+      "docs/evidence/epic-3-followup/browser/runs/422d77e8a90fc2ce7ddf011fe708b130/refresh-failed-1280.png",
+      "docs/evidence/epic-3-followup/browser/runs/422d77e8a90fc2ce7ddf011fe708b130/refresh-failed-390.png",
+      "docs/evidence/epic-3-followup/browser/runs/422d77e8a90fc2ce7ddf011fe708b130/refreshed-unconfirmed-1280.png",
+      "docs/evidence/epic-3-followup/browser/runs/422d77e8a90fc2ce7ddf011fe708b130/refreshed-unconfirmed-390.png",
+      "docs/evidence/epic-3-followup/browser/runs/422d77e8a90fc2ce7ddf011fe708b130/rooms-script-failed-1280.png",
+      "docs/evidence/epic-3-followup/browser/runs/422d77e8a90fc2ce7ddf011fe708b130/rooms-script-failed-390.png",
+      "docs/evidence/epic-3-followup/browser/runs/422d77e8a90fc2ce7ddf011fe708b130/unknown-room-save-1280.png",
+      "docs/evidence/epic-3-followup/browser/runs/422d77e8a90fc2ce7ddf011fe708b130/unknown-room-save-390.png"
+    ],
+    "storage": "2 room updates, 2 created blocks, 4 occupied half-hour slots, exactly 4 corresponding audit events; integrity and foreign keys checked",
+    "visual_inspection": [
+      "confirmation-invalidated-390.png",
+      "no-js-1280.png"
+    ],
+    "no_private_credentials_in_evidence": true
+  },
+  "checks": {
+    "R1": {
+      "result": "PASS",
+      "change": "房间字段与按钮受默认 disabled fieldset 保护；全部事件绑定完成后才启用；始终可见的脚本不可用提示由成功初始化隐藏。",
+      "verification": [
+        "Python 模板断言",
+        "JS 实际脚本初始化断言",
+        "Chrome 两种尺寸禁 JS 与只阻断 rooms.js：控件保持禁用，点击和 Enter 均不产生额外 /admin GET 或写入。"
+      ]
+    },
+    "R2": {
+      "result": "PASS",
+      "change": "房间网络失败、响应头/响应体超时、坏 JSON/坏 DTO 均保留草稿、清除确认，提示先刷新核对再重新勾选，不自动重试。",
+      "verification": [
+        "JS 网络/坏响应/双阶段超时测试，确认清除后直接 submit 不新增请求",
+        "Chrome 两种尺寸中断房间保存，草稿保持且再次点击未产生第二次请求。"
+      ]
+    },
+    "R3": {
+      "result": "PASS",
+      "change": "成功保存广播目录变化；停用确认和创建按钮锁定至显式刷新成功；刷新失败或刷新期间再次保存均保持失效，更新全部三个会议室下拉。",
+      "verification": [
+        "JS 双面板保存、失败刷新、成功刷新与重确认",
+        "JS 刷新中再次变更；已发送停用请求的成功/冲突/未知结果均保留且不 abort",
+        "Chrome 两种尺寸真实编辑→确认失效→注入刷新失败→真实刷新→重确认→真实创建。"
+      ]
+    },
+    "R4": {
+      "result": "PASS",
+      "change": "房间保存与停用创建的合法成功事实在 blocked 判断前记录；身份丢失后继续提示成功与重新登录，不再请求列表。",
+      "verification": [
+        "JS 组合运行 rooms.js 和 blocks.js，AUTH_REQUIRED/FORBIDDEN，房间/停用写入两种前后顺序均覆盖",
+        "断言私密列表清空、控件禁用、成功事实仍可见、迟到写成功不再发查询。"
+      ]
+    },
+    "R5": {
+      "result": "PASS",
+      "change": "初始 data-room 逐条解析和校验；畸形条目独立禁用；编辑、提交、刷新 DTO 均检查安全整数，不发出舍入目标 POST。",
+      "verification": [
+        "JS 畸形 JSON/null/数组/不安全 ID，以及混合畸形和合法初始条目",
+        "JS 不安全目录拒绝且正常编号仍可编辑",
+        "JS 最大安全编号 9007199254740991 精确提交；授权保护仍正常。"
+      ]
+    },
+    "R6": {
+      "result": "PASS",
+      "change": "审计事件数字以及所有 before/after 快照数字改用 Number.isSafeInteger；任何不安全记录拒绝整批展示并保留筛选。",
+      "verification": [
+        "JS 事件 id/actor_id/target_id/occurred_at 与三类 before/after 快照各数字字段不安全整数矩阵",
+        "JS 合法记录渲染、字段绑定及失败后恢复查询。"
+      ]
+    },
+    "R7": {
+      "result": "PASS",
+      "change": "停用原因标签、初始摘要及动态摘要均标明所有已登录成员可见。",
+      "verification": [
+        "Python 模板断言",
+        "JS 动态摘要",
+        "Chrome 两种尺寸实际原因标签及确认摘要检查。"
+      ]
+    },
+    "R8": {
+      "result": "PASS",
+      "change": "停用创建结果未知时明确要求查询包含已撤销历史的全部状态，核对房间/日期；说明再次提交是新建而非原请求重放，并再次勾选确认。",
+      "verification": [
+        "JS 未知结果提示全文语义与确认门禁检查；直接再次 submit 不新增请求。"
+      ]
+    }
+  },
+  "preserved_incomplete_runs": [
+    {
+      "directory": "browser/runs/1ada3b2e76429a7bb3fd1eaa6c1c4e80",
+      "reason": "禁 JS 检查对 fieldset 使用 Playwright isDisabled()，该 API 不识别 fieldset 自身 disabled；所有实际写入控件禁用断言先已通过。"
+    },
+    {
+      "directory": "browser/runs/9421ffce80f3ba8dc725a201218edbd9",
+      "reason": "同一验证器问题复现并取得安全行号，后改用 disabled 属性断言；原结果保持 INCOMPLETE。"
+    }
+  ],
+  "limits": [
+    "两项故障通过 Chrome 路由注入：房间保存中断与会议室选项刷新 503；正常房间修改、选项刷新、停用创建均走真实 Waitress 与临时 SQLite。",
+    "不安全 JSON 整数采用拒绝操作/展示；不更改后端整数 DTO，不引入无损 JSON 协议。",
+    "未修改业务后端、规格、故事状态或其他项目文档；没有提交 Git。"
+  ]
+}

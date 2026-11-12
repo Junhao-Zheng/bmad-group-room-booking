@@ -95,3 +95,7 @@ context:
 ## 本轮接受结果
 
 208项唯一Python、313项JS，真实双视口与停服重启、138项权限检查通过，8组修补闭环，0defer。[最终核验](../../docs/evidence/story-3.4-review-fixes/parent-final-qa.json)。初版201/296保留为历史记录。
+
+## Epic 3 复盘后修补
+
+本卡完成后重新打开，8组共享修补按实际状态关闭。208 Python/376 JS和双视口管理/审计验证通过；最后独立复核受429限制未完成，按open item披露。[最终核验](../../docs/evidence/epic-3-followup/verification.md)。不改写本卡首次验收指标。
