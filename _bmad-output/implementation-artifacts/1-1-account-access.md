@@ -2,8 +2,9 @@
 title: '使用预置账号安全登录和退出'
 type: feature
 created: '2026-11-12'
-status: ready-for-dev
+status: in-progress
 route: dispatch
+baseline_commit: 837f30b48199ede90c4bfbb970080361db051070
 story_key: 1-1-account-access
 review_loop_iteration: 0
 context:
