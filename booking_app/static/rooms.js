@@ -8,7 +8,7 @@
   const refresh = find("rooms-refresh"), feedback = find("room-feedback"), directoryFeedback = find("rooms-feedback");
   const conflicts = find("room-conflicts"), relogin = find("room-relogin");
   const inputs = ["name", "location", "capacity"].map(name => form.elements.namedItem(name));
-  let editing = null, busy = false, blocked = false;
+  let editing = null, busy = false, blocked = false, savedMessage = "";
   const displayed = new Map();
   function fillInputs(room) {
     for (const input of inputs) {
@@ -40,6 +40,7 @@
   function setEditing(room) {
     if (busy || blocked) return;
     editing = room;
+    savedMessage = "";
     fillInputs(room);
     confirm.checked = false; cancel.hidden = !room; clearErrors();
     heading.textContent = room ? `编辑会议室 ${room.id}` : "新增会议室";
@@ -76,19 +77,27 @@
       throw new Error("Invalid response");
     } finally { window.clearTimeout(timer); }
   }
-  function sessionError(error) {
+  function sessionError(error, broadcast = true) {
     const identityLost = ["AUTH_REQUIRED", "FORBIDDEN"].includes(error.code);
     if (identityLost) {
+      const firstLoss = !blocked;
       blocked = true; list.replaceChildren(); conflicts.replaceChildren();
       say(directoryFeedback, error.code === "AUTH_REQUIRED" ? "登录已失效，请重新登录后打开管理页。表单输入已保留。" :
         "当前无管理权限，请以管理员身份重新登录后打开管理页。表单输入已保留。", true);
+      say(feedback, `${savedMessage}${directoryFeedback.textContent}`, true);
+      controls(busy);
+      if (broadcast && firstLoss) document.dispatchEvent(new CustomEvent("admin-auth-lost", {detail:{code:error.code}}));
     }
     if (["AUTH_REQUIRED", "FORBIDDEN", "CSRF_REJECTED"].includes(error.code)) relogin.hidden = false;
     return identityLost;
   }
+  document.addEventListener("admin-auth-lost", event => {
+    if (["AUTH_REQUIRED","FORBIDDEN"].includes(event.detail?.code)) sessionError({code:event.detail.code},false);
+  });
   async function loadRooms() {
     const data = await request("/api/rooms");
     if (!Array.isArray(data.items) || data.total !== data.items.length || !data.items.every(roomShape)) throw new Error("Invalid directory");
+    if (blocked) return;
     list.replaceChildren();
     for (const room of data.items) {
       const item = document.createElement("li"), title = document.createElement("h3"), detail = document.createElement("p"), button = document.createElement("button");
@@ -109,21 +118,24 @@
     }
     const values = {name:draftText(inputs[0]), location:draftText(inputs[1]), capacity};
     const roomId = editing?.id; const initiatedHere = form.contains(document.activeElement);
+    savedMessage = "";
     clearErrors(); controls(true); submit.textContent = "正在提交…";
     say(feedback, "正在保存，请稍候…"); let focusTarget = feedback;
     try {
       const room = await request(roomId ? `/api/admin/rooms/${roomId}` : "/api/admin/rooms", values);
       if (!roomShape(room) || (roomId && room.id !== roomId)) throw new Error("Invalid room");
+      if (blocked) return;
       editing = room; cancel.hidden = false; heading.textContent = `编辑会议室 ${room.id}`;
       fillInputs(room);
       confirm.checked = false;
+      savedMessage = "会议室资料已保存。";
       say(feedback, `会议室 ${room.id} 已保存。相同资料重复保存不会新增操作记录。`);
       try { await loadRooms(); }
       catch (error) {
-        if (error.serverError && sessionError(error.serverError)) say(feedback, "会议室资料已保存。");
-        else say(directoryFeedback, "会议室已保存，但目录刷新失败，请手动刷新目录。", true);
+        if (!(error.serverError && sessionError(error.serverError)) && !blocked) say(directoryFeedback, "会议室已保存，但目录刷新失败，请手动刷新目录。", true);
       }
     } catch (failure) {
+      if (blocked) return;
       const error = failure.serverError;
       if (error) {
         say(feedback, `${error.message} 输入已保留。`, true); sessionError(error);
@@ -153,7 +165,7 @@
     controls(true); say(directoryFeedback, "正在刷新目录…");
     try { await loadRooms(); }
     catch (error) {
-      if (!(error.serverError && sessionError(error.serverError))) {
+      if (!(error.serverError && sessionError(error.serverError)) && !blocked) {
         say(directoryFeedback, "目录刷新失败，表单输入已保留，请手动重试。", true);
       }
     } finally {

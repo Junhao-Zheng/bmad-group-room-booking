@@ -1,0 +1,43 @@
+✔ create headers timeout restores controls and draft, with one request (4.621375ms)
+✔ create body timeout restores controls and draft, with one request (0.805417ms)
+✔ query headers timeout restores controls and draft, with one request (0.747667ms)
+✔ query body timeout restores controls and draft, with one request (0.634ms)
+✔ create network preserves input and restores controls (0.613667ms)
+✔ create bad-json preserves input and restores controls (0.446208ms)
+✔ create extra-key preserves input and restores controls (0.529375ms)
+✔ create missing-null preserves input and restores controls (0.868083ms)
+✔ create bad-null preserves input and restores controls (0.60375ms)
+✔ create malformed-error preserves input and restores controls (0.537875ms)
+✔ successful create lists complete plain text fields and no mutation buttons (0.669958ms)
+✔ field rejection focuses enabled field and retry restores success (0.97225ms)
+✔ booking and block conflicts display required facts as text and preserve original input (0.523916ms)
+✔ STORE_BUSY restores inputs without retry (0.418667ms)
+✔ INTERNAL_ERROR restores inputs without retry (0.420791ms)
+✔ NOT_FOUND restores inputs without retry (0.365ms)
+✔ CSRF_REJECTED restores inputs without retry (0.332833ms)
+✔ AUTH_REQUIRED blocks resubmission and clears protected lists while preserving draft (0.491083ms)
+✔ FORBIDDEN blocks resubmission and clears protected lists while preserving draft (0.465708ms)
+✔ success does not steal focus from another form (0.524916ms)
+✔ failure does not steal focus from another form (0.373042ms)
+✔ list-failure does not steal focus from another form (0.434541ms)
+✔ room_id input invalidates confirmation and updates preview (0.383916ms)
+✔ room_id change invalidates confirmation and updates preview (0.348667ms)
+✔ start input invalidates confirmation and updates preview (0.331917ms)
+✔ start change invalidates confirmation and updates preview (0.314042ms)
+✔ end input invalidates confirmation and updates preview (1.078333ms)
+✔ end change invalidates confirmation and updates preview (0.496083ms)
+✔ reason input invalidates confirmation and updates preview (0.396ms)
+✔ reason change invalidates confirmation and updates preview (0.351083ms)
+✔ filters sent only when selected, legal empty lists differ from not yet queried (0.508ms)
+✔ malformed list never renders partial records and query can be retried (0.590917ms)
+✔ created block remains explicitly successful when automatic list refresh gets AUTH_REQUIRED (0.493167ms)
+✔ created block remains explicitly successful when automatic list refresh gets FORBIDDEN (0.473042ms)
+✔ query waits prevent competing creation and restore the same input on completion (0.401958ms)
+ℹ tests 35
+ℹ suites 0
+ℹ pass 35
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 76.812208

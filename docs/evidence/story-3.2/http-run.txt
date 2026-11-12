@@ -1,0 +1,19 @@
+ERROR:booking_app:request_id=7340f52026d847f981c3b4b8a50faa6c action=web.create_block_api error_type=RuntimeError
+{
+  "result": "PASS",
+  "completed": true,
+  "rounds": 20,
+  "concurrent_responses": 40,
+  "wins": {
+    "booking": 13,
+    "block": 7
+  },
+  "shared_slot_integrity": true,
+  "original_booking_preserved": true,
+  "adjacent_long_cross_day_block": true,
+  "admin_exact_dtos": true,
+  "member_rejected": true,
+  "full_audit_failure_rollback": true,
+  "restart_preserves_business_slots_audits": true,
+  "old_intent_replay": true
+}

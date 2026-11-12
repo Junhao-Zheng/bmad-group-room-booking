@@ -1,6 +1,6 @@
 # 课题组活动与会议室预约
 
-软件工程管理课程项目。选题及使用对象已由用户确认。Story 1.1—1.3、2.1—2.4 与 3.1 已实现预置账号登录、身份显示、退出、会议室目录、共享日程、可用会议室查询、创建预约、原提交意图可靠确认、个人预约四态查询/完整详情、确认取消本人未开始预约，以及管理员新增/修改会议室和容量保护。停用管理与管理员取消属于后续故事。
+软件工程管理课程项目。选题及使用对象已由用户确认。Story 1.1—1.3、2.1—2.4 与 3.1—3.2 已实现预置账号登录、身份显示、退出、会议室目录、共享日程、可用会议室查询、创建预约、原提交意图可靠确认、个人预约四态查询/完整详情、确认取消本人未开始预约，以及管理员新增/修改会议室、容量保护、创建维护停用与完整管理查询。管理员取消预约和撤销停用属于后续故事。
 
 本仓库按实际发生的工作保存 BMAD 产物和过程证据。实验 B 按用户转述的教师要求免做，实验 A 保留。人数和截止日期不作为当前阶段的阻塞条件。
 
@@ -134,7 +134,7 @@ node --test tests/test_*js.cjs
 
 成功 key 与规范化六字段 JSON 持久保存在数据库，按成员隔离。同成员相同 key、相同规范化内容返回 **200**，`data={booking:BookingFull,replayed:true}`；原预约已开始、已结束、已取消或房间容量降低也能确认原 ID 与查询时当前状态、房间及显示名。相同 key 变更实质字段返回 409 `IDEMPOTENCY_MISMATCH`；明确失败不会占用 key，重放不会新增预约、占用槽或审计。
 
-本页表单使用 32 字节安全随机提交键，相同规范化六字段保留原键。网络断开、20 秒超时（含正文）或响应格式异常会显示「未能确认」，保留内容；点击「重试确认原预约」即可用原键确认。成功后仍可点击「再次确认原预约」，不会自动清空表单。活动名称/用途的实质编辑、选择不同房间或不同查询条件会生成新意图；仅 Python `str.strip()` 等价的首尾空白不算修改，包括 U+0085 和 U+001C—1F，但不去除 U+FEFF。点击「开始新预约」明确结束当前表单，再查询选房。提交期间锁定相关输入、查询、房间选择及新预约按钮；不会自动重提。本人取消现已由 Story 2.4 交付；管理员干预和停用管理接口仍属于后续故事。
+本页表单使用 32 字节安全随机提交键，相同规范化六字段保留原键。网络断开、20 秒超时（含正文）或响应格式异常会显示「未能确认」，保留内容；点击「重试确认原预约」即可用原键确认。成功后仍可点击「再次确认原预约」，不会自动清空表单。活动名称/用途的实质编辑、选择不同房间或不同查询条件会生成新意图；仅 Python `str.strip()` 等价的首尾空白不算修改，包括 U+0085 和 U+001C—1F，但不去除 U+FEFF。点击「开始新预约」明确结束当前表单，再查询选房。提交期间锁定相关输入、查询、房间选择及新预约按钮；不会自动重提。本人取消现已由 Story 2.4 交付；管理员取消和停用撤销仍属于后续故事；创建停用和完整管理查询见 Story 3.2。
 
 复跑本故事（均使用隔离临时文件库，自动停止服务和清理测试凭证）：
 
@@ -213,6 +213,30 @@ node --test tests/test_*js.cjs
 ```
 
 浏览器工具安装方法和 `--browser-executable` 参数同上；管理 runner 默认端口 8007。新验证器使用独立临时文件库、私有随机凭证、固定测试 Clock，复用已验证的进程清理，先写 INCOMPLETE，完成原始 HTTP/DOM/存储断言和清理后才写 PASS，记录运行前后源码指纹。此次 **133 项 Python、103 项 JavaScript 全部通过，无 skip**；20 轮真实预约/降容量竞争、故障回滚、停服重启和旧意图重放通过。1280×800、390×844 管理路径和原预约/取消浏览器回归通过。逐项 AC、原始输出、网络响应和截图见 [Story 3.1 验证记录](docs/evidence/story-3.1-verification.md)。
+
+## 创建停用与完整管理查询（Story 3.2）
+
+管理员在 `/admin` 的「创建维护停用」选择会议室，填写北京时间起止及原因，核对预览后勾选确认。半小时刻度，严格满足 `当前时刻 < start < end <= 当前时刻 + 30 天`；允许跨日及超过 4 小时。原因去首尾空白后为 1—500 个 Unicode 字符。新增会议室后可点击「刷新会议室选项」，保留已有表单并重新确认。
+
+`POST /api/admin/blocks` 接受 `room_id,start,end,reason`，`room_id` 必须是 JSON 正整数；返回 201 与精确 `BlockFull`。未撤销的五个 `revoked_*`/`revoke_reason` 字段均为 null，外部没有 cancelled 字段。服务取得写锁后重新认证管理员并取一次 Clock；停用、完整半小时槽和一次 `block.created` 审计同事务提交。预约与停用共用槽约束，重叠返回 409 `OCCUPANCY_CONFLICT`，原安排不变；相邻允许。审计失败全量回滚。
+
+`GET /api/admin/bookings` 与 `GET /api/admin/blocks` 均支持可选 `room_id,date,status`，返回全部匹配记录及 total，按开始时间、编号升序。日期以北京时间半开区间相交判断，跨日停用在各覆盖日出现。预约四态为 pending/in_progress/ended/cancelled；停用为 pending/in_progress/ended/revoked，终态优先且四态互斥。非法过滤条件 400、合法不存在房间 404。完整字段仅管理员可读，成员直接调用 403，匿名及失效会话 401。两个管理列表当前仅查看，不提供管理员取消或撤销按钮。
+
+页面区分尚未查询、加载、空结果、成功、冲突、服务失败和权限失效。提交中锁定相关输入；20 秒请求期限包含响应正文。失败保留输入；未知结果须先查询停用记录核对，不自动重提。已创建但列表刷新失败仍保留创建成功事实；返回提示不抢走移到其他表单的焦点。原因及其他用户文本均按纯文本展示。重新登录需要重新打开管理页，当前页草稿不跨导航自动恢复。
+
+```bash
+.venv/bin/python -m unittest discover -s tests -v
+node --test tests/test_*js.cjs
+.venv/bin/python -m scripts.verify_maintenance_block_http --output-dir work/maintenance-block-http
+.venv/bin/python -m scripts.verify_maintenance_block_browser --output-dir work/maintenance-block-browser
+.venv/bin/python -m scripts.verify_room_management_browser --output-dir work/block-room-regression
+.venv/bin/python -m scripts.verify_auth_browser --replay --port 8005 --output-dir work/block-booking-regression
+.venv/bin/python -m scripts.verify_member_cancel_browser --output-dir work/block-cancel-regression
+```
+
+浏览器依赖安装同上；可加 `--browser-executable /absolute/path/to/chrome` 指定已有浏览器。新浏览器 runner 默认端口 8008，真实 HTTP 使用随机空闲端口。所有验证使用独立临时文件库、私有随机凭证和固定测试 Clock；没有生产 HTTP 测试后门。复用已验证的进程清理、INCOMPLETE 和前后源码指纹机制。
+
+本次 **153 项 Python、176 项 JavaScript 全部通过，无 skip**；20 轮真实 HTTP 预约/停用竞争均恰一成功一冲突，原安排保护、槽完整性、审计故障回滚、真实停服重启及旧意图重放通过。1280×800、390×844 新停用和原房间/预约/取消浏览器流程均通过。[逐项验收与原始证据](docs/evidence/story-3.2-verification.md)。
 
 ## AI 使用声明
 

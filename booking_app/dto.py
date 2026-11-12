@@ -47,6 +47,28 @@ def booking_snapshot(row) -> dict:
             "cancel_reason": row["cancel_reason"]}
 
 
+def block_full(row, room_row, now: int) -> dict:
+    return {
+        "id": row["id"], "room": room(room_row), "creator_id": row["user_id"],
+        "creator_display_name": row["owner_display_name"], "reason": row["reason"],
+        "start_at": row["start_at"], "start_local": local_time(row["start_at"]),
+        "end_at": row["end_at"], "end_local": local_time(row["end_at"]),
+        "status": "revoked" if row["cancelled_at"] is not None else active_status(row["start_at"], row["end_at"], now),
+        "created_at": row["created_at"], "created_local": local_time(row["created_at"]),
+        "revoked_at": row["cancelled_at"],
+        "revoked_local": local_time(row["cancelled_at"]) if row["cancelled_at"] is not None else None,
+        "revoked_by_id": row["cancelled_by"], "revoked_by_display_name": row["cancelled_by_display_name"],
+        "revoke_reason": row["cancel_reason"],
+    }
+
+
+def block_snapshot(row) -> dict:
+    return {"id": row["id"], "room_id": row["room_id"], "creator_id": row["user_id"],
+            "reason": row["reason"], "start_at": row["start_at"], "end_at": row["end_at"],
+            "created_at": row["created_at"], "revoked_at": row["cancelled_at"],
+            "revoked_by_id": row["cancelled_by"], "revoke_reason": row["cancel_reason"]}
+
+
 def conflict(row, now: int, *, admin: bool) -> dict:
     result = {"type": row["kind"], "room_id": row["room_id"],
               "start_at": row["start_at"], "start_local": local_time(row["start_at"]),

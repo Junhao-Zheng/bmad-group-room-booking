@@ -1,0 +1,1259 @@
+[
+  {
+    "phase": "room",
+    "path": "/api/admin/rooms",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "capacity": 20,
+        "id": 1,
+        "location": "测试楼",
+        "name": "合成停用竞争 00"
+      },
+      "ok": true
+    },
+    "duration_ms": 7.089416962116957
+  },
+  {
+    "phase": "room",
+    "path": "/api/admin/rooms",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "capacity": 20,
+        "id": 2,
+        "location": "测试楼",
+        "name": "合成停用竞争 01"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.4834169782698154
+  },
+  {
+    "phase": "room",
+    "path": "/api/admin/rooms",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "capacity": 20,
+        "id": 3,
+        "location": "测试楼",
+        "name": "合成停用竞争 02"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.2975832000374794
+  },
+  {
+    "phase": "room",
+    "path": "/api/admin/rooms",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "capacity": 20,
+        "id": 4,
+        "location": "测试楼",
+        "name": "合成停用竞争 03"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.4126669634133577
+  },
+  {
+    "phase": "room",
+    "path": "/api/admin/rooms",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "capacity": 20,
+        "id": 5,
+        "location": "测试楼",
+        "name": "合成停用竞争 04"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.3597908914089203
+  },
+  {
+    "phase": "room",
+    "path": "/api/admin/rooms",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "capacity": 20,
+        "id": 6,
+        "location": "测试楼",
+        "name": "合成停用竞争 05"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.318500006571412
+  },
+  {
+    "phase": "room",
+    "path": "/api/admin/rooms",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "capacity": 20,
+        "id": 7,
+        "location": "测试楼",
+        "name": "合成停用竞争 06"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.8988750893622637
+  },
+  {
+    "phase": "room",
+    "path": "/api/admin/rooms",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "capacity": 20,
+        "id": 8,
+        "location": "测试楼",
+        "name": "合成停用竞争 07"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.3669578842818737
+  },
+  {
+    "phase": "room",
+    "path": "/api/admin/rooms",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "capacity": 20,
+        "id": 9,
+        "location": "测试楼",
+        "name": "合成停用竞争 08"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.2532501500099897
+  },
+  {
+    "phase": "room",
+    "path": "/api/admin/rooms",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "capacity": 20,
+        "id": 10,
+        "location": "测试楼",
+        "name": "合成停用竞争 09"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.6626658402383327
+  },
+  {
+    "phase": "room",
+    "path": "/api/admin/rooms",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "capacity": 20,
+        "id": 11,
+        "location": "测试楼",
+        "name": "合成停用竞争 10"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.4190828446298838
+  },
+  {
+    "phase": "room",
+    "path": "/api/admin/rooms",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "capacity": 20,
+        "id": 12,
+        "location": "测试楼",
+        "name": "合成停用竞争 11"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.115458879619837
+  },
+  {
+    "phase": "room",
+    "path": "/api/admin/rooms",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "capacity": 20,
+        "id": 13,
+        "location": "测试楼",
+        "name": "合成停用竞争 12"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.6174168344587088
+  },
+  {
+    "phase": "room",
+    "path": "/api/admin/rooms",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "capacity": 20,
+        "id": 14,
+        "location": "测试楼",
+        "name": "合成停用竞争 13"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.810000140219927
+  },
+  {
+    "phase": "room",
+    "path": "/api/admin/rooms",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "capacity": 20,
+        "id": 15,
+        "location": "测试楼",
+        "name": "合成停用竞争 14"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.4053330309689045
+  },
+  {
+    "phase": "room",
+    "path": "/api/admin/rooms",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "capacity": 20,
+        "id": 16,
+        "location": "测试楼",
+        "name": "合成停用竞争 15"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.542541991919279
+  },
+  {
+    "phase": "room",
+    "path": "/api/admin/rooms",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "capacity": 20,
+        "id": 17,
+        "location": "测试楼",
+        "name": "合成停用竞争 16"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.7520420737564564
+  },
+  {
+    "phase": "room",
+    "path": "/api/admin/rooms",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "capacity": 20,
+        "id": 18,
+        "location": "测试楼",
+        "name": "合成停用竞争 17"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.694124985486269
+  },
+  {
+    "phase": "room",
+    "path": "/api/admin/rooms",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "capacity": 20,
+        "id": 19,
+        "location": "测试楼",
+        "name": "合成停用竞争 18"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.8995828945189714
+  },
+  {
+    "phase": "room",
+    "path": "/api/admin/rooms",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "capacity": 20,
+        "id": 20,
+        "location": "测试楼",
+        "name": "合成停用竞争 19"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.6032921634614468
+  },
+  {
+    "phase": "adjacency_room",
+    "path": "/api/admin/rooms",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "capacity": 20,
+        "id": 21,
+        "location": "测试楼",
+        "name": "合成边界房间"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.4126671962440014
+  },
+  {
+    "phase": "booking",
+    "path": "/api/bookings",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794538800,
+          "end_local": "2026-11-13T11:00:00+08:00",
+          "id": 21,
+          "owner_display_name": "演示成员甲",
+          "owner_id": 1,
+          "purpose": "私密",
+          "room": {
+            "capacity": 20,
+            "id": 21,
+            "location": "测试楼",
+            "name": "合成边界房间"
+          },
+          "start_at": 1794535200,
+          "start_local": "2026-11-13T10:00:00+08:00",
+          "status": "pending",
+          "title": "原安排"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 3.875249996781349
+  },
+  {
+    "phase": "protect_booking",
+    "path": "/api/admin/blocks",
+    "http_status": 409,
+    "response": {
+      "error": {
+        "code": "OCCUPANCY_CONFLICT",
+        "conflicts": [
+          {
+            "attendees": 5,
+            "end_at": 1794538800,
+            "end_local": "2026-11-13T11:00:00+08:00",
+            "id": 21,
+            "reason": null,
+            "room_id": 21,
+            "start_at": 1794535200,
+            "start_local": "2026-11-13T10:00:00+08:00",
+            "status": "pending",
+            "type": "booking"
+          }
+        ],
+        "fields": {},
+        "message": "该时段已有预约或停用，原安排保持不变。请调整停用时段。"
+      },
+      "ok": false
+    },
+    "duration_ms": 3.333207918331027
+  },
+  {
+    "phase": "adjacent_long_block",
+    "path": "/api/admin/blocks",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "演示管理员",
+        "creator_id": 3,
+        "end_at": 1794643200,
+        "end_local": "2026-11-14T16:00:00+08:00",
+        "id": 22,
+        "reason": "跨日长维护 <img src=x>",
+        "revoke_reason": null,
+        "revoked_at": null,
+        "revoked_by_display_name": null,
+        "revoked_by_id": null,
+        "revoked_local": null,
+        "room": {
+          "capacity": 20,
+          "id": 21,
+          "location": "测试楼",
+          "name": "合成边界房间"
+        },
+        "start_at": 1794538800,
+        "start_local": "2026-11-13T11:00:00+08:00",
+        "status": "pending"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.5669170320034027
+  },
+  {
+    "phase": "block_overlap",
+    "path": "/api/admin/blocks",
+    "http_status": 409,
+    "response": {
+      "error": {
+        "code": "OCCUPANCY_CONFLICT",
+        "conflicts": [
+          {
+            "attendees": null,
+            "end_at": 1794643200,
+            "end_local": "2026-11-14T16:00:00+08:00",
+            "id": 22,
+            "reason": "跨日长维护 <img src=x>",
+            "room_id": 21,
+            "start_at": 1794538800,
+            "start_local": "2026-11-13T11:00:00+08:00",
+            "status": "pending",
+            "type": "block"
+          }
+        ],
+        "fields": {},
+        "message": "该时段已有预约或停用，原安排保持不变。请调整停用时段。"
+      },
+      "ok": false
+    },
+    "duration_ms": 3.178749931976199
+  },
+  {
+    "phase": "member_direct_write",
+    "path": "/api/admin/blocks",
+    "http_status": 403,
+    "response": {
+      "error": {
+        "code": "FORBIDDEN",
+        "conflicts": [],
+        "fields": {},
+        "message": "仅管理员可管理会议室。"
+      },
+      "ok": false
+    },
+    "duration_ms": 3.757708938792348
+  },
+  {
+    "phase": "member_direct_list",
+    "path": "/api/admin/bookings?status=bad",
+    "http_status": 403,
+    "response": {
+      "error": {
+        "code": "FORBIDDEN",
+        "conflicts": [],
+        "fields": {},
+        "message": "仅管理员可管理会议室。"
+      },
+      "ok": false
+    },
+    "duration_ms": 2.7324999682605267
+  },
+  {
+    "phase": "admin_full_list",
+    "path": "/api/admin/bookings",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "items": [
+          {
+            "attendees": 5,
+            "cancel_reason": null,
+            "cancelled_at": null,
+            "cancelled_by_display_name": null,
+            "cancelled_by_id": null,
+            "cancelled_local": null,
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "end_at": 1794459600,
+            "end_local": "2026-11-12T13:00:00+08:00",
+            "id": 1,
+            "owner_display_name": "演示成员甲",
+            "owner_id": 1,
+            "purpose": "私密用途",
+            "room": {
+              "capacity": 20,
+              "id": 1,
+              "location": "测试楼",
+              "name": "合成停用竞争 00"
+            },
+            "start_at": 1794456000,
+            "start_local": "2026-11-12T12:00:00+08:00",
+            "status": "pending",
+            "title": "合成活动"
+          },
+          {
+            "attendees": 5,
+            "cancel_reason": null,
+            "cancelled_at": null,
+            "cancelled_by_display_name": null,
+            "cancelled_by_id": null,
+            "cancelled_local": null,
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "end_at": 1794459600,
+            "end_local": "2026-11-12T13:00:00+08:00",
+            "id": 4,
+            "owner_display_name": "演示成员甲",
+            "owner_id": 1,
+            "purpose": "私密用途",
+            "room": {
+              "capacity": 20,
+              "id": 4,
+              "location": "测试楼",
+              "name": "合成停用竞争 03"
+            },
+            "start_at": 1794456000,
+            "start_local": "2026-11-12T12:00:00+08:00",
+            "status": "pending",
+            "title": "合成活动"
+          },
+          {
+            "attendees": 5,
+            "cancel_reason": null,
+            "cancelled_at": null,
+            "cancelled_by_display_name": null,
+            "cancelled_by_id": null,
+            "cancelled_local": null,
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "end_at": 1794459600,
+            "end_local": "2026-11-12T13:00:00+08:00",
+            "id": 10,
+            "owner_display_name": "演示成员甲",
+            "owner_id": 1,
+            "purpose": "私密用途",
+            "room": {
+              "capacity": 20,
+              "id": 10,
+              "location": "测试楼",
+              "name": "合成停用竞争 09"
+            },
+            "start_at": 1794456000,
+            "start_local": "2026-11-12T12:00:00+08:00",
+            "status": "pending",
+            "title": "合成活动"
+          },
+          {
+            "attendees": 5,
+            "cancel_reason": null,
+            "cancelled_at": null,
+            "cancelled_by_display_name": null,
+            "cancelled_by_id": null,
+            "cancelled_local": null,
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "end_at": 1794459600,
+            "end_local": "2026-11-12T13:00:00+08:00",
+            "id": 11,
+            "owner_display_name": "演示成员甲",
+            "owner_id": 1,
+            "purpose": "私密用途",
+            "room": {
+              "capacity": 20,
+              "id": 11,
+              "location": "测试楼",
+              "name": "合成停用竞争 10"
+            },
+            "start_at": 1794456000,
+            "start_local": "2026-11-12T12:00:00+08:00",
+            "status": "pending",
+            "title": "合成活动"
+          },
+          {
+            "attendees": 5,
+            "cancel_reason": null,
+            "cancelled_at": null,
+            "cancelled_by_display_name": null,
+            "cancelled_by_id": null,
+            "cancelled_local": null,
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "end_at": 1794459600,
+            "end_local": "2026-11-12T13:00:00+08:00",
+            "id": 12,
+            "owner_display_name": "演示成员甲",
+            "owner_id": 1,
+            "purpose": "私密用途",
+            "room": {
+              "capacity": 20,
+              "id": 12,
+              "location": "测试楼",
+              "name": "合成停用竞争 11"
+            },
+            "start_at": 1794456000,
+            "start_local": "2026-11-12T12:00:00+08:00",
+            "status": "pending",
+            "title": "合成活动"
+          },
+          {
+            "attendees": 5,
+            "cancel_reason": null,
+            "cancelled_at": null,
+            "cancelled_by_display_name": null,
+            "cancelled_by_id": null,
+            "cancelled_local": null,
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "end_at": 1794459600,
+            "end_local": "2026-11-12T13:00:00+08:00",
+            "id": 13,
+            "owner_display_name": "演示成员甲",
+            "owner_id": 1,
+            "purpose": "私密用途",
+            "room": {
+              "capacity": 20,
+              "id": 13,
+              "location": "测试楼",
+              "name": "合成停用竞争 12"
+            },
+            "start_at": 1794456000,
+            "start_local": "2026-11-12T12:00:00+08:00",
+            "status": "pending",
+            "title": "合成活动"
+          },
+          {
+            "attendees": 5,
+            "cancel_reason": null,
+            "cancelled_at": null,
+            "cancelled_by_display_name": null,
+            "cancelled_by_id": null,
+            "cancelled_local": null,
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "end_at": 1794459600,
+            "end_local": "2026-11-12T13:00:00+08:00",
+            "id": 14,
+            "owner_display_name": "演示成员甲",
+            "owner_id": 1,
+            "purpose": "私密用途",
+            "room": {
+              "capacity": 20,
+              "id": 14,
+              "location": "测试楼",
+              "name": "合成停用竞争 13"
+            },
+            "start_at": 1794456000,
+            "start_local": "2026-11-12T12:00:00+08:00",
+            "status": "pending",
+            "title": "合成活动"
+          },
+          {
+            "attendees": 5,
+            "cancel_reason": null,
+            "cancelled_at": null,
+            "cancelled_by_display_name": null,
+            "cancelled_by_id": null,
+            "cancelled_local": null,
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "end_at": 1794459600,
+            "end_local": "2026-11-12T13:00:00+08:00",
+            "id": 18,
+            "owner_display_name": "演示成员甲",
+            "owner_id": 1,
+            "purpose": "私密用途",
+            "room": {
+              "capacity": 20,
+              "id": 18,
+              "location": "测试楼",
+              "name": "合成停用竞争 17"
+            },
+            "start_at": 1794456000,
+            "start_local": "2026-11-12T12:00:00+08:00",
+            "status": "pending",
+            "title": "合成活动"
+          },
+          {
+            "attendees": 5,
+            "cancel_reason": null,
+            "cancelled_at": null,
+            "cancelled_by_display_name": null,
+            "cancelled_by_id": null,
+            "cancelled_local": null,
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "end_at": 1794538800,
+            "end_local": "2026-11-13T11:00:00+08:00",
+            "id": 21,
+            "owner_display_name": "演示成员甲",
+            "owner_id": 1,
+            "purpose": "私密",
+            "room": {
+              "capacity": 20,
+              "id": 21,
+              "location": "测试楼",
+              "name": "合成边界房间"
+            },
+            "start_at": 1794535200,
+            "start_local": "2026-11-13T10:00:00+08:00",
+            "status": "pending",
+            "title": "原安排"
+          }
+        ],
+        "total": 9
+      },
+      "ok": true
+    },
+    "duration_ms": 4.944041837006807
+  },
+  {
+    "phase": "illegal_status",
+    "path": "/api/admin/bookings?status=invalid",
+    "http_status": 400,
+    "response": {
+      "error": {
+        "code": "INVALID_INPUT",
+        "conflicts": [],
+        "fields": {
+          "status": "请选择列表中的有效状态。"
+        },
+        "message": "请检查管理记录状态。"
+      },
+      "ok": false
+    },
+    "duration_ms": 3.832167014479637
+  },
+  {
+    "phase": "member_direct_list",
+    "path": "/api/admin/blocks?status=bad",
+    "http_status": 403,
+    "response": {
+      "error": {
+        "code": "FORBIDDEN",
+        "conflicts": [],
+        "fields": {},
+        "message": "仅管理员可管理会议室。"
+      },
+      "ok": false
+    },
+    "duration_ms": 3.7470420356839895
+  },
+  {
+    "phase": "admin_full_list",
+    "path": "/api/admin/blocks",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "items": [
+          {
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "creator_display_name": "演示管理员",
+            "creator_id": 3,
+            "end_at": 1794459600,
+            "end_local": "2026-11-12T13:00:00+08:00",
+            "id": 2,
+            "reason": "维护",
+            "revoke_reason": null,
+            "revoked_at": null,
+            "revoked_by_display_name": null,
+            "revoked_by_id": null,
+            "revoked_local": null,
+            "room": {
+              "capacity": 20,
+              "id": 2,
+              "location": "测试楼",
+              "name": "合成停用竞争 01"
+            },
+            "start_at": 1794456000,
+            "start_local": "2026-11-12T12:00:00+08:00",
+            "status": "pending"
+          },
+          {
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "creator_display_name": "演示管理员",
+            "creator_id": 3,
+            "end_at": 1794459600,
+            "end_local": "2026-11-12T13:00:00+08:00",
+            "id": 3,
+            "reason": "维护",
+            "revoke_reason": null,
+            "revoked_at": null,
+            "revoked_by_display_name": null,
+            "revoked_by_id": null,
+            "revoked_local": null,
+            "room": {
+              "capacity": 20,
+              "id": 3,
+              "location": "测试楼",
+              "name": "合成停用竞争 02"
+            },
+            "start_at": 1794456000,
+            "start_local": "2026-11-12T12:00:00+08:00",
+            "status": "pending"
+          },
+          {
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "creator_display_name": "演示管理员",
+            "creator_id": 3,
+            "end_at": 1794459600,
+            "end_local": "2026-11-12T13:00:00+08:00",
+            "id": 5,
+            "reason": "维护",
+            "revoke_reason": null,
+            "revoked_at": null,
+            "revoked_by_display_name": null,
+            "revoked_by_id": null,
+            "revoked_local": null,
+            "room": {
+              "capacity": 20,
+              "id": 5,
+              "location": "测试楼",
+              "name": "合成停用竞争 04"
+            },
+            "start_at": 1794456000,
+            "start_local": "2026-11-12T12:00:00+08:00",
+            "status": "pending"
+          },
+          {
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "creator_display_name": "演示管理员",
+            "creator_id": 3,
+            "end_at": 1794459600,
+            "end_local": "2026-11-12T13:00:00+08:00",
+            "id": 6,
+            "reason": "维护",
+            "revoke_reason": null,
+            "revoked_at": null,
+            "revoked_by_display_name": null,
+            "revoked_by_id": null,
+            "revoked_local": null,
+            "room": {
+              "capacity": 20,
+              "id": 6,
+              "location": "测试楼",
+              "name": "合成停用竞争 05"
+            },
+            "start_at": 1794456000,
+            "start_local": "2026-11-12T12:00:00+08:00",
+            "status": "pending"
+          },
+          {
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "creator_display_name": "演示管理员",
+            "creator_id": 3,
+            "end_at": 1794459600,
+            "end_local": "2026-11-12T13:00:00+08:00",
+            "id": 7,
+            "reason": "维护",
+            "revoke_reason": null,
+            "revoked_at": null,
+            "revoked_by_display_name": null,
+            "revoked_by_id": null,
+            "revoked_local": null,
+            "room": {
+              "capacity": 20,
+              "id": 7,
+              "location": "测试楼",
+              "name": "合成停用竞争 06"
+            },
+            "start_at": 1794456000,
+            "start_local": "2026-11-12T12:00:00+08:00",
+            "status": "pending"
+          },
+          {
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "creator_display_name": "演示管理员",
+            "creator_id": 3,
+            "end_at": 1794459600,
+            "end_local": "2026-11-12T13:00:00+08:00",
+            "id": 8,
+            "reason": "维护",
+            "revoke_reason": null,
+            "revoked_at": null,
+            "revoked_by_display_name": null,
+            "revoked_by_id": null,
+            "revoked_local": null,
+            "room": {
+              "capacity": 20,
+              "id": 8,
+              "location": "测试楼",
+              "name": "合成停用竞争 07"
+            },
+            "start_at": 1794456000,
+            "start_local": "2026-11-12T12:00:00+08:00",
+            "status": "pending"
+          },
+          {
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "creator_display_name": "演示管理员",
+            "creator_id": 3,
+            "end_at": 1794459600,
+            "end_local": "2026-11-12T13:00:00+08:00",
+            "id": 9,
+            "reason": "维护",
+            "revoke_reason": null,
+            "revoked_at": null,
+            "revoked_by_display_name": null,
+            "revoked_by_id": null,
+            "revoked_local": null,
+            "room": {
+              "capacity": 20,
+              "id": 9,
+              "location": "测试楼",
+              "name": "合成停用竞争 08"
+            },
+            "start_at": 1794456000,
+            "start_local": "2026-11-12T12:00:00+08:00",
+            "status": "pending"
+          },
+          {
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "creator_display_name": "演示管理员",
+            "creator_id": 3,
+            "end_at": 1794459600,
+            "end_local": "2026-11-12T13:00:00+08:00",
+            "id": 15,
+            "reason": "维护",
+            "revoke_reason": null,
+            "revoked_at": null,
+            "revoked_by_display_name": null,
+            "revoked_by_id": null,
+            "revoked_local": null,
+            "room": {
+              "capacity": 20,
+              "id": 15,
+              "location": "测试楼",
+              "name": "合成停用竞争 14"
+            },
+            "start_at": 1794456000,
+            "start_local": "2026-11-12T12:00:00+08:00",
+            "status": "pending"
+          },
+          {
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "creator_display_name": "演示管理员",
+            "creator_id": 3,
+            "end_at": 1794459600,
+            "end_local": "2026-11-12T13:00:00+08:00",
+            "id": 16,
+            "reason": "维护",
+            "revoke_reason": null,
+            "revoked_at": null,
+            "revoked_by_display_name": null,
+            "revoked_by_id": null,
+            "revoked_local": null,
+            "room": {
+              "capacity": 20,
+              "id": 16,
+              "location": "测试楼",
+              "name": "合成停用竞争 15"
+            },
+            "start_at": 1794456000,
+            "start_local": "2026-11-12T12:00:00+08:00",
+            "status": "pending"
+          },
+          {
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "creator_display_name": "演示管理员",
+            "creator_id": 3,
+            "end_at": 1794459600,
+            "end_local": "2026-11-12T13:00:00+08:00",
+            "id": 17,
+            "reason": "维护",
+            "revoke_reason": null,
+            "revoked_at": null,
+            "revoked_by_display_name": null,
+            "revoked_by_id": null,
+            "revoked_local": null,
+            "room": {
+              "capacity": 20,
+              "id": 17,
+              "location": "测试楼",
+              "name": "合成停用竞争 16"
+            },
+            "start_at": 1794456000,
+            "start_local": "2026-11-12T12:00:00+08:00",
+            "status": "pending"
+          },
+          {
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "creator_display_name": "演示管理员",
+            "creator_id": 3,
+            "end_at": 1794459600,
+            "end_local": "2026-11-12T13:00:00+08:00",
+            "id": 19,
+            "reason": "维护",
+            "revoke_reason": null,
+            "revoked_at": null,
+            "revoked_by_display_name": null,
+            "revoked_by_id": null,
+            "revoked_local": null,
+            "room": {
+              "capacity": 20,
+              "id": 19,
+              "location": "测试楼",
+              "name": "合成停用竞争 18"
+            },
+            "start_at": 1794456000,
+            "start_local": "2026-11-12T12:00:00+08:00",
+            "status": "pending"
+          },
+          {
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "creator_display_name": "演示管理员",
+            "creator_id": 3,
+            "end_at": 1794459600,
+            "end_local": "2026-11-12T13:00:00+08:00",
+            "id": 20,
+            "reason": "维护",
+            "revoke_reason": null,
+            "revoked_at": null,
+            "revoked_by_display_name": null,
+            "revoked_by_id": null,
+            "revoked_local": null,
+            "room": {
+              "capacity": 20,
+              "id": 20,
+              "location": "测试楼",
+              "name": "合成停用竞争 19"
+            },
+            "start_at": 1794456000,
+            "start_local": "2026-11-12T12:00:00+08:00",
+            "status": "pending"
+          },
+          {
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "creator_display_name": "演示管理员",
+            "creator_id": 3,
+            "end_at": 1794643200,
+            "end_local": "2026-11-14T16:00:00+08:00",
+            "id": 22,
+            "reason": "跨日长维护 <img src=x>",
+            "revoke_reason": null,
+            "revoked_at": null,
+            "revoked_by_display_name": null,
+            "revoked_by_id": null,
+            "revoked_local": null,
+            "room": {
+              "capacity": 20,
+              "id": 21,
+              "location": "测试楼",
+              "name": "合成边界房间"
+            },
+            "start_at": 1794538800,
+            "start_local": "2026-11-13T11:00:00+08:00",
+            "status": "pending"
+          }
+        ],
+        "total": 13
+      },
+      "ok": true
+    },
+    "duration_ms": 4.34474996291101
+  },
+  {
+    "phase": "illegal_status",
+    "path": "/api/admin/blocks?status=invalid",
+    "http_status": 400,
+    "response": {
+      "error": {
+        "code": "INVALID_INPUT",
+        "conflicts": [],
+        "fields": {
+          "status": "请选择列表中的有效状态。"
+        },
+        "message": "请检查管理记录状态。"
+      },
+      "ok": false
+    },
+    "duration_ms": 4.015749786049128
+  },
+  {
+    "phase": "cross_day_query",
+    "path": "/api/admin/blocks?room_id=21&date=2026-11-13",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "items": [
+          {
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "creator_display_name": "演示管理员",
+            "creator_id": 3,
+            "end_at": 1794643200,
+            "end_local": "2026-11-14T16:00:00+08:00",
+            "id": 22,
+            "reason": "跨日长维护 <img src=x>",
+            "revoke_reason": null,
+            "revoked_at": null,
+            "revoked_by_display_name": null,
+            "revoked_by_id": null,
+            "revoked_local": null,
+            "room": {
+              "capacity": 20,
+              "id": 21,
+              "location": "测试楼",
+              "name": "合成边界房间"
+            },
+            "start_at": 1794538800,
+            "start_local": "2026-11-13T11:00:00+08:00",
+            "status": "pending"
+          }
+        ],
+        "total": 1
+      },
+      "ok": true
+    },
+    "duration_ms": 3.6551670636981726
+  },
+  {
+    "phase": "cross_day_query",
+    "path": "/api/admin/blocks?room_id=21&date=2026-11-14",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "items": [
+          {
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "creator_display_name": "演示管理员",
+            "creator_id": 3,
+            "end_at": 1794643200,
+            "end_local": "2026-11-14T16:00:00+08:00",
+            "id": 22,
+            "reason": "跨日长维护 <img src=x>",
+            "revoke_reason": null,
+            "revoked_at": null,
+            "revoked_by_display_name": null,
+            "revoked_by_id": null,
+            "revoked_local": null,
+            "room": {
+              "capacity": 20,
+              "id": 21,
+              "location": "测试楼",
+              "name": "合成边界房间"
+            },
+            "start_at": 1794538800,
+            "start_local": "2026-11-13T11:00:00+08:00",
+            "status": "pending"
+          }
+        ],
+        "total": 1
+      },
+      "ok": true
+    },
+    "duration_ms": 2.5557910557836294
+  },
+  {
+    "phase": "audit_failure",
+    "path": "/api/admin/blocks",
+    "http_status": 500,
+    "response": {
+      "error": {
+        "code": "INTERNAL_ERROR",
+        "conflicts": [],
+        "fields": {},
+        "message": "操作未完成，请稍后重试。"
+      },
+      "ok": false
+    },
+    "duration_ms": 5.117292050272226
+  },
+  {
+    "phase": "old_intent_after_restart",
+    "path": "/api/bookings",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794538800,
+          "end_local": "2026-11-13T11:00:00+08:00",
+          "id": 21,
+          "owner_display_name": "演示成员甲",
+          "owner_id": 1,
+          "purpose": "私密",
+          "room": {
+            "capacity": 20,
+            "id": 21,
+            "location": "测试楼",
+            "name": "合成边界房间"
+          },
+          "start_at": 1794535200,
+          "start_local": "2026-11-13T10:00:00+08:00",
+          "status": "pending",
+          "title": "原安排"
+        },
+        "replayed": true
+      },
+      "ok": true
+    },
+    "duration_ms": 4.696541000157595
+  },
+  {
+    "phase": "retry_after_failure",
+    "path": "/api/admin/blocks",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "演示管理员",
+        "creator_id": 3,
+        "end_at": 1794808800,
+        "end_local": "2026-11-16T14:00:00+08:00",
+        "id": 23,
+        "reason": "跨日长维护 <img src=x>",
+        "revoke_reason": null,
+        "revoked_at": null,
+        "revoked_by_display_name": null,
+        "revoked_by_id": null,
+        "revoked_local": null,
+        "room": {
+          "capacity": 20,
+          "id": 21,
+          "location": "测试楼",
+          "name": "合成边界房间"
+        },
+        "start_at": 1794715200,
+        "start_local": "2026-11-15T12:00:00+08:00",
+        "status": "pending"
+      },
+      "ok": true
+    },
+    "duration_ms": 5.94924995675683
+  }
+]

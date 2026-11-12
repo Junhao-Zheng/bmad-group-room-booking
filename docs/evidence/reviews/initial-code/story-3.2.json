@@ -1,0 +1,13 @@
+{
+  "recorded_at_utc": "2026-11-12T12:57:40.544742+00:00",
+  "story": "story-3.2",
+  "baseline": "4747ea2add89c06299246a1f60a06b2ecebad2a3",
+  "source_only_patch": "story-3.2.diff",
+  "patch_sha256": "6ae2b8cc181d785d466e0b495afd6a17e5ed6e266f290d7252941e49c2e528af",
+  "original_unified_diff_sha256": "4f8f6b90ca1584283a80b8d64f693f9581d00c51530829ae48ca0871e3d55d2e",
+  "validated_against": "docs/evidence/story-3.2/http/http-result.json",
+  "report_sha256": "fb84690522f54e43b0738b0c95436f4208c2a81069472241a562d37fe52a47f5",
+  "reconstructed_hash_count": 33,
+  "result": "PASS",
+  "scope": "Initial pre-review source (booking_app/tests/scripts), reconstructed from the recorded baseline plus patch; excludes evidence/media and does not pretend to be an initial implementation commit."
+}

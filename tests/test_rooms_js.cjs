@@ -6,7 +6,7 @@ const fail=(code,fields={},conflicts=[])=>({ok:false,json:async()=>({ok:false,er
 const tick=()=>new Promise(setImmediate);
 function harness(initialRoom=room){
   let active,impl=async url=>ok(url==='/api/rooms'?{items:[room],total:1}:room),timer=0;
-  const timers=new Map(),fetches=[];
+  const timers=new Map(),fetches=[],events=new Map();
   function node(id='',tag=''){
     const attrs=new Map(),handlers={};let text='',disabled=false,value='';
     return {id,tag,attrs,handlers,children:[],name:'',checked:false,hidden:false,dataset:{},classList:{toggle(){}},
@@ -27,7 +27,7 @@ function harness(initialRoom=room){
   const edit=node('edit','button');edit.dataset={room:JSON.stringify(initialRoom)};n['admin-rooms'].append(edit);
   const body=node('body');
   vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../booking_app/static/rooms.js'),'utf8'),{
-    AbortController,document:{getElementById:id=>n[id],querySelector:s=>n[s.slice(1)],createElement:t=>node('',t),body,get activeElement(){return active;}},
+    AbortController,CustomEvent:class {constructor(type,options){this.type=type;this.detail=options.detail;}},document:{addEventListener(name,handler){if(!events.has(name))events.set(name,[]);events.get(name).push(handler);},dispatchEvent(event){for(const handler of events.get(event.type)||[])handler(event);},getElementById:id=>n[id],querySelector:s=>n[s.slice(1)],createElement:t=>node('',t),body,get activeElement(){return active;}},
     window:{setTimeout(fn,ms){timers.set(++timer,{fn,ms});return timer;},clearTimeout(id){timers.delete(id);}},
     fetch:(url,options)=>{fetches.push({url,options});return impl(url,options);}});
   return {n,inputs,timers,fetches,get active(){return active;},setFetch:f=>{impl=f;},edit:()=>edit.handlers.click(),
@@ -114,7 +114,7 @@ for(const code of ['AUTH_REQUIRED','FORBIDDEN'])for(const phase of ['manual','af
   assert.doesNotMatch(ui.n['rooms-feedback'].textContent,/手动重试|手动刷新/);
   assert.equal(ui.n['admin-rooms'].children.length,0);assert.equal(ui.n['rooms-refresh'].disabled,true);
   assert.equal(ui.n['room-relogin'].hidden,false);assert.equal(ui.inputs[0].value,room.name);
-  if(phase==='after-save')assert.equal(ui.n['room-feedback'].textContent,'会议室资料已保存。');
+  if(phase==='after-save')assert.match(ui.n['room-feedback'].textContent,/会议室资料已保存。.*重新登录/);
 });
 const validConflict={id:102,attendees:5,start_local:'2026-11-12T10:00:00+08:00',end_local:'2026-11-12T11:00:00+08:00',status:'in_progress'};
 for(const [label,fields,conflicts] of [

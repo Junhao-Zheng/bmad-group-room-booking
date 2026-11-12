@@ -1,0 +1,9 @@
+{
+  "stage": "no-script",
+  "error_type": "AssertionError",
+  "source": {
+    "file": "scripts/verify_maintenance_block_browser.cjs",
+    "line": 45,
+    "column": 14
+  }
+}

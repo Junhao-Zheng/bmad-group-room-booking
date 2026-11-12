@@ -1,0 +1,55 @@
+{
+  "checked_at_utc": "2026-11-12T13:04:30.416307+00:00",
+  "result": "PASS",
+  "python_tests": 156,
+  "unique_python_test_ids": 156,
+  "js_tests": 208,
+  "reports": [
+    {
+      "file": "docs/evidence/story-3.2-review-fixes/implementer/browser/browser-results.json",
+      "run_id": "df9b7a8afe0b73d60bbfcfd270fa4b87",
+      "result": "PASS",
+      "verified_hash_counts": {
+        "app_source_files_sha256": 22,
+        "verification_source_files_sha256": 10
+      }
+    },
+    {
+      "file": "docs/evidence/story-3.2-review-fixes/rooms/browser-results.json",
+      "run_id": "07cf480ac79dd56b0e60a8b364b56569",
+      "result": "PASS",
+      "verified_hash_counts": {
+        "app_source_files_sha256": 22,
+        "verification_source_files_sha256": 8
+      }
+    },
+    {
+      "file": "docs/evidence/story-3.2-review-fixes/replay/browser-results.json",
+      "run_id": "6f20d831a13aa66fec53b7c7c61fa077",
+      "result": "PASS",
+      "verified_hash_counts": {
+        "app_source_files_sha256": 22,
+        "verification_source_files_sha256": 4
+      }
+    },
+    {
+      "file": "docs/evidence/story-3.2-review-fixes/cancel/browser-results.json",
+      "run_id": "921dc81639d000b1cf50a58d5ec539af",
+      "result": "PASS",
+      "verified_hash_counts": {
+        "app_source_files_sha256": 22,
+        "verification_source_files_sha256": 7
+      }
+    },
+    {
+      "file": "docs/evidence/story-3.2-review-fixes/http/http-result.json",
+      "run_id": "52a541ee19f0b1526c7280b75c5850f9",
+      "result": "PASS",
+      "verified_hash_counts": {
+        "app_source_files_sha256": 22,
+        "verification_source_files_sha256": 11
+      }
+    }
+  ],
+  "visual_inspection": "主流程检查390px停用创建完整截图：原因安全文本、创建成功、跨日区间和完整停用详情可读；表单单列，无横向溢出。页面很长，未声称界面效率已由真实用户评估。"
+}

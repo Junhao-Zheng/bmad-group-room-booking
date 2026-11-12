@@ -1,0 +1,77 @@
+{
+  "reports": {
+    "http": {
+      "result": "PASS",
+      "run_id": "2e032fd0031dbddbecb2a4770848aca8",
+      "artifact_directory": "runs/2e032fd0031dbddbecb2a4770848aca8",
+      "source_hashes_match": true,
+      "wins": {
+        "booking": 13,
+        "block": 7
+      }
+    },
+    "browser": {
+      "result": "PASS",
+      "run_id": "a63c69c1bf1104d708a49b9e4e3661a0",
+      "artifact_directory": "runs/a63c69c1bf1104d708a49b9e4e3661a0",
+      "source_hashes_match": true
+    },
+    "room-regression": {
+      "result": "PASS",
+      "run_id": "48dd03badf580cd193980ce2168fb86c",
+      "artifact_directory": "runs/48dd03badf580cd193980ce2168fb86c",
+      "source_hashes_match": true
+    },
+    "booking-regression": {
+      "result": "PASS",
+      "run_id": "cce817bd45cae6ce29dda7d70b05fd19",
+      "artifact_directory": "runs/cce817bd45cae6ce29dda7d70b05fd19",
+      "source_hashes_match": true
+    },
+    "cancel-regression": {
+      "result": "PASS",
+      "run_id": "73f3631f83907477f0e359eadb330386",
+      "artifact_directory": "runs/73f3631f83907477f0e359eadb330386",
+      "source_hashes_match": true
+    }
+  },
+  "python_tests": 153,
+  "javascript_tests": 176,
+  "skips": 0,
+  "unique_python_test_ids": 153,
+  "duplicate_python_test_ids": [],
+  "test_source_files_sha256": {
+    "tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests/history_fixtures.py": "fc87b9201d85a5a2cedc4a1819d68564639f8b939874a4add0d0a077f75a4a35",
+    "tests/maintenance_contract.py": "646e9f89c3403c8d72ac6f907c566a7bd3def10b69dfe4b8ce32d5cae10b74c0",
+    "tests/schedule_fixtures.py": "93a77f4297e77c5a786037c770c9881eddd4566415f260e95d757d0f83f96751",
+    "tests/test_auth.py": "8f1a9fb34c1337207e910e2c232b34286cf6f9926b22a65027fe4cc04b8ce98c",
+    "tests/test_auth_js.cjs": "1e594abb862bd1047a3f5653476db7382d030a0fbafd6d97895816a0f794913a",
+    "tests/test_availability.py": "d017fb7bfa1660f5e912c78cae4323ca49f682e2ac2aee59d4f3bd78492120fd",
+    "tests/test_availability_js.cjs": "b8651bfc4a9e43b5bda197d37809a1ef87fface260c166182cb8fd9bc766b969",
+    "tests/test_availability_performance.py": "1f5457a43db55c1eb869e836456de63b7a8de69a33457c9d3087b6ea5e825571",
+    "tests/test_blocks_js.cjs": "f14ce5f52482531b20eb3791cf83bcfd3c342efba381c817fdf8fefcf99b6bd3",
+    "tests/test_booking_js.cjs": "bce3e2efc150181c85aff5d45d193d9639b00b7c610204fcd62d1e554cfd6642",
+    "tests/test_browser_verification.py": "a507676c1dd9708e6875d2d1ff1dd89d86e6084e26c89924b207137da2351682",
+    "tests/test_create_booking.py": "9cc8245582a0ae9d1045bf353e8bb338fef9c8f9e38b85524d6371132f910166",
+    "tests/test_history_browser_runner.py": "bd700705acf7a3b0725944cfc4aba0e057999cb382fc7b872d2519427df4139c",
+    "tests/test_history_js.cjs": "65547c983254958077efad1aca16cdf85d3f8f5b7c11623587f2a1fd3dd35988",
+    "tests/test_maintenance_block.py": "a031d9698e40ba7561c80d291159e0d1e0eeffb76741d70957ac568669ece391",
+    "tests/test_member_cancel.py": "96de6b769024010f0bc74b19da26747005077bd7112268eeb3264f437acad4e7",
+    "tests/test_member_cancel_http_runner.py": "427912da144f4830cc1b2dc7af61322ce59eaa790478a45482a935688ed55555",
+    "tests/test_personal_history.py": "ee5348c06bd5a951f72b2af8b07c1af3eea6a6fdc610fb6142ad2f0076db02e1",
+    "tests/test_replay_intent.py": "3efdaaedf6039accf7f1f9db8c78cbaba7d216437eeced1d306e512e34308693",
+    "tests/test_room_browser_runner_js.cjs": "bc6340edcd6422e89bf96153c9013a23cd451f3831943124e2b43113661d6232",
+    "tests/test_room_management.py": "7cc535ce490ab0c3cc679117ea28cde9d99e205d100fe1ba0a3072071153bed4",
+    "tests/test_room_management_browser_runner.py": "04a61fb5726c216efeaa59eafb6247cd97844a559d14fee9dee85a0c1859a59f",
+    "tests/test_room_schedule.py": "ea259a28149688ac0167a7be67d32a3dbb3525e1aefb96065db88bc81852714d",
+    "tests/test_rooms_js.cjs": "9f87815aa5d06fc3e625e4c3e73a395dda1a551aafde186a89ec6b08d31e0a56",
+    "tests/test_schedule_js.cjs": "8d9a47a405fffe4fb26602de63dcb06bbfb6abae6e56d29131920ca2251a3ea1"
+  },
+  "verification_ports_closed": {
+    "8005": true,
+    "8006": true,
+    "8007": true,
+    "8008": true
+  }
+}

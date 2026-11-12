@@ -1,0 +1,9 @@
+{
+  "stage": "startup",
+  "error_type": "Error",
+  "source": {
+    "file": "scripts/verify_maintenance_block_browser.cjs",
+    "line": 27,
+    "column": 32
+  }
+}

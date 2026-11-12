@@ -227,6 +227,39 @@ def normalize_room_payload(payload) -> dict:
     return values
 
 
+def normalize_block_payload(payload) -> dict:
+    """Static block fields; the write transaction supplies the window's clock."""
+    if not isinstance(payload, dict):
+        raise DomainError("INVALID_INPUT", "请求内容必须是一个对象。")
+    fields, values = {}, {}
+    validators = {
+        "room_id": lambda value: resource_id(value) if type(value) is int else resource_id(None),
+        "start": lambda value: beijing_datetime(value, "start"),
+        "end": lambda value: beijing_datetime(value, "end"),
+        "reason": lambda value: normalized_text(value, "reason", 500),
+    }
+    for name, validate in validators.items():
+        try:
+            values[name + "_at" if name in ("start", "end") else name] = validate(payload.get(name))
+        except DomainError as error:
+            fields.update(error.fields)
+    if fields:
+        raise DomainError("INVALID_INPUT", "请检查停用信息。", fields)
+    return values
+
+
+def validate_block_window(start_at: int, end_at: int, now: int) -> None:
+    fields = {}
+    if start_at <= now:
+        fields["start"] = "开始时间必须晚于当前北京时间。"
+    if end_at <= start_at:
+        fields["end"] = "结束时间必须晚于开始时间。"
+    if end_at > now + 30 * 86400:
+        fields["end"] = "结束时间不能超过当前时刻起 30 天。"
+    if fields:
+        raise DomainError("INVALID_INPUT", "请检查停用起止时间。", fields)
+
+
 def query_attendees(value) -> int:
     """Canonical URL integer, capped at 1001 (the no-matching-room sentinel).
 

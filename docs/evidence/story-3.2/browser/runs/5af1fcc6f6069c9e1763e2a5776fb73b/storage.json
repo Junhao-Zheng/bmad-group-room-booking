@@ -1,0 +1,1340 @@
+{
+  "before": {
+    "rooms": [
+      {
+        "id": 10,
+        "name": "合成 A",
+        "location": "演示楼 101",
+        "capacity": 10,
+        "created_at": 1794448800,
+        "updated_at": 1794448800
+      },
+      {
+        "id": 20,
+        "name": "合成 A",
+        "location": "演示楼 202",
+        "capacity": 20,
+        "created_at": 1794448800,
+        "updated_at": 1794448800
+      },
+      {
+        "id": 30,
+        "name": "合成 C <讨论室>",
+        "location": "演示楼 303",
+        "capacity": 30,
+        "created_at": 1794448800,
+        "updated_at": 1794448800
+      }
+    ],
+    "reservations": [
+      {
+        "id": 101,
+        "kind": "block",
+        "room_id": 10,
+        "user_id": 3,
+        "title": null,
+        "purpose": null,
+        "attendees": null,
+        "reason": "合成维护 <检查设备>",
+        "start_at": 1794409200,
+        "end_at": 1794416400,
+        "intent_key": null,
+        "request_payload": null,
+        "created_at": 1794016800,
+        "cancelled_at": null,
+        "cancelled_by": null,
+        "cancel_reason": null
+      },
+      {
+        "id": 103,
+        "kind": "booking",
+        "room_id": 10,
+        "user_id": 2,
+        "title": "已结束合成活动",
+        "purpose": "PRIVATE_PURPOSE_NEVER_SHARED",
+        "attendees": 5,
+        "reason": null,
+        "start_at": 1794445200,
+        "end_at": 1794448800,
+        "intent_key": "synthetic_key_00000103",
+        "request_payload": "{\"attendees\":5,\"end_at\":1794448800,\"purpose\":\"PRIVATE_PURPOSE_NEVER_SHARED\",\"room_id\":10,\"start_at\":1794445200,\"title\":\"已结束合成活动\"}",
+        "created_at": 1794016800,
+        "cancelled_at": null,
+        "cancelled_by": null,
+        "cancel_reason": null
+      },
+      {
+        "id": 104,
+        "kind": "booking",
+        "room_id": 10,
+        "user_id": 2,
+        "title": "合成演示活动",
+        "purpose": "PRIVATE_PURPOSE_NEVER_SHARED",
+        "attendees": 5,
+        "reason": null,
+        "start_at": 1794448800,
+        "end_at": 1794452400,
+        "intent_key": "synthetic_key_00000104",
+        "request_payload": "{\"attendees\":5,\"end_at\":1794452400,\"purpose\":\"PRIVATE_PURPOSE_NEVER_SHARED\",\"room_id\":10,\"start_at\":1794448800,\"title\":\"合成演示活动\"}",
+        "created_at": 1794016800,
+        "cancelled_at": 1794103200,
+        "cancelled_by": 3,
+        "cancel_reason": "PRIVATE_CANCELLATION_NEVER_SHARED"
+      },
+      {
+        "id": 105,
+        "kind": "booking",
+        "room_id": 10,
+        "user_id": 2,
+        "title": "<img src=x onerror=\"window.fixtureXss=1\">合成活动",
+        "purpose": "PRIVATE_PURPOSE_NEVER_SHARED",
+        "attendees": 5,
+        "reason": null,
+        "start_at": 1794448800,
+        "end_at": 1794452400,
+        "intent_key": "synthetic_key_00000105",
+        "request_payload": "{\"attendees\":5,\"end_at\":1794452400,\"purpose\":\"PRIVATE_PURPOSE_NEVER_SHARED\",\"room_id\":10,\"start_at\":1794448800,\"title\":\"<img src=x onerror=\\\"window.fixtureXss=1\\\">合成活动\"}",
+        "created_at": 1794016800,
+        "cancelled_at": null,
+        "cancelled_by": null,
+        "cancel_reason": null
+      },
+      {
+        "id": 107,
+        "kind": "booking",
+        "room_id": 10,
+        "user_id": 2,
+        "title": "待开始合成活动",
+        "purpose": "PRIVATE_PURPOSE_NEVER_SHARED",
+        "attendees": 5,
+        "reason": null,
+        "start_at": 1794452400,
+        "end_at": 1794454200,
+        "intent_key": "synthetic_key_00000107",
+        "request_payload": "{\"attendees\":5,\"end_at\":1794454200,\"purpose\":\"PRIVATE_PURPOSE_NEVER_SHARED\",\"room_id\":10,\"start_at\":1794452400,\"title\":\"待开始合成活动\"}",
+        "created_at": 1794016800,
+        "cancelled_at": null,
+        "cancelled_by": null,
+        "cancel_reason": null
+      },
+      {
+        "id": 108,
+        "kind": "block",
+        "room_id": 10,
+        "user_id": 3,
+        "title": null,
+        "purpose": null,
+        "attendees": null,
+        "reason": "合成维护 <检查设备>",
+        "start_at": 1794495600,
+        "end_at": 1794499200,
+        "intent_key": null,
+        "request_payload": null,
+        "created_at": 1794016800,
+        "cancelled_at": null,
+        "cancelled_by": null,
+        "cancel_reason": null
+      },
+      {
+        "id": 109,
+        "kind": "block",
+        "room_id": 10,
+        "user_id": 3,
+        "title": null,
+        "purpose": null,
+        "attendees": null,
+        "reason": "合成维护 <检查设备>",
+        "start_at": 1794499200,
+        "end_at": 1794502800,
+        "intent_key": null,
+        "request_payload": null,
+        "created_at": 1794016800,
+        "cancelled_at": null,
+        "cancelled_by": null,
+        "cancel_reason": null
+      },
+      {
+        "id": 110,
+        "kind": "block",
+        "room_id": 10,
+        "user_id": 3,
+        "title": null,
+        "purpose": null,
+        "attendees": null,
+        "reason": "合成维护 <检查设备>",
+        "start_at": 1794456000,
+        "end_at": 1794459600,
+        "intent_key": null,
+        "request_payload": null,
+        "created_at": 1794016800,
+        "cancelled_at": 1794103200,
+        "cancelled_by": 3,
+        "cancel_reason": "PRIVATE_CANCELLATION_NEVER_SHARED"
+      },
+      {
+        "id": 111,
+        "kind": "booking",
+        "room_id": 20,
+        "user_id": 2,
+        "title": "其他会议室同起点",
+        "purpose": "PRIVATE_PURPOSE_NEVER_SHARED",
+        "attendees": 5,
+        "reason": null,
+        "start_at": 1794448800,
+        "end_at": 1794452400,
+        "intent_key": "synthetic_key_00000111",
+        "request_payload": "{\"attendees\":5,\"end_at\":1794452400,\"purpose\":\"PRIVATE_PURPOSE_NEVER_SHARED\",\"room_id\":20,\"start_at\":1794448800,\"title\":\"其他会议室同起点\"}",
+        "created_at": 1794016800,
+        "cancelled_at": null,
+        "cancelled_by": null,
+        "cancel_reason": null
+      },
+      {
+        "id": 112,
+        "kind": "block",
+        "room_id": 30,
+        "user_id": 3,
+        "title": null,
+        "purpose": null,
+        "attendees": null,
+        "reason": "合成维护 <检查设备>",
+        "start_at": 1794448800,
+        "end_at": 1794452400,
+        "intent_key": null,
+        "request_payload": null,
+        "created_at": 1794016800,
+        "cancelled_at": null,
+        "cancelled_by": null,
+        "cancel_reason": null
+      }
+    ],
+    "occupancy_slots": [
+      {
+        "room_id": 10,
+        "slot_start": 1794409200,
+        "reservation_id": 101
+      },
+      {
+        "room_id": 10,
+        "slot_start": 1794411000,
+        "reservation_id": 101
+      },
+      {
+        "room_id": 10,
+        "slot_start": 1794412800,
+        "reservation_id": 101
+      },
+      {
+        "room_id": 10,
+        "slot_start": 1794414600,
+        "reservation_id": 101
+      },
+      {
+        "room_id": 10,
+        "slot_start": 1794445200,
+        "reservation_id": 103
+      },
+      {
+        "room_id": 10,
+        "slot_start": 1794447000,
+        "reservation_id": 103
+      },
+      {
+        "room_id": 10,
+        "slot_start": 1794448800,
+        "reservation_id": 105
+      },
+      {
+        "room_id": 10,
+        "slot_start": 1794450600,
+        "reservation_id": 105
+      },
+      {
+        "room_id": 10,
+        "slot_start": 1794452400,
+        "reservation_id": 107
+      },
+      {
+        "room_id": 10,
+        "slot_start": 1794495600,
+        "reservation_id": 108
+      },
+      {
+        "room_id": 10,
+        "slot_start": 1794497400,
+        "reservation_id": 108
+      },
+      {
+        "room_id": 10,
+        "slot_start": 1794499200,
+        "reservation_id": 109
+      },
+      {
+        "room_id": 10,
+        "slot_start": 1794501000,
+        "reservation_id": 109
+      },
+      {
+        "room_id": 20,
+        "slot_start": 1794448800,
+        "reservation_id": 111
+      },
+      {
+        "room_id": 20,
+        "slot_start": 1794450600,
+        "reservation_id": 111
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794448800,
+        "reservation_id": 112
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794450600,
+        "reservation_id": 112
+      }
+    ],
+    "audit_events": []
+  },
+  "after": {
+    "rooms": [
+      {
+        "id": 10,
+        "name": "合成 A",
+        "location": "演示楼 101",
+        "capacity": 10,
+        "created_at": 1794448800,
+        "updated_at": 1794448800
+      },
+      {
+        "id": 20,
+        "name": "合成 A",
+        "location": "演示楼 202",
+        "capacity": 20,
+        "created_at": 1794448800,
+        "updated_at": 1794448800
+      },
+      {
+        "id": 30,
+        "name": "合成 C <讨论室>",
+        "location": "演示楼 303",
+        "capacity": 30,
+        "created_at": 1794448800,
+        "updated_at": 1794448800
+      }
+    ],
+    "reservations": [
+      {
+        "id": 101,
+        "kind": "block",
+        "room_id": 10,
+        "user_id": 3,
+        "title": null,
+        "purpose": null,
+        "attendees": null,
+        "reason": "合成维护 <检查设备>",
+        "start_at": 1794409200,
+        "end_at": 1794416400,
+        "intent_key": null,
+        "request_payload": null,
+        "created_at": 1794016800,
+        "cancelled_at": null,
+        "cancelled_by": null,
+        "cancel_reason": null
+      },
+      {
+        "id": 103,
+        "kind": "booking",
+        "room_id": 10,
+        "user_id": 2,
+        "title": "已结束合成活动",
+        "purpose": "PRIVATE_PURPOSE_NEVER_SHARED",
+        "attendees": 5,
+        "reason": null,
+        "start_at": 1794445200,
+        "end_at": 1794448800,
+        "intent_key": "synthetic_key_00000103",
+        "request_payload": "{\"attendees\":5,\"end_at\":1794448800,\"purpose\":\"PRIVATE_PURPOSE_NEVER_SHARED\",\"room_id\":10,\"start_at\":1794445200,\"title\":\"已结束合成活动\"}",
+        "created_at": 1794016800,
+        "cancelled_at": null,
+        "cancelled_by": null,
+        "cancel_reason": null
+      },
+      {
+        "id": 104,
+        "kind": "booking",
+        "room_id": 10,
+        "user_id": 2,
+        "title": "合成演示活动",
+        "purpose": "PRIVATE_PURPOSE_NEVER_SHARED",
+        "attendees": 5,
+        "reason": null,
+        "start_at": 1794448800,
+        "end_at": 1794452400,
+        "intent_key": "synthetic_key_00000104",
+        "request_payload": "{\"attendees\":5,\"end_at\":1794452400,\"purpose\":\"PRIVATE_PURPOSE_NEVER_SHARED\",\"room_id\":10,\"start_at\":1794448800,\"title\":\"合成演示活动\"}",
+        "created_at": 1794016800,
+        "cancelled_at": 1794103200,
+        "cancelled_by": 3,
+        "cancel_reason": "PRIVATE_CANCELLATION_NEVER_SHARED"
+      },
+      {
+        "id": 105,
+        "kind": "booking",
+        "room_id": 10,
+        "user_id": 2,
+        "title": "<img src=x onerror=\"window.fixtureXss=1\">合成活动",
+        "purpose": "PRIVATE_PURPOSE_NEVER_SHARED",
+        "attendees": 5,
+        "reason": null,
+        "start_at": 1794448800,
+        "end_at": 1794452400,
+        "intent_key": "synthetic_key_00000105",
+        "request_payload": "{\"attendees\":5,\"end_at\":1794452400,\"purpose\":\"PRIVATE_PURPOSE_NEVER_SHARED\",\"room_id\":10,\"start_at\":1794448800,\"title\":\"<img src=x onerror=\\\"window.fixtureXss=1\\\">合成活动\"}",
+        "created_at": 1794016800,
+        "cancelled_at": null,
+        "cancelled_by": null,
+        "cancel_reason": null
+      },
+      {
+        "id": 107,
+        "kind": "booking",
+        "room_id": 10,
+        "user_id": 2,
+        "title": "待开始合成活动",
+        "purpose": "PRIVATE_PURPOSE_NEVER_SHARED",
+        "attendees": 5,
+        "reason": null,
+        "start_at": 1794452400,
+        "end_at": 1794454200,
+        "intent_key": "synthetic_key_00000107",
+        "request_payload": "{\"attendees\":5,\"end_at\":1794454200,\"purpose\":\"PRIVATE_PURPOSE_NEVER_SHARED\",\"room_id\":10,\"start_at\":1794452400,\"title\":\"待开始合成活动\"}",
+        "created_at": 1794016800,
+        "cancelled_at": null,
+        "cancelled_by": null,
+        "cancel_reason": null
+      },
+      {
+        "id": 108,
+        "kind": "block",
+        "room_id": 10,
+        "user_id": 3,
+        "title": null,
+        "purpose": null,
+        "attendees": null,
+        "reason": "合成维护 <检查设备>",
+        "start_at": 1794495600,
+        "end_at": 1794499200,
+        "intent_key": null,
+        "request_payload": null,
+        "created_at": 1794016800,
+        "cancelled_at": null,
+        "cancelled_by": null,
+        "cancel_reason": null
+      },
+      {
+        "id": 109,
+        "kind": "block",
+        "room_id": 10,
+        "user_id": 3,
+        "title": null,
+        "purpose": null,
+        "attendees": null,
+        "reason": "合成维护 <检查设备>",
+        "start_at": 1794499200,
+        "end_at": 1794502800,
+        "intent_key": null,
+        "request_payload": null,
+        "created_at": 1794016800,
+        "cancelled_at": null,
+        "cancelled_by": null,
+        "cancel_reason": null
+      },
+      {
+        "id": 110,
+        "kind": "block",
+        "room_id": 10,
+        "user_id": 3,
+        "title": null,
+        "purpose": null,
+        "attendees": null,
+        "reason": "合成维护 <检查设备>",
+        "start_at": 1794456000,
+        "end_at": 1794459600,
+        "intent_key": null,
+        "request_payload": null,
+        "created_at": 1794016800,
+        "cancelled_at": 1794103200,
+        "cancelled_by": 3,
+        "cancel_reason": "PRIVATE_CANCELLATION_NEVER_SHARED"
+      },
+      {
+        "id": 111,
+        "kind": "booking",
+        "room_id": 20,
+        "user_id": 2,
+        "title": "其他会议室同起点",
+        "purpose": "PRIVATE_PURPOSE_NEVER_SHARED",
+        "attendees": 5,
+        "reason": null,
+        "start_at": 1794448800,
+        "end_at": 1794452400,
+        "intent_key": "synthetic_key_00000111",
+        "request_payload": "{\"attendees\":5,\"end_at\":1794452400,\"purpose\":\"PRIVATE_PURPOSE_NEVER_SHARED\",\"room_id\":20,\"start_at\":1794448800,\"title\":\"其他会议室同起点\"}",
+        "created_at": 1794016800,
+        "cancelled_at": null,
+        "cancelled_by": null,
+        "cancel_reason": null
+      },
+      {
+        "id": 112,
+        "kind": "block",
+        "room_id": 30,
+        "user_id": 3,
+        "title": null,
+        "purpose": null,
+        "attendees": null,
+        "reason": "合成维护 <检查设备>",
+        "start_at": 1794448800,
+        "end_at": 1794452400,
+        "intent_key": null,
+        "request_payload": null,
+        "created_at": 1794016800,
+        "cancelled_at": null,
+        "cancelled_by": null,
+        "cancel_reason": null
+      },
+      {
+        "id": 113,
+        "kind": "block",
+        "room_id": 30,
+        "user_id": 3,
+        "title": null,
+        "purpose": null,
+        "attendees": null,
+        "reason": "<img src=x onerror=\"window.blockXss=1\">维护 1280",
+        "start_at": 1794535200,
+        "end_at": 1794643200,
+        "intent_key": null,
+        "request_payload": null,
+        "created_at": 1794448800,
+        "cancelled_at": null,
+        "cancelled_by": null,
+        "cancel_reason": null
+      },
+      {
+        "id": 114,
+        "kind": "block",
+        "room_id": 30,
+        "user_id": 3,
+        "title": null,
+        "purpose": null,
+        "attendees": null,
+        "reason": "响应未知维护",
+        "start_at": 1794643200,
+        "end_at": 1794646800,
+        "intent_key": null,
+        "request_payload": null,
+        "created_at": 1794448800,
+        "cancelled_at": null,
+        "cancelled_by": null,
+        "cancel_reason": null
+      },
+      {
+        "id": 115,
+        "kind": "block",
+        "room_id": 30,
+        "user_id": 3,
+        "title": null,
+        "purpose": null,
+        "attendees": null,
+        "reason": "<img src=x onerror=\"window.blockXss=1\">维护 390",
+        "start_at": 1794880800,
+        "end_at": 1794988800,
+        "intent_key": null,
+        "request_payload": null,
+        "created_at": 1794448800,
+        "cancelled_at": null,
+        "cancelled_by": null,
+        "cancel_reason": null
+      },
+      {
+        "id": 116,
+        "kind": "block",
+        "room_id": 30,
+        "user_id": 3,
+        "title": null,
+        "purpose": null,
+        "attendees": null,
+        "reason": "响应未知维护",
+        "start_at": 1794988800,
+        "end_at": 1794992400,
+        "intent_key": null,
+        "request_payload": null,
+        "created_at": 1794448800,
+        "cancelled_at": null,
+        "cancelled_by": null,
+        "cancel_reason": null
+      }
+    ],
+    "occupancy_slots": [
+      {
+        "room_id": 10,
+        "slot_start": 1794409200,
+        "reservation_id": 101
+      },
+      {
+        "room_id": 10,
+        "slot_start": 1794411000,
+        "reservation_id": 101
+      },
+      {
+        "room_id": 10,
+        "slot_start": 1794412800,
+        "reservation_id": 101
+      },
+      {
+        "room_id": 10,
+        "slot_start": 1794414600,
+        "reservation_id": 101
+      },
+      {
+        "room_id": 10,
+        "slot_start": 1794445200,
+        "reservation_id": 103
+      },
+      {
+        "room_id": 10,
+        "slot_start": 1794447000,
+        "reservation_id": 103
+      },
+      {
+        "room_id": 10,
+        "slot_start": 1794448800,
+        "reservation_id": 105
+      },
+      {
+        "room_id": 10,
+        "slot_start": 1794450600,
+        "reservation_id": 105
+      },
+      {
+        "room_id": 10,
+        "slot_start": 1794452400,
+        "reservation_id": 107
+      },
+      {
+        "room_id": 10,
+        "slot_start": 1794495600,
+        "reservation_id": 108
+      },
+      {
+        "room_id": 10,
+        "slot_start": 1794497400,
+        "reservation_id": 108
+      },
+      {
+        "room_id": 10,
+        "slot_start": 1794499200,
+        "reservation_id": 109
+      },
+      {
+        "room_id": 10,
+        "slot_start": 1794501000,
+        "reservation_id": 109
+      },
+      {
+        "room_id": 20,
+        "slot_start": 1794448800,
+        "reservation_id": 111
+      },
+      {
+        "room_id": 20,
+        "slot_start": 1794450600,
+        "reservation_id": 111
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794448800,
+        "reservation_id": 112
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794450600,
+        "reservation_id": 112
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794535200,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794537000,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794538800,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794540600,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794542400,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794544200,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794546000,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794547800,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794549600,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794551400,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794553200,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794555000,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794556800,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794558600,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794560400,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794562200,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794564000,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794565800,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794567600,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794569400,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794571200,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794573000,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794574800,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794576600,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794578400,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794580200,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794582000,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794583800,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794585600,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794587400,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794589200,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794591000,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794592800,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794594600,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794596400,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794598200,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794600000,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794601800,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794603600,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794605400,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794607200,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794609000,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794610800,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794612600,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794614400,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794616200,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794618000,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794619800,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794621600,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794623400,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794625200,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794627000,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794628800,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794630600,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794632400,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794634200,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794636000,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794637800,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794639600,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794641400,
+        "reservation_id": 113
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794643200,
+        "reservation_id": 114
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794645000,
+        "reservation_id": 114
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794880800,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794882600,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794884400,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794886200,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794888000,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794889800,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794891600,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794893400,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794895200,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794897000,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794898800,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794900600,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794902400,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794904200,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794906000,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794907800,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794909600,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794911400,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794913200,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794915000,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794916800,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794918600,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794920400,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794922200,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794924000,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794925800,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794927600,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794929400,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794931200,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794933000,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794934800,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794936600,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794938400,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794940200,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794942000,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794943800,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794945600,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794947400,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794949200,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794951000,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794952800,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794954600,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794956400,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794958200,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794960000,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794961800,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794963600,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794965400,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794967200,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794969000,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794970800,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794972600,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794974400,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794976200,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794978000,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794979800,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794981600,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794983400,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794985200,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794987000,
+        "reservation_id": 115
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794988800,
+        "reservation_id": 116
+      },
+      {
+        "room_id": 30,
+        "slot_start": 1794990600,
+        "reservation_id": 116
+      }
+    ],
+    "audit_events": [
+      {
+        "id": 1,
+        "actor_id": 3,
+        "actor_display_name": "演示管理员",
+        "action": "block.created",
+        "target_type": "block",
+        "target_id": 113,
+        "occurred_at": 1794448800,
+        "before_json": null,
+        "after_json": "{\"created_at\":1794448800,\"creator_id\":3,\"end_at\":1794643200,\"id\":113,\"reason\":\"<img src=x onerror=\\\"window.blockXss=1\\\">维护 1280\",\"revoke_reason\":null,\"revoked_at\":null,\"revoked_by_id\":null,\"room_id\":30,\"start_at\":1794535200}",
+        "reason": "<img src=x onerror=\"window.blockXss=1\">维护 1280"
+      },
+      {
+        "id": 2,
+        "actor_id": 3,
+        "actor_display_name": "演示管理员",
+        "action": "block.created",
+        "target_type": "block",
+        "target_id": 114,
+        "occurred_at": 1794448800,
+        "before_json": null,
+        "after_json": "{\"created_at\":1794448800,\"creator_id\":3,\"end_at\":1794646800,\"id\":114,\"reason\":\"响应未知维护\",\"revoke_reason\":null,\"revoked_at\":null,\"revoked_by_id\":null,\"room_id\":30,\"start_at\":1794643200}",
+        "reason": "响应未知维护"
+      },
+      {
+        "id": 3,
+        "actor_id": 3,
+        "actor_display_name": "演示管理员",
+        "action": "block.created",
+        "target_type": "block",
+        "target_id": 115,
+        "occurred_at": 1794448800,
+        "before_json": null,
+        "after_json": "{\"created_at\":1794448800,\"creator_id\":3,\"end_at\":1794988800,\"id\":115,\"reason\":\"<img src=x onerror=\\\"window.blockXss=1\\\">维护 390\",\"revoke_reason\":null,\"revoked_at\":null,\"revoked_by_id\":null,\"room_id\":30,\"start_at\":1794880800}",
+        "reason": "<img src=x onerror=\"window.blockXss=1\">维护 390"
+      },
+      {
+        "id": 4,
+        "actor_id": 3,
+        "actor_display_name": "演示管理员",
+        "action": "block.created",
+        "target_type": "block",
+        "target_id": 116,
+        "occurred_at": 1794448800,
+        "before_json": null,
+        "after_json": "{\"created_at\":1794448800,\"creator_id\":3,\"end_at\":1794992400,\"id\":116,\"reason\":\"响应未知维护\",\"revoke_reason\":null,\"revoked_at\":null,\"revoked_by_id\":null,\"room_id\":30,\"start_at\":1794988800}",
+        "reason": "响应未知维护"
+      }
+    ]
+  },
+  "slot_audit_invariants_verified": true
+}

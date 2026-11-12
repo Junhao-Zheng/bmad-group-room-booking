@@ -2,6 +2,7 @@
 {% block title %}会议室管理 · 课题组活动与会议室预约{% endblock %}
 {% block content %}
 <script src="{{ url_for('static', filename='rooms.js') }}" defer></script>
+<script src="{{ url_for('static', filename='blocks.js') }}" defer></script>
 <section class="page-intro">
   <p class="eyebrow">管理员</p><h1>会议室管理</h1>
   <p class="muted">维护名称、地点及容量。降低容量须满足所有未结束有效预约的人数，包含进行中预约。</p>
@@ -35,4 +36,43 @@
     <noscript><p>请启用 JavaScript 以新增或修改会议室。</p></noscript>
   </section>
 </div>
+<section class="card admin-section" aria-labelledby="block-form-title">
+  <h2 id="block-form-title">创建维护停用</h2>
+  <p class="muted">时间均为北京时间，须晚于当前时刻并在未来 30 天内。半小时刻度，允许跨日及超过 4 小时；已有安排不会被自动取消。</p>
+  <button id="block-rooms-refresh" type="button" class="button-secondary">刷新会议室选项</button>
+  <p id="block-rooms-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>
+  <p id="block-script-unavailable" class="notice">停用创建尚未启用。请等待脚本加载；若未启用 JavaScript 或脚本加载失败，请启用后重新打开管理页。</p>
+  <form id="block-form">
+    <fieldset id="block-fields" disabled>
+    <div class="form-field"><label for="block-room_id">停用会议室</label><select id="block-room_id" name="room_id" required aria-describedby="block-room_id-error"><option value="">请选择会议室</option>{% for room in rooms['items'] %}<option value="{{ room.id }}">{{ room.name }} · {{ room.location }}</option>{% endfor %}</select><p id="block-room_id-error" class="field-error"></p></div>
+    <div class="availability-fields">
+      <div class="form-field"><label for="block-start">开始（北京时间）</label><input id="block-start" name="start" type="datetime-local" step="1800" required aria-describedby="block-start-error"><p id="block-start-error" class="field-error"></p></div>
+      <div class="form-field"><label for="block-end">结束（北京时间）</label><input id="block-end" name="end" type="datetime-local" step="1800" required aria-describedby="block-end-error"><p id="block-end-error" class="field-error"></p></div>
+    </div>
+    <div class="form-field"><label for="block-reason">停用原因（1—500 字）</label><textarea id="block-reason" name="reason" rows="3" required aria-describedby="block-reason-error"></textarea><p id="block-reason-error" class="field-error"></p></div>
+    <p id="block-summary" class="notice">请填写会议室、起止时间和原因后核对。</p>
+    <label class="room-confirm-label" for="block-confirm"><input id="block-confirm" type="checkbox" required>我已核对上述会议室、北京时间和停用原因，确认创建</label>
+    <button id="block-submit" class="button-primary" type="submit" disabled>确认创建停用</button>
+    </fieldset>
+  </form>
+  <p id="block-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>
+  <a id="block-relogin" class="relogin-link" href="{{ url_for('web.login_page') }}" hidden>重新登录（不会自动提交）</a>
+  <ul id="block-conflicts" class="schedule-items" aria-label="占用冲突（北京时间）"></ul>
+</section>
+{% for kind, label, terminal, terminal_label in [('bookings','预约','cancelled','已取消'),('blocks','停用','revoked','已撤销')] %}
+<section class="card admin-section" aria-labelledby="admin-{{ kind }}-title">
+  <h2 id="admin-{{ kind }}-title">完整{{ label }}记录</h2>
+  <p class="muted">仅查看；按开始时间和编号升序。日期按北京时间相交筛选，留空显示全部。</p>
+  <form id="admin-{{ kind }}-form">
+    <div class="availability-fields">
+      <div class="form-field"><label for="admin-{{ kind }}-room_id">会议室</label><select id="admin-{{ kind }}-room_id" name="room_id" aria-describedby="admin-{{ kind }}-room_id-error"><option value="">全部会议室</option>{% for room in rooms['items'] %}<option value="{{ room.id }}">{{ room.name }} · {{ room.location }}</option>{% endfor %}</select><p id="admin-{{ kind }}-room_id-error" class="field-error"></p></div>
+      <div class="form-field"><label for="admin-{{ kind }}-date">日期（北京时间）</label><input id="admin-{{ kind }}-date" name="date" type="date" max="9999-12-30" aria-describedby="admin-{{ kind }}-date-error"><p id="admin-{{ kind }}-date-error" class="field-error"></p></div>
+      <div class="form-field"><label for="admin-{{ kind }}-status">状态</label><select id="admin-{{ kind }}-status" name="status" aria-describedby="admin-{{ kind }}-status-error"><option value="">全部状态</option><option value="pending">待开始</option><option value="in_progress">进行中</option><option value="ended">已结束</option><option value="{{ terminal }}">{{ terminal_label }}</option></select><p id="admin-{{ kind }}-status-error" class="field-error"></p></div>
+    </div>
+    <button id="admin-{{ kind }}-submit" class="button-primary" type="submit">查看{{ label }}记录</button>
+  </form>
+  <p id="admin-{{ kind }}-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1">尚未查询{{ label }}记录，请选择条件后查询。</p>
+  <ul id="admin-{{ kind }}-items" class="history-items"></ul>
+</section>
+{% endfor %}
 {% endblock %}

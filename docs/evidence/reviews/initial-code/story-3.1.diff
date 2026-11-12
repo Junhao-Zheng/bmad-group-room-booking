@@ -1,0 +1,1119 @@
+diff --git a/booking_app/domain.py b/booking_app/domain.py
+index 4c05532..4390c86 100644
+--- a/booking_app/domain.py
++++ b/booking_app/domain.py
+@@ -207,6 +207,26 @@ def normalize_booking_payload(payload) -> tuple[dict, str]:
+     return normalized, key
+ 
+ 
++def normalize_room_payload(payload) -> dict:
++    """Room writes always validate a complete object before changing any field."""
++    if not isinstance(payload, dict):
++        raise DomainError("INVALID_INPUT", "请求内容必须是一个对象。")
++    fields, values = {}, {}
++    for name, limit in (("name", 80), ("location", 120)):
++        try:
++            values[name] = normalized_text(payload.get(name), name, limit)
++        except DomainError as error:
++            fields.update(error.fields)
++    capacity = payload.get("capacity")
++    if type(capacity) is not int or not 1 <= capacity <= 1000:
++        fields["capacity"] = "容量须为 1—1000 的整数。"
++    else:
++        values["capacity"] = capacity
++    if fields:
++        raise DomainError("INVALID_INPUT", "请检查会议室资料。", fields)
++    return values
++
++
+ def query_attendees(value) -> int:
+     """Canonical URL integer, capped at 1001 (the no-matching-room sentinel).
+ 
+diff --git a/booking_app/services.py b/booking_app/services.py
+index 982cd0e..bd14ee4 100644
+--- a/booking_app/services.py
++++ b/booking_app/services.py
+@@ -7,7 +7,7 @@ from flask import current_app
+ 
+ from . import auth, db, dto
+ from .domain import DomainError, auth_required, beijing_day, booking_interval, query_attendees, resource_id
+-from .domain import normalize_booking_payload, validate_booking_window
++from .domain import normalize_booking_payload, normalize_room_payload, validate_booking_window
+ 
+ 
+ def _require_actor(conn, actor: auth.Actor, now: int) -> auth.Actor:
+@@ -88,14 +88,82 @@ def create_booking(actor: auth.Actor, payload: dict) -> dict:
+     return result
+ 
+ 
+-def list_rooms(actor: auth.Actor) -> dict:
++def list_rooms(actor: auth.Actor, *, admin_only=False) -> dict:
+     with db.read_transaction() as conn:
+         now = current_app.config["CLOCK"].now_epoch()
+-        _require_actor(conn, actor, now)
++        actor = _require_actor(conn, actor, now)
++        if admin_only:
++            require_admin(actor)
+         rows = conn.execute("SELECT id,name,location,capacity FROM rooms ORDER BY name,location,id").fetchall()
+         return dto.list_result([dto.room(row) for row in rows])
+ 
+ 
++def require_admin(actor: auth.Actor) -> auth.Actor:
++    if actor.role != "admin":
++        raise DomainError("FORBIDDEN", "仅管理员可管理会议室。")
++    return actor
++
++
++def _room_duplicate(conn, values: dict, room_id=None) -> None:
++    duplicate = conn.execute(
++        "SELECT id FROM rooms WHERE name=? AND location=? AND (? IS NULL OR id<>?)",
++        (values["name"], values["location"], room_id, room_id),
++    ).fetchone()
++    if duplicate is not None:
++        raise DomainError("ROOM_DUPLICATE", "相同名称和地点的会议室已存在，请检查资料。")
++
++
++def create_room(actor: auth.Actor, payload: dict) -> dict:
++    with db.write_transaction() as conn:
++        now = current_app.config["CLOCK"].now_epoch()
++        actor = require_admin(_require_actor(conn, actor, now))
++        values = normalize_room_payload(payload)
++        _room_duplicate(conn, values)
++        inserted = conn.execute(
++            "INSERT INTO rooms(name,location,capacity,created_at,updated_at) VALUES(?,?,?,?,?)",
++            (values["name"], values["location"], values["capacity"], now, now),
++        )
++        result = dict(id=inserted.lastrowid, **values)
++        current_app.config["AUDIT_WRITER"](conn, {
++            "actor_id": actor.id, "actor_display_name": actor.display_name, "action": "room.created",
++            "target_type": "room", "target_id": result["id"], "occurred_at": now,
++            "before": None, "after": result, "reason": None,
++        })
++    return result
++
++
++def update_room(actor: auth.Actor, room_id, payload: dict) -> dict:
++    with db.write_transaction() as conn:
++        now = current_app.config["CLOCK"].now_epoch()
++        actor = require_admin(_require_actor(conn, actor, now))
++        normalized_id = resource_id(room_id)
++        values = normalize_room_payload(payload)
++        row = conn.execute("SELECT id,name,location,capacity FROM rooms WHERE id=?", (normalized_id,)).fetchone()
++        if row is None:
++            raise DomainError("NOT_FOUND", "会议室不存在，请重新选择。")
++        before, result = dto.room(row), dict(id=normalized_id, **values)
++        if result == before:
++            return before
++        _room_duplicate(conn, values, normalized_id)
++        if values["capacity"] < before["capacity"]:
++            conflicts = conn.execute(
++                "SELECT id,kind,room_id,start_at,end_at,attendees,reason FROM reservations "
++                "WHERE room_id=? AND kind='booking' AND cancelled_at IS NULL AND end_at>? "
++                "AND attendees>? ORDER BY start_at,id", (normalized_id, now, values["capacity"]),
++            ).fetchall()
++            if conflicts:
++                raise DomainError("CAPACITY_CONFLICT", "新容量不足以容纳未结束的有效预约，会议室资料未修改。",
++                                  conflicts=[dto.conflict(row, now, admin=True) for row in conflicts])
++        conn.execute("UPDATE rooms SET name=?,location=?,capacity=?,updated_at=? WHERE id=?",
++                     (values["name"], values["location"], values["capacity"], now, normalized_id))
++        current_app.config["AUDIT_WRITER"](conn, {
++            "actor_id": actor.id, "actor_display_name": actor.display_name, "action": "room.updated",
++            "target_type": "room", "target_id": normalized_id, "occurred_at": now,
++            "before": before, "after": result, "reason": None,
++        })
++    return result
++
++
+ _BOOKING_DETAIL_SELECT = (
+     "SELECT r.*,u.display_name AS owner_display_name,c.display_name AS cancelled_by_display_name,"
+     "room.name AS room_name,room.location AS room_location,room.capacity AS room_capacity "
+diff --git a/booking_app/static/app.css b/booking_app/static/app.css
+index 42f856e..5757185 100644
+--- a/booking_app/static/app.css
++++ b/booking_app/static/app.css
+@@ -83,3 +83,6 @@ textarea[aria-invalid="true"]{border:2px solid #a52b37}
+ #cancel-form{margin-top:28px;padding-top:20px;border-top:1px solid #dde6e8}
+ #cancel-form label{display:flex;align-items:flex-start;gap:10px;font-weight:600}
+ #cancel-confirm{width:20px;height:20px;min-height:20px;flex:0 0 20px;margin-top:3px;padding:0;accent-color:#126d65}
++.room-confirm-label{display:flex;align-items:flex-start;gap:10px;margin-top:24px}
++#room-confirm{width:20px;height:20px;min-height:20px;flex:0 0 20px;margin-top:3px;padding:0;accent-color:#126d65}
++#room-cancel{margin-top:12px}#admin-rooms button{max-width:100%;overflow-wrap:anywhere}
+diff --git a/booking_app/templates/base.html b/booking_app/templates/base.html
+index 06dab64..238ccc8 100644
+--- a/booking_app/templates/base.html
++++ b/booking_app/templates/base.html
+@@ -16,6 +16,7 @@
+       <nav class="primary-nav" aria-label="主要导航">
+         <a href="{{ url_for('web.home') }}"{% if request.endpoint == 'web.home' %} aria-current="page"{% endif %}>预约</a>
+         <a href="{{ url_for('web.my_page') }}"{% if request.endpoint == 'web.my_page' %} aria-current="page"{% endif %}>我的预约</a>
++        {% if user.role == 'admin' %}<a href="{{ url_for('web.admin_page') }}"{% if request.endpoint == 'web.admin_page' %} aria-current="page"{% endif %}>管理</a>{% endif %}
+       </nav>
+       <div class="account">
+         <span class="account-name">{{ user.display_name }}</span>
+diff --git a/booking_app/web.py b/booking_app/web.py
+index 893092a..4886de1 100644
+--- a/booking_app/web.py
++++ b/booking_app/web.py
+@@ -13,7 +13,7 @@ bp = Blueprint("web", __name__)
+ STATUS = {"INVALID_INPUT": 400, "AUTH_REQUIRED": 401, "INVALID_CREDENTIALS": 401,
+           "FORBIDDEN": 403, "CSRF_REJECTED": 403, "NOT_FOUND": 404,
+           "OCCUPANCY_CONFLICT": 409, "CAPACITY_CONFLICT": 409, "IDEMPOTENCY_MISMATCH": 409,
+-          "TRANSITION_CLOSED": 409,
++          "TRANSITION_CLOSED": 409, "ROOM_DUPLICATE": 409,
+           "STORE_BUSY": 503, "INTERNAL_ERROR": 500}
+ 
+ 
+@@ -69,6 +69,29 @@ def my_page():
+     return render_template("my.html", user=auth.current_user(auth.require_session(token())))
+ 
+ 
++@bp.get("/admin")
++def admin_page():
++    session = auth.require_session(token())
++    actor = services.require_admin(auth.actor_for_token(token()))
++    return render_template("admin.html", user=auth.current_user(session), rooms=services.list_rooms(actor, admin_only=True))
++
++
++@bp.post("/api/admin/rooms")
++def create_room_api():
++    actor = services.require_admin(auth.actor_for_token(token()))
++    if request.mimetype != "application/json":
++        raise DomainError("INVALID_INPUT", "请使用 JSON 格式提交会议室资料。")
++    return jsonify(ok=True, data=services.create_room(actor, payload())), 201
++
++
++@bp.post("/api/admin/rooms/<room_id>")
++def update_room_api(room_id):
++    actor = services.require_admin(auth.actor_for_token(token()))
++    if request.mimetype != "application/json":
++        raise DomainError("INVALID_INPUT", "请使用 JSON 格式提交会议室资料。")
++    return jsonify(ok=True, data=services.update_room(actor, room_id, payload()))
++
++
+ @bp.get("/api/bookings/mine")
+ def my_bookings_api():
+     actor = auth.actor_for_token(token())
+diff --git a/booking_app/static/rooms.js b/booking_app/static/rooms.js
+new file mode 100644
+index 0000000..de90fd0
+--- /dev/null
++++ b/booking_app/static/rooms.js
+@@ -0,0 +1,137 @@
++"use strict";
++
++(() => {
++  const find = id => document.getElementById(id);
++  const form = find("room-form"), list = find("admin-rooms"), heading = find("room-form-title");
++  if (!form) return;
++  const submit = find("room-submit"), cancel = find("room-cancel"), confirm = find("room-confirm");
++  const refresh = find("rooms-refresh"), feedback = find("room-feedback"), directoryFeedback = find("rooms-feedback");
++  const conflicts = find("room-conflicts"), relogin = find("room-relogin");
++  const inputs = ["name", "location", "capacity"].map(name => form.elements.namedItem(name));
++  let editing = null, busy = false, blocked = false;
++  const say = (node, message, error = false) => {
++    node.textContent = message; node.classList.toggle("error", error);
++    node.setAttribute("role", error ? "alert" : "status");
++  };
++  function controls(value) {
++    busy = value;
++    [...inputs, confirm, submit, cancel, refresh, ...list.querySelectorAll("button")].forEach(node => { node.disabled = value || blocked; });
++    if (value) form.setAttribute("aria-busy", "true"); else form.removeAttribute("aria-busy");
++  }
++  function clearErrors() {
++    for (const input of inputs) {
++      input.removeAttribute("aria-invalid"); find(`room-${input.name}-error`).textContent = "";
++    }
++    conflicts.replaceChildren(); relogin.hidden = true;
++  }
++  function setEditing(room) {
++    if (busy || blocked) return;
++    editing = room;
++    for (const input of inputs) input.value = room ? String(room[input.name]) : "";
++    confirm.checked = false; cancel.hidden = !room; clearErrors();
++    heading.textContent = room ? `编辑会议室 ${room.id}` : "新增会议室";
++    submit.textContent = room ? "确认保存会议室" : "确认新增会议室";
++    say(feedback, ""); heading.focus();
++  }
++  function bindEdit(button, room) { button.addEventListener("click", () => setEditing(room)); }
++  for (const button of list.querySelectorAll("button")) {
++    bindEdit(button, {id:Number(button.dataset.roomId),name:button.dataset.roomName,
++      location:button.dataset.roomLocation,capacity:Number(button.dataset.roomCapacity)});
++  }
++  function roomShape(room) {
++    return room && Object.keys(room).sort().join(",") === "capacity,id,location,name" &&
++      Number.isInteger(room.id) && room.id > 0 && typeof room.name === "string" &&
++      typeof room.location === "string" && Number.isInteger(room.capacity) && room.capacity >= 1 && room.capacity <= 1000;
++  }
++  async function request(url, values) {
++    const controller = new AbortController(), timer = window.setTimeout(() => controller.abort(), 20000);
++    try {
++      const response = await fetch(url, {credentials:"same-origin",signal:controller.signal,
++        ...(values ? {method:"POST",headers:{"Content-Type":"application/json",
++          "X-CSRF-Token":document.querySelector("#logout-form").elements.csrf_token.value},body:JSON.stringify(values)} : {})});
++      const body = await response.json();
++      if (response.ok && body.ok === true && body.data) return body.data;
++      if (!response.ok && body.ok === false && body.error && typeof body.error.code === "string" &&
++          typeof body.error.message === "string") throw {serverError:body.error};
++      throw new Error("Invalid response");
++    } finally { window.clearTimeout(timer); }
++  }
++  function sessionError(error) {
++    if (["AUTH_REQUIRED", "FORBIDDEN"].includes(error.code)) {
++      blocked = true; list.replaceChildren(); conflicts.replaceChildren();
++      say(directoryFeedback, "当前无管理权限，请重新登录后打开管理页。", true);
++    }
++    if (["AUTH_REQUIRED", "FORBIDDEN", "CSRF_REJECTED"].includes(error.code)) relogin.hidden = false;
++  }
++  async function loadRooms() {
++    const data = await request("/api/rooms");
++    if (!Array.isArray(data.items) || data.total !== data.items.length || !data.items.every(roomShape)) throw new Error("Invalid directory");
++    list.replaceChildren();
++    for (const room of data.items) {
++      const item = document.createElement("li"), title = document.createElement("h3"), detail = document.createElement("p"), button = document.createElement("button");
++      title.textContent = room.name; detail.textContent = `${room.location} · 容量 ${room.capacity} 人`;
++      button.textContent = `编辑会议室 ${room.id}`; button.type = "button"; button.className = "button-secondary";
++      button.disabled = busy || blocked; bindEdit(button, room); item.append(title, detail, button); list.append(item);
++    }
++    say(directoryFeedback, data.total ? `共 ${data.total} 间会议室，目录已刷新。` : "暂无会议室，请新增。");
++  }
++  const canFocus = () => !document.activeElement || document.activeElement === document.body || form.contains(document.activeElement);
++  form.addEventListener("submit", async event => {
++    event.preventDefault(); if (busy || blocked || !confirm.checked) return;
++    const values = {name:inputs[0].value, location:inputs[1].value,
++      capacity:/^[1-9][0-9]*$/.test(inputs[2].value) ? Number(inputs[2].value) : null};
++    const roomId = editing?.id; const initiatedHere = form.contains(document.activeElement);
++    clearErrors(); controls(true); submit.textContent = "正在提交…";
++    say(feedback, "正在保存，请稍候…"); let focusTarget = feedback;
++    try {
++      const room = await request(roomId ? `/api/admin/rooms/${roomId}` : "/api/admin/rooms", values);
++      if (!roomShape(room) || (roomId && room.id !== roomId)) throw new Error("Invalid room");
++      editing = room; cancel.hidden = false; heading.textContent = `编辑会议室 ${room.id}`;
++      for (const input of inputs) input.value = String(room[input.name]);
++      confirm.checked = false;
++      say(feedback, `会议室 ${room.id} 已保存。相同资料重复保存不会新增操作记录。`);
++      try { await loadRooms(); }
++      catch (error) {
++        if (error.serverError) sessionError(error.serverError);
++        say(directoryFeedback, "会议室已保存，但目录刷新失败，请手动刷新目录。", true);
++      }
++    } catch (failure) {
++      const error = failure.serverError;
++      if (error) {
++        say(feedback, `${error.message} 输入已保留。`, true); sessionError(error);
++        for (const input of inputs) {
++          if (error.fields && typeof error.fields[input.name] === "string") {
++            input.setAttribute("aria-invalid", "true"); find(`room-${input.name}-error`).textContent = error.fields[input.name];
++            if (focusTarget === feedback) focusTarget = input;
++          }
++        }
++        for (const row of error.conflicts || []) {
++          const item = document.createElement("li");
++          item.textContent = `预约 ${row.id} · ${row.attendees} 人 · 北京时间 ${row.start_local.replace("T", " ").slice(0,19)} 至 ${row.end_local.replace("T", " ").slice(0,19)} · ${row.status === "in_progress" ? "进行中" : "待开始"}`;
++          conflicts.append(item);
++        }
++      } else {
++        say(feedback, "未能确认保存结果，输入已保留。请先刷新目录核对，再手动提交；不会自动重试。", true);
++      }
++    } finally {
++      controls(false); submit.textContent = editing ? "确认保存会议室" : "确认新增会议室";
++      if (initiatedHere && canFocus()) focusTarget.focus();
++    }
++  });
++  cancel.addEventListener("click", () => setEditing(null));
++  refresh.addEventListener("click", async () => {
++    if (busy || blocked) return;
++    const initiatedHere = document.activeElement === refresh;
++    controls(true); say(directoryFeedback, "正在刷新目录…");
++    try { await loadRooms(); }
++    catch (error) {
++      if (error.serverError) sessionError(error.serverError);
++      say(directoryFeedback, "目录刷新失败，表单输入已保留，请手动重试。", true);
++    } finally {
++      controls(false);
++      if (initiatedHere && (!document.activeElement || document.activeElement === document.body)) {
++        (blocked ? directoryFeedback : refresh).focus();
++      }
++    }
++  });
++})();
+diff --git a/booking_app/templates/admin.html b/booking_app/templates/admin.html
+new file mode 100644
+index 0000000..14c1ed5
+--- /dev/null
++++ b/booking_app/templates/admin.html
+@@ -0,0 +1,38 @@
++{% extends "base.html" %}
++{% block title %}会议室管理 · 课题组活动与会议室预约{% endblock %}
++{% block content %}
++<script src="{{ url_for('static', filename='rooms.js') }}" defer></script>
++<section class="page-intro">
++  <p class="eyebrow">管理员</p><h1>会议室管理</h1>
++  <p class="muted">维护名称、地点及容量。降低容量须满足所有未结束有效预约的人数，包含进行中预约。</p>
++  <p id="auth-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>
++  <a id="relogin-link" class="relogin-link" href="{{ url_for('web.login_page') }}" hidden>重新登录</a>
++</section>
++<div class="history-layout">
++  <section class="card" aria-labelledby="room-list-title">
++    <h2 id="room-list-title">会议室目录</h2>
++    <button id="rooms-refresh" class="button-secondary" type="button">刷新目录</button>
++    <p id="rooms-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1">共 {{ rooms.total }} 间会议室。选择编辑或填写右侧新增表单。</p>
++    <ul id="admin-rooms" class="room-list">
++      {% for room in rooms['items'] %}<li><h3>{{ room.name }}</h3><p>{{ room.location }} · 容量 {{ room.capacity }} 人</p>
++        <button class="button-secondary" type="button" data-room-id="{{ room.id }}" data-room-name="{{ room.name }}" data-room-location="{{ room.location }}" data-room-capacity="{{ room.capacity }}">编辑会议室 {{ room.id }}</button>
++      </li>{% else %}<li>暂无会议室，请新增。</li>{% endfor %}
++    </ul>
++  </section>
++  <section class="card" aria-labelledby="room-form-title">
++    <h2 id="room-form-title" tabindex="-1">新增会议室</h2>
++    <form id="room-form">
++      <div class="form-field"><label for="room-name">名称</label><input id="room-name" name="name" required aria-describedby="room-name-error"><p id="room-name-error" class="field-error"></p></div>
++      <div class="form-field"><label for="room-location">地点</label><input id="room-location" name="location" required aria-describedby="room-location-error"><p id="room-location-error" class="field-error"></p></div>
++      <div class="form-field"><label for="room-capacity">容量（1—1000 人）</label><input id="room-capacity" name="capacity" type="number" min="1" max="1000" step="1" required aria-describedby="room-capacity-error"><p id="room-capacity-error" class="field-error"></p></div>
++      <label class="room-confirm-label" for="room-confirm"><input id="room-confirm" type="checkbox" required>我已核对资料，确认提交</label>
++      <button id="room-submit" class="button-primary" type="submit">确认新增会议室</button>
++      <button id="room-cancel" class="button-secondary" type="button" hidden>取消编辑，填写新增</button>
++    </form>
++    <p id="room-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>
++    <a id="room-relogin" class="relogin-link" href="{{ url_for('web.login_page') }}" hidden>重新登录（不会自动提交）</a>
++    <ul id="room-conflicts" class="schedule-items" aria-label="容量冲突预约（北京时间）"></ul>
++    <noscript><p>请启用 JavaScript 以新增或修改会议室。</p></noscript>
++  </section>
++</div>
++{% endblock %}
+diff --git a/scripts/verify_room_management_browser.cjs b/scripts/verify_room_management_browser.cjs
+new file mode 100644
+index 0000000..fa00e02
+--- /dev/null
++++ b/scripts/verify_room_management_browser.cjs
+@@ -0,0 +1,94 @@
++// Real browser management paths. Synthetic secrets remain in the private credential file.
++const {chromium}=require('playwright');
++const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
++const [origin,credentialsFile,outputDir,executablePath]=process.argv.slice(2);
++const users=JSON.parse(fs.readFileSync(credentialsFile,'utf8')).users;
++const roomKeys=['capacity','id','location','name'];
++async function login(context,user){
++  const page=await context.newPage();await page.goto(origin+'/login');
++  await page.locator('#username').fill(user.username);await page.locator('#password').fill(user.password);
++  await page.locator('#password').press('Enter');await page.waitForURL(origin+'/');return page;
++}
++async function settled(page){await page.waitForFunction(()=>!document.querySelector('#room-form').hasAttribute('aria-busy'));}
++async function fill(page,value){for(const key of ['name','location','capacity'])await page.locator(`#room-${key}`).fill(String(value[key]));await page.locator('#room-confirm').check();}
++async function draft(page){return page.locator('#room-form').evaluate(form=>Object.fromEntries(['name','location','capacity'].map(key=>[key,form.elements.namedItem(key).value])));}
++(async()=>{
++  assert.equal(require('playwright/package.json').version,'1.58.2');
++  const browser=await chromium.launch({headless:true,...(executablePath?{executablePath}:{})});const results=[];
++  try{
++    for(const viewport of [{width:1280,height:800},{width:390,height:844}]){
++      const context=await browser.newContext({viewport}),page=await login(context,users[2]);
++      const errors=[],network=[];let writes=0;
++      page.on('pageerror',error=>errors.push(error.name));page.on('request',request=>{if(request.method()==='POST'&&request.url().includes('/api/admin/rooms'))writes++;});
++      function stage(name){fs.writeFileSync(path.join(outputDir,'progress.json'),JSON.stringify({viewport,stage:name}));}
++      async function capture(response,phase){const row={phase,path:new URL(response.url()).pathname,status:response.status(),body:await response.json()};network.push(row);fs.writeFileSync(path.join(outputDir,`network-${viewport.width}.json`),JSON.stringify(network,null,2));return row;}
++      async function screenshot(name){const width=await page.evaluate(()=>({document:document.documentElement.scrollWidth,viewport:innerWidth}));assert.ok(width.document<=width.viewport);await page.screenshot({path:path.join(outputDir,`${name}-${viewport.width}.png`),fullPage:true});}
++      stage('open');await page.locator('.primary-nav a[href="/admin"]').click();await page.waitForSelector('#room-form');
++      assert.equal(await page.locator('#room-form-title').textContent(),'新增会议室');
++      for(const name of ['name','location','capacity'])assert.equal(await page.locator(`label[for="room-${name}"]`).count(),1);
++      await screenshot('admin-initial');
++      const values={name:`<img src=x onerror="window.roomXss=1">新 ${viewport.width}`,location:'合成楼 <script>纯文本</script>',capacity:20};
++      await fill(page,values);await page.locator('#room-confirm').uncheck();await page.locator('#room-submit').click();assert.equal(writes,0);
++      await page.locator('#room-confirm').check();
++      stage('csrf');
++      await page.route('**/api/admin/rooms',async route=>{const headers=route.request().headers();delete headers['x-csrf-token'];await route.continue({headers});});
++      let response=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/admin/rooms');await page.locator('#room-submit').focus();await page.keyboard.press('Enter');
++      assert.equal((await capture(await response,'csrf-rejected')).status,403);await settled(page);
++      assert.deepEqual(await draft(page),{...values,capacity:'20'});assert.equal(await page.evaluate(()=>document.activeElement.id),'room-feedback');
++      await screenshot('csrf-rejected');await page.unroute('**/api/admin/rooms');
++      stage('create-wait');let release;const gate=new Promise(resolve=>{release=resolve;});
++      await page.route('**/api/admin/rooms',async route=>{await gate;await route.continue();});
++      response=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/admin/rooms');await page.locator('#room-submit').click();
++      assert.equal(await page.locator('#room-name').isDisabled(),true);assert.equal(await page.locator('#rooms-refresh').isDisabled(),true);
++      await screenshot('saving');await page.locator('#logout-form button').focus();release();
++      const created=await capture(await response,'created');assert.equal(created.status,201);await settled(page);
++      assert.equal(await page.evaluate(()=>document.activeElement===document.querySelector('#logout-form button')),true);
++      assert.deepEqual(Object.keys(created.body.data).sort(),roomKeys);
++      assert.equal(await page.locator('#admin-rooms img,#admin-rooms script').count(),0);assert.equal(await page.evaluate(()=>window.roomXss),undefined);
++      await screenshot('created-plain-text');await page.unroute('**/api/admin/rooms');
++      stage('unchanged');await page.locator('#room-confirm').check();response=page.waitForResponse(r=>r.url().endsWith(`/api/admin/rooms/${created.body.data.id}`));
++      await page.locator('#room-submit').click();const unchanged=await capture(await response,'unchanged');await settled(page);assert.deepEqual(unchanged.body,created.body);
++      stage('invalid');await page.locator('#room-name').fill('长'.repeat(81));await page.locator('#room-confirm').check();
++      response=page.waitForResponse(r=>r.url().endsWith(`/api/admin/rooms/${created.body.data.id}`));await page.locator('#room-submit').click();
++      assert.equal((await capture(await response,'field-invalid')).status,400);await settled(page);
++      assert.equal(await page.evaluate(()=>document.activeElement.id),'room-name');assert.equal(await page.locator('#room-name').inputValue(),'长'.repeat(81));await screenshot('field-invalid');
++      stage('duplicate');await page.locator('#room-cancel').click();await fill(page,values);response=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/admin/rooms');
++      await page.locator('#room-submit').click();assert.equal((await capture(await response,'duplicate')).status,409);await settled(page);assert.deepEqual(await draft(page),{...values,capacity:'20'});await screenshot('duplicate');
++      stage('capacity');const target=viewport.width===1280?1:2;
++      await page.locator('#admin-rooms button').filter({hasText:new RegExp(`^编辑会议室 ${target}$`)}).click();
++      const edited={name:`管理修改 ${viewport.width}`,location:'新地点',capacity:4};await fill(page,edited);
++      response=page.waitForResponse(r=>r.url().endsWith(`/api/admin/rooms/${target}`));await page.locator('#room-submit').click();
++      const conflict=await capture(await response,'capacity-conflict');assert.equal(conflict.status,409);await settled(page);
++      assert.deepEqual(Object.keys(conflict.body.error.conflicts[0]).sort(),['attendees','end_at','end_local','id','reason','room_id','start_at','start_local','status','type']);
++      assert.deepEqual(await draft(page),{...edited,capacity:'4'});assert.match(await page.locator('#room-conflicts').textContent(),/5 人.*北京时间.*进行中/);await screenshot('capacity-conflict');
++      await page.locator('#room-capacity').fill('5');response=page.waitForResponse(r=>r.url().endsWith(`/api/admin/rooms/${target}`));await page.locator('#room-submit').click();
++      const changed=await capture(await response,'equal-capacity-saved');assert.equal(changed.status,200);assert.equal(changed.body.data.id,target);await settled(page);await screenshot('updated');
++      stage('unknown');await page.locator('#room-cancel').click();const unknown={name:`响应未知房间 ${viewport.width}`,location:'临时楼',capacity:8};await fill(page,unknown);
++      await page.route('**/api/admin/rooms',async route=>{await capture(await route.fetch(),'committed-response-dropped');await route.abort();});
++      const beforeUnknown=writes;await page.locator('#room-submit').click();await page.waitForFunction(()=>document.querySelector('#room-feedback').textContent.includes('未能确认'));await settled(page);
++      assert.equal(writes,beforeUnknown+1);assert.deepEqual(await draft(page),{...unknown,capacity:'8'});await screenshot('response-unknown');await page.unroute('**/api/admin/rooms');
++      await page.locator('#rooms-refresh').click();await settled(page);assert.deepEqual(await draft(page),{...unknown,capacity:'8'});
++      assert.ok((await page.locator('#admin-rooms').textContent()).includes(unknown.name));assert.equal(writes,beforeUnknown+1);
++      stage('session');const csrf=(await (await context.request.get(origin+'/api/me')).json()).data.csrf_token;
++      assert.equal((await context.request.post(origin+'/api/logout',{data:{},headers:{Origin:origin,'X-CSRF-Token':csrf}})).status(),200);
++      response=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/admin/rooms');await page.locator('#room-submit').click();
++      assert.equal((await capture(await response,'session-expired')).status,401);await settled(page);
++      assert.deepEqual(await draft(page),{...unknown,capacity:'8'});assert.equal(await page.locator('#room-relogin').isVisible(),true);assert.equal(await page.locator('#room-submit').isDisabled(),true);await screenshot('session-expired');
++      stage('member');const memberContext=await browser.newContext({viewport}),memberPage=await login(memberContext,users[0]);
++      assert.equal(await memberPage.locator('.primary-nav a[href="/admin"]').count(),0);
++      const denied=await memberContext.request.get(origin+'/admin');assert.equal(denied.status(),403);
++      const memberCsrf=(await (await memberContext.request.get(origin+'/api/me')).json()).data.csrf_token;
++      assert.equal((await memberContext.request.post(origin+'/api/admin/rooms',{data:values,headers:{Origin:origin,'X-CSRF-Token':memberCsrf}})).status(),403);
++      // Existing directory, day schedule and personal history remain operable.
++      stage('existing-paths');await memberPage.locator('#room_id').selectOption(String(target));await memberPage.locator('#date').fill('2026-11-12');
++      const scheduleResponse=memberPage.waitForResponse(r=>new URL(r.url()).pathname==='/api/schedule');await memberPage.locator('#schedule-form button[type=submit]').click();
++      assert.equal((await capture(await scheduleResponse,'existing-schedule')).status,200);
++      await memberPage.locator('.primary-nav a[href="/my"]').click();await memberPage.waitForSelector('#history-items button');
++      await memberPage.locator('#logout-form button').focus();await memberPage.keyboard.press('Enter');await memberPage.waitForURL(origin+'/login?logged_out=1');
++      assert.equal((await memberContext.request.get(origin+'/api/rooms')).status(),401);
++      assert.deepEqual(errors,[]);results.push({viewport,normal_rejected_unknown_and_session_paths:true,keyboard_focus:true,no_horizontal_overflow:true,exact_dto_and_plain_text:true,writes});
++      await memberContext.close();await context.close();
++    }
++  }finally{await browser.close();}
++  console.log(JSON.stringify({result:'PASS',viewports:results}));
++})().catch(error=>{console.error(error);process.exitCode=1;});
+diff --git a/scripts/verify_room_management_browser.py b/scripts/verify_room_management_browser.py
+new file mode 100644
+index 0000000..06c23fb
+--- /dev/null
++++ b/scripts/verify_room_management_browser.py
+@@ -0,0 +1,127 @@
++"""Story 3.1 isolated room-management browser validation with shared verified process lifecycle."""
++import argparse
++from datetime import datetime, timezone
++import hashlib
++import json
++import os
++from pathlib import Path
++import secrets
++import socket
++import subprocess
++import sys
++import tempfile
++import time
++
++from booking_app import ROOT, db
++from scripts.init_demo import DEMO_IDENTITIES, seed_users
++from scripts.verify_auth_browser import write_report
++from tests.history_fixtures import FixedClock, seed_history_fixture
++
++
++
++from scripts.verify_history_browser import (require_process_groups, stop_process_group,
++    browser_wrapper, run_driver, environment_metadata)
++from scripts.verify_room_management_http import facts
++
++
++def source_fingerprints():
++    app_files = sorted(path for path in (ROOT / 'booking_app').rglob('*')
++                       if path.is_file() and path.suffix in {'.py','.sql','.js','.css','.html'})
++    helpers = [ROOT / path for path in (
++        'scripts/verify_room_management_browser.py', 'scripts/verify_room_management_browser.cjs',
++        'scripts/verify_history_browser.py',
++        'scripts/verify_auth_browser.py', 'scripts/init_demo.py',
++        'tests/history_fixtures.py', 'tests/schedule_fixtures.py', 'scripts/verify_room_management_http.py')]
++    def hashes(paths):
++        return {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
++    return {'app_source_files_sha256': hashes(app_files), 'verification_source_files_sha256': hashes(helpers)}
++
++
++def run(args):
++    require_process_groups()
++    origin = f'http://127.0.0.1:{args.port}'
++    with socket.socket() as probe: probe.bind(('127.0.0.1', args.port))
++    with tempfile.TemporaryDirectory(prefix='grb-room-browser-') as directory:
++        temporary = Path(directory)
++        users = [dict(username=u, display_name=d, role=r, password=secrets.token_urlsafe(24)) for u,d,r in (*DEMO_IDENTITIES, ('demo_empty', '合成空记录成员', 'member'))]
++        credentials = temporary / 'demo.credentials.json'
++        credentials.touch(mode=0o600)
++        credentials.write_text(json.dumps({'users': users}), encoding='utf-8')
++        database = temporary / 'history.sqlite3'
++        seed_users(database, users, FixedClock())
++        seed_history_fixture(database)
++        before = facts(database)
++        env = dict(os.environ, BOOKING_DB_PATH=str(database), APP_ORIGIN=origin, COOKIE_SECURE='false',
++                   TRUSTED_HOSTS='127.0.0.1', NODE_PATH=str(args.playwright_root.resolve()))
++        executable = args.browser_executable
++        if executable is None:
++            resolved = subprocess.run(['node', '-e', 'process.stdout.write(require("playwright").chromium.executablePath())'],
++                env=env, cwd=ROOT, capture_output=True, text=True, check=True, timeout=10, start_new_session=True)
++            executable = Path(resolved.stdout)
++        wrapper, registry = browser_wrapper(temporary, executable.resolve())
++        command = [sys.executable, '-m', 'waitress', f'--listen=127.0.0.1:{args.port}', '--threads=8',
++                   '--call', 'scripts.verify_auth_browser:create_schedule_verification_app']
++        with (temporary / 'waitress.log').open('w') as log:
++            server = subprocess.Popen(command, cwd=ROOT, env=env, stdout=log, stderr=log, start_new_session=True)
++            try:
++                for _ in range(100):
++                    if server.poll() is not None: raise RuntimeError('Waitress startup failed')
++                    try:
++                        with socket.create_connection(('127.0.0.1', args.port), timeout=.1): break
++                    except OSError: time.sleep(.05)
++                else: raise RuntimeError('Waitress startup timeout')
++                result = run_driver(['node', str(ROOT / 'scripts/verify_room_management_browser.cjs'), origin,
++                    str(credentials), str(args.output_dir), str(wrapper)], env, registry)
++                if result.returncode: raise RuntimeError('Browser verification failed; private diagnostics omitted')
++                report = json.loads(result.stdout)
++                after = facts(database)
++                for table in ('reservations','occupancy_slots'):
++                    assert after[table] == before[table], 'Room UI cannot change booking facts or slots'
++                assert len(after['rooms']) == len(before['rooms']) + 4
++                assert len(after['audit_events']) == 6
++                assert sum(a['action']=='room.created' for a in after['audit_events']) == 4
++                assert sum(a['action']=='room.updated' for a in after['audit_events']) == 2
++                for event in after['audit_events']:
++                    assert event['target_type']=='room' and event['reason'] is None
++                    assert set(json.loads(event['after_json']))=={'id','name','location','capacity'}
++                write_report(args.output_dir / 'storage.json', {'before': before, 'after': after, 'room_invariants_verified': True})
++                report['storage'] = {'room_invariants_verified': True, 'rooms': len(after['rooms']),
++                                     'audits': len(after['audit_events'])}
++                report['server'] = {'command': command, 'threads': 8, 'processes': 1}
++                return report
++            finally:
++                stop_process_group(server.pid, server)
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--port', type=int, default=8007)
++    parser.add_argument('--playwright-root', type=Path, default=ROOT / 'work/browser-tools/node_modules')
++    parser.add_argument('--browser-executable', type=Path)
++    parser.add_argument('--output-dir', type=Path, default=ROOT / 'work/room-management-browser')
++    args = parser.parse_args()
++    args.output_dir = args.output_dir.resolve()
++    args.output_dir.mkdir(parents=True, exist_ok=True)
++    meta = {'run_id': secrets.token_hex(16), 'started_at_utc': datetime.now(timezone.utc).isoformat()}
++    target = args.output_dir / 'browser-results.json'
++    write_report(target, meta | {'result': 'INCOMPLETE', 'completed': False})
++    run_args = argparse.Namespace(**(vars(args) | {'output_dir': args.output_dir / 'runs' / meta['run_id']}))
++    run_args.output_dir.mkdir(parents=True)
++    meta['artifact_directory'] = f"runs/{meta['run_id']}"
++    try:
++        meta.update(environment=environment_metadata(args), **source_fingerprints())
++        observed = run(run_args)
++        if any(meta[key] != value for key, value in source_fingerprints().items()):
++            raise RuntimeError('Verification sources changed during this run')
++        report = observed | meta | {'result': 'PASS', 'completed': True,
++                                       'finished_at_utc': datetime.now(timezone.utc).isoformat()}
++    except BaseException as error:
++        report = meta | {'result': 'INCOMPLETE', 'completed': False, 'error_type': type(error).__name__}
++        write_report(target, report)
++        print(json.dumps(report, ensure_ascii=False, indent=2))
++        return 1
++    write_report(target, report)
++    print(json.dumps(report, ensure_ascii=False, indent=2))
++    return 0
++
++if __name__ == '__main__': raise SystemExit(main())
+diff --git a/scripts/verify_room_management_http.py b/scripts/verify_room_management_http.py
+new file mode 100644
+index 0000000..0ec4b2a
+--- /dev/null
++++ b/scripts/verify_room_management_http.py
+@@ -0,0 +1,150 @@
++"""Story 3.1: 20 real booking/capacity races, full storage oracle, fault and restart."""
++import argparse
++from concurrent.futures import ThreadPoolExecutor
++from datetime import datetime, timezone
++import hashlib
++import json
++from pathlib import Path
++import secrets
++import tempfile
++import threading
++
++from booking_app import ROOT, db
++from scripts.init_demo import DEMO_IDENTITIES, seed_users
++from scripts.verify_availability_performance import Client, environment, write_json
++from scripts.verify_create_booking_http import BookingServer, FixedClock
++from scripts.verify_history_browser import source_fingerprints
++from tests.schedule_fixtures import NOW
++
++
++def facts(database):
++    with db.read_transaction(database) as conn:
++        assert conn.execute('PRAGMA integrity_check').fetchone()[0]=='ok'
++        assert conn.execute('PRAGMA foreign_key_check').fetchall()==[]
++        return {table:[dict(row) for row in conn.execute(f'SELECT * FROM {table} ORDER BY 1')]
++                for table in ('rooms','reservations','occupancy_slots','audit_events')}
++
++
++def checked_storage(database):
++    value=facts(database); rooms={r['id']:r for r in value['rooms']}
++    for record in value['reservations']:
++        slots=sorted(s['slot_start'] for s in value['occupancy_slots'] if s['reservation_id']==record['id'])
++        assert slots==([] if record['cancelled_at'] is not None else list(range(record['start_at'],record['end_at'],1800)))
++        if record['cancelled_at'] is None and record['end_at']>NOW: assert record['attendees']<=rooms[record['room_id']]['capacity']
++        events=[a for a in value['audit_events'] if a['target_type']=='booking' and a['target_id']==record['id']]
++        assert sum(a['action']=='booking.created' for a in events)==1
++        assert sum(a['action']=='booking.cancelled_by_member' for a in events)==int(record['cancelled_at'] is not None)
++    for room in rooms.values():
++        events=[a for a in value['audit_events'] if a['target_type']=='room' and a['target_id']==room['id']]
++        assert events and events[0]['action']=='room.created' and events[0]['before_json'] is None
++        last=None
++        for event in events:
++            before=json.loads(event['before_json']) if event['before_json'] else None
++            after=json.loads(event['after_json'])
++            assert before==last and set(after)=={'id','name','location','capacity'}
++            assert event['reason'] is None and event['occurred_at']==NOW and event['actor_display_name']=='演示管理员'
++            last=after
++        assert last=={key:room[key] for key in ('id','name','location','capacity')}
++    return value
++
++
++def fingerprints():
++    value=source_fingerprints()
++    for name in ('scripts/verify_room_management_http.py','scripts/verify_create_booking_http.py','scripts/verify_availability_performance.py'):
++        value['verification_source_files_sha256'][name]=hashlib.sha256((ROOT/name).read_bytes()).hexdigest()
++    return value
++
++
++def run(output,meta):
++    responses=[]
++    def capture(client,phase,path,body):
++        status,result,elapsed=client.request(path,body)
++        row=dict(phase=phase,path=path,http_status=status,response=result,duration_ms=elapsed)
++        responses.append(row);write_json(output/'http-steps.json',responses)
++        return status,result
++    with tempfile.TemporaryDirectory(prefix='grb-room-http-') as directory:
++        database=Path(directory)/'booking.sqlite3'
++        users=[dict(username=u,display_name=d,role=r,password=secrets.token_urlsafe(24)) for u,d,r in DEMO_IDENTITIES]
++        seed_users(database,users,FixedClock());server=BookingServer(database)
++        wins={'booking':0,'capacity':0}
++        try:
++            server.start();admin,member=Client(server.origin),Client(server.origin)
++            admin.login(users[2]);member.login(users[0])
++            write_json(output/'environment.json',environment(server,meta)|dict(fixed_now=NOW,threads=8,
++                independent_sessions=2,rounds=20,server_start='spawn scripts.verify_create_booking_http.server_main',
++                invocation=['.venv/bin/python','-m','scripts.verify_room_management_http','--output-dir',str(output)]))
++            for round_number in range(20):
++                room_values=dict(name=f'合成竞争房间 {round_number:02}',location='测试楼',capacity=20)
++                status,result=capture(admin,'setup_room','/api/admin/rooms',room_values);assert status==201
++                room_id=result['data']['id'];barrier=threading.Barrier(2)
++                jobs=[(member,'booking','/api/bookings',dict(room_id=room_id,title='并发预约',purpose='合成测试',attendees=10,
++                    start='2026-11-12T12:00',end='2026-11-12T13:00',intent_key=f'capacity-race-intent-{round_number:03}')),
++                    (admin,'capacity',f'/api/admin/rooms/{room_id}',room_values|dict(capacity=5))]
++                def compete(job):
++                    client,phase,path,body=job;barrier.wait(timeout=30)
++                    status,response,elapsed=client.request(path,body)
++                    return dict(round=round_number,phase=phase,path=path,http_status=status,response=response,duration_ms=elapsed)
++                with ThreadPoolExecutor(max_workers=2) as pool:
++                    futures=[pool.submit(compete,job) for job in jobs];rows=[]
++                    for future in futures:
++                        try:row=future.result()
++                        except Exception as error:row=dict(round=round_number,http_status=None,error_type=type(error).__name__)
++                        rows.append(row)
++                        with (output/'concurrent-responses.jsonl').open('a') as raw:raw.write(json.dumps(row,ensure_ascii=False)+'\n')
++                write_json(output/f'round-{round_number:02}-storage.json',facts(database))
++                codes=[row['http_status'] for row in rows]
++                assert codes in ([201,409],[409,200]),codes
++                loser=next(row for row in rows if row['http_status']==409)
++                assert loser['response']['error']['code']=='CAPACITY_CONFLICT'
++                winner='booking' if codes[0]==201 else 'capacity';wins[winner]+=1
++                final=checked_storage(database)
++                room_events=[e for e in final['audit_events'] if e['target_type']=='room' and e['target_id']==room_id]
++                assert len(room_events)==(1 if winner=='booking' else 2)
++                assert sum(r['room_id']==room_id for r in final['reservations'])==int(winner=='booking')
++            # A real successful intent, cancelled and then lowered below its historical attendees.
++            status,result=capture(admin,'replay_room','/api/admin/rooms',dict(name='重放房间',location='测试楼',capacity=20));assert status==201
++            replay_room=result['data'];payload=dict(room_id=replay_room['id'],title='旧意图',purpose='合成测试',attendees=10,
++                start='2026-11-12T12:00',end='2026-11-12T13:00',intent_key='room-management-replay-intent')
++            status,result=capture(member,'replay_create','/api/bookings',payload);assert status==201
++            booking_id=result['data']['booking']['id']
++            assert capture(member,'cancel_for_replay',f'/api/bookings/{booking_id}/cancel',{})[0]==200
++            lowered={key:replay_room[key] for key in ('name','location','capacity')}|dict(capacity=1)
++            assert capture(admin,'lower_after_cancel',f'/api/admin/rooms/{replay_room["id"]}',lowered)[0]==200
++            saved=checked_storage(database);write_json(output/'before-restart-fault.json',saved)
++        finally:server.stop()
++        server=BookingServer(database,fail=True)
++        try:
++            server.start();admin,member=Client(server.origin),Client(server.origin);admin.login(users[2]);member.login(users[0])
++            assert checked_storage(database)==saved
++            for path,body in [('/api/admin/rooms',dict(name='故障新增',location='测试楼',capacity=20)),
++                              (f'/api/admin/rooms/{replay_room["id"]}',lowered|dict(name='故障修改',capacity=2))]:
++                status,result=capture(admin,'audit_failure',path,body)
++                assert status==500 and result['error']['code']=='INTERNAL_ERROR'
++                assert checked_storage(database)==saved
++            assert capture(admin,'no_change_failing_writer',f'/api/admin/rooms/{replay_room["id"]}',lowered)[0]==200
++            status,result=capture(member,'old_intent_lowered_restart','/api/bookings',payload)
++            assert status==200 and result['data']['replayed'] and result['data']['booking']['id']==booking_id
++            assert result['data']['booking']['room']['capacity']==1
++            assert checked_storage(database)==saved
++            write_json(output/'after-restart-fault.json',checked_storage(database))
++        finally:server.stop()
++    return dict(result='PASS',completed=True,rounds=20,concurrent_responses=40,wins=wins,
++        no_unfinished_overcapacity=True,exact_room_audit_chain=True,full_fault_rollback=True,
++        restart_preserves_business_slots_audits=True,old_intent_replay_after_lowering=True,no_change_writer_calls=0)
++
++
++def main():
++    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--output-dir',type=Path,default=ROOT/'work/room-management-http')
++    args=parser.parse_args();args.output_dir.mkdir(parents=True,exist_ok=True)
++    meta=dict(run_id=secrets.token_hex(16),started_at_utc=datetime.now(timezone.utc).isoformat())
++    target=args.output_dir/'http-result.json';write_json(target,meta|dict(result='INCOMPLETE',completed=False))
++    output=args.output_dir/'runs'/meta['run_id'];output.mkdir(parents=True);meta['artifact_directory']='runs/'+meta['run_id']
++    try:
++        meta.update(fingerprints());report=run(output,meta)
++        assert all(meta[key]==value for key,value in fingerprints().items()),'Sources changed during verification'
++        write_json(target,meta|report|dict(finished_at_utc=datetime.now(timezone.utc).isoformat()))
++    except BaseException as error:
++        write_json(target,meta|dict(result='INCOMPLETE',completed=False,error_type=type(error).__name__));raise
++    print(json.dumps(report,ensure_ascii=False,indent=2))
++
++if __name__=='__main__':main()
+diff --git a/tests/test_room_management.py b/tests/test_room_management.py
+new file mode 100644
+index 0000000..4cd8257
+--- /dev/null
++++ b/tests/test_room_management.py
+@@ -0,0 +1,247 @@
++"""Story 3.1 independent authorization, capacity and atomicity acceptance cases."""
++from contextlib import contextmanager
++from dataclasses import replace
++import json
++from pathlib import Path
++import re
++import secrets
++import sqlite3
++import tempfile
++import unittest
++from unittest.mock import patch
++
++from booking_app import auth, create_app, db, services
++from booking_app.audit import audit_writer
++from booking_app.domain import DomainError
++from scripts.init_demo import DEMO_IDENTITIES, seed_users
++from tests.history_fixtures import FixedClock, seed_history_fixture
++from tests.schedule_fixtures import NOW, assert_slot_integrity
++
++ORIGIN = 'http://127.0.0.1:8000'
++ROOM_KEYS = {'id', 'name', 'location', 'capacity'}
++CONFLICT_KEYS = {'id','type','room_id','start_at','start_local','end_at','end_local','status','attendees','reason'}
++
++
++class RoomManagementTests(unittest.TestCase):
++    @classmethod
++    def setUpClass(cls):
++        cls.directory = tempfile.TemporaryDirectory()
++        cls.fixture = Path(cls.directory.name)/'fixture.sqlite3'
++        cls.password = secrets.token_urlsafe(24)
++        seed_users(cls.fixture, [dict(username=u,display_name=d,role=r,password=cls.password)
++                               for u,d,r in DEMO_IDENTITIES], FixedClock())
++        seed_history_fixture(cls.fixture)
++
++    @classmethod
++    def tearDownClass(cls): cls.directory.cleanup()
++
++    def setUp(self):
++        directory = tempfile.TemporaryDirectory(); self.addCleanup(directory.cleanup)
++        self.database = Path(directory.name)/'test.sqlite3'
++        source, target = db.connect(self.fixture), db.connect(self.database)
++        source.backup(target); source.close(); target.close()
++        self.clock = FixedClock()
++        self.app = create_app({'TESTING':True,'DATABASE':str(self.database),'CLOCK':self.clock})
++        self.client, self.identity = self.login('demo_admin')
++        self.addCleanup(assert_slot_integrity,self,self.database)
++
++    def login(self, username):
++        client = self.app.test_client(); page = client.get('/login',base_url=ORIGIN)
++        csrf = re.search(r'name="csrf_token" value="([^"]+)"',page.text).group(1)
++        response = client.post('/api/login',base_url=ORIGIN,headers={'Origin':ORIGIN,'X-CSRF-Token':csrf},
++                               json=dict(username=username,password=self.password))
++        self.assertEqual(response.status_code,200)
++        return client,response.json['data']
++
++    def post(self, values=None, room_id=None, client=None, identity=None):
++        return (client or self.client).post('/api/admin/rooms'+('' if room_id is None else f'/{room_id}'),
++            base_url=ORIGIN,headers={'Origin':ORIGIN,'X-CSRF-Token':(identity or self.identity)['csrf_token']},
++            json=values if values is not None else dict(name='新会议室',location='测试楼',capacity=20))
++
++    def facts(self):
++        with db.read_transaction(self.database) as conn:
++            return {table:[dict(row) for row in conn.execute(f'SELECT * FROM {table} ORDER BY 1')]
++                    for table in ('rooms','reservations','occupancy_slots','audit_events')}
++
++    def error(self,response,status,code):
++        self.assertEqual(response.status_code,status,response.text)
++        self.assertEqual(set(response.json),{'ok','error'})
++        self.assertEqual(set(response.json['error']),{'code','message','fields','conflicts'})
++        self.assertFalse(response.json['ok']); self.assertEqual(response.json['error']['code'],code)
++        return response.json['error']
++
++    def actor(self):
++        return auth.actor_for_token(self.client.get_cookie(auth.COOKIE_NAME,domain='127.0.0.1').value)
++
++    def test_create_update_stable_id_exact_dto_and_snapshots(self):
++        observed=[]; connections=[]; real_transaction=db.write_transaction
++        @contextmanager
++        def tracked(database=None):
++            with real_transaction(database) as conn:
++                connections.append(conn)
++                try: yield conn
++                finally: connections.pop()
++        self.enterContext(patch.object(db,'write_transaction',tracked))
++        def writer(conn,event):
++            self.assertIs(conn,connections[-1])
++            self.assertTrue(conn.in_transaction)
++            row=conn.execute('SELECT * FROM rooms WHERE id=?',(event['target_id'],)).fetchone()
++            self.assertEqual({key:row[key] for key in ROOM_KEYS},event['after'])
++            observed.append(event); audit_writer(conn,event)
++        self.app.config['AUDIT_WRITER']=writer
++        response=self.post(dict(name='  <img src=x> 🧪  ',location=' \u0085楼 101\u0085 ',capacity=1000))
++        self.assertEqual(response.status_code,201); original=response.json['data']; self.assertEqual(set(original),ROOM_KEYS)
++        self.assertEqual(original['name'],'<img src=x> 🧪'); self.assertEqual(original['location'],'楼 101')
++        self.assertEqual(observed[0]['before'],None); self.assertEqual(observed[0]['after'],original)
++        changed=dict(name='改名',location='改地点',capacity=1)
++        response=self.post(changed,original['id']); self.assertEqual(response.status_code,200)
++        self.assertEqual(response.json,dict(ok=True,data=dict(id=original['id'],**changed)))
++        self.assertEqual(len(observed),2); self.assertEqual(observed[1]['before'],original)
++        for event in observed:
++            self.assertEqual(event['reason'],None); self.assertEqual(event['occurred_at'],NOW)
++            self.assertEqual(set(event['after']),ROOM_KEYS); self.assertEqual(event['actor_display_name'],'演示管理员')
++        self.assertEqual([e['action'] for e in observed],['room.created','room.updated'])
++
++    def test_no_change_normalization_does_not_write_timestamp_or_audit(self):
++        original=self.facts()['rooms'][0]; before=self.facts()
++        self.clock.now+=1
++        self.app.config['AUDIT_WRITER']=lambda *_:self.fail('No-change must not call writer')
++        response=self.post(dict(name=' '+original['name']+' ',location=' '+original['location']+' ',capacity=original['capacity']),1)
++        self.assertEqual(response.status_code,200); self.assertEqual(set(response.json['data']),ROOM_KEYS)
++        self.assertEqual(self.facts(),before)
++
++    def test_invalid_complete_fields_strict_types_bounds_utf8_and_rollback(self):
++        valid=dict(name='合法',location='地点',capacity=10); before=self.facts()
++        bad=[{}, {'name':'partial'}, *[valid|{'capacity':v} for v in (True,False,1.0,'10',0,-1,1001,10**100,None)],
++             *[valid|{key:value} for key,limit in [('name',80),('location',120)]
++               for value in ('',' \u0085 ', 'x'*(limit+1),'x\x00y','x\ud800',None,7)]]
++        for value in bad:
++            for room_id in (None,1):
++                with self.subTest(value=repr(value),room_id=room_id):
++                    self.error(self.post(value,room_id),400,'INVALID_INPUT');self.assertEqual(self.facts(),before)
++        response=self.post(dict(name='🧪'*80,location='🧪'*120,capacity=1000));self.assertEqual(response.status_code,201)
++
++    def test_duplicate_combination_409_complete_rollback_case_sensitive(self):
++        first=self.post().json['data']; before=self.facts()
++        for room_id in (None,1):
++            self.error(self.post(dict(name=' 新会议室 ',location=' 测试楼 ',capacity=1),room_id),409,'ROOM_DUPLICATE')
++            self.assertEqual(self.facts(),before)
++        self.assertEqual(self.post(dict(name=first['name'],location='另一个地点',capacity=20)).status_code,201)
++        for name in ('Room','room','é','e\u0301'):
++            self.assertEqual(self.post(dict(name=name,location='同地',capacity=1)).status_code,201)
++
++    def test_capacity_protects_pending_and_in_progress_and_equal_succeeds(self):
++        before=self.facts()
++        error=self.error(self.post(dict(name='不得部分改名',location='不得部分保存',capacity=4),1),409,'CAPACITY_CONFLICT')
++        self.assertEqual(self.facts(),before); self.assertEqual([c['id'] for c in error['conflicts']],[102,103])
++        self.assertEqual([c['status'] for c in error['conflicts']],['in_progress','pending'])
++        for row in error['conflicts']:
++            self.assertEqual(set(row),CONFLICT_KEYS); self.assertEqual(row['attendees'],5);self.assertIsNone(row['reason'])
++        response=self.post(dict(name='等于人数',location='新地点',capacity=5),1)
++        self.assertEqual(response.status_code,200); after=self.facts()
++        for table in ('reservations','occupancy_slots'):self.assertEqual(after[table],before[table])
++        self.assertEqual(len(after['audit_events']),1)
++
++    def test_ended_cancelled_and_block_do_not_prevent_lowering(self):
++        # At the exact final active booking end, historical slots remain but do not prevent lowering.
++        with db.write_transaction(self.database) as conn:
++            conn.execute("INSERT INTO rooms VALUES(4,'仅停用','4',30,?,?)",(NOW,NOW))
++            conn.execute("INSERT INTO reservations(id,kind,room_id,user_id,reason,start_at,end_at,created_at) "
++                         "VALUES(402,'block',4,3,'未来维护',?,?,?)",(NOW+1800,NOW+3600,NOW))
++            conn.execute('INSERT INTO occupancy_slots VALUES(4,?,402)',(NOW+1800,))
++        self.assertEqual(self.post(dict(name='仅停用',location='4',capacity=1),4).status_code,200)
++        self.clock.now=NOW+3*3600
++        response=self.post(dict(name='历史仍保留',location='1',capacity=1),1)
++        self.assertEqual(response.status_code,200,response.text)
++        self.assertEqual(self.post(dict(name='停用不按人数',location='3',capacity=1),3).status_code,200)
++        self.assertEqual(len(self.facts()['reservations']),10)
++
++    def test_authorization_html_api_nav_and_ids_before_validation(self):
++        before=self.facts(); member,identity=self.login('demo_member_a'); anonymous=self.app.test_client()
++        for room_id in (None,1,'9'*5000):
++            self.error(self.post({},room_id,member,identity),403,'FORBIDDEN')
++            response=anonymous.post('/api/admin/rooms'+('' if room_id is None else f'/{room_id}'),base_url=ORIGIN,headers={'Origin':ORIGIN},json={})
++            self.error(response,401,'AUTH_REQUIRED')
++        self.assertEqual(member.get('/admin',base_url=ORIGIN).status_code,403)
++        self.assertEqual(anonymous.get('/admin',base_url=ORIGIN).status_code,302)
++        self.assertNotIn('href="/admin"',member.get('/',base_url=ORIGIN).text)
++        page=self.client.get('/admin',base_url=ORIGIN);self.assertEqual(page.status_code,200)
++        for text in ['href="/admin"','id="room-form"','for="room-name"','for="room-location"','for="room-capacity"','id="room-confirm"']:
++            self.assertIn(text,page.text)
++        for value in ('0','01','-1','1.0','abc',str(2**63),'9'*5000):self.error(self.post(room_id=value),400,'INVALID_INPUT')
++        self.error(self.post(room_id=2**63-1),404,'NOT_FOUND')
++        self.assertNotEqual(self.client.delete('/api/admin/rooms/1',base_url=ORIGIN).status_code,200)
++        self.assertEqual(self.facts(),before)
++
++    def test_origin_csrf_content_type_logout_and_expired_rejections(self):
++        before=self.facts()
++        for headers in ({},{'Origin':'http://evil.test'},{'Origin':ORIGIN},{'Origin':ORIGIN,'X-CSRF-Token':'bad'}):
++            self.error(self.client.post('/api/admin/rooms',base_url=ORIGIN,headers=headers,json={}),403,'CSRF_REJECTED')
++        headers={'Origin':ORIGIN,'X-CSRF-Token':self.identity['csrf_token']}
++        self.error(self.client.post('/api/admin/rooms',base_url=ORIGIN,headers=headers,data={}),400,'INVALID_INPUT')
++        self.error(self.client.post('/api/admin/rooms',base_url=ORIGIN,headers=headers,json=[]),400,'INVALID_INPUT')
++        old=self.client.get_cookie(auth.COOKIE_NAME,domain='127.0.0.1').value
++        self.assertEqual(self.client.post('/api/logout',base_url=ORIGIN,headers=headers,json={}).status_code,200)
++        self.client.set_cookie(auth.COOKIE_NAME,old,domain='127.0.0.1')
++        self.error(self.post(),401,'AUTH_REQUIRED')
++        self.client,self.identity=self.login('demo_admin');self.clock.now=NOW+auth.SESSION_SECONDS
++        self.error(self.post(room_id='bad'),401,'AUTH_REQUIRED');self.assertEqual(self.facts(),before)
++
++    def test_service_reloads_role_actor_and_one_clock_after_write_lock(self):
++        with self.app.app_context():
++            actor=self.actor(); self.clock.calls=0
++            services.create_room(replace(actor,display_name='stale'),dict(name='新',location='地',capacity=10))
++            self.assertEqual(self.clock.calls,1)
++            self.assertEqual(self.facts()['audit_events'][0]['actor_display_name'],'演示管理员')
++            for bad in (None,replace(actor,id=1),replace(actor,session_token_hash='0'*64)):
++                with self.assertRaises(DomainError) as found:services.create_room(bad,{})
++                self.assertEqual(found.exception.code,'AUTH_REQUIRED')
++            with db.write_transaction(self.database) as conn:conn.execute("UPDATE users SET role='member' WHERE id=?",(actor.id,))
++            for command,args in ((services.create_room,({},)),(services.update_room,('bad',{}))):
++                with self.assertRaises(DomainError) as found:command(actor,*args)
++                self.assertEqual(found.exception.code,'FORBIDDEN')
++
++    def test_expiration_rechecked_after_lock_before_fields_or_changes(self):
++        original=db.write_transaction;before=self.facts()
++        @contextmanager
++        def advance(database=None):
++            with original(database) as conn:
++                self.clock.now=NOW+auth.SESSION_SECONDS;yield conn
++        with patch.object(db,'write_transaction',advance):self.error(self.post(),401,'AUTH_REQUIRED')
++        self.assertEqual(self.facts(),before)
++
++    def test_audit_failure_before_after_insert_and_commit_roll_back_every_table(self):
++        before=self.facts()
++        for after_insert in (False,True):
++            def fail(conn,event):
++                if after_insert:audit_writer(conn,event)
++                raise RuntimeError('private SQL token secret')
++            self.app.config['AUDIT_WRITER']=fail
++            for room_id in (None,1):
++                with self.assertLogs(self.app.logger,level='ERROR') as logs:self.error(self.post(room_id=room_id),500,'INTERNAL_ERROR')
++                self.assertNotIn('private',str(logs.output));self.assertEqual(self.facts(),before)
++        self.app.config['AUDIT_WRITER']=audit_writer; connect=db.connect
++        class FailCommit:
++            def __init__(self,conn):self.conn=conn
++            def __getattr__(self,name):return getattr(self.conn,name)
++            def execute(self,sql,*args):
++                if sql=='COMMIT':raise sqlite3.OperationalError('commit failure')
++                return self.conn.execute(sql,*args)
++        with patch.object(db,'connect',lambda *a,**k:FailCommit(connect(*a,**k))),self.assertLogs(self.app.logger,level='ERROR'):
++            self.error(self.post(),500,'INTERNAL_ERROR')
++        self.assertEqual(self.facts(),before)
++
++    def test_old_successful_intent_replays_after_cancel_and_capacity_reduction(self):
++        member,identity=self.login('demo_member_a');headers={'Origin':ORIGIN,'X-CSRF-Token':identity['csrf_token']}
++        payload=dict(room_id=2,title='原预约',purpose='保留',attendees=10,start='2026-11-13T12:00',end='2026-11-13T13:00',intent_key='room-replay-original-intent')
++        first=member.post('/api/bookings',base_url=ORIGIN,headers=headers,json=payload)
++        self.assertEqual(first.status_code,201);booking_id=first.json['data']['booking']['id']
++        self.assertEqual(member.post(f'/api/bookings/{booking_id}/cancel',base_url=ORIGIN,headers=headers,json={}).status_code,200)
++        self.assertEqual(self.post(dict(name='降容房间',location='2',capacity=5),2).status_code,200)
++        before=self.facts();response=member.post('/api/bookings',base_url=ORIGIN,headers=headers,json=payload)
++        self.assertEqual(response.status_code,200);self.assertTrue(response.json['data']['replayed'])
++        self.assertEqual(response.json['data']['booking']['id'],booking_id)
++        self.assertEqual(response.json['data']['booking']['room']['capacity'],5)
++        self.assertEqual(self.facts(),before)
++
++if __name__=='__main__':unittest.main()
+diff --git a/tests/test_rooms_js.cjs b/tests/test_rooms_js.cjs
+new file mode 100644
+index 0000000..c6f1007
+--- /dev/null
++++ b/tests/test_rooms_js.cjs
+@@ -0,0 +1,89 @@
++// Execute the actual management handlers with controllable fetch and timers.
++const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
++const room={id:1,name:'<img src=x onerror="evil()">',location:'合成楼',capacity:20};
++const ok=data=>({ok:true,json:async()=>({ok:true,data})});
++const fail=(code,fields={},conflicts=[])=>({ok:false,json:async()=>({ok:false,error:{code,message:'合成错误',fields,conflicts}})});
++const tick=()=>new Promise(setImmediate);
++function harness(){
++  let active,impl=async url=>ok(url==='/api/rooms'?{items:[room],total:1}:room),timer=0;
++  const timers=new Map(),fetches=[];
++  function node(id='',tag=''){
++    const attrs=new Map(),handlers={};let text='',disabled=false;
++    return {id,tag,attrs,handlers,children:[],value:'',name:'',checked:false,hidden:false,dataset:{},classList:{toggle(){}},
++      get disabled(){return disabled;},set disabled(v){disabled=v;if(v&&active===this)active=undefined;},
++      get textContent(){return text+this.children.map(c=>c.textContent).join('');},set textContent(v){text=String(v);this.children=[];},
++      set innerHTML(v){throw new Error('Unsafe HTML');},append(...children){this.children.push(...children);},replaceChildren(){this.children=[];},
++      setAttribute(k,v){attrs.set(k,v);},removeAttribute(k){attrs.delete(k);},getAttribute(k){return attrs.get(k);},
++      addEventListener(k,f){handlers[k]=f;},querySelectorAll(tag){return this.children.flatMap(c=>[...(c.tag===tag?[c]:[]),...c.querySelectorAll(tag)]);},
++      contains(target){return this===target||this.children.some(c=>c.contains(target));},focus(){if(!disabled)active=this;}};
++  }
++  const ids=['room-form','admin-rooms','room-form-title','room-submit','room-cancel','room-confirm','rooms-refresh','room-feedback','rooms-feedback',
++    'room-conflicts','room-relogin','room-name','room-location','room-capacity','room-name-error','room-location-error','room-capacity-error','logout-form'];
++  const n=Object.fromEntries(ids.map(id=>[id,node(id)]));
++  const inputs=['name','location','capacity'].map(name=>{const input=n['room-'+name];input.name=name;input.value=String(room[name]);return input;});
++  n['room-form'].elements={namedItem:name=>n['room-'+name]};n['room-form'].append(...inputs,n['room-submit'],n['room-cancel'],n['room-confirm']);
++  n['logout-form'].elements={csrf_token:{value:'synthetic'}};
++  const edit=node('edit','button');edit.dataset={roomId:'1',roomName:room.name,roomLocation:room.location,roomCapacity:'20'};n['admin-rooms'].append(edit);
++  const body=node('body');
++  vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../booking_app/static/rooms.js'),'utf8'),{
++    AbortController,document:{getElementById:id=>n[id],querySelector:s=>n[s.slice(1)],createElement:t=>node('',t),body,get activeElement(){return active;}},
++    window:{setTimeout(fn,ms){timers.set(++timer,{fn,ms});return timer;},clearTimeout(id){timers.delete(id);}},
++    fetch:(url,options)=>{fetches.push({url,options});return impl(url,options);}});
++  return {n,inputs,timers,fetches,get active(){return active;},setFetch:f=>{impl=f;},edit:()=>edit.handlers.click(),
++    submit(){n['room-confirm'].checked=true;n['room-submit'].focus();return n['room-form'].handlers.submit({preventDefault(){}});},
++    refresh(){n['rooms-refresh'].focus();return n['rooms-refresh'].handlers.click();}};
++}
++function restored(ui){for(const input of ui.inputs)assert.equal(input.disabled,false);assert.equal(ui.n['room-submit'].disabled,false);
++  assert.equal(ui.n['room-form'].getAttribute('aria-busy'),undefined);assert.equal(ui.timers.size,0);}
++for(const phase of ['headers','body'])test(`room ${phase} timeout restores input and offers manual verification without retry`,async()=>{
++  const ui=harness();ui.setFetch(async(_url,{signal})=>{
++    const stalled=()=>new Promise((_r,reject)=>signal.addEventListener('abort',()=>reject(new Error('aborted'))));
++    return phase==='headers'?stalled():{ok:true,json:stalled};});
++  const pending=ui.submit();await tick();assert.equal(ui.n['room-submit'].disabled,true);await ui.submit();assert.equal(ui.fetches.length,1);
++  const timer=[...ui.timers.values()][0];assert.equal(timer.ms,20000);timer.fn();await pending;restored(ui);
++  assert.match(ui.n['room-feedback'].textContent,/未能确认.*输入已保留.*不会自动重试/);assert.equal(ui.inputs[0].value,room.name);
++  assert.equal(ui.active,ui.n['room-feedback']);assert.equal(ui.fetches.length,1);
++});
++for(const failure of ['network','bad-json','bad-room'])test(`room ${failure} is unknown and keeps complete draft`,async()=>{
++  const ui=harness();ui.setFetch(async()=>{if(failure==='network')throw new Error();if(failure==='bad-json')return {ok:true,json:async()=>{throw new Error();}};return ok({...room,extra:'leak'});});
++  await ui.submit();restored(ui);assert.match(ui.n['room-feedback'].textContent,/未能确认/);assert.equal(ui.inputs[0].value,room.name);assert.equal(ui.fetches.length,1);
++});
++test('field errors focus enabled input; retry creates then uses stable update ID',async()=>{
++  const ui=harness();ui.setFetch(async()=>fail('INVALID_INPUT',{name:'名称过长'}));await ui.submit();restored(ui);
++  assert.equal(ui.active,ui.inputs[0]);assert.equal(ui.n['room-name-error'].textContent,'名称过长');
++  ui.setFetch(async url=>ok(url==='/api/rooms'?{items:[room],total:1}:room));await ui.submit();restored(ui);
++  assert.equal(ui.inputs[0].getAttribute('aria-invalid'),undefined);assert.equal(ui.n['room-confirm'].checked,false);
++  assert.equal(ui.n['room-cancel'].hidden,false);assert.match(ui.n['room-feedback'].textContent,/已保存/);
++  await ui.submit();assert.equal(ui.fetches[3].url,'/api/admin/rooms/1');
++  assert.equal(ui.n['admin-rooms'].querySelectorAll('img').length,0);assert.ok(ui.n['admin-rooms'].textContent.includes(room.name));
++});
++test('capacity conflict renders exact management facts as text and preserves all fields',async()=>{
++  const ui=harness();ui.edit();ui.inputs[2].value='4';ui.setFetch(async()=>fail('CAPACITY_CONFLICT',{},[
++    {id:102,attendees:5,start_local:'2026-11-12T10:00:00+08:00',end_local:'2026-11-12T11:00:00+08:00',status:'in_progress'}]));
++  await ui.submit();restored(ui);assert.equal(ui.inputs[2].value,'4');assert.equal(ui.fetches[0].url,'/api/admin/rooms/1');
++  assert.match(ui.n['room-conflicts'].textContent,/预约 102.*5 人.*北京时间.*进行中/);
++});
++for(const code of ['ROOM_DUPLICATE','CSRF_REJECTED','INTERNAL_ERROR','NOT_FOUND'])test(`${code} rejection retains draft and permits deliberate retry`,async()=>{
++  const ui=harness();ui.setFetch(async()=>fail(code));await ui.submit();restored(ui);assert.equal(ui.inputs[0].value,room.name);
++  assert.match(ui.n['room-feedback'].textContent,/输入已保留/);assert.equal(ui.n['room-relogin'].hidden,code!=='CSRF_REJECTED');
++});
++for(const code of ['AUTH_REQUIRED','FORBIDDEN'])test(`${code} preserves draft, clears directory and blocks stale resubmission`,async()=>{
++  const ui=harness();ui.setFetch(async()=>fail(code));await ui.submit();assert.equal(ui.n['room-relogin'].hidden,false);
++  assert.equal(ui.n['admin-rooms'].children.length,0);assert.equal(ui.inputs[0].value,room.name);assert.equal(ui.n['room-submit'].disabled,true);
++  await ui.submit();assert.equal(ui.fetches.length,1);assert.equal(ui.timers.size,0);
++});
++for(const success of [true,false])test(`room ${success?'success':'failure'} does not steal focus from logout during request`,async()=>{
++  const ui=harness();let resolve;ui.setFetch(url=>url==='/api/rooms'?Promise.resolve(ok({items:[room],total:1})):new Promise(r=>{resolve=r;}));
++  const pending=ui.submit();ui.n['logout-form'].focus();resolve(success?ok(room):fail('ROOM_DUPLICATE'));await pending;
++  assert.equal(ui.active,ui.n['logout-form']);restored(ui);
++});
++test('successful save with directory refresh failure stays a success and retains normalized saved form',async()=>{
++  const ui=harness();ui.setFetch(async url=>{if(url==='/api/rooms')throw new Error();return ok(room);});await ui.submit();restored(ui);
++  assert.match(ui.n['room-feedback'].textContent,/已保存/);assert.match(ui.n['rooms-feedback'].textContent,/已保存.*刷新失败/);
++  assert.equal(ui.n['room-form-title'].textContent,'编辑会议室 1');
++});
++test('explicit directory refresh preserves draft and cancel edit resets to create with heading focus',async()=>{
++  const ui=harness();ui.edit();ui.inputs[0].value='draft';await ui.refresh();restored(ui);assert.equal(ui.inputs[0].value,'draft');
++  assert.equal(ui.active,ui.n['rooms-refresh']);ui.n['room-cancel'].handlers.click();assert.equal(ui.inputs[0].value,'');
++  assert.equal(ui.n['room-cancel'].hidden,true);assert.equal(ui.active,ui.n['room-form-title']);assert.equal(ui.n['room-confirm'].checked,false);
++});

@@ -8,6 +8,7 @@ from flask import current_app
 from . import auth, db, dto
 from .domain import DomainError, auth_required, beijing_day, booking_interval, query_attendees, resource_id
 from .domain import normalize_booking_payload, normalize_room_payload, validate_booking_window
+from .domain import normalize_block_payload, validate_block_window
 
 
 def _require_actor(conn, actor: auth.Actor, now: int) -> auth.Actor:
@@ -132,6 +133,48 @@ def create_room(actor: auth.Actor, payload: dict) -> dict:
     return result
 
 
+def create_block(actor: auth.Actor, payload: dict) -> dict:
+    with db.write_transaction() as conn:
+        now = current_app.config["CLOCK"].now_epoch()
+        actor = require_admin(_require_actor(conn, actor, now))
+        values = normalize_block_payload(payload)
+        room = conn.execute("SELECT id,name,location,capacity FROM rooms WHERE id=?", (values["room_id"],)).fetchone()
+        if room is None:
+            raise DomainError("NOT_FOUND", "会议室不存在，请重新选择。")
+        validate_block_window(values["start_at"], values["end_at"], now)
+        conflicts = conn.execute(
+            "SELECT id,kind,room_id,start_at,end_at,attendees,reason FROM reservations "
+            "WHERE room_id=? AND cancelled_at IS NULL AND start_at<? AND ?<end_at ORDER BY start_at,id",
+            (values["room_id"], values["end_at"], values["start_at"]),
+        ).fetchall()
+        if conflicts:
+            raise DomainError("OCCUPANCY_CONFLICT", "该时段已有预约或停用，原安排保持不变。请调整停用时段。",
+                              conflicts=[dto.conflict(row, now, admin=True) for row in conflicts])
+        inserted = conn.execute(
+            "INSERT INTO reservations(kind,room_id,user_id,reason,start_at,end_at,created_at) "
+            "VALUES('block',?,?,?,?,?,?)",
+            (values["room_id"], actor.id, values["reason"], values["start_at"], values["end_at"], now),
+        )
+        block_id = inserted.lastrowid
+        try:
+            conn.executemany("INSERT INTO occupancy_slots(room_id,slot_start,reservation_id) VALUES(?,?,?)",
+                             [(values["room_id"], slot, block_id)
+                              for slot in range(values["start_at"], values["end_at"], 1800)])
+        except sqlite3.IntegrityError as error:
+            if (error.sqlite_errorcode in (sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY, sqlite3.SQLITE_CONSTRAINT_UNIQUE)
+                    and str(error) == "UNIQUE constraint failed: occupancy_slots.room_id, occupancy_slots.slot_start"):
+                raise DomainError("OCCUPANCY_CONFLICT", "该时段已被占用，请调整停用时段。") from None
+            raise
+        row = conn.execute(_BOOKING_DETAIL_SELECT + "WHERE r.id=?", (block_id,)).fetchone()
+        current_app.config["AUDIT_WRITER"](conn, {
+            "actor_id": actor.id, "actor_display_name": actor.display_name, "action": "block.created",
+            "target_type": "block", "target_id": block_id, "occurred_at": now,
+            "before": None, "after": dto.block_snapshot(row), "reason": values["reason"],
+        })
+        result = dto.block_full(row, room, now)
+    return result
+
+
 def update_room(actor: auth.Actor, room_id, payload: dict) -> dict:
     with db.write_transaction() as conn:
         now = current_app.config["CLOCK"].now_epoch()
@@ -241,6 +284,51 @@ def booking_detail(actor: auth.Actor, booking_id) -> dict:
         if row is None:
             raise DomainError("NOT_FOUND", "预约不存在或无权查看。")
         return _full_booking(row, now)
+
+
+def _admin_records(actor: auth.Actor, kind: str, room_id, date, status) -> dict:
+    """Read-only shared filtering; each public query fixes its record kind."""
+    with db.read_transaction() as conn:
+        now = current_app.config["CLOCK"].now_epoch()
+        require_admin(_require_actor(conn, actor, now))
+        terminal = "cancelled" if kind == "booking" else "revoked"
+        conditions = {
+            "pending": ("r.cancelled_at IS NULL AND r.start_at>?", (now,)),
+            "in_progress": ("r.cancelled_at IS NULL AND r.start_at<=? AND r.end_at>?", (now, now)),
+            "ended": ("r.cancelled_at IS NULL AND r.end_at<=?", (now,)),
+            terminal: ("r.cancelled_at IS NOT NULL", ()),
+        }
+        if status is not None and (not isinstance(status, str) or status not in conditions):
+            raise DomainError("INVALID_INPUT", "请检查管理记录状态。", {"status": "请选择列表中的有效状态。"})
+        query, parameters = _BOOKING_DETAIL_SELECT + "WHERE r.kind=?", (kind,)
+        if room_id is not None:
+            normalized_id = resource_id(room_id)
+            if conn.execute("SELECT id FROM rooms WHERE id=?", (normalized_id,)).fetchone() is None:
+                raise DomainError("NOT_FOUND", "会议室不存在，请重新选择。")
+            query += " AND r.room_id=?"
+            parameters += (normalized_id,)
+        if date is not None:
+            day_start, day_end = beijing_day(date)
+            query += " AND r.start_at<? AND ?<r.end_at"
+            parameters += (day_end, day_start)
+        if status is not None:
+            clause, values = conditions[status]
+            query += " AND " + clause
+            parameters += values
+        rows = conn.execute(query + " ORDER BY r.start_at,r.id", parameters).fetchall()
+        items = []
+        for row in rows:
+            room = {"id": row["room_id"], "name": row["room_name"], "location": row["room_location"], "capacity": row["room_capacity"]}
+            items.append(dto.booking_full(row, room, now) if kind == "booking" else dto.block_full(row, room, now))
+        return dto.list_result(items)
+
+
+def admin_bookings(actor: auth.Actor, room_id=None, date=None, status=None) -> dict:
+    return _admin_records(actor, "booking", room_id, date, status)
+
+
+def admin_blocks(actor: auth.Actor, room_id=None, date=None, status=None) -> dict:
+    return _admin_records(actor, "block", room_id, date, status)
 
 
 def availability(actor: auth.Actor, start, end, attendees) -> dict:
