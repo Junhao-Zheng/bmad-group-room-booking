@@ -2,7 +2,7 @@
 
 软件工程管理课程原型：以 BMAD 需求、架构、故事、两轮增量和实际验证组织交付。实验 B 按用户转述的教师安排免做，实验 A 的初版、统一评审和局限单独保存。
 
-12个故事均已完成技术验收；208项Python与376项JavaScript测试通过。最终史诗复盘保留独立复核缺口；视频与全新副本检查的交接状态见课程核对；人类要求未全部满足，详见下文。
+12个故事均已完成技术验收；208项Python与376项JavaScript测试通过。最终史诗复盘保留独立复核缺口；全新副本检查及GitHub上传的交接状态见课程核对；人类要求未全部满足，详见下文。
 
 ## 先看课程材料
 
@@ -17,7 +17,7 @@
 |人机决策与过程复盘|[真实人工决策](decision-log.md)、[五指标复盘](retrospective.md)|
 |实验 A|[预登记协议](docs/experiments/experiment-a-protocol.md)、[实测结果](docs/experiment-a-results.md)|
 |贡献与AI使用|[实际贡献及AI声明](docs/ai-use-and-contributions.md)、[可见会话节选](docs/evidence/conversations/README.md)|
-|约10分钟演示|[视频](docs/demonstration/course-demo.mp4)、[讲稿与字幕](docs/demonstration/README.md)|
+|约10分钟演示（暂缓）|用户要求本轮先不录制视频和演示；[准备记录](docs/demonstration-plan.md)|
 
 人类决策目前仅有4条真实范围记录、0次技术否决，尚未满足讲义的至少15条及5次人工否决/实质修改。范围记录能否计分仍由教师判断。AI评审、合成演示和压缩迭代不冒充真实用户访谈、教师M1/M2、学生分工或四周课堂经历。可用[本人复核清单](docs/human-review-worksheet.md)补充真实判断；待填问题不是已经发生的决策。
 
