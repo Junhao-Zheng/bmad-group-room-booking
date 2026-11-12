@@ -1,0 +1,112 @@
+{
+  "result": "PASS",
+  "scope": "父流程交回的 epic-3-followup 评审修补；仅管理页 JS、相应 harness、指定 Chrome runner 与独立新增证据。",
+  "changes": [
+    "房间 POST 发出前广播 pending，立即让停用确认与取消/撤销目标失效；等待期间阻止选项刷新、重新查询选择及各关联提交。结束后仍要求显式刷新，失败/未知/no-op 保存均保守重新核对。",
+    "房间目录使用完整房间事实的规范化快照比较；手动刷新实际发现变化时传播失效，不按旧 editing 比较跳过。未知结果不自动重试。",
+    "取消/撤销清除旧摘要、确认与选择，失效相关在途列表；保留原因草稿，并在重新查询选择同一目标后保留草稿。",
+    "已发停用创建/取消/撤销请求保持进行；迟到成功、服务端拒绝或未知结果仍明确显示。取消/撤销响应不恢复旧房间摘要，成功后需重新查询；不丢失成功事实。",
+    "停用冲突数字必须为安全整数；房间冲突 id/attendees unsafe 回归明确检查未知结果与确认清除，并覆盖最大安全 id/attendees 正向渲染。",
+    "所有保守失效提示使用资料可能变化，未宣称无变化保存发生确定变化；不安全目录仍整批拒绝。"
+  ],
+  "verification": {
+    "javascript": {
+      "command": [
+        "node",
+        "--test",
+        "tests/test_rooms_js.cjs",
+        "tests/test_blocks_js.cjs"
+      ],
+      "passed": 237,
+      "failed": 0,
+      "directory": "docs/evidence/epic-3-followup/review-fixes/targeted-20261112T161449310727Z",
+      "source_hashes_stable": true
+    },
+    "browser": {
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "scripts.verify_epic3_followup_browser",
+        "--output-dir",
+        "docs/evidence/epic-3-followup/review-fixes/browser"
+      ],
+      "directory": "docs/evidence/epic-3-followup/review-fixes/browser/runs/7f37938732d708a600415d806dd85946",
+      "version": "157.0.8103.51",
+      "source_hashes_stable": true,
+      "viewports": [
+        {
+          "width": 1280,
+          "height": 900,
+          "room_save": true,
+          "confirmation_invalidated": true,
+          "failed_refresh_remains_stale": true,
+          "explicit_refresh_and_reconfirm": true,
+          "committed_room_update_response_discarded": true,
+          "pending_blocks_reconfirmation_and_refresh": true,
+          "no_change_save_requires_recheck": true,
+          "disabled_js_guard": true,
+          "failed_script_guard": true,
+          "no_native_get": true,
+          "reason_visibility": true,
+          "unknown_save_clears_confirmation": true,
+          "page_errors": []
+        },
+        {
+          "width": 390,
+          "height": 844,
+          "room_save": true,
+          "confirmation_invalidated": true,
+          "failed_refresh_remains_stale": true,
+          "explicit_refresh_and_reconfirm": true,
+          "committed_room_update_response_discarded": true,
+          "pending_blocks_reconfirmation_and_refresh": true,
+          "no_change_save_requires_recheck": true,
+          "disabled_js_guard": true,
+          "failed_script_guard": true,
+          "no_native_get": true,
+          "reason_visibility": true,
+          "unknown_save_clears_confirmation": true,
+          "page_errors": []
+        }
+      ],
+      "committed_response_loss": "route.fetch() 实际转发房间更新，获得提交完成 200 后暂扣响应；等待中强制点击禁用停用提交/选项刷新均无请求；再丢弃响应，页面进入未知结果，独立 GET 确认已保存；显式房间目录刷新与相同资料 no-op 保存后再刷新停用选项并重确认创建。",
+      "database_facts": {
+        "rooms": 2,
+        "reservations": 2,
+        "occupancy_slots": 4,
+        "audit_events": 4
+      },
+      "database_integrity_verified": true,
+      "screenshots": [
+        "docs/evidence/epic-3-followup/review-fixes/browser/runs/7f37938732d708a600415d806dd85946/committed-response-held-1280.png",
+        "docs/evidence/epic-3-followup/review-fixes/browser/runs/7f37938732d708a600415d806dd85946/committed-response-held-390.png",
+        "docs/evidence/epic-3-followup/review-fixes/browser/runs/7f37938732d708a600415d806dd85946/committed-response-lost-1280.png",
+        "docs/evidence/epic-3-followup/review-fixes/browser/runs/7f37938732d708a600415d806dd85946/committed-response-lost-390.png",
+        "docs/evidence/epic-3-followup/review-fixes/browser/runs/7f37938732d708a600415d806dd85946/confirmation-invalidated-1280.png",
+        "docs/evidence/epic-3-followup/review-fixes/browser/runs/7f37938732d708a600415d806dd85946/confirmation-invalidated-390.png",
+        "docs/evidence/epic-3-followup/review-fixes/browser/runs/7f37938732d708a600415d806dd85946/created-1280.png",
+        "docs/evidence/epic-3-followup/review-fixes/browser/runs/7f37938732d708a600415d806dd85946/created-390.png",
+        "docs/evidence/epic-3-followup/review-fixes/browser/runs/7f37938732d708a600415d806dd85946/no-js-1280.png",
+        "docs/evidence/epic-3-followup/review-fixes/browser/runs/7f37938732d708a600415d806dd85946/no-js-390.png",
+        "docs/evidence/epic-3-followup/review-fixes/browser/runs/7f37938732d708a600415d806dd85946/refresh-failed-1280.png",
+        "docs/evidence/epic-3-followup/review-fixes/browser/runs/7f37938732d708a600415d806dd85946/refresh-failed-390.png",
+        "docs/evidence/epic-3-followup/review-fixes/browser/runs/7f37938732d708a600415d806dd85946/refreshed-unconfirmed-1280.png",
+        "docs/evidence/epic-3-followup/review-fixes/browser/runs/7f37938732d708a600415d806dd85946/refreshed-unconfirmed-390.png",
+        "docs/evidence/epic-3-followup/review-fixes/browser/runs/7f37938732d708a600415d806dd85946/rooms-script-failed-1280.png",
+        "docs/evidence/epic-3-followup/review-fixes/browser/runs/7f37938732d708a600415d806dd85946/rooms-script-failed-390.png",
+        "docs/evidence/epic-3-followup/review-fixes/browser/runs/7f37938732d708a600415d806dd85946/unknown-room-save-1280.png",
+        "docs/evidence/epic-3-followup/review-fixes/browser/runs/7f37938732d708a600415d806dd85946/unknown-room-save-390.png"
+      ],
+      "screenshots_inspected": [
+        "committed-response-held-390.png",
+        "committed-response-lost-1280.png"
+      ]
+    },
+    "diff_check": "git diff --check passed"
+  },
+  "limits": [
+    "本轮仅执行 rooms/blocks 的实际 JS harness 与指定 Chrome runner；未运行 Python 模板、审计或全量测试，交由父流程统一验证。",
+    "浏览器使用临时账号/临时 SQLite；保留原证据，不提交 Git，不修改业务规则、故事状态或其他文档。",
+    "前轮 acceptance.json 描述前轮基线，本轮结果保存在 review-fixes/ 下，没有覆盖。"
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "created_at_utc": "2026-11-12T15:57:48.050712+00:00",
+  "created_at_utc": "2026-11-12T16:21:34.785907+00:00",
   "files": [
     {
       "file": "root-visible-messages.selected.json",
@@ -426,7 +426,43 @@
       "messages": 66,
       "sha256": "e3ac655a8f1f910abbe12d29b503fe7f656536c93595991146924c5e31fa823b",
       "redactions": 0
+    },
+    {
+      "file": "final-followup-adversarial.selected.json",
+      "messages": 1,
+      "sha256": "d8bc32a16bad8f4a79d0d5a7c8193532d1202e627f19d1531083ce9a5f98f28b",
+      "redactions": 0
+    },
+    {
+      "file": "final-followup-edge.selected.json",
+      "messages": 1,
+      "sha256": "352c976eed4da32d24ccbe18275aa1db2911259f2d523878e22ffbaed92ca665",
+      "redactions": 0
+    },
+    {
+      "file": "final-followup-implementation-complete.selected.json",
+      "messages": 9,
+      "sha256": "18b1757f41028d7fa1266d80ac56eafe167a9c2d4a7bb343cdfc84ca16d1eb59",
+      "redactions": 0
+    },
+    {
+      "file": "final-followup-root-complete.selected.json",
+      "messages": 11,
+      "sha256": "58f3434ddb9c1eb801f70ac06d52a4d9dfc4e828e4649dccb69571def57941f6",
+      "redactions": 0
+    },
+    {
+      "file": "final-followup-verification-complete.selected.json",
+      "messages": 2,
+      "sha256": "a07b4315a83a7095b250d9e6f916a8b9d8d14c83bb525a50bcecf666b227128c",
+      "redactions": 0
+    },
+    {
+      "file": "final-followup-verification.selected.json",
+      "messages": 1,
+      "sha256": "9a56ad603b7dcb0f9687d06ef3cc8345eaa91d20344c92894b8f6d0e6fdcdc84",
+      "redactions": 0
     }
   ],
-  "note": "部分历史会话的可见输出，文件之间可能重叠；有UUID的协作代理已补充可取得回复及轮次元数据。导出接口未返回的初始派发指令不伪造为消息；实际规格、派发模板及评审另存。精确模型ID不可核验。"
+  "note": "部分历史会话的可见输出，文件之间可能重叠；有UUID的协作代理已补充可取得回复及轮次元数据。导出接口未返回的初始派发指令不伪造为消息；实际规格、派发模板及评审另存。精确模型ID不可核验。 本轮追加最终独立复核可见消息，历史文件不重新生成；root记录止于归档时，非完整平台记录。"
 }

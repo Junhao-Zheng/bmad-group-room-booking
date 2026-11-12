@@ -41,6 +41,37 @@ async function main(){
       const blockDraft=await page.locator('#block-form').evaluate(form=>Object.fromEntries(new FormData(form)));
       stage='room-save';await page.locator('#admin-rooms button').filter({hasText:`编辑会议室 ${roomId}`}).click();
       await page.locator('#room-name').fill(`更新后的会议室 ${roomId}`);await page.locator('#room-confirm').check();
+      stage='committed-response-held';let committed,releaseResponse;
+      const committedResponse=new Promise(resolve=>{committed=resolve;}),responseGate=new Promise(resolve=>{releaseResponse=resolve;});
+      await page.route('**/api/admin/rooms/*',async route=>{
+        // Forward once to the actual server, wait for its committed 200, then drop only the response.
+        const response=await route.fetch();committed({status:response.status(),body:await response.json()});
+        await responseGate;await route.abort();
+      });
+      const dependentRequests=[];
+      const watchDependent=request=>{const url=new URL(request.url());if(url.pathname==='/api/rooms'||url.pathname==='/api/admin/blocks')dependentRequests.push({method:request.method(),path:url.pathname});};
+      page.on('request',watchDependent);await page.locator('#room-submit').click();const committedResult=await committedResponse;
+      assert.equal(committedResult.status,200);assert.equal(committedResult.body.data.name,`更新后的会议室 ${roomId}`);
+      assert.equal(await page.locator('#room-form').getAttribute('aria-busy'),'true');
+      assert.equal(await page.locator('#block-confirm').isChecked(),false);
+      for(const selector of ['#block-confirm','#block-submit','#block-rooms-refresh','#admin-blocks-submit','#admin-bookings-submit'])assert.equal(await page.locator(selector).isDisabled(),true);
+      await page.locator('#block-submit').click({force:true});await page.locator('#block-rooms-refresh').click({force:true});
+      assert.deepEqual(dependentRequests,[]);await shot('committed-response-held','section[aria-labelledby="block-form-title"]');
+      releaseResponse();await page.waitForFunction(()=>document.getElementById('room-feedback').textContent.includes('未能确认'));await done('room-form');
+      await page.unroute('**/api/admin/rooms/*');assert.deepEqual(dependentRequests,[]);
+      assert.equal(await page.locator('#block-confirm').isDisabled(),true);assert.equal(await page.locator('#block-submit').isDisabled(),true);
+      assert.equal(await page.locator('#block-rooms-refresh').isDisabled(),false);assert.equal(await page.locator('#room-confirm').isChecked(),false);
+      assert.equal(await page.locator('#room-name').inputValue(),`更新后的会议室 ${roomId}`);
+      await page.locator('#block-submit').click({force:true});assert.deepEqual(dependentRequests,[]);
+      const persisted=(await (await context.request.get(origin+'/api/rooms')).json()).data.items.find(room=>room.id===roomId);
+      assert.deepEqual(persisted,committedResult.body.data);
+      network.push({operation:'committed-room-update-response-discarded',status:committedResult.status,data:persisted,
+        waiting_prevents_dependent_requests:true,unknown_keeps_block_confirmation_disabled:true,dependent_requests:dependentRequests.slice()});
+      await shot('committed-response-lost','section[aria-labelledby="block-form-title"]');page.off('request',watchDependent);
+      // A deliberate directory check then identical save confirms the same facts without another mutation.
+      await page.locator('#rooms-refresh').click();await done('room-form');
+      assert.equal(await page.locator('#block-confirm').isDisabled(),true);
+      stage='no-change-room-save';await page.locator('#room-confirm').check();
       const saveResponse=page.waitForResponse(response=>new URL(response.url()).pathname===`/api/admin/rooms/${roomId}`);
       await page.locator('#room-submit').click();const saved=await saveResponse;assert.equal(saved.status(),200);await done('room-form');
       network.push({operation:'room-save',status:saved.status(),data:(await saved.json()).data});
@@ -48,6 +79,7 @@ async function main(){
       assert.equal(await page.locator('#block-submit').isDisabled(),true);assert.equal(await page.locator('#block-rooms-refresh').isDisabled(),false);
       assert.deepEqual(await page.locator('#block-form').evaluate(form=>Object.fromEntries(new FormData(form))),blockDraft);
       assert.match(await page.locator('#block-rooms-feedback').textContent(),/旧核对已失效/);assert.match(await page.locator('#block-summary').textContent(),/选项已过期/);
+      assert.doesNotMatch(await page.locator('#block-rooms-feedback').textContent(),/资料已更改|资料已保存/);
       await shot('confirmation-invalidated','section[aria-labelledby="block-form-title"]');
       stage='refresh-failure';await page.route('**/api/rooms',route=>route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({ok:false,error:{code:'STORE_BUSY',message:'合成刷新失败',fields:{},conflicts:[]}})}));
       await page.locator('#block-rooms-refresh').click();await page.waitForFunction(()=>document.getElementById('block-rooms-feedback').textContent.includes('刷新失败'));
@@ -71,6 +103,7 @@ async function main(){
       await page.locator('#room-submit').click();assert.equal(unknownRequests,1);await shot('unknown-room-save','section[aria-labelledby="room-form-title"]');
       assert.deepEqual(errors,[]);fs.writeFileSync(path.join(outputDir,`observations-${viewport.width}.json`),JSON.stringify(network,null,2));
       results.push({...viewport,room_save:true,confirmation_invalidated:true,failed_refresh_remains_stale:true,explicit_refresh_and_reconfirm:true,
+        committed_room_update_response_discarded:true,pending_blocks_reconfirmation_and_refresh:true,no_change_save_requires_recheck:true,
         disabled_js_guard:true,failed_script_guard:true,no_native_get:true,reason_visibility:true,unknown_save_clears_confirmation:true,page_errors:errors});await context.close();
     }
     return {result:'PASS',completed:true,browser_version:browser.version(),viewports:results};

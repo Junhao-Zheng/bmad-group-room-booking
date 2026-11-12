@@ -2,7 +2,7 @@
 
 软件工程管理课程原型：以 BMAD 需求、架构、故事、两轮增量和实际验证组织交付。实验 B 按用户转述的教师安排免做，实验 A 的初版、统一评审和局限单独保存。
 
-12个故事均已完成技术验收；208项Python与376项JavaScript测试通过。最终史诗复盘保留独立复核缺口；[全新副本安装检查](docs/evidence/delivery/README.md)已通过；人类要求未全部满足，详见下文。
+12个故事均已完成技术验收；208项Python与399项JavaScript测试通过。最后一批修补的独立复核与收口验证已完成，最终史诗技术接受；此前的[全新副本安装检查](docs/evidence/delivery/README.md)已通过；人类要求未全部满足，详见下文。
 
 ## 先看课程材料
 
@@ -52,7 +52,7 @@ uv run --frozen waitress-serve --listen=127.0.0.1:8000 --threads=8 --call bookin
 node --test tests/test_*js.cjs
 ```
 
-已实际通过 **208个唯一Python测试、376项JavaScript测试，0跳过**；[最终修补核验](docs/evidence/epic-3-followup/verification.md)。真实HTTP覆盖138项路由权限、7种业务变更和实际停服新PID重启；并发最终完整状态符合互斥/容量约束。NFR03最近一次200个测量样本P95为21.501ms、0错误，负载与限制见验证索引。
+已实际通过 **208个唯一Python测试、399项JavaScript测试，0跳过**；[最终修补核验](docs/evidence/epic-3-followup/review-fixes/verification.md)。真实HTTP覆盖138项路由权限、7种业务变更和实际停服新PID重启；并发最终完整状态符合互斥/容量约束。NFR03最近一次200个测量样本P95为21.501ms、0错误，负载与限制见验证索引。
 
 浏览器和真实HTTP验证使用独立临时库和合成身份，不改默认演示库。多数规则测试使用固定Clock；最终审计与重启验证使用生产SystemClock，具体以各报告为准。[验证索引](docs/verification.md)提供实际执行结果、完整复跑命令和浏览器工具安装方法；同一应用版本的哈希绑定在对应报告中。历史失败不删除，后续通过记录不覆盖初稿。
 

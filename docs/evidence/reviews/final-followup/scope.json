@@ -1,0 +1,12 @@
+{
+  "baseline": "abb72911742e59d3aa5d60c28e1f60ca384add13",
+  "head": "e8e2f3a5f8eb3af42e620ee11bed376998423370",
+  "bytes": 56258,
+  "reviewed_at_utc": "2026-11-12T16:11:28.956721+00:00",
+  "source_diff_sha256": "6cf3ce621d64f8a4bd018bc3a5b85702fb8fbc3c0d71a20f374b19abacdde0e0",
+  "review_agents": {
+    "adversarial": "01a1d07f-e981-75b2-842f-196feb054dc4",
+    "edge": "01a1d080-25a3-7310-ab29-1d30017eee6d",
+    "verification": "01a1d080-5d1b-7020-9dc3-cf79058cd40c"
+  }
+}

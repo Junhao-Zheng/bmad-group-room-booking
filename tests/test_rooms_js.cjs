@@ -126,11 +126,18 @@ const validConflict={id:102,attendees:5,start_local:'2026-11-12T10:00:00+08:00',
 for(const [label,fields,conflicts] of [
   ['non-array conflicts',{},{}],['string conflicts',{},'private'],['missing timestamp',{},[{...validConflict,end_local:undefined}]],
   ['numeric timestamp',{},[{...validConflict,start_local:7}]],['null conflict',{},[null]],['object id',{},[{...validConflict,id:{private:1}}]],
+  ['unsafe id',{},[{...validConflict,id:Number('9007199254740993')}]],['unsafe attendees',{},[{...validConflict,attendees:Number('9223372036854775807')}]],
   ['bad status',{},[{...validConflict,status:{private:1}}]],['array fields',[],[]],['null fields',null,[]],['non-text field',{name:{private:1}},[]]
 ])test(`malformed ${label} uses unknown-result recovery and restores draft`,async()=>{
   const ui=harness();ui.setFetch(async()=>fail('CAPACITY_CONFLICT',fields,conflicts));await ui.submit();restored(ui);
   assert.match(ui.n['room-feedback'].textContent,/未能确认.*输入已保留/);assert.equal(ui.inputs[0].value,room.name);
+  assert.equal(ui.n['room-confirm'].checked,false);
   assert.equal(ui.n['room-conflicts'].children.length,0);assert.equal(ui.fetches.length,1);
+});
+test('largest safe conflict id and attendee count remain exact display facts',async()=>{
+  const ui=harness();ui.setFetch(async()=>fail('CAPACITY_CONFLICT',{},[{...validConflict,id:Number.MAX_SAFE_INTEGER,attendees:Number.MAX_SAFE_INTEGER}]));
+  await ui.submit();restored(ui);assert.match(ui.n['room-conflicts'].textContent,/预约 9007199254740991 · 9007199254740991 人/);
+  assert.doesNotMatch(ui.n['room-feedback'].textContent,/未能确认/);assert.equal(ui.fetches.length,1);
 });
 for(const field of ['name','location','capacity'])for(const event of ['input','change'])test(`${field} ${event} clears confirmation and prevents POST until reconfirmed`,async()=>{
   const ui=harness();ui.n['room-confirm'].checked=true;ui.n['room-'+field].handlers[event]();

@@ -1,0 +1,24 @@
+{
+  "result": "PASS",
+  "command": [
+    "node",
+    "--test",
+    "tests/test_rooms_js.cjs",
+    "tests/test_blocks_js.cjs"
+  ],
+  "source_sha256_before": {
+    "booking_app/static/rooms.js": "d04171eb21463d61a4936355e3831adbc644c239d023a5262ae7100e7841db04",
+    "booking_app/static/blocks.js": "82d31c85d2e19dad9068f44e4b6b3294ed1333fe325bfd58441ed16db1416ae0",
+    "tests/test_rooms_js.cjs": "5795854ae20ff52b832734b7dfa1d574c9ae98037c8b10c5c02c8f781fff8019",
+    "tests/test_blocks_js.cjs": "c15ae9fcfad9bffdae5ff78cba43549eef910f34d36700987bdba479542f51a9",
+    "scripts/verify_epic3_followup_browser.cjs": "33b74e69b81d8c20b06d93e9abdc492fbe03f0d7806b18f20acbbee1e463f642"
+  },
+  "exit_code": 0,
+  "source_sha256_after": {
+    "booking_app/static/rooms.js": "d04171eb21463d61a4936355e3831adbc644c239d023a5262ae7100e7841db04",
+    "booking_app/static/blocks.js": "82d31c85d2e19dad9068f44e4b6b3294ed1333fe325bfd58441ed16db1416ae0",
+    "tests/test_rooms_js.cjs": "5795854ae20ff52b832734b7dfa1d574c9ae98037c8b10c5c02c8f781fff8019",
+    "tests/test_blocks_js.cjs": "c15ae9fcfad9bffdae5ff78cba43549eef910f34d36700987bdba479542f51a9",
+    "scripts/verify_epic3_followup_browser.cjs": "33b74e69b81d8c20b06d93e9abdc492fbe03f0d7806b18f20acbbee1e463f642"
+  }
+}

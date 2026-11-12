@@ -10,6 +10,9 @@
   const inputs = ["name", "location", "capacity"].map(name => form.elements.namedItem(name));
   let editing = null, busy = false, blocked = false, savedMessage = "";
   const invalidEdits = new WeakSet();
+  const initialRooms = [];
+  const directoryKey = rooms => JSON.stringify(rooms.map(room => [room.id,room.name,room.location,room.capacity]).sort((a,b) => a[0]-b[0]));
+  let directorySnapshot;
   const displayed = new Map();
   function fillInputs(room) {
     for (const input of inputs) {
@@ -61,8 +64,10 @@
     let room;
     try { room = JSON.parse(button.dataset.room); } catch (_) { /* Reject only this malformed entry. */ }
     bindEdit(button, room);
+    if (roomShape(room)) initialRooms.push(room);
     if (!roomShape(room)) say(directoryFeedback, "部分会议室资料或编号无法安全读取，已禁止编辑这些条目。请刷新目录核对。", true);
   }
+  directorySnapshot = directoryKey(initialRooms);
   function roomShape(room) {
     return room && typeof room === "object" && !Array.isArray(room) && Object.keys(room).sort().join(",") === "capacity,id,location,name" &&
       Number.isSafeInteger(room.id) && room.id > 0 && typeof room.name === "string" &&
@@ -110,6 +115,9 @@
     const data = await request("/api/rooms");
     if (!Array.isArray(data.items) || data.total !== data.items.length || !data.items.every(roomShape)) throw new Error("Invalid directory");
     if (blocked) return;
+    const snapshot = directoryKey(data.items);
+    if (snapshot !== directorySnapshot) document.dispatchEvent(new CustomEvent("admin-room-directory-changed", {detail:{}}));
+    directorySnapshot = snapshot;
     list.replaceChildren();
     for (const room of data.items) {
       const item = document.createElement("li"), title = document.createElement("h3"), detail = document.createElement("p"), button = document.createElement("button");
@@ -136,13 +144,13 @@
     const roomId = editing?.id; const initiatedHere = form.contains(document.activeElement);
     savedMessage = "";
     clearErrors(); controls(true); submit.textContent = "正在提交…";
+    document.dispatchEvent(new CustomEvent("admin-room-write-state", {detail:{pending:true}}));
     say(feedback, "正在保存，请稍候…"); let focusTarget = feedback;
     try {
       const room = await request(roomId ? `/api/admin/rooms/${roomId}` : "/api/admin/rooms", values);
       if (!roomShape(room) || (roomId && room.id !== roomId)) throw new Error("Invalid room");
       savedMessage = "会议室资料已保存。";
       confirm.checked = false;
-      document.dispatchEvent(new CustomEvent("admin-room-directory-changed", {detail:{}}));
       if (blocked) { say(feedback, `${savedMessage}请重新登录后打开管理页核对。`, true); return; }
       editing = room; cancel.hidden = false; heading.textContent = `编辑会议室 ${room.id}`;
       fillInputs(room);
@@ -173,6 +181,7 @@
         say(feedback, "未能确认保存结果，输入已保留。请先刷新目录核对，再重新勾选确认后手动提交；不会自动重试。", true);
       }
     } finally {
+      document.dispatchEvent(new CustomEvent("admin-room-write-state", {detail:{pending:false}}));
       controls(false); submit.textContent = editing ? "确认保存会议室" : "确认新增会议室";
       if (initiatedHere && canFocus()) focusTarget.focus();
     }

@@ -1,0 +1,170 @@
+{
+  "before": {
+    "counts": {
+      "rooms": 2,
+      "reservations": 0,
+      "occupancy_slots": 0,
+      "audit_events": 0
+    },
+    "schema_version": 1,
+    "business_and_relationship_sha256": "6a51aec251cac88b3499cd3dea859475e7f76fda2011d3f24cb94c45b0bcc6b7",
+    "rooms": [
+      {
+        "id": 1,
+        "name": "合成会议室 1",
+        "location": "合成楼",
+        "capacity": 20,
+        "created_at": 1794500065,
+        "updated_at": 1794500065
+      },
+      {
+        "id": 2,
+        "name": "合成会议室 2",
+        "location": "合成楼",
+        "capacity": 20,
+        "created_at": 1794500065,
+        "updated_at": 1794500065
+      }
+    ],
+    "reservations": [],
+    "occupancy_slots": [],
+    "audit_events": []
+  },
+  "after": {
+    "counts": {
+      "rooms": 2,
+      "reservations": 2,
+      "occupancy_slots": 4,
+      "audit_events": 4
+    },
+    "schema_version": 1,
+    "business_and_relationship_sha256": "278c8383d91af0b741708bf2550ff6eed66a1b40f5652045ad2910fbcd022ba9",
+    "rooms": [
+      {
+        "id": 1,
+        "name": "更新后的会议室 1",
+        "location": "合成楼",
+        "capacity": 20,
+        "created_at": 1794500065,
+        "updated_at": 1794500069
+      },
+      {
+        "id": 2,
+        "name": "更新后的会议室 2",
+        "location": "合成楼",
+        "capacity": 20,
+        "created_at": 1794500065,
+        "updated_at": 1794500073
+      }
+    ],
+    "reservations": [
+      {
+        "id": 1,
+        "kind": "block",
+        "room_id": 1,
+        "user_id": 3,
+        "title": null,
+        "purpose": null,
+        "attendees": null,
+        "reason": "合成维护原因，成员可见",
+        "start_at": 1794621600,
+        "end_at": 1794625200,
+        "request_payload": null,
+        "created_at": 1794500070,
+        "cancelled_at": null,
+        "cancelled_by": null,
+        "cancel_reason": null
+      },
+      {
+        "id": 2,
+        "kind": "block",
+        "room_id": 2,
+        "user_id": 3,
+        "title": null,
+        "purpose": null,
+        "attendees": null,
+        "reason": "合成维护原因，成员可见",
+        "start_at": 1794621600,
+        "end_at": 1794625200,
+        "request_payload": null,
+        "created_at": 1794500074,
+        "cancelled_at": null,
+        "cancelled_by": null,
+        "cancel_reason": null
+      }
+    ],
+    "occupancy_slots": [
+      {
+        "room_id": 1,
+        "slot_start": 1794621600,
+        "reservation_id": 1
+      },
+      {
+        "room_id": 1,
+        "slot_start": 1794623400,
+        "reservation_id": 1
+      },
+      {
+        "room_id": 2,
+        "slot_start": 1794621600,
+        "reservation_id": 2
+      },
+      {
+        "room_id": 2,
+        "slot_start": 1794623400,
+        "reservation_id": 2
+      }
+    ],
+    "audit_events": [
+      {
+        "id": 1,
+        "actor_id": 3,
+        "actor_display_name": "演示管理员",
+        "action": "room.updated",
+        "target_type": "room",
+        "target_id": 1,
+        "occurred_at": 1794500069,
+        "before_json": "{\"capacity\":20,\"id\":1,\"location\":\"合成楼\",\"name\":\"合成会议室 1\"}",
+        "after_json": "{\"capacity\":20,\"id\":1,\"location\":\"合成楼\",\"name\":\"更新后的会议室 1\"}",
+        "reason": null
+      },
+      {
+        "id": 2,
+        "actor_id": 3,
+        "actor_display_name": "演示管理员",
+        "action": "block.created",
+        "target_type": "block",
+        "target_id": 1,
+        "occurred_at": 1794500070,
+        "before_json": null,
+        "after_json": "{\"created_at\":1794500070,\"creator_id\":3,\"end_at\":1794625200,\"id\":1,\"reason\":\"合成维护原因，成员可见\",\"revoke_reason\":null,\"revoked_at\":null,\"revoked_by_id\":null,\"room_id\":1,\"start_at\":1794621600}",
+        "reason": "合成维护原因，成员可见"
+      },
+      {
+        "id": 3,
+        "actor_id": 3,
+        "actor_display_name": "演示管理员",
+        "action": "room.updated",
+        "target_type": "room",
+        "target_id": 2,
+        "occurred_at": 1794500073,
+        "before_json": "{\"capacity\":20,\"id\":2,\"location\":\"合成楼\",\"name\":\"合成会议室 2\"}",
+        "after_json": "{\"capacity\":20,\"id\":2,\"location\":\"合成楼\",\"name\":\"更新后的会议室 2\"}",
+        "reason": null
+      },
+      {
+        "id": 4,
+        "actor_id": 3,
+        "actor_display_name": "演示管理员",
+        "action": "block.created",
+        "target_type": "block",
+        "target_id": 2,
+        "occurred_at": 1794500074,
+        "before_json": null,
+        "after_json": "{\"created_at\":1794500074,\"creator_id\":3,\"end_at\":1794625200,\"id\":2,\"reason\":\"合成维护原因，成员可见\",\"revoke_reason\":null,\"revoked_at\":null,\"revoked_by_id\":null,\"room_id\":2,\"start_at\":1794621600}",
+        "reason": "合成维护原因，成员可见"
+      }
+    ]
+  },
+  "final_storage_verified": true
+}

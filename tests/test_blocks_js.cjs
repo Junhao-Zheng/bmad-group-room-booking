@@ -177,13 +177,14 @@ for(const code of ['AUTH_REQUIRED','FORBIDDEN'])for(const late of ['room-directo
   });
   let pending;
   if(late==='room-directory')pending=ui.n['rooms-refresh'].handlers.click();else if(late==='room-write')pending=ui.roomSubmit();else if(late==='block-write')pending=ui.submit();else pending=ui.load();
-  if(late.startsWith('room'))await ui.load();else await ui.roomSubmit();
+  if(late==='room-write')ui.document.dispatchEvent({type:'admin-auth-lost',detail:{code}});
+  else if(late.startsWith('room'))await ui.load();else await ui.roomSubmit();
   release(ok(late==='room-directory'?{items:[block.room],total:1}:late==='block-list'?{items:[block],total:1}:late==='room-write'?block.room:block));await pending;
   assert.equal(ui.n['admin-rooms'].children.length,0);assert.equal(ui.n['admin-blocks-items'].children.length,0);assert.equal(ui.n['block-submit'].disabled,true);assert.equal(ui.n['room-submit'].disabled,true);
   if(late==='room-write'||late==='block-write'){
     const feedback=ui.n[late==='room-write'?'room-feedback':'block-feedback'].textContent;
     assert.match(feedback,late==='room-write'?/已保存.*重新登录/:/停用 120 已创建.*重新登录/);
-    assert.equal(ui.fetches.length,2,'late success cannot start a private-data refresh');
+    assert.equal(ui.fetches.length,late==='room-write'?1:2,'late success cannot start a private-data refresh');
   }
 });
 for(const code of ['AUTH_REQUIRED','FORBIDDEN'])for(const saved of ['room','block'])test(`confirmed ${saved} success survives ${code} in the other panel`,async()=>{
@@ -212,7 +213,7 @@ test('room save invalidates block confirmation until an explicit successful opti
 test('room change during option refresh cannot certify an older directory response',async()=>{
   const ui=harness({combined:true});let release;ui.setFetch(()=>new Promise(r=>{release=r;}));const pending=ui.refresh();
   ui.document.dispatchEvent({type:'admin-room-directory-changed'});release(ok({items:[block.room],total:1}));await pending;
-  assert.equal(ui.n['block-confirm'].disabled,true);assert.match(ui.n['block-rooms-feedback'].textContent,/再次更改.*重新刷新/);
+  assert.equal(ui.n['block-confirm'].disabled,true);assert.match(ui.n['block-rooms-feedback'].textContent,/可能变化.*重新刷新/);
   ui.setFetch(async()=>ok({items:[block.room],total:1}));await ui.refresh();restored(ui);assert.equal(ui.n['block-confirm'].checked,false);
 });
 for(const outcome of ['success','conflict','unknown'])test(`room save does not cancel or hide in-flight block ${outcome}`,async()=>{
@@ -487,4 +488,64 @@ for(const first of ['cancel','revoke'])test(`integrated ${first} identity refusa
   assert.equal(ui.n['room-submit'].disabled,true);assert.equal(ui.n['block-submit'].disabled,true);
   await ui.cancel();await submitRevoke(ui);assert.equal(ui.fetches.filter(c=>c.options.method==='POST').length,1);
   assert.equal(ui.n['admin-cancel-reason'].value,'取消草稿');assert.equal(ui.n['revoke-reason'].value,' 修复完成 <img> ');
+});
+
+for(const field of ['id','room_id','attendees','start_at','end_at'])test(`unsafe conflict ${field} never displays rounded facts`,async()=>{
+  const ui=harness();ui.setFetch(async()=>fail('OCCUPANCY_CONFLICT',{},[{...conflict,[field]:Number('9007199254740993')}]));
+  await ui.submit();restored(ui);assert.equal(ui.n['block-conflicts'].children.length,0);
+  assert.match(ui.n['block-feedback'].textContent,/未能确认/);assert.equal(ui.n['block-confirm'].checked,false);assert.equal(ui.fetches.length,1);
+});
+for(const result of ['no-change','unknown','rejected'])test(`room ${result} invalidates before dispatch and keeps block confirmation stale after completion`,async()=>{
+  const ui=harness({combined:true});let release;ui.n['block-confirm'].checked=true;
+  ui.setFetch((url)=>url==='/api/admin/rooms'?new Promise(r=>{release=r;}):Promise.resolve(ok({items:[block.room],total:1})));
+  const pending=ui.roomSubmit();assert.equal(ui.fetches.length,1);assert.equal(ui.n['block-confirm'].checked,false);
+  for(const id of ['block-confirm','block-submit','block-rooms-refresh','admin-bookings-submit','admin-blocks-submit'])assert.equal(ui.n[id].disabled,true);
+  await ui.submit();await ui.refresh();await ui.load();assert.equal(ui.fetches.length,1,'waiting write cannot authorize old options or submit');
+  release(result==='no-change'?ok(block.room):result==='unknown'?ok({broken:true}):fail('STORE_BUSY'));await pending;
+  assert.equal(ui.n['block-confirm'].disabled,true);assert.equal(ui.n['block-submit'].disabled,true);assert.equal(ui.n['block-rooms-refresh'].disabled,false);
+  assert.match(ui.n['block-rooms-feedback'].textContent,/可能变化/);assert.doesNotMatch(ui.n['block-summary'].textContent,/资料已更改|资料已保存/);
+  const count=ui.fetches.length;await ui.submit();assert.equal(ui.fetches.length,count);
+  await ui.refresh();restored(ui);assert.equal(ui.n['block-confirm'].checked,false);
+});
+for(const settledFirst of ['refresh','write'])test(`option query started before room write cannot clear stale when ${settledFirst} settles first`,async()=>{
+  const ui=harness({combined:true});let directoryRelease,writeRelease;
+  ui.setFetch(url=>new Promise(resolve=>{if(url==='/api/rooms')directoryRelease=resolve;else writeRelease=resolve;}));
+  const refreshing=ui.refresh(),writing=ui.roomSubmit();const before=ui.inputs[0].children.length;
+  if(settledFirst==='refresh'){directoryRelease(ok({items:[block.room],total:1}));await refreshing;writeRelease(ok({broken:true}));await writing;}
+  else {writeRelease(ok({broken:true}));await writing;directoryRelease(ok({items:[block.room],total:1}));await refreshing;}
+  assert.equal(ui.inputs[0].children.length,before);assert.equal(ui.n['block-confirm'].disabled,true);assert.match(ui.n['block-rooms-feedback'].textContent,/可能变化.*重新刷新/);
+  ui.setFetch(async()=>ok({items:[block.room],total:1}));await ui.refresh();restored(ui);
+});
+for(const kind of ['bookings','blocks'])test(`manual directory refresh invalidates ${kind} target only when room facts change, retaining the reason for reselection`,async()=>{
+  const ui=harness({combined:true}),booking=kind==='bookings';
+  if(booking){ui.setFetch(async()=>ok({items:[adminBooking()],total:1}));await ui.load(kind);ui.choose();ui.n['admin-cancel-reason'].value='保留取消草稿';}
+  else await selectRevoke(ui);
+  const prefix=booking?'admin-cancel':'revoke',reason=ui.n[prefix+'-reason'].value;ui.n[prefix+'-confirm'].checked=true;ui.n['block-confirm'].checked=true;
+  ui.setFetch(async()=>ok({items:[block.room],total:1}));await ui.n['rooms-refresh'].handlers.click();
+  assert.equal(ui.n[prefix+'-confirm'].checked,true);assert.equal(ui.n['block-confirm'].checked,true);
+  const changed={...block.room,name:'外部已修改'};ui.setFetch(async()=>ok({items:[changed],total:1}));await ui.n['rooms-refresh'].handlers.click();
+  assert.equal(ui.n[prefix+'-confirm'].checked,false);assert.equal(ui.n[prefix+'-summary'].textContent,'');assert.equal(ui.n[prefix+'-reason'].value,reason);
+  assert.equal(ui.n[`admin-${kind}-items`].children.length,0);assert.match(ui.n[prefix+'-feedback'].textContent,/重新查询并选择/);
+  const count=ui.fetches.length;if(booking)await ui.cancel();else await submitRevoke(ui);assert.equal(ui.fetches.length,count);
+  ui.setFetch(async()=>ok({items:[{...(booking?adminBooking():block),room:changed}],total:1}));await ui.load(kind);
+  if(booking)ui.choose();else ui.n['admin-blocks-items'].querySelectorAll('button')[0].handlers.click();
+  assert.equal(ui.n[prefix+'-reason'].value,reason);assert.match(ui.n[prefix+'-summary'].textContent,/外部已修改/);assert.equal(ui.n[prefix+'-confirm'].checked,false);
+});
+for(const kind of ['bookings','blocks'])for(const outcome of ['success','failure','unknown'])test(`pending ${kind} write keeps ${outcome} after room write clears stale target`,async()=>{
+  const ui=harness({combined:true}),booking=kind==='bookings';
+  if(booking){ui.setFetch(async()=>ok({items:[adminBooking()],total:1}));await ui.load(kind);ui.choose();ui.n['admin-cancel-reason'].value='取消草稿';}
+  else await selectRevoke(ui);
+  const prefix=booking?'admin-cancel':'revoke',reason=ui.n[prefix+'-reason'].value;let release;
+  ui.setFetch(async url=>url.endsWith(booking?'/cancel':'/revoke')?new Promise(r=>{release=r;}):url==='/api/admin/rooms'?ok(block.room):ok({items:[block.room],total:1}));
+  const pending=booking?ui.cancel():submitRevoke(ui),signal=ui.fetches.at(-1).options.signal;await ui.roomSubmit();
+  assert.equal(signal.aborted,false);assert.equal(ui.n[prefix+'-summary'].textContent,'');assert.equal(ui.n[prefix+'-reason'].value,reason);
+  const count=ui.fetches.length;release(outcome==='success'?ok(booking?adminBooking('cancelled'):revoked):outcome==='failure'?fail('STORE_BUSY'):ok({broken:true}));await pending;
+  assert.equal(ui.fetches.length,count);assert.equal(ui.n[prefix+'-summary'].textContent,'');assert.equal(ui.n[prefix+'-reason'].value,reason);
+  assert.match(ui.n[prefix+'-feedback'].textContent,outcome==='success'?(booking?/已取消.*重新查询并选择/:/已撤销.*重新查询并选择/):outcome==='failure'?/合成错误.*重新查询并选择/:/未能确认.*重新查询并选择/);
+  if(booking)assert.equal(ui.n['admin-cancel-fields'].disabled,true);else assert.equal(ui.n['revoke-submit'].disabled,true);
+});
+for(const kind of ['bookings','blocks'])test(`late ${kind} list cannot restore target choices after room save starts`,async()=>{
+  const ui=harness({combined:true});let release;ui.setFetch(async url=>url.startsWith('/api/admin/'+kind+'?')?new Promise(r=>{release=r;}):ok({broken:true}));
+  const pending=ui.load(kind);await ui.roomSubmit();release(ok({items:[kind==='bookings'?adminBooking():block],total:1}));await pending;
+  assert.equal(ui.n[`admin-${kind}-items`].children.length,0);assert.match(ui.n[`admin-${kind}-feedback`].textContent,/重新查询并选择/);
 });

@@ -1,0 +1,75 @@
+[
+  {
+    "mode": "no-js",
+    "requests": [
+      {
+        "method": "GET",
+        "path": "/admin"
+      }
+    ],
+    "no_native_get": true,
+    "write_controls_disabled": true
+  },
+  {
+    "mode": "rooms-script-failed",
+    "requests": [
+      {
+        "method": "GET",
+        "path": "/admin"
+      }
+    ],
+    "no_native_get": true,
+    "write_controls_disabled": true
+  },
+  {
+    "operation": "committed-room-update-response-discarded",
+    "status": 200,
+    "data": {
+      "capacity": 20,
+      "id": 2,
+      "location": "合成楼",
+      "name": "更新后的会议室 2"
+    },
+    "waiting_prevents_dependent_requests": true,
+    "unknown_keeps_block_confirmation_disabled": true,
+    "dependent_requests": []
+  },
+  {
+    "operation": "room-save",
+    "status": 200,
+    "data": {
+      "capacity": 20,
+      "id": 2,
+      "location": "合成楼",
+      "name": "更新后的会议室 2"
+    }
+  },
+  {
+    "operation": "create-after-reconfirmation",
+    "status": 201,
+    "data": {
+      "created_at": 1794500074,
+      "created_local": "2026-11-13T00:14:34+08:00",
+      "creator_display_name": "演示管理员",
+      "creator_id": 3,
+      "end_at": 1794625200,
+      "end_local": "2026-11-14T11:00:00+08:00",
+      "id": 2,
+      "reason": "合成维护原因，成员可见",
+      "revoke_reason": null,
+      "revoked_at": null,
+      "revoked_by_display_name": null,
+      "revoked_by_id": null,
+      "revoked_local": null,
+      "room": {
+        "capacity": 20,
+        "id": 2,
+        "location": "合成楼",
+        "name": "更新后的会议室 2"
+      },
+      "start_at": 1794621600,
+      "start_local": "2026-11-14T10:00:00+08:00",
+      "status": "pending"
+    }
+  }
+]

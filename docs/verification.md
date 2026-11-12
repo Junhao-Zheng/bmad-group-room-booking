@@ -96,14 +96,14 @@ npm install --prefix work/browser-tools --no-save playwright@1.58.2
 
 ## 解释范围
 
-这是本机、合成数据、所列浏览器及规定负载的实测证据，不证明生产稳定性。JS使用Number，超出安全整数的极大数据库ID在管理操作中明确拒绝，API仍按正64位ID合同校验；首版不为这种不现实的演示数据改全部JSON合同。没有人为身份信息、真实口令、Cookie或运行数据库需要交到仓库。
+这是本机、合成数据、所列浏览器及规定负载的实测证据，不证明生产稳定性。JS使用Number，超出安全整数的极大数据库ID在管理操作中明确拒绝，API仍按正64位ID合同校验；首版不为这种不现实的演示数据改全部JSON合同。目录中只要含不安全ID就整批拒绝；即使有安全条目，旧选项失效后也不能靠重复刷新同一无效目录恢复，未实现部分目录可用模式。没有人为身份信息、真实口令、Cookie或运行数据库需要交到仓库。
 
 ## 最终史诗修补
 
-最新全量208唯一Python、376 JS、0skip；[父流程核验](evidence/epic-3-followup/parent-final-qa.json)。真实管理联动/禁JS/脚本失败与审计双视口报告各61项源码哈希已复算。后端未改，历史138权限/重启/并发/性能按原报告保留。最后独立3镜头429无结果，父流程检查不能替代独立性，复盘保留open item。
+原修补通过208唯一Python/376 JS，当时独立三镜头因429无报告，记录保留在[历史核验](evidence/epic-3-followup/parent-final-qa.json)。2026-11-13继续独立复核并修补后的最新全量为208唯一Python/399 JS、0跳过，见[本轮核验](evidence/epic-3-followup/review-fixes/verification.md)。真实Chrome双视口验证已提交但响应丢失、等待禁用、失败刷新及重新确认；61项源码哈希已复算。后端与依赖未改，历史138权限/重启/并发/性能和审计浏览器按原报告版本保留。
 
 新增管理复跑：`.venv/bin/python -m scripts.verify_epic3_followup_browser --browser-executable '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --output-dir work/rerun/admin-followup`。
 
 ## 全新副本交付检查
 
-[实际安装及全量检查](evidence/delivery/README.md)通过：Python3.12.14/SQLite3.53.1，新虚拟环境从uv.lock安装，208唯一Python、376 JS，0skip，真实Waitress初始化/登录/退出验证；原目录虚拟环境和数据库未复制。之后文档/会话归档不改变产品与锁文件。
+[实际安装及全量检查](evidence/delivery/README.md)通过：Python3.12.14/SQLite3.53.1，新虚拟环境从uv.lock安装，208唯一Python、376 JS，0skip，真实Waitress初始化/登录/退出验证；原目录虚拟环境和数据库未复制。该报告对应581e3878b4a92942be919deb22f73160a728ae7e；本轮前端/测试已变，未重复安装验证，不声称旧报告覆盖当前全部代码。后端与锁文件未变，当前完整回归另见上节。

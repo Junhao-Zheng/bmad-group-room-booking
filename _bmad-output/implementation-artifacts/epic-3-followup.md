@@ -59,6 +59,20 @@ context:
 
 ## Review Triage Log
 
+2026-11-13：继续此前因429未取得报告的独立复核，冻结源码HEAD为e8e2f3a5f8eb3af42e620ee11bed376998423370。原始来源及详细裁决见 [本轮报告](../../docs/evidence/reviews/final-followup/triage.md)。
+
+|编号|来源与问题|裁决及依据|处置|
+|---|---|---|---|
+|A1|房间写入结果未知时旧停用确认仍可发送|medium：rooms.js仅在合法成功分支广播目录变更；unknown分支只清本表单确认，blocks.js的roomsStale仍为false。实际可达。|修补：写入前即使依赖确认失效，未知结果保持待刷新。|
+|A2|房间写入等待期间仍能发起已确认停用|medium：两个脚本的busy状态未共享，开始POST至响应前存在窗口。|修补：共享写入等待状态，阻止新确认及刷新解除失效；不取消已发请求。|
+|A3|手动目录刷新已看到变化，但关联选项未失效|medium：loadRooms只重绘房间列表，不通知其他面板。|修补：比较实际目录快照，变化时广播失效。|
+|A4|房间变化后取消/撤销仍持有旧摘要与确认|medium：目录事件仅更新新建停用表单，两个已选择对象仍可提交。|修补：清选择及确认，保留原因草稿，要求重新查询；已发写入继续处理实际结果。|
+|A5|目录含不安全大整数ID时整批刷新被拒绝|low：实际发生，但既有策略是拒绝不安全JSON对象，refresh在本批之前已使用roomShape与isSafeInteger整批校验；不保证混合目录部分可用。正常SQLite自动分配编号不会在课程规模达到该边界。|接受既有已披露限制：不引入部分目录或无损整数协议；含超范围编号的目录不能在该页面完成刷新，重复刷新同一响应不能恢复。|
+|A6|无变化保存也使确认失效并声称发生变化|low：成功事件无条件发出，确有误导文案。仅将结果与旧editing比较也不能证明无变化，因为可能覆盖其他窗口更新。|修补准确文案，保留保守重新核对；不宣称no-op必然导致实际目录变化。|
+|E1|丢失房间写入响应后旧停用确认有效|medium：与A1同一根因，独立来源的重叠保留。|与A1同组修补，不重复计为实现调用。|
+|V1|冲突编号及人数安全整数防护无回归|medium：评审实际运行原376项及移除防护的变异，均通过；其临时探针显示编号舍入。|增加unsafe id/attendees回归，断言不显示错误对象、结果未确认、取消勾选；补最大安全值正向边界。|
+
+
 ## Verification
 
 `node --test tests/test_rooms_js.cjs tests/test_blocks_js.cjs tests/test_audit_js.cjs`；相关Python模板测试。真实浏览器使用本机Chrome `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome` 与 `work/browser-tools/node_modules`。不得将仅mock检查冒充浏览器执行。
@@ -69,4 +83,6 @@ context:
 
 ## 最终结果
 
-技术矩阵R1—R8通过；208唯一Python/376 JS，双视口管理和审计PASS。独立三镜头均429失败；父流程复核无新阻断发现，独立复核留open item而非假通过。[记录](../../docs/evidence/reviews/epic-3-followup-review.md)。
+原技术矩阵R1—R8通过208唯一Python/376 JS，当时独立三镜头429失败。2026-11-13继续后已取得三镜头8条发现，6组修补后通过208唯一Python/399 JS、真实管理双视口及独立收口复验；大整数目录整批拒绝作为既有边界保留，独立复核行动项关闭。[记录](../../docs/evidence/reviews/epic-3-followup-review.md)。
+
+本轮源码、测试、真实浏览器及哈希证据见[最终核验](../../docs/evidence/epic-3-followup/review-fixes/verification.md)，独立收口[原文](../../docs/evidence/reviews/final-followup/closure.md)。取消/撤销确认同受房间事实变化影响，故实际重开2.5、3.1、3.2、3.3并闭环；业务规则与实验A封存不变。

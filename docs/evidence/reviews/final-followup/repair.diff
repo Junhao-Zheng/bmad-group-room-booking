@@ -1,0 +1,436 @@
+diff --git a/booking_app/static/blocks.js b/booking_app/static/blocks.js
+index 9c52f71..92fe09d 100644
+--- a/booking_app/static/blocks.js
++++ b/booking_app/static/blocks.js
+@@ -8,7 +8,8 @@
+   const conflicts = find("block-conflicts"), relogin = find("block-relogin"), refresh = find("block-rooms-refresh");
+   const statuses = {pending:"待开始", in_progress:"进行中", ended:"已结束", cancelled:"已取消", revoked:"已撤销"};
+   let creating = false, refreshing = false, blocked = false, createdMessage = "";
+-  let roomsStale = false, roomsRevision = 0;
++  let roomsStale = false, roomsRevision = 0, roomWriting = false;
++  let cancelDraftTarget = null, revokeDraftTarget = null;
+   const cancelForm = find("admin-cancel-form"), cancelReason = find("admin-cancel-reason"), cancelConfirm = find("admin-cancel-confirm");
+   const cancelFeedback = find("admin-cancel-feedback");
+   let cancelling = false, selectedBooking = null, cancelledMessage = "";
+@@ -47,9 +48,10 @@
+     return exact(error,"code,message,fields,conflicts") && typeof error.code === "string" && typeof error.message === "string" &&
+       object(error.fields) && Object.values(error.fields).every(value => typeof value === "string") && Array.isArray(error.conflicts) &&
+       error.conflicts.every(row => exact(row,"id,type,room_id,start_at,start_local,end_at,end_local,status,attendees,reason") &&
+-        id(row.id) && id(row.room_id) && [row.start_at,row.end_at].every(Number.isInteger) && [row.start_local,row.end_local].every(local) &&
++        id(row.id) && Number.isSafeInteger(row.id) && id(row.room_id) && Number.isSafeInteger(row.room_id) &&
++        [row.start_at,row.end_at].every(Number.isSafeInteger) && [row.start_local,row.end_local].every(local) &&
+         ["pending","in_progress","ended"].includes(row.status) &&
+-        (row.type === "booking" ? id(row.attendees) && row.reason === null : row.type === "block" && row.attendees === null && typeof row.reason === "string"));
++        (row.type === "booking" ? id(row.attendees) && Number.isSafeInteger(row.attendees) && row.reason === null : row.type === "block" && row.attendees === null && typeof row.reason === "string"));
+   }
+   async function request(url, values) {
+     const controller = new AbortController(), timer = window.setTimeout(() => controller.abort(), 20000);
+@@ -64,7 +66,7 @@
+     } finally { window.clearTimeout(timer); }
+   }
+   function controls() {
+-    const busy = creating || refreshing || revoking || cancelling || lists.some(list => list.busy);
++    const busy = roomWriting || creating || refreshing || revoking || cancelling || lists.some(list => list.busy);
+     [...inputs,confirm,submit].forEach(node => { node.disabled = blocked || busy; });
+     confirm.disabled = submit.disabled = blocked || busy || roomsStale;
+     refresh.disabled = blocked || busy;
+@@ -78,7 +80,7 @@
+     }
+     if (creating) form.setAttribute("aria-busy","true"); else form.removeAttribute("aria-busy");
+     for (const list of lists) {
+-      [...fields(list), find(`admin-${list.kind}-submit`), ...list.items.querySelectorAll("button")].forEach(node => { node.disabled = blocked || list.busy || refreshing || creating || cancelling || revoking; });
++      [...fields(list), find(`admin-${list.kind}-submit`), ...list.items.querySelectorAll("button")].forEach(node => { node.disabled = blocked || roomWriting || list.busy || refreshing || creating || cancelling || revoking; });
+       if (list.busy) list.form.setAttribute("aria-busy","true"); else list.form.removeAttribute("aria-busy");
+     }
+   }
+@@ -111,11 +113,30 @@
+   function summary() {
+     confirm.checked = false;
+     const room = inputs[0].options[inputs[0].selectedIndex]?.textContent || "未选择会议室";
+-    find("block-summary").textContent = `${roomsStale ? "会议室资料已更改，当前选项已过期。请先刷新会议室选项，再重新核对。\n" : ""}会议室：${room}\n北京时间：${inputs[1].value || "未填开始"} 至 ${inputs[2].value || "未填结束"}\n停用原因（所有已登录成员可见）：${inputs[3].value || "未填写"}`;
++    find("block-summary").textContent = `${roomsStale ? "会议室资料可能变化，当前选项已过期。请等待保存结束后刷新会议室选项，再重新核对。\n" : ""}会议室：${room}\n北京时间：${inputs[1].value || "未填开始"} 至 ${inputs[2].value || "未填结束"}\n停用原因（所有已登录成员可见）：${inputs[3].value || "未填写"}`;
+   }
+-  document.addEventListener("admin-room-directory-changed", () => {
+-    roomsStale = true; roomsRevision++; summary(); controls();
+-    if (!blocked) say(find("block-rooms-feedback"), "会议室资料已保存，旧核对已失效。请刷新会议室选项，成功后再重新核对并勾选确认。", true);
++  const roomRecheck = "会议室资料可能变化，旧核对已失效。请等待保存结束后刷新会议室选项，成功后再重新核对并勾选确认。";
++  const targetRecheck = "会议室资料可能变化，请重新查询并选择记录，原因草稿已保留。";
++  function invalidateRoomFacts() {
++    roomsStale = true; roomsRevision++; summary();
++    if (selectedBooking) cancelDraftTarget = selectedBooking.id;
++    if (selected) revokeDraftTarget = selected.id;
++    selectedBooking = null; selected = null; selectButtons = [];
++    if (cancelForm) { cancelConfirm.checked = false; find("admin-cancel-summary").textContent = ""; }
++    revokeConfirm.checked = false; find("revoke-summary").textContent = "";
++    for (const list of lists) { list.revision++; list.items.replaceChildren(); }
++    controls();
++    if (!blocked) {
++      say(find("block-rooms-feedback"),roomRecheck,true);
++      for (const list of lists) say(list.feedback,targetRecheck,true);
++      if (cancelForm && !cancelling) say(cancelFeedback,`${cancelledMessage}${targetRecheck}`,true);
++      if (!revoking) say(revokeFeedback,`${revokedMessage}${targetRecheck}`,true);
++    }
++  }
++  document.addEventListener("admin-room-directory-changed", invalidateRoomFacts);
++  document.addEventListener("admin-room-write-state", event => {
++    roomWriting = event.detail.pending;
++    if (roomWriting) invalidateRoomFacts(); else controls();
+   });
+   for (const input of inputs) for (const event of ["input","change"]) input.addEventListener(event,summary);
+   const formatted = value => value.replace("T"," ").slice(0,19);
+@@ -149,10 +170,11 @@
+         const button = document.createElement("button"); button.type = "button"; button.className = "button-secondary";
+         button.textContent = `${row.status === "cancelled" ? "确认取消状态" : "管理员取消"} · 预约 ${row.id}`;
+         button.addEventListener("click", () => {
+-          if (blocked || cancelling || revoking || creating || refreshing || list.busy) return;
++          if (blocked || roomWriting || cancelling || revoking || creating || refreshing || list.busy) return;
+           if (!Number.isSafeInteger(row.id)) { clearCancelTarget(); say(list.feedback,"当前浏览器无法安全提交此预约编号。",true); return; }
+           selectedBooking = row;
+-          cancelReason.value = ""; cancelConfirm.checked = false; cancelledMessage = "";
++          if (cancelDraftTarget !== row.id) cancelReason.value = "";
++          cancelDraftTarget = null; cancelConfirm.checked = false; cancelledMessage = "";
+           cancelReason.removeAttribute("aria-invalid"); find("admin-cancel-reason-error").textContent = "";
+           find("admin-cancel-panel").hidden = false; find("admin-cancel-relogin").hidden = true;
+           find("admin-cancel-summary").textContent = `预约 ${row.id} · ${row.title}\n${row.room.name} · 北京时间 ${formatted(row.start_local)} 至 ${formatted(row.end_local)} · ${statuses[row.status]}`;
+@@ -165,8 +187,9 @@
+         const button = document.createElement("button"); button.type = "button"; button.className = "button-secondary";
+         button.textContent = `选择撤销停用 ${row.id}`;
+         button.addEventListener("click", () => {
+-          if (blocked || creating || refreshing || revoking || cancelling || lists.some(list => list.busy)) return;
+-          if (selected?.id !== row.id) revokeReason.value = "";
++          if (blocked || roomWriting || creating || refreshing || revoking || cancelling || lists.some(list => list.busy)) return;
++          if (selected?.id !== row.id && revokeDraftTarget !== row.id) revokeReason.value = "";
++          revokeDraftTarget = null;
+           selected = row; revokedMessage = ""; revokeConfirm.checked = false; revokeForm.hidden = false;
+           revokeReason.removeAttribute("aria-invalid"); find("revoke-reason-error").textContent = "";
+           find("revoke-panel").hidden = false; showSelected(); say(revokeFeedback,"");
+@@ -180,7 +203,7 @@
+     }
+   }
+   async function load(list, automatic = false) {
+-    if (list.busy || blocked) return;
++    if (list.busy || blocked || roomWriting) return;
+     if (list.kind === "bookings" && !automatic) clearCancelTarget();
+     if (list.kind === "blocks" && !automatic) clearSelected("正在重新查询，请从新结果选择停用；撤销原因草稿已保留。");
+     const initiatedHere = list.form.contains(document.activeElement), params = new URLSearchParams(), revision = list.revision;
+@@ -230,7 +253,7 @@
+     event.preventDefault(); if (!creating && !cancelling && !revoking && !refreshing) return load(list);
+   });
+   form.addEventListener("submit", async event => {
+-    event.preventDefault(); if (creating || cancelling || revoking || refreshing || blocked || roomsStale || lists.some(list => list.busy) || !confirm.checked) return;
++    event.preventDefault(); if (roomWriting || creating || cancelling || revoking || refreshing || blocked || roomsStale || lists.some(list => list.busy) || !confirm.checked) return;
+     const values = {room_id:Number(inputs[0].value), start:inputs[1].value, end:inputs[2].value, reason:inputs[3].value};
+     const initiatedHere = form.contains(document.activeElement); let focusTarget = feedback;
+     for (const input of inputs) { input.removeAttribute("aria-invalid"); find(`block-${input.name}-error`).textContent = ""; }
+@@ -271,15 +294,15 @@
+     }
+   });
+   refresh.addEventListener("click", async () => {
+-    if (blocked || refreshing || creating || cancelling || revoking || lists.some(list => list.busy)) return;
++    if (blocked || roomWriting || refreshing || creating || cancelling || revoking || lists.some(list => list.busy)) return;
+     const initiatedHere = document.activeElement === refresh, revision = roomsRevision; refreshing = true; confirm.checked = false; controls();
+     const output = find("block-rooms-feedback"); say(output,"正在刷新会议室选项…");
+     try {
+       const data = await request("/api/rooms");
+       if (!exact(data,"items,total") || !Array.isArray(data.items) || data.total !== data.items.length || !data.items.every(roomShape)) throw new Error("Invalid rooms");
+       if (blocked) return;
+-      if (revision !== roomsRevision) {
+-        say(output,"刷新期间会议室资料再次更改，请重新刷新会议室选项后再确认。",true); return;
++      if (roomWriting || revision !== roomsRevision) {
++        say(output,"刷新期间会议室资料可能变化，请等待保存结束后重新刷新会议室选项再确认。",true); return;
+       }
+       for (const select of [inputs[0],...lists.map(list => fields(list)[0])]) {
+         const previous = select.value, first = document.createElement("option"); first.value = "";
+@@ -299,8 +322,8 @@
+     for (const event of ["input","change"]) cancelReason.addEventListener(event, () => { cancelConfirm.checked = false; });
+     cancelForm.addEventListener("submit", async event => {
+       event.preventDefault();
+-      if (blocked || cancelling || revoking || creating || refreshing || lists.some(list => list.busy) || !selectedBooking || !cancelConfirm.checked) return;
+-      const bookingId = selectedBooking.id, initiatedHere = cancelForm.contains(document.activeElement);
++      if (blocked || roomWriting || cancelling || revoking || creating || refreshing || lists.some(list => list.busy) || !selectedBooking || !cancelConfirm.checked) return;
++      const bookingId = selectedBooking.id, initiatedHere = cancelForm.contains(document.activeElement), revision = roomsRevision;
+       let focusTarget = cancelFeedback;
+       cancelledMessage = ""; cancelling = true; controls();
+       find("admin-cancel-relogin").hidden = true;
+@@ -311,12 +334,18 @@
+         if (!recordShape(record,"bookings") || record.id !== bookingId || record.status !== "cancelled") throw new Error("Unconfirmed cancellation");
+         cancelledMessage = `预约 ${bookingId} 已取消，时段已释放。`;
+         if (blocked) { say(cancelFeedback,`${cancelledMessage} 请重新登录后查看详情。`,true); return; }
++        if (revision !== roomsRevision) { say(cancelFeedback,`${cancelledMessage}${targetRecheck}`); return; }
+         selectedBooking = record; cancelConfirm.checked = false;
+         find("admin-cancel-summary").textContent = `预约 ${record.id} · ${record.title} · 已取消\n会议室：${record.room.id} · ${record.room.name} · ${record.room.location}\n预约时段（北京时间）：${formatted(record.start_local)} 至 ${formatted(record.end_local)}\n取消时间（北京时间）：${formatted(record.cancelled_local)}\n操作者：${record.cancelled_by_display_name}\n原取消原因：${record.cancel_reason ?? "本人取消，无原因"}`;
+         say(cancelFeedback,`${cancelledMessage} 原取消信息和历史已保留。日程与可用性将在预约页查询时更新。`);
+         await load(lists[0],true);
+       } catch (failure) {
+         const error = failure.serverError;
++        if (revision !== roomsRevision) {
++          if (error && identityError(error)) return;
++          if (!blocked) say(cancelFeedback,`${error ? error.message : "未能确认取消结果。"}${targetRecheck}`,true);
++          return;
++        }
+         if (error) {
+           if (!(["AUTH_REQUIRED","FORBIDDEN"].includes(error.code) && identityError(error)) && !blocked) {
+             if (["TRANSITION_CLOSED","NOT_FOUND"].includes(error.code)) {
+@@ -348,8 +377,8 @@
+   });
+   revokeForm.addEventListener("submit", async event => {
+     event.preventDefault();
+-    if (!selected || !["pending","in_progress"].includes(selected.status) || !revokeConfirm.checked || blocked || creating || refreshing || revoking || cancelling || lists.some(list => list.busy)) return;
+-    const blockId = selected.id, initiatedHere = revokeForm.contains(document.activeElement);
++    if (!selected || !["pending","in_progress"].includes(selected.status) || !revokeConfirm.checked || blocked || roomWriting || creating || refreshing || revoking || cancelling || lists.some(list => list.busy)) return;
++    const blockId = selected.id, initiatedHere = revokeForm.contains(document.activeElement), revision = roomsRevision;
+     let focusTarget = revokeFeedback;
+     revokeReason.removeAttribute("aria-invalid"); find("revoke-reason-error").textContent = "";
+     find("revoke-relogin").hidden = true; revoking = true; controls(); say(revokeFeedback,"正在撤销停用，请稍候…");
+@@ -361,12 +390,17 @@
+         say(revokeFeedback,`${revokedMessage}请重新登录查看首次撤销信息。撤销原因草稿已保留。`);
+         return;
+       }
++      if (revision !== roomsRevision) { say(revokeFeedback,`${revokedMessage}${targetRecheck}`); return; }
+       selected = result; revokeConfirm.checked = false; revokeForm.hidden = true; showSelected();
+       say(revokeFeedback,`${revokedMessage}首次撤销信息已显示。`);
+       await load(lists[1],"停用已撤销");
+     } catch (failure) {
+       const error = failure.serverError;
+       if (error && identityError(error)) return;
++      if (revision !== roomsRevision) {
++        if (!blocked) say(revokeFeedback,`${error ? error.message : "未能确认撤销结果。"}${targetRecheck}`,true);
++        return;
++      }
+       if (!blocked) {
+         revokeConfirm.checked = false;
+         if (["TRANSITION_CLOSED","NOT_FOUND"].includes(error?.code)) {
+diff --git a/booking_app/static/rooms.js b/booking_app/static/rooms.js
+index 23b4b85..85fd701 100644
+--- a/booking_app/static/rooms.js
++++ b/booking_app/static/rooms.js
+@@ -10,6 +10,9 @@
+   const inputs = ["name", "location", "capacity"].map(name => form.elements.namedItem(name));
+   let editing = null, busy = false, blocked = false, savedMessage = "";
+   const invalidEdits = new WeakSet();
++  const initialRooms = [];
++  const directoryKey = rooms => JSON.stringify(rooms.map(room => [room.id,room.name,room.location,room.capacity]).sort((a,b) => a[0]-b[0]));
++  let directorySnapshot;
+   const displayed = new Map();
+   function fillInputs(room) {
+     for (const input of inputs) {
+@@ -61,8 +64,10 @@
+     let room;
+     try { room = JSON.parse(button.dataset.room); } catch (_) { /* Reject only this malformed entry. */ }
+     bindEdit(button, room);
++    if (roomShape(room)) initialRooms.push(room);
+     if (!roomShape(room)) say(directoryFeedback, "部分会议室资料或编号无法安全读取，已禁止编辑这些条目。请刷新目录核对。", true);
+   }
++  directorySnapshot = directoryKey(initialRooms);
+   function roomShape(room) {
+     return room && typeof room === "object" && !Array.isArray(room) && Object.keys(room).sort().join(",") === "capacity,id,location,name" &&
+       Number.isSafeInteger(room.id) && room.id > 0 && typeof room.name === "string" &&
+@@ -110,6 +115,9 @@
+     const data = await request("/api/rooms");
+     if (!Array.isArray(data.items) || data.total !== data.items.length || !data.items.every(roomShape)) throw new Error("Invalid directory");
+     if (blocked) return;
++    const snapshot = directoryKey(data.items);
++    if (snapshot !== directorySnapshot) document.dispatchEvent(new CustomEvent("admin-room-directory-changed", {detail:{}}));
++    directorySnapshot = snapshot;
+     list.replaceChildren();
+     for (const room of data.items) {
+       const item = document.createElement("li"), title = document.createElement("h3"), detail = document.createElement("p"), button = document.createElement("button");
+@@ -136,13 +144,13 @@
+     const roomId = editing?.id; const initiatedHere = form.contains(document.activeElement);
+     savedMessage = "";
+     clearErrors(); controls(true); submit.textContent = "正在提交…";
++    document.dispatchEvent(new CustomEvent("admin-room-write-state", {detail:{pending:true}}));
+     say(feedback, "正在保存，请稍候…"); let focusTarget = feedback;
+     try {
+       const room = await request(roomId ? `/api/admin/rooms/${roomId}` : "/api/admin/rooms", values);
+       if (!roomShape(room) || (roomId && room.id !== roomId)) throw new Error("Invalid room");
+       savedMessage = "会议室资料已保存。";
+       confirm.checked = false;
+-      document.dispatchEvent(new CustomEvent("admin-room-directory-changed", {detail:{}}));
+       if (blocked) { say(feedback, `${savedMessage}请重新登录后打开管理页核对。`, true); return; }
+       editing = room; cancel.hidden = false; heading.textContent = `编辑会议室 ${room.id}`;
+       fillInputs(room);
+@@ -173,6 +181,7 @@
+         say(feedback, "未能确认保存结果，输入已保留。请先刷新目录核对，再重新勾选确认后手动提交；不会自动重试。", true);
+       }
+     } finally {
++      document.dispatchEvent(new CustomEvent("admin-room-write-state", {detail:{pending:false}}));
+       controls(false); submit.textContent = editing ? "确认保存会议室" : "确认新增会议室";
+       if (initiatedHere && canFocus()) focusTarget.focus();
+     }
+diff --git a/scripts/verify_epic3_followup_browser.cjs b/scripts/verify_epic3_followup_browser.cjs
+index 3de50da..2eb3e5a 100644
+--- a/scripts/verify_epic3_followup_browser.cjs
++++ b/scripts/verify_epic3_followup_browser.cjs
+@@ -41,6 +41,37 @@ async function main(){
+       const blockDraft=await page.locator('#block-form').evaluate(form=>Object.fromEntries(new FormData(form)));
+       stage='room-save';await page.locator('#admin-rooms button').filter({hasText:`编辑会议室 ${roomId}`}).click();
+       await page.locator('#room-name').fill(`更新后的会议室 ${roomId}`);await page.locator('#room-confirm').check();
++      stage='committed-response-held';let committed,releaseResponse;
++      const committedResponse=new Promise(resolve=>{committed=resolve;}),responseGate=new Promise(resolve=>{releaseResponse=resolve;});
++      await page.route('**/api/admin/rooms/*',async route=>{
++        // Forward once to the actual server, wait for its committed 200, then drop only the response.
++        const response=await route.fetch();committed({status:response.status(),body:await response.json()});
++        await responseGate;await route.abort();
++      });
++      const dependentRequests=[];
++      const watchDependent=request=>{const url=new URL(request.url());if(url.pathname==='/api/rooms'||url.pathname==='/api/admin/blocks')dependentRequests.push({method:request.method(),path:url.pathname});};
++      page.on('request',watchDependent);await page.locator('#room-submit').click();const committedResult=await committedResponse;
++      assert.equal(committedResult.status,200);assert.equal(committedResult.body.data.name,`更新后的会议室 ${roomId}`);
++      assert.equal(await page.locator('#room-form').getAttribute('aria-busy'),'true');
++      assert.equal(await page.locator('#block-confirm').isChecked(),false);
++      for(const selector of ['#block-confirm','#block-submit','#block-rooms-refresh','#admin-blocks-submit','#admin-bookings-submit'])assert.equal(await page.locator(selector).isDisabled(),true);
++      await page.locator('#block-submit').click({force:true});await page.locator('#block-rooms-refresh').click({force:true});
++      assert.deepEqual(dependentRequests,[]);await shot('committed-response-held','section[aria-labelledby="block-form-title"]');
++      releaseResponse();await page.waitForFunction(()=>document.getElementById('room-feedback').textContent.includes('未能确认'));await done('room-form');
++      await page.unroute('**/api/admin/rooms/*');assert.deepEqual(dependentRequests,[]);
++      assert.equal(await page.locator('#block-confirm').isDisabled(),true);assert.equal(await page.locator('#block-submit').isDisabled(),true);
++      assert.equal(await page.locator('#block-rooms-refresh').isDisabled(),false);assert.equal(await page.locator('#room-confirm').isChecked(),false);
++      assert.equal(await page.locator('#room-name').inputValue(),`更新后的会议室 ${roomId}`);
++      await page.locator('#block-submit').click({force:true});assert.deepEqual(dependentRequests,[]);
++      const persisted=(await (await context.request.get(origin+'/api/rooms')).json()).data.items.find(room=>room.id===roomId);
++      assert.deepEqual(persisted,committedResult.body.data);
++      network.push({operation:'committed-room-update-response-discarded',status:committedResult.status,data:persisted,
++        waiting_prevents_dependent_requests:true,unknown_keeps_block_confirmation_disabled:true,dependent_requests:dependentRequests.slice()});
++      await shot('committed-response-lost','section[aria-labelledby="block-form-title"]');page.off('request',watchDependent);
++      // A deliberate directory check then identical save confirms the same facts without another mutation.
++      await page.locator('#rooms-refresh').click();await done('room-form');
++      assert.equal(await page.locator('#block-confirm').isDisabled(),true);
++      stage='no-change-room-save';await page.locator('#room-confirm').check();
+       const saveResponse=page.waitForResponse(response=>new URL(response.url()).pathname===`/api/admin/rooms/${roomId}`);
+       await page.locator('#room-submit').click();const saved=await saveResponse;assert.equal(saved.status(),200);await done('room-form');
+       network.push({operation:'room-save',status:saved.status(),data:(await saved.json()).data});
+@@ -48,6 +79,7 @@ async function main(){
+       assert.equal(await page.locator('#block-submit').isDisabled(),true);assert.equal(await page.locator('#block-rooms-refresh').isDisabled(),false);
+       assert.deepEqual(await page.locator('#block-form').evaluate(form=>Object.fromEntries(new FormData(form))),blockDraft);
+       assert.match(await page.locator('#block-rooms-feedback').textContent(),/旧核对已失效/);assert.match(await page.locator('#block-summary').textContent(),/选项已过期/);
++      assert.doesNotMatch(await page.locator('#block-rooms-feedback').textContent(),/资料已更改|资料已保存/);
+       await shot('confirmation-invalidated','section[aria-labelledby="block-form-title"]');
+       stage='refresh-failure';await page.route('**/api/rooms',route=>route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({ok:false,error:{code:'STORE_BUSY',message:'合成刷新失败',fields:{},conflicts:[]}})}));
+       await page.locator('#block-rooms-refresh').click();await page.waitForFunction(()=>document.getElementById('block-rooms-feedback').textContent.includes('刷新失败'));
+@@ -71,6 +103,7 @@ async function main(){
+       await page.locator('#room-submit').click();assert.equal(unknownRequests,1);await shot('unknown-room-save','section[aria-labelledby="room-form-title"]');
+       assert.deepEqual(errors,[]);fs.writeFileSync(path.join(outputDir,`observations-${viewport.width}.json`),JSON.stringify(network,null,2));
+       results.push({...viewport,room_save:true,confirmation_invalidated:true,failed_refresh_remains_stale:true,explicit_refresh_and_reconfirm:true,
++        committed_room_update_response_discarded:true,pending_blocks_reconfirmation_and_refresh:true,no_change_save_requires_recheck:true,
+         disabled_js_guard:true,failed_script_guard:true,no_native_get:true,reason_visibility:true,unknown_save_clears_confirmation:true,page_errors:errors});await context.close();
+     }
+     return {result:'PASS',completed:true,browser_version:browser.version(),viewports:results};
+diff --git a/tests/test_blocks_js.cjs b/tests/test_blocks_js.cjs
+index d584af9..d6db69f 100644
+--- a/tests/test_blocks_js.cjs
++++ b/tests/test_blocks_js.cjs
+@@ -177,13 +177,14 @@ for(const code of ['AUTH_REQUIRED','FORBIDDEN'])for(const late of ['room-directo
+   });
+   let pending;
+   if(late==='room-directory')pending=ui.n['rooms-refresh'].handlers.click();else if(late==='room-write')pending=ui.roomSubmit();else if(late==='block-write')pending=ui.submit();else pending=ui.load();
+-  if(late.startsWith('room'))await ui.load();else await ui.roomSubmit();
++  if(late==='room-write')ui.document.dispatchEvent({type:'admin-auth-lost',detail:{code}});
++  else if(late.startsWith('room'))await ui.load();else await ui.roomSubmit();
+   release(ok(late==='room-directory'?{items:[block.room],total:1}:late==='block-list'?{items:[block],total:1}:late==='room-write'?block.room:block));await pending;
+   assert.equal(ui.n['admin-rooms'].children.length,0);assert.equal(ui.n['admin-blocks-items'].children.length,0);assert.equal(ui.n['block-submit'].disabled,true);assert.equal(ui.n['room-submit'].disabled,true);
+   if(late==='room-write'||late==='block-write'){
+     const feedback=ui.n[late==='room-write'?'room-feedback':'block-feedback'].textContent;
+     assert.match(feedback,late==='room-write'?/已保存.*重新登录/:/停用 120 已创建.*重新登录/);
+-    assert.equal(ui.fetches.length,2,'late success cannot start a private-data refresh');
++    assert.equal(ui.fetches.length,late==='room-write'?1:2,'late success cannot start a private-data refresh');
+   }
+ });
+ for(const code of ['AUTH_REQUIRED','FORBIDDEN'])for(const saved of ['room','block'])test(`confirmed ${saved} success survives ${code} in the other panel`,async()=>{
+@@ -212,7 +213,7 @@ test('room save invalidates block confirmation until an explicit successful opti
+ test('room change during option refresh cannot certify an older directory response',async()=>{
+   const ui=harness({combined:true});let release;ui.setFetch(()=>new Promise(r=>{release=r;}));const pending=ui.refresh();
+   ui.document.dispatchEvent({type:'admin-room-directory-changed'});release(ok({items:[block.room],total:1}));await pending;
+-  assert.equal(ui.n['block-confirm'].disabled,true);assert.match(ui.n['block-rooms-feedback'].textContent,/再次更改.*重新刷新/);
++  assert.equal(ui.n['block-confirm'].disabled,true);assert.match(ui.n['block-rooms-feedback'].textContent,/可能变化.*重新刷新/);
+   ui.setFetch(async()=>ok({items:[block.room],total:1}));await ui.refresh();restored(ui);assert.equal(ui.n['block-confirm'].checked,false);
+ });
+ for(const outcome of ['success','conflict','unknown'])test(`room save does not cancel or hide in-flight block ${outcome}`,async()=>{
+@@ -488,3 +489,63 @@ for(const first of ['cancel','revoke'])test(`integrated ${first} identity refusa
+   await ui.cancel();await submitRevoke(ui);assert.equal(ui.fetches.filter(c=>c.options.method==='POST').length,1);
+   assert.equal(ui.n['admin-cancel-reason'].value,'取消草稿');assert.equal(ui.n['revoke-reason'].value,' 修复完成 <img> ');
+ });
++
++for(const field of ['id','room_id','attendees','start_at','end_at'])test(`unsafe conflict ${field} never displays rounded facts`,async()=>{
++  const ui=harness();ui.setFetch(async()=>fail('OCCUPANCY_CONFLICT',{},[{...conflict,[field]:Number('9007199254740993')}]));
++  await ui.submit();restored(ui);assert.equal(ui.n['block-conflicts'].children.length,0);
++  assert.match(ui.n['block-feedback'].textContent,/未能确认/);assert.equal(ui.n['block-confirm'].checked,false);assert.equal(ui.fetches.length,1);
++});
++for(const result of ['no-change','unknown','rejected'])test(`room ${result} invalidates before dispatch and keeps block confirmation stale after completion`,async()=>{
++  const ui=harness({combined:true});let release;ui.n['block-confirm'].checked=true;
++  ui.setFetch((url)=>url==='/api/admin/rooms'?new Promise(r=>{release=r;}):Promise.resolve(ok({items:[block.room],total:1})));
++  const pending=ui.roomSubmit();assert.equal(ui.fetches.length,1);assert.equal(ui.n['block-confirm'].checked,false);
++  for(const id of ['block-confirm','block-submit','block-rooms-refresh','admin-bookings-submit','admin-blocks-submit'])assert.equal(ui.n[id].disabled,true);
++  await ui.submit();await ui.refresh();await ui.load();assert.equal(ui.fetches.length,1,'waiting write cannot authorize old options or submit');
++  release(result==='no-change'?ok(block.room):result==='unknown'?ok({broken:true}):fail('STORE_BUSY'));await pending;
++  assert.equal(ui.n['block-confirm'].disabled,true);assert.equal(ui.n['block-submit'].disabled,true);assert.equal(ui.n['block-rooms-refresh'].disabled,false);
++  assert.match(ui.n['block-rooms-feedback'].textContent,/可能变化/);assert.doesNotMatch(ui.n['block-summary'].textContent,/资料已更改|资料已保存/);
++  const count=ui.fetches.length;await ui.submit();assert.equal(ui.fetches.length,count);
++  await ui.refresh();restored(ui);assert.equal(ui.n['block-confirm'].checked,false);
++});
++for(const settledFirst of ['refresh','write'])test(`option query started before room write cannot clear stale when ${settledFirst} settles first`,async()=>{
++  const ui=harness({combined:true});let directoryRelease,writeRelease;
++  ui.setFetch(url=>new Promise(resolve=>{if(url==='/api/rooms')directoryRelease=resolve;else writeRelease=resolve;}));
++  const refreshing=ui.refresh(),writing=ui.roomSubmit();const before=ui.inputs[0].children.length;
++  if(settledFirst==='refresh'){directoryRelease(ok({items:[block.room],total:1}));await refreshing;writeRelease(ok({broken:true}));await writing;}
++  else {writeRelease(ok({broken:true}));await writing;directoryRelease(ok({items:[block.room],total:1}));await refreshing;}
++  assert.equal(ui.inputs[0].children.length,before);assert.equal(ui.n['block-confirm'].disabled,true);assert.match(ui.n['block-rooms-feedback'].textContent,/可能变化.*重新刷新/);
++  ui.setFetch(async()=>ok({items:[block.room],total:1}));await ui.refresh();restored(ui);
++});
++for(const kind of ['bookings','blocks'])test(`manual directory refresh invalidates ${kind} target only when room facts change, retaining the reason for reselection`,async()=>{
++  const ui=harness({combined:true}),booking=kind==='bookings';
++  if(booking){ui.setFetch(async()=>ok({items:[adminBooking()],total:1}));await ui.load(kind);ui.choose();ui.n['admin-cancel-reason'].value='保留取消草稿';}
++  else await selectRevoke(ui);
++  const prefix=booking?'admin-cancel':'revoke',reason=ui.n[prefix+'-reason'].value;ui.n[prefix+'-confirm'].checked=true;ui.n['block-confirm'].checked=true;
++  ui.setFetch(async()=>ok({items:[block.room],total:1}));await ui.n['rooms-refresh'].handlers.click();
++  assert.equal(ui.n[prefix+'-confirm'].checked,true);assert.equal(ui.n['block-confirm'].checked,true);
++  const changed={...block.room,name:'外部已修改'};ui.setFetch(async()=>ok({items:[changed],total:1}));await ui.n['rooms-refresh'].handlers.click();
++  assert.equal(ui.n[prefix+'-confirm'].checked,false);assert.equal(ui.n[prefix+'-summary'].textContent,'');assert.equal(ui.n[prefix+'-reason'].value,reason);
++  assert.equal(ui.n[`admin-${kind}-items`].children.length,0);assert.match(ui.n[prefix+'-feedback'].textContent,/重新查询并选择/);
++  const count=ui.fetches.length;if(booking)await ui.cancel();else await submitRevoke(ui);assert.equal(ui.fetches.length,count);
++  ui.setFetch(async()=>ok({items:[{...(booking?adminBooking():block),room:changed}],total:1}));await ui.load(kind);
++  if(booking)ui.choose();else ui.n['admin-blocks-items'].querySelectorAll('button')[0].handlers.click();
++  assert.equal(ui.n[prefix+'-reason'].value,reason);assert.match(ui.n[prefix+'-summary'].textContent,/外部已修改/);assert.equal(ui.n[prefix+'-confirm'].checked,false);
++});
++for(const kind of ['bookings','blocks'])for(const outcome of ['success','failure','unknown'])test(`pending ${kind} write keeps ${outcome} after room write clears stale target`,async()=>{
++  const ui=harness({combined:true}),booking=kind==='bookings';
++  if(booking){ui.setFetch(async()=>ok({items:[adminBooking()],total:1}));await ui.load(kind);ui.choose();ui.n['admin-cancel-reason'].value='取消草稿';}
++  else await selectRevoke(ui);
++  const prefix=booking?'admin-cancel':'revoke',reason=ui.n[prefix+'-reason'].value;let release;
++  ui.setFetch(async url=>url.endsWith(booking?'/cancel':'/revoke')?new Promise(r=>{release=r;}):url==='/api/admin/rooms'?ok(block.room):ok({items:[block.room],total:1}));
++  const pending=booking?ui.cancel():submitRevoke(ui),signal=ui.fetches.at(-1).options.signal;await ui.roomSubmit();
++  assert.equal(signal.aborted,false);assert.equal(ui.n[prefix+'-summary'].textContent,'');assert.equal(ui.n[prefix+'-reason'].value,reason);
++  const count=ui.fetches.length;release(outcome==='success'?ok(booking?adminBooking('cancelled'):revoked):outcome==='failure'?fail('STORE_BUSY'):ok({broken:true}));await pending;
++  assert.equal(ui.fetches.length,count);assert.equal(ui.n[prefix+'-summary'].textContent,'');assert.equal(ui.n[prefix+'-reason'].value,reason);
++  assert.match(ui.n[prefix+'-feedback'].textContent,outcome==='success'?(booking?/已取消.*重新查询并选择/:/已撤销.*重新查询并选择/):outcome==='failure'?/合成错误.*重新查询并选择/:/未能确认.*重新查询并选择/);
++  if(booking)assert.equal(ui.n['admin-cancel-fields'].disabled,true);else assert.equal(ui.n['revoke-submit'].disabled,true);
++});
++for(const kind of ['bookings','blocks'])test(`late ${kind} list cannot restore target choices after room save starts`,async()=>{
++  const ui=harness({combined:true});let release;ui.setFetch(async url=>url.startsWith('/api/admin/'+kind+'?')?new Promise(r=>{release=r;}):ok({broken:true}));
++  const pending=ui.load(kind);await ui.roomSubmit();release(ok({items:[kind==='bookings'?adminBooking():block],total:1}));await pending;
++  assert.equal(ui.n[`admin-${kind}-items`].children.length,0);assert.match(ui.n[`admin-${kind}-feedback`].textContent,/重新查询并选择/);
++});
+diff --git a/tests/test_rooms_js.cjs b/tests/test_rooms_js.cjs
+index 3dbe916..ae9d7b1 100644
+--- a/tests/test_rooms_js.cjs
++++ b/tests/test_rooms_js.cjs
+@@ -126,12 +126,19 @@ const validConflict={id:102,attendees:5,start_local:'2026-11-12T10:00:00+08:00',
+ for(const [label,fields,conflicts] of [
+   ['non-array conflicts',{},{}],['string conflicts',{},'private'],['missing timestamp',{},[{...validConflict,end_local:undefined}]],
+   ['numeric timestamp',{},[{...validConflict,start_local:7}]],['null conflict',{},[null]],['object id',{},[{...validConflict,id:{private:1}}]],
++  ['unsafe id',{},[{...validConflict,id:Number('9007199254740993')}]],['unsafe attendees',{},[{...validConflict,attendees:Number('9223372036854775807')}]],
+   ['bad status',{},[{...validConflict,status:{private:1}}]],['array fields',[],[]],['null fields',null,[]],['non-text field',{name:{private:1}},[]]
+ ])test(`malformed ${label} uses unknown-result recovery and restores draft`,async()=>{
+   const ui=harness();ui.setFetch(async()=>fail('CAPACITY_CONFLICT',fields,conflicts));await ui.submit();restored(ui);
+   assert.match(ui.n['room-feedback'].textContent,/未能确认.*输入已保留/);assert.equal(ui.inputs[0].value,room.name);
++  assert.equal(ui.n['room-confirm'].checked,false);
+   assert.equal(ui.n['room-conflicts'].children.length,0);assert.equal(ui.fetches.length,1);
+ });
++test('largest safe conflict id and attendee count remain exact display facts',async()=>{
++  const ui=harness();ui.setFetch(async()=>fail('CAPACITY_CONFLICT',{},[{...validConflict,id:Number.MAX_SAFE_INTEGER,attendees:Number.MAX_SAFE_INTEGER}]));
++  await ui.submit();restored(ui);assert.match(ui.n['room-conflicts'].textContent,/预约 9007199254740991 · 9007199254740991 人/);
++  assert.doesNotMatch(ui.n['room-feedback'].textContent,/未能确认/);assert.equal(ui.fetches.length,1);
++});
+ for(const field of ['name','location','capacity'])for(const event of ['input','change'])test(`${field} ${event} clears confirmation and prevents POST until reconfirmed`,async()=>{
+   const ui=harness();ui.n['room-confirm'].checked=true;ui.n['room-'+field].handlers[event]();
+   assert.equal(ui.n['room-confirm'].checked,false);await ui.n['room-form'].handlers.submit({preventDefault(){}});assert.equal(ui.fetches.length,0);
