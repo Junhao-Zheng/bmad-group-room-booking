@@ -1,0 +1,363 @@
+{
+  "snapshot": "911e8c5",
+  "files": [
+    {
+      "path": "booking_app/domain.py",
+      "added": 178,
+      "deleted": 0,
+      "net": 178,
+      "commit_count": 3,
+      "binary_revisions": 0,
+      "lines": 178,
+      "functions": [
+        {
+          "name": "auth_required",
+          "lines": 2
+        },
+        {
+          "name": "validate_credentials",
+          "lines": 21
+        },
+        {
+          "name": "resource_id",
+          "lines": 14
+        },
+        {
+          "name": "beijing_day",
+          "lines": 16
+        },
+        {
+          "name": "local_time",
+          "lines": 5
+        },
+        {
+          "name": "active_status",
+          "lines": 4
+        },
+        {
+          "name": "beijing_datetime",
+          "lines": 16
+        },
+        {
+          "name": "validate_booking_window",
+          "lines": 19
+        },
+        {
+          "name": "booking_interval",
+          "lines": 11
+        },
+        {
+          "name": "positive_integer",
+          "lines": 5
+        },
+        {
+          "name": "query_attendees",
+          "lines": 13
+        }
+      ]
+    },
+    {
+      "path": "booking_app/web.py",
+      "added": 150,
+      "deleted": 2,
+      "net": 148,
+      "commit_count": 3,
+      "binary_revisions": 0,
+      "lines": 148,
+      "functions": [
+        {
+          "name": "token",
+          "lines": 2
+        },
+        {
+          "name": "csrf",
+          "lines": 4
+        },
+        {
+          "name": "payload",
+          "lines": 10
+        },
+        {
+          "name": "issue_cookie",
+          "lines": 7
+        },
+        {
+          "name": "login_page",
+          "lines": 6
+        },
+        {
+          "name": "home",
+          "lines": 4
+        },
+        {
+          "name": "rooms_api",
+          "lines": 2
+        },
+        {
+          "name": "schedule_api",
+          "lines": 3
+        },
+        {
+          "name": "availability_api",
+          "lines": 5
+        },
+        {
+          "name": "me",
+          "lines": 2
+        },
+        {
+          "name": "login_api",
+          "lines": 3
+        },
+        {
+          "name": "logout_api",
+          "lines": 7
+        },
+        {
+          "name": "install_handlers",
+          "lines": 44
+        }
+      ]
+    },
+    {
+      "path": "booking_app/auth.py",
+      "added": 148,
+      "deleted": 0,
+      "net": 148,
+      "commit_count": 1,
+      "binary_revisions": 0,
+      "lines": 148,
+      "functions": [
+        {
+          "name": "token_digest",
+          "lines": 2
+        },
+        {
+          "name": "read_session",
+          "lines": 6
+        },
+        {
+          "name": "session_for_token",
+          "lines": 8
+        },
+        {
+          "name": "require_session",
+          "lines": 5
+        },
+        {
+          "name": "check_csrf",
+          "lines": 9
+        },
+        {
+          "name": "current_user",
+          "lines": 3
+        },
+        {
+          "name": "actor_for_token",
+          "lines": 3
+        },
+        {
+          "name": "prepare_login",
+          "lines": 13
+        },
+        {
+          "name": "login",
+          "lines": 34
+        },
+        {
+          "name": "logout",
+          "lines": 13
+        }
+      ]
+    },
+    {
+      "path": "booking_app/db.py",
+      "added": 129,
+      "deleted": 0,
+      "net": 129,
+      "commit_count": 2,
+      "binary_revisions": 0,
+      "lines": 129,
+      "functions": [
+        {
+          "name": "connect",
+          "lines": 16
+        },
+        {
+          "name": "get_db",
+          "lines": 4
+        },
+        {
+          "name": "close_db",
+          "lines": 4
+        },
+        {
+          "name": "read_transaction",
+          "lines": 14
+        },
+        {
+          "name": "write_transaction",
+          "lines": 12
+        },
+        {
+          "name": "initialize_database",
+          "lines": 29
+        },
+        {
+          "name": "check_database",
+          "lines": 16
+        }
+      ]
+    },
+    {
+      "path": "booking_app/static/schedule.js",
+      "added": 95,
+      "deleted": 0,
+      "net": 95,
+      "commit_count": 1,
+      "binary_revisions": 0,
+      "lines": 95
+    },
+    {
+      "path": "booking_app/static/availability.js",
+      "added": 91,
+      "deleted": 0,
+      "net": 91,
+      "commit_count": 1,
+      "binary_revisions": 0,
+      "lines": 91
+    },
+    {
+      "path": "booking_app/templates/home.html",
+      "added": 99,
+      "deleted": 8,
+      "net": 91,
+      "commit_count": 3,
+      "binary_revisions": 0,
+      "lines": 91
+    },
+    {
+      "path": "booking_app/__init__.py",
+      "added": 83,
+      "deleted": 0,
+      "net": 83,
+      "commit_count": 1,
+      "binary_revisions": 0,
+      "lines": 83,
+      "functions": [
+        {
+          "name": "default_database",
+          "lines": 2
+        },
+        {
+          "name": "check_runtime",
+          "lines": 7
+        },
+        {
+          "name": "canonical_origin",
+          "lines": 19
+        },
+        {
+          "name": "create_app",
+          "lines": 31
+        }
+      ]
+    },
+    {
+      "path": "booking_app/schema.sql",
+      "added": 79,
+      "deleted": 0,
+      "net": 79,
+      "commit_count": 2,
+      "binary_revisions": 0,
+      "lines": 79
+    },
+    {
+      "path": "booking_app/static/auth.js",
+      "added": 78,
+      "deleted": 0,
+      "net": 78,
+      "commit_count": 1,
+      "binary_revisions": 0,
+      "lines": 78
+    },
+    {
+      "path": "booking_app/static/app.css",
+      "added": 73,
+      "deleted": 0,
+      "net": 73,
+      "commit_count": 3,
+      "binary_revisions": 0,
+      "lines": 73
+    },
+    {
+      "path": "booking_app/services.py",
+      "added": 61,
+      "deleted": 1,
+      "net": 60,
+      "commit_count": 2,
+      "binary_revisions": 0,
+      "lines": 60,
+      "functions": [
+        {
+          "name": "_require_actor",
+          "lines": 7
+        },
+        {
+          "name": "list_rooms",
+          "lines": 6
+        },
+        {
+          "name": "availability",
+          "lines": 17
+        },
+        {
+          "name": "schedule",
+          "lines": 16
+        }
+      ]
+    },
+    {
+      "path": "booking_app/templates/login.html",
+      "added": 37,
+      "deleted": 0,
+      "net": 37,
+      "commit_count": 1,
+      "binary_revisions": 0,
+      "lines": 37
+    },
+    {
+      "path": "booking_app/templates/base.html",
+      "added": 30,
+      "deleted": 0,
+      "net": 30,
+      "commit_count": 1,
+      "binary_revisions": 0,
+      "lines": 30
+    },
+    {
+      "path": "booking_app/dto.py",
+      "added": 24,
+      "deleted": 0,
+      "net": 24,
+      "commit_count": 1,
+      "binary_revisions": 0,
+      "lines": 24,
+      "functions": [
+        {
+          "name": "room",
+          "lines": 3
+        },
+        {
+          "name": "schedule_item",
+          "lines": 10
+        },
+        {
+          "name": "list_result",
+          "lines": 2
+        }
+      ]
+    }
+  ],
+  "note": "Churn and size are inspection hints, not proof of a god class. No merges in range."
+}
