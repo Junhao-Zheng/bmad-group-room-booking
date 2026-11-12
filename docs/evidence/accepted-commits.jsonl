@@ -10,3 +10,4 @@
 {"recorded_at_utc": "2026-11-12T11:44:29.992715+00:00", "story": "2-4-member-cancel", "accepted_commit": "b8069f377f17fdd83796ad06c4b6ce07091b891d", "kind": "initial_acceptance"}
 {"recorded_at_utc": "2026-11-12T11:44:29.992715+00:00", "story": "2-3-personal-history", "accepted_commit": "b8069f377f17fdd83796ad06c4b6ce07091b891d", "kind": "post_done_rework_acceptance", "work_id": "history-runner-exit-race"}
 {"recorded_at_utc": "2026-11-12T12:17:43.084972+00:00", "story": "3-1-room-management", "accepted_commit": "7d31d1ace915bac6d0ee4cab0f492dc07daa51b9", "kind": "initial_acceptance"}
+{"recorded_at_utc": "2026-11-12T13:04:54.653772+00:00", "story": "3-2-maintenance-block", "accepted_commit": "85aac3fab0e7a35ac22cb27e362940e9dc9b18ca", "kind": "initial_acceptance"}
