@@ -117,7 +117,7 @@ reservations 字段矩阵（“有值”表示 NOT NULL；指定 NULL 的分支�
 
 ### 5.2 输入与时间规范化
 
-- 文本使用 Python `str.strip()`，按 Unicode code point 数长度；不自动截断、不做大小写或 Unicode NFC 合并。title 1—80，purpose/reason 1—500，name 1—80，location 1—120。HTML 当纯文本。
+- 文本使用 Python `str.strip()`，按 Unicode code point 数长度；不自动截断、不做大小写或 Unicode NFC 合并。title 1—80，purpose/reason 1—500，name 1—80，location 1—120。HTML 当纯文本。 输入文本须能编码为UTF-8且不含NUL（U+0000）；不合法编码或NUL统一400字段错误。该技术格式澄清避免SQLite文本length在NUL处停止及绑定孤立代理码点失败，不限制普通中文、emoji或HTML文本。
 - JSON 人数、容量和所有数据库ID必须满足 `type(value) is int`，不接受 bool/float/数字字符串；HTML表单及URL路径/查询的数值只接受ASCII十进制正整数文本。所有传入ID均须 `1 <= id <= 9223372036854775807`，在SQL绑定前检查；超范围、超长数字或非法类型统一400 INVALID_INPUT。先认证/角色授权再做受保护参数校验；合法范围但不存在的对象404。文本ID先做长度及字典序范围检查再转int，避免超长数字转换异常；规范写法不接受前导零。人数不超过会议室当时容量。
 - API 请求 `start`/`end` 先按四位年、两位月/日/时/分的固定宽度校验，再解析为精确 `YYYY-MM-DDTHH:MM`，使用 `ZoneInfo('Asia/Shanghai')` 转 UTC 整数秒。拒绝附带偏移、秒、小数和无效日期；分钟仅 00/30。该约束使 UI 与测试输入不分歧。[zoneinfo](https://docs.python.org/3.12/library/zoneinfo.html)
 - **唯一时钟接口是 `Clock.now_epoch() -> int`**：认证（含临时会话/登录/退出）、查询、业务、审计和测试全部使用应用注入的同一Clock实例，禁止模块另取系统时间。生产实现返回UTC整数秒；会话在 `t >= expires_at` 失效。写事务取得锁后读取一次 t，所有窗口、期限和事件时刻使用它；查询在短读事务内取一次t。预约执行 PRD `t<start<end<=t+2592000`、同一北京时间日期、1800≤时长≤14400；结束次日00:00为跨日。停用同窗口，但允许跨日且不限4h。
