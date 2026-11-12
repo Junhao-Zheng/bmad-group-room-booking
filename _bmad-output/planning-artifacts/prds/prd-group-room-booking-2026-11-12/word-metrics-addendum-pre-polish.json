@@ -1,0 +1,26 @@
+{
+  "file": "_bmad-output/planning-artifacts/prds/prd-group-room-booking-2026-11-12/addendum.md",
+  "total_words": 793,
+  "sections": [
+    {
+      "heading": "PRD 交接补充",
+      "level": 1,
+      "words": 50
+    },
+    {
+      "heading": "架构应回答的事项",
+      "level": 2,
+      "words": 362
+    },
+    {
+      "heading": "已作出的需求取舍",
+      "level": 2,
+      "words": 228
+    },
+    {
+      "heading": "课程流程边界",
+      "level": 2,
+      "words": 122
+    }
+  ]
+}

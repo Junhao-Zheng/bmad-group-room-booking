@@ -1,0 +1,221 @@
+{
+  "file": "_bmad-output/planning-artifacts/PRD.md",
+  "total_words": 8401,
+  "sections": [
+    {
+      "heading": "(preamble)",
+      "level": 0,
+      "words": 29
+    },
+    {
+      "heading": "课题组活动与会议室预约 PRD",
+      "level": 1,
+      "words": 0
+    },
+    {
+      "heading": "0. 文档用途与证据边界",
+      "level": 2,
+      "words": 263
+    },
+    {
+      "heading": "1. 产品目标与范围",
+      "level": 2,
+      "words": 417
+    },
+    {
+      "heading": "2. 使用对象与路径",
+      "level": 2,
+      "words": 420
+    },
+    {
+      "heading": "3. 术语与统一业务规则",
+      "level": 2,
+      "words": 1236
+    },
+    {
+      "heading": "4. 功能需求",
+      "level": 2,
+      "words": 0
+    },
+    {
+      "heading": "4.1 账号、认证与权限",
+      "level": 3,
+      "words": 0
+    },
+    {
+      "heading": "FR-01 预置账号",
+      "level": 4,
+      "words": 141
+    },
+    {
+      "heading": "FR-02 登录",
+      "level": 4,
+      "words": 108
+    },
+    {
+      "heading": "FR-03 会话与退出",
+      "level": 4,
+      "words": 135
+    },
+    {
+      "heading": "FR-04 服务端授权",
+      "level": 4,
+      "words": 137
+    },
+    {
+      "heading": "4.2 会议室与可用性查询",
+      "level": 3,
+      "words": 0
+    },
+    {
+      "heading": "FR-05 会议室目录",
+      "level": 4,
+      "words": 75
+    },
+    {
+      "heading": "FR-06 条件查询可用会议室",
+      "level": 4,
+      "words": 133
+    },
+    {
+      "heading": "FR-07 查看共享日程",
+      "level": 4,
+      "words": 165
+    },
+    {
+      "heading": "4.3 预约创建与重试",
+      "level": 3,
+      "words": 0
+    },
+    {
+      "heading": "FR-08 创建活动预约",
+      "level": 4,
+      "words": 163
+    },
+    {
+      "heading": "FR-09 校验预约时间边界",
+      "level": 4,
+      "words": 131
+    },
+    {
+      "heading": "FR-10 校验预计人数",
+      "level": 4,
+      "words": 84
+    },
+    {
+      "heading": "FR-11 保证占用互斥",
+      "level": 4,
+      "words": 122
+    },
+    {
+      "heading": "FR-12 识别重复提交",
+      "level": 4,
+      "words": 446
+    },
+    {
+      "heading": "4.4 个人记录与取消",
+      "level": 3,
+      "words": 0
+    },
+    {
+      "heading": "FR-13 查看本人预约",
+      "level": 4,
+      "words": 128
+    },
+    {
+      "heading": "FR-14 成员取消本人预约",
+      "level": 4,
+      "words": 124
+    },
+    {
+      "heading": "FR-15 管理员干预预约",
+      "level": 4,
+      "words": 161
+    },
+    {
+      "heading": "4.5 管理员资源与停用管理",
+      "level": 3,
+      "words": 0
+    },
+    {
+      "heading": "FR-16 维护会议室资料",
+      "level": 4,
+      "words": 149
+    },
+    {
+      "heading": "FR-17 容量调整保护",
+      "level": 4,
+      "words": 119
+    },
+    {
+      "heading": "FR-18 创建停用时段",
+      "level": 4,
+      "words": 133
+    },
+    {
+      "heading": "FR-19 撤销停用",
+      "level": 4,
+      "words": 129
+    },
+    {
+      "heading": "FR-20 管理员查询完整记录",
+      "level": 4,
+      "words": 139
+    },
+    {
+      "heading": "4.6 操作记录与失败反馈",
+      "level": 3,
+      "words": 0
+    },
+    {
+      "heading": "FR-21 记录并查询业务变更",
+      "level": 4,
+      "words": 180
+    },
+    {
+      "heading": "FR-22 一致的反馈与失败恢复",
+      "level": 4,
+      "words": 187
+    },
+    {
+      "heading": "5. 非功能需求与验收条件",
+      "level": 2,
+      "words": 46
+    },
+    {
+      "heading": "NFR-01 一致性",
+      "level": 3,
+      "words": 268
+    },
+    {
+      "heading": "NFR-02 认证、安全与隐私",
+      "level": 3,
+      "words": 389
+    },
+    {
+      "heading": "NFR-03 查询性能",
+      "level": 3,
+      "words": 283
+    },
+    {
+      "heading": "NFR-04 持久化与可追溯性",
+      "level": 3,
+      "words": 159
+    },
+    {
+      "heading": "6. 成功度量与验收取舍",
+      "level": 2,
+      "words": 317
+    },
+    {
+      "heading": "7. 待验证事项与后续交接",
+      "level": 2,
+      "words": 395
+    },
+    {
+      "heading": "8. 假设与 AI 决策索引",
+      "level": 2,
+      "words": 509
+    }
+  ]
+}

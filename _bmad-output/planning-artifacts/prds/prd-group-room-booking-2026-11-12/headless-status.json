@@ -1,0 +1,38 @@
+{
+  "status": "complete",
+  "intent": "create",
+  "prd": "_bmad-output/planning-artifacts/PRD.md",
+  "addendum": "_bmad-output/planning-artifacts/prds/prd-group-room-booking-2026-11-12/addendum.md",
+  "memlog": "_bmad-output/planning-artifacts/prds/prd-group-room-booking-2026-11-12/.memlog.md",
+  "open_questions": [],
+  "assumptions": [
+    "继承产品简述 H-01—H-11；真实问题和规则仍未经过课题组访谈，用户已授权 AI 拟定原型规则。",
+    "A-01：未来 30 天内、30 分钟刻度停用，可跨日，不限 4 小时；可撤销，不能覆盖已有占用；有效性与时间状态分离。",
+    "A-02：容量降低同时保护待开始和进行中的未取消预约。",
+    "A-03：共享字段最小化；本人和管理员可读完整业务字段；课程原型保留历史。",
+    "A-04：文档化初始化至少两个成员和一个管理员，初始口令至少 12 个字符，不提供账号管理网页。",
+    "A-05：绝对 8 小时会话、单会话退出、不自动重提失败预约。",
+    "A-06：文本和容量上限为首版设计值，用户文本按纯文本展示。",
+    "A-07：成功预约意图随记录保留，六个规范化业务字段确定重放，其他成员标识相同不能读取彼此结果。",
+    "A-08：先授权后幂等取消与撤销，保留首次状态转换，不重复记审计。",
+    "并发轮数、安全矩阵和持久化检查为原型验收设计，未声称测得通过结果。"
+  ],
+  "deferred_validation": [
+    "OQ-01：项目维护者在首次真实部署或得到课题组反馈前确认实际资源和当前流程。",
+    "OQ-02：项目维护者在首次真实试用后复核窗口、取消、停用和共享字段。",
+    "OQ-03：项目维护者在转为持续使用前确认数据保留期限与账号运维。"
+  ],
+  "review": {
+    "original_critical": 0,
+    "original_high": 0,
+    "original_medium": 3,
+    "closed": ["R-01", "R-02", "R-03"],
+    "unresolved": [],
+    "resolution": "_bmad-output/planning-artifacts/prds/prd-group-room-booking-2026-11-12/review-resolution.md"
+  },
+  "external_handoffs": [],
+  "application_code_changed": false,
+  "git_changed": false,
+  "application_tests_run": false,
+  "human_gate_approval_claimed": false
+}

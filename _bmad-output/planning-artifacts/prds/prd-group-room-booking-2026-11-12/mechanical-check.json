@@ -1,0 +1,17 @@
+{
+  "fr_count": 22,
+  "nfr_count": 4,
+  "fr_contiguous": true,
+  "nfr_contiguous": true,
+  "all_fr_nfr_references_resolve": true,
+  "canonical_prd_symlink": true,
+  "broken_local_links": [],
+  "prd_status": "final",
+  "review_findings_closed": [
+    "R-01",
+    "R-02",
+    "R-03"
+  ],
+  "application_tests_run": false,
+  "human_gate_approval_claimed": false
+}
