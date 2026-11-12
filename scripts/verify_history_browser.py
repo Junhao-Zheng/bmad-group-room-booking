@@ -36,6 +36,15 @@ def stop_process_group(group_id, process=None, grace=1):
     def send(sig):
         try: os.killpg(group_id, sig)
         except ProcessLookupError: return False
+        except PermissionError:
+            # macOS can report EPERM while a just-terminated group contains only zombies.
+            # A live member still means cleanup failed; never blanket-ignore denied signals.
+            if process is not None: process.poll()
+            rows = subprocess.check_output(['ps', '-axo', 'pgid=,state='], text=True).splitlines()
+            if any(int(group) == group_id and not state.startswith('Z')
+                   for group, state in (row.split() for row in rows)):
+                raise
+            return False
         return True
     if send(signal.SIGTERM):
         deadline = time.monotonic() + grace

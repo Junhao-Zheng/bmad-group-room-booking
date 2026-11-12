@@ -1,0 +1,47 @@
+{
+  "checked_at_utc": "2026-11-12T11:27:50.831371+00:00",
+  "result": "PASS",
+  "python_tests": 119,
+  "unique_python_test_ids": 119,
+  "js_tests": 71,
+  "cleanup_tests": 6,
+  "credential_key_scan_files": 51,
+  "reports": [
+    {
+      "file": "docs/evidence/story-2.4-browser/browser-results.json",
+      "run_id": "4b0edd1b2b234d52adfa35a10147884f",
+      "result": "PASS",
+      "verified_fingerprints": {
+        "app_source_files_sha256": 19,
+        "verification_source_files_sha256": 7
+      }
+    },
+    {
+      "file": "docs/evidence/story-2.4-history-regression/browser-results.json",
+      "run_id": "bc6674f0d81e60363292310453a4b2a5",
+      "result": "PASS",
+      "verified_fingerprints": {
+        "app_source_files_sha256": 19,
+        "verification_source_files_sha256": 6
+      }
+    },
+    {
+      "file": "docs/evidence/story-2.4-replay-regression/browser-results.json",
+      "run_id": "25e92d9e96d97a738692418ae85143bc",
+      "result": "PASS",
+      "verified_fingerprints": {
+        "app_source_files_sha256": 19,
+        "verification_source_files_sha256": 4
+      }
+    },
+    {
+      "file": "docs/evidence/story-2.4-http/http-result.json",
+      "run_id": "4d2bf31f24ba1214893ce90928446243",
+      "result": "PASS",
+      "verified_fingerprints": {
+        "app_source_files_sha256": 19,
+        "verification_source_files_sha256": 9
+      }
+    }
+  ]
+}

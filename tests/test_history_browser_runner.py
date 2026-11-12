@@ -28,6 +28,45 @@ def wait_for_file(path):
 
 
 class HistoryBrowserRunnerTests(unittest.TestCase):
+    def test_permission_denied_with_successful_zombie_only_snapshot_is_recovered(self):
+        group_id=max(os.getpgrp()+1, 999999)
+        with patch.object(runner.os, 'killpg', side_effect=PermissionError('injected zombie-only group')) as kill, \
+                patch.object(runner.subprocess, 'check_output', return_value=f'{group_id} Z\n{group_id} Z+\n1 S\n') as table:
+            runner.stop_process_group(group_id, grace=.03)
+        kill.assert_called_once_with(group_id, signal.SIGTERM)
+        table.assert_called_once_with(['ps', '-axo', 'pgid=,state='], text=True)
+
+    def test_fast_exit_groups_are_reaped_without_treating_zombies_as_live(self):
+        for _ in range(20):
+            process = subprocess.Popen([sys.executable, '-c', 'import time;time.sleep(30)'], start_new_session=True)
+            try:
+                runner.stop_process_group(process.pid, process, grace=.03)
+                self.assertIsNotNone(process.returncode)
+                self.assertEqual(live_group_pids(process.pid), [])
+            finally:
+                if process.poll() is None:
+                    process.kill(); process.wait(timeout=2)
+
+    def test_permission_denied_with_live_group_is_not_reported_as_cleaned(self):
+        process = subprocess.Popen([sys.executable, '-c', 'import time;time.sleep(30)'], start_new_session=True)
+        try:
+            with patch.object(runner.os, 'killpg', side_effect=PermissionError('injected denied signal')):
+                with self.assertRaises(PermissionError): runner.stop_process_group(process.pid, process, grace=.03)
+            self.assertIsNone(process.poll())
+            self.assertIn(process.pid, live_group_pids(process.pid))
+        finally: runner.stop_process_group(process.pid, process, grace=.03)
+
+    def test_permission_denied_and_unreadable_process_table_fails_closed(self):
+        process = subprocess.Popen([sys.executable, '-c', 'import time;time.sleep(30)'], start_new_session=True)
+        try:
+            with patch.object(runner.os, 'killpg', side_effect=PermissionError('injected denied signal')), \
+                    patch.object(runner.subprocess, 'check_output', side_effect=subprocess.CalledProcessError(1, ['ps'])):
+                with self.assertRaises(subprocess.CalledProcessError):
+                    runner.stop_process_group(process.pid, process, grace=.03)
+            self.assertIsNone(process.poll())
+            self.assertIn(process.pid, live_group_pids(process.pid))
+        finally: runner.stop_process_group(process.pid, process, grace=.03)
+
     def test_driver_failure_and_timeout_reap_detached_browser_group_only(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

@@ -1,0 +1,8 @@
+test_driver_failure_and_timeout_reap_detached_browser_group_only (tests.test_history_browser_runner.HistoryBrowserRunnerTests.test_driver_failure_and_timeout_reap_detached_browser_group_only) ... ok
+test_missing_playwright_metadata_replaces_prior_pass_with_incomplete (tests.test_history_browser_runner.HistoryBrowserRunnerTests.test_missing_playwright_metadata_replaces_prior_pass_with_incomplete) ... ok
+test_server_ignoring_term_is_force_killed_and_reaped (tests.test_history_browser_runner.HistoryBrowserRunnerTests.test_server_ignoring_term_is_force_killed_and_reaped) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 4.402s
+
+OK

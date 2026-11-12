@@ -1,0 +1,46 @@
+{
+  "checked_at_utc": "2026-11-12T11:43:19.528190+00:00",
+  "result": "PASS",
+  "python_tests": 121,
+  "unique_python_test_ids": 121,
+  "js_tests": 86,
+  "reports": [
+    {
+      "file": "docs/evidence/story-2.4-review-fixes/browser/browser-results.json",
+      "run_id": "b37cdadfae3598457940caa1a062f846",
+      "result": "PASS",
+      "verified_hash_counts": {
+        "app_source_files_sha256": 19,
+        "verification_source_files_sha256": 7
+      }
+    },
+    {
+      "file": "docs/evidence/story-2.4-review-fixes/history/browser-results.json",
+      "run_id": "14ec425d27bdab06917b7e2c5f66ae02",
+      "result": "PASS",
+      "verified_hash_counts": {
+        "app_source_files_sha256": 19,
+        "verification_source_files_sha256": 6
+      }
+    },
+    {
+      "file": "docs/evidence/story-2.4-review-fixes/replay/browser-results.json",
+      "run_id": "85c6d42df0290f7400ff8210d61ed8b1",
+      "result": "PASS",
+      "verified_hash_counts": {
+        "app_source_files_sha256": 19,
+        "verification_source_files_sha256": 4
+      }
+    },
+    {
+      "file": "docs/evidence/story-2.4-review-fixes/http/http-result.json",
+      "run_id": "9d4339fd816c42f0cfa2aee92dcacae5",
+      "result": "PASS",
+      "verified_hash_counts": {
+        "app_source_files_sha256": 19,
+        "verification_source_files_sha256": 9
+      }
+    }
+  ],
+  "visual_inspection": "父流程检查新版390px拒绝截图，文字安全换行，无横向溢出；焦点skip链接显示为浏览器当前焦点状态。"
+}

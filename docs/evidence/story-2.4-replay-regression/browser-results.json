@@ -1,0 +1,594 @@
+{
+  "result": "PASS",
+  "browser": "157.0.8103.51",
+  "execution": {
+    "node": "v26.8.1",
+    "playwright_package_path": "/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/work/browser-tools/node_modules/playwright/package.json",
+    "playwright": "1.58.2",
+    "browser_executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "scenario": "booking"
+  },
+  "runner": "Playwright 1.58.2 (external verification tool only)",
+  "results": [
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "loginWidth": {
+        "document": 1280,
+        "viewport": 1280
+      },
+      "homeWidth": {
+        "document": 1280,
+        "viewport": 1280
+      },
+      "booking": {
+        "width": {
+          "document": 1280,
+          "viewport": 1280
+        },
+        "query_first_blocks_creation": "PASS",
+        "creation_first_blocks_query": "PASS",
+        "neutral_room_selection_feedback": "PASS",
+        "room_selection_accessible_names": "PASS",
+        "committed_response_lost": {
+          "http_status": 201,
+          "request_count": 1,
+          "booking_id": 113,
+          "room_id": 30,
+          "start_at": 1794808800,
+          "end_at": 1794812400,
+          "title": "响应丢失的合成活动 1280"
+        },
+        "explicit_new_booking": "PASS",
+        "created": "PASS",
+        "conflict_retains_inputs": "PASS",
+        "loading_disables_controls": "PASS",
+        "literal_unicode_xss": "PASS",
+        "explicit_retry_same_intent": {
+          "original_id": 113,
+          "replayed_id": 113,
+          "new_id": 114,
+          "key_retained": true,
+          "edited_key_changed": true,
+          "request_hashes": [
+            "e5e9e90941726d7cedd9b4d50adf7c06142301b780b81e7b344f68a941914649",
+            "e5e9e90941726d7cedd9b4d50adf7c06142301b780b81e7b344f68a941914649",
+            "26a2321fe5f5128c87b2c0dcf0d96cfe451c490f63f5765c7092b1d2e3b531ea"
+          ],
+          "statuses": [
+            201,
+            200,
+            201
+          ],
+          "new_booking": {
+            "attendees": 5,
+            "cancel_reason": null,
+            "cancelled_at": null,
+            "cancelled_by_display_name": null,
+            "cancelled_by_id": null,
+            "cancelled_local": null,
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "end_at": 1794819600,
+            "end_local": "2026-11-16T17:00:00+08:00",
+            "id": 114,
+            "owner_display_name": "演示成员甲",
+            "owner_id": 1,
+            "purpose": "实质编辑后的新预约用途",
+            "room": {
+              "capacity": 31,
+              "id": 30,
+              "location": "演示楼 303",
+              "name": "合成 C <讨论室>"
+            },
+            "start_at": 1794816000,
+            "start_local": "2026-11-16T16:00:00+08:00",
+            "status": "pending",
+            "title": "响应丢失的合成活动 1280"
+          },
+          "network_file": "replay-network-1280.jsonl"
+        },
+        "not_delivered_retry": {
+          "booking_id": 115,
+          "room_id": 30,
+          "title": "首次请求未送达 1280",
+          "start_at": 1794823200,
+          "end_at": 1794826800,
+          "key_retained": true,
+          "pre_retry_matching_records": 0,
+          "statuses": [
+            null,
+            201
+          ],
+          "request_hashes": [
+            "ed68558f35dbec939e8109bad322251ddea5b8699f755ce0403c53873f6a276d",
+            "ed68558f35dbec939e8109bad322251ddea5b8699f755ce0403c53873f6a276d"
+          ],
+          "network_file": "not-delivered-network-1280.jsonl"
+        },
+        "schedule_updated": "PASS"
+      },
+      "keyboard_login": "PASS",
+      "login_pending_inputs_and_no_duplicate": "PASS",
+      "keyboard_logout": "PASS",
+      "identity_api": "PASS",
+      "logout_and_old_cookie": "PASS",
+      "empty_fields_feedback": "PASS",
+      "visible_labels": "PASS",
+      "page_errors": [],
+      "schedule": {
+        "scheduleWidth": {
+          "document": 1280,
+          "viewport": 1280
+        },
+        "labels": "PASS",
+        "loading": "PASS",
+        "pending_inputs_disabled_and_restored": "PASS",
+        "field_error": "PASS",
+        "keyboard_schedule_submit": "PASS",
+        "success_and_empty_focus_and_tab": "PASS",
+        "preserves_other_form_focus": "PASS",
+        "required_semantics": "PASS",
+        "block_reason_value": "PASS",
+        "keyboard_room_and_date_error_focus": "PASS",
+        "fixed_clock_status_texts": "PASS",
+        "exact_api_intervals": "PASS",
+        "exact_display_intervals": "PASS",
+        "no_script_notice_and_readable_directory": "PASS",
+        "shared_contract": "PASS",
+        "literal_html_and_xss": "PASS",
+        "private_values_absent": "PASS",
+        "half_open_midnight": "PASS",
+        "empty_result": "PASS",
+        "error_retains_conditions": "PASS",
+        "logout_rejects_queries": "PASS",
+        "session_loss_feedback": "PASS"
+      },
+      "availability": {
+        "availableWidth": {
+          "document": 1280,
+          "viewport": 1280
+        },
+        "labels": "PASS",
+        "required_semantics": "PASS",
+        "half_hour_controls": "PASS",
+        "keyboard_submit": "PASS",
+        "loading": "PASS",
+        "restored_controls": "PASS",
+        "success_and_empty_button_focus": "PASS",
+        "success_and_empty_next_tab": "PASS",
+        "success_exact_conditions": "PASS",
+        "literal_room_text": "PASS",
+        "card_location_capacity_values": "PASS",
+        "empty_result": "PASS",
+        "time_and_attendees_field_errors": "PASS",
+        "network_failure_retains_conditions": "PASS",
+        "query_does_not_reserve_notice": "PASS",
+        "session_loss_and_old_cookie": "PASS"
+      }
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "loginWidth": {
+        "document": 390,
+        "viewport": 390
+      },
+      "homeWidth": {
+        "document": 390,
+        "viewport": 390
+      },
+      "booking": {
+        "width": {
+          "document": 390,
+          "viewport": 390
+        },
+        "query_first_blocks_creation": "PASS",
+        "creation_first_blocks_query": "PASS",
+        "neutral_room_selection_feedback": "PASS",
+        "room_selection_accessible_names": "PASS",
+        "committed_response_lost": {
+          "http_status": 201,
+          "request_count": 1,
+          "booking_id": 117,
+          "room_id": 30,
+          "start_at": 1794895200,
+          "end_at": 1794898800,
+          "title": "响应丢失的合成活动 390"
+        },
+        "explicit_new_booking": "PASS",
+        "created": "PASS",
+        "conflict_retains_inputs": "PASS",
+        "loading_disables_controls": "PASS",
+        "literal_unicode_xss": "PASS",
+        "explicit_retry_same_intent": {
+          "original_id": 117,
+          "replayed_id": 117,
+          "new_id": 118,
+          "key_retained": true,
+          "edited_key_changed": true,
+          "request_hashes": [
+            "347d81370fa33d00ef9eb7098bb20a317502bb6e2464bd7526985abccaf480d1",
+            "347d81370fa33d00ef9eb7098bb20a317502bb6e2464bd7526985abccaf480d1",
+            "1f8465383fc0cc7189a37bdaa16de38ead2f4db70dce80f868d52908ebdda762"
+          ],
+          "statuses": [
+            201,
+            200,
+            201
+          ],
+          "new_booking": {
+            "attendees": 5,
+            "cancel_reason": null,
+            "cancelled_at": null,
+            "cancelled_by_display_name": null,
+            "cancelled_by_id": null,
+            "cancelled_local": null,
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "end_at": 1794906000,
+            "end_local": "2026-11-17T17:00:00+08:00",
+            "id": 118,
+            "owner_display_name": "演示成员甲",
+            "owner_id": 1,
+            "purpose": "实质编辑后的新预约用途",
+            "room": {
+              "capacity": 31,
+              "id": 30,
+              "location": "演示楼 303",
+              "name": "合成 C <讨论室>"
+            },
+            "start_at": 1794902400,
+            "start_local": "2026-11-17T16:00:00+08:00",
+            "status": "pending",
+            "title": "响应丢失的合成活动 390"
+          },
+          "network_file": "replay-network-390.jsonl"
+        },
+        "not_delivered_retry": {
+          "booking_id": 119,
+          "room_id": 30,
+          "title": "首次请求未送达 390",
+          "start_at": 1794909600,
+          "end_at": 1794913200,
+          "key_retained": true,
+          "pre_retry_matching_records": 0,
+          "statuses": [
+            null,
+            201
+          ],
+          "request_hashes": [
+            "2cc20e9457dfabc50257fa38f7ab6774a74340381bbdf3317847093d20443448",
+            "2cc20e9457dfabc50257fa38f7ab6774a74340381bbdf3317847093d20443448"
+          ],
+          "network_file": "not-delivered-network-390.jsonl"
+        },
+        "schedule_updated": "PASS"
+      },
+      "keyboard_login": "PASS",
+      "login_pending_inputs_and_no_duplicate": "PASS",
+      "keyboard_logout": "PASS",
+      "identity_api": "PASS",
+      "logout_and_old_cookie": "PASS",
+      "empty_fields_feedback": "PASS",
+      "visible_labels": "PASS",
+      "page_errors": [],
+      "schedule": {
+        "scheduleWidth": {
+          "document": 390,
+          "viewport": 390
+        },
+        "labels": "PASS",
+        "loading": "PASS",
+        "pending_inputs_disabled_and_restored": "PASS",
+        "field_error": "PASS",
+        "keyboard_schedule_submit": "PASS",
+        "success_and_empty_focus_and_tab": "PASS",
+        "preserves_other_form_focus": "PASS",
+        "required_semantics": "PASS",
+        "block_reason_value": "PASS",
+        "keyboard_room_and_date_error_focus": "PASS",
+        "fixed_clock_status_texts": "PASS",
+        "exact_api_intervals": "PASS",
+        "exact_display_intervals": "PASS",
+        "no_script_notice_and_readable_directory": "PASS",
+        "shared_contract": "PASS",
+        "literal_html_and_xss": "PASS",
+        "private_values_absent": "PASS",
+        "half_open_midnight": "PASS",
+        "empty_result": "PASS",
+        "error_retains_conditions": "PASS",
+        "logout_rejects_queries": "PASS",
+        "session_loss_feedback": "PASS"
+      },
+      "availability": {
+        "availableWidth": {
+          "document": 390,
+          "viewport": 390
+        },
+        "labels": "PASS",
+        "required_semantics": "PASS",
+        "half_hour_controls": "PASS",
+        "keyboard_submit": "PASS",
+        "loading": "PASS",
+        "restored_controls": "PASS",
+        "success_and_empty_button_focus": "PASS",
+        "success_and_empty_next_tab": "PASS",
+        "success_exact_conditions": "PASS",
+        "literal_room_text": "PASS",
+        "card_location_capacity_values": "PASS",
+        "empty_result": "PASS",
+        "time_and_attendees_field_errors": "PASS",
+        "network_failure_retains_conditions": "PASS",
+        "query_does_not_reserve_notice": "PASS",
+        "session_loss_and_old_cookie": "PASS"
+      }
+    }
+  ],
+  "committed_response_loss_storage": [
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "booking_id": 113,
+      "matching_reservations": 1,
+      "slots": [
+        {
+          "room_id": 30,
+          "slot_start": 1794808800,
+          "reservation_id": 113
+        },
+        {
+          "room_id": 30,
+          "slot_start": 1794810600,
+          "reservation_id": 113
+        }
+      ],
+      "creation_audits": [
+        {
+          "id": 2,
+          "actor_id": 1,
+          "action": "booking.created",
+          "target_type": "booking",
+          "target_id": 113,
+          "occurred_at": 1794448800,
+          "before_json": null,
+          "after_json": "{\"attendees\":5,\"cancel_reason\":null,\"cancelled_at\":null,\"cancelled_by_id\":null,\"created_at\":1794448800,\"end_at\":1794812400,\"id\":113,\"owner_id\":1,\"purpose\":\"成功提交但响应丢失，保留输入 🧪\",\"room_id\":30,\"start_at\":1794808800,\"title\":\"响应丢失的合成活动 1280\"}",
+          "reason": null
+        }
+      ],
+      "result": "PASS"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "booking_id": 117,
+      "matching_reservations": 1,
+      "slots": [
+        {
+          "room_id": 30,
+          "slot_start": 1794895200,
+          "reservation_id": 117
+        },
+        {
+          "room_id": 30,
+          "slot_start": 1794897000,
+          "reservation_id": 117
+        }
+      ],
+      "creation_audits": [
+        {
+          "id": 6,
+          "actor_id": 1,
+          "action": "booking.created",
+          "target_type": "booking",
+          "target_id": 117,
+          "occurred_at": 1794448800,
+          "before_json": null,
+          "after_json": "{\"attendees\":5,\"cancel_reason\":null,\"cancelled_at\":null,\"cancelled_by_id\":null,\"created_at\":1794448800,\"end_at\":1794898800,\"id\":117,\"owner_id\":1,\"purpose\":\"成功提交但响应丢失，保留输入 🧪\",\"room_id\":30,\"start_at\":1794895200,\"title\":\"响应丢失的合成活动 390\"}",
+          "reason": null
+        }
+      ],
+      "result": "PASS"
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "original_id": 113,
+      "replayed_id": 113,
+      "edited_new_id": 114,
+      "key_hashes_match": true,
+      "records": 2,
+      "creation_audits": 2,
+      "slots_per_booking": 2,
+      "result": "PASS"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "original_id": 117,
+      "replayed_id": 117,
+      "edited_new_id": 118,
+      "key_hashes_match": true,
+      "records": 2,
+      "creation_audits": 2,
+      "slots_per_booking": 2,
+      "result": "PASS"
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "scenario": "request_not_delivered_then_retry",
+      "booking_id": 115,
+      "matching_reservations": 1,
+      "key_hash_match": true,
+      "slots": [
+        {
+          "room_id": 30,
+          "slot_start": 1794823200,
+          "reservation_id": 115
+        },
+        {
+          "room_id": 30,
+          "slot_start": 1794825000,
+          "reservation_id": 115
+        }
+      ],
+      "creation_audits": [
+        {
+          "id": 4,
+          "action": "booking.created",
+          "target_id": 115
+        }
+      ],
+      "result": "PASS"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "request_not_delivered_then_retry",
+      "booking_id": 119,
+      "matching_reservations": 1,
+      "key_hash_match": true,
+      "slots": [
+        {
+          "room_id": 30,
+          "slot_start": 1794909600,
+          "reservation_id": 119
+        },
+        {
+          "room_id": 30,
+          "slot_start": 1794911400,
+          "reservation_id": 119
+        }
+      ],
+      "creation_audits": [
+        {
+          "id": 8,
+          "action": "booking.created",
+          "target_id": 119
+        }
+      ],
+      "result": "PASS"
+    }
+  ],
+  "server": {
+    "processes": 1,
+    "threads": 8,
+    "origin": "http://127.0.0.1:8005",
+    "command": [
+      "/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/.venv/bin/python",
+      "-m",
+      "waitress",
+      "--listen=127.0.0.1:8005",
+      "--threads=8",
+      "--call",
+      "scripts.verify_auth_browser:create_schedule_verification_app"
+    ]
+  },
+  "clock": {
+    "kind": "fixed_fixture",
+    "now_epoch": 1794448800,
+    "now_local": "2026-11-12T10:00:00+08:00"
+  },
+  "run_id": "25e92d9e96d97a738692418ae85143bc",
+  "started_at_utc": "2026-11-12T11:19:47.528572+00:00",
+  "artifact_directory": "runs/25e92d9e96d97a738692418ae85143bc",
+  "configuration": {
+    "port": 8005,
+    "schedule": true,
+    "availability": true,
+    "booking": true,
+    "replay": true,
+    "playwright_root": "/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/work/browser-tools/node_modules",
+    "browser_executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+  },
+  "environment": {
+    "platform": "macOS-26.6-arm64-arm-64bit",
+    "python": "3.12.14 (main, Aug 25 2026, 13:50:33) [Clang 22.1.3 ]",
+    "sqlite": "3.53.1",
+    "packages": {
+      "Flask": "3.1.3",
+      "Jinja2": "3.1.6",
+      "Werkzeug": "3.1.9",
+      "waitress": "3.0.2"
+    },
+    "playwright": "1.58.2"
+  },
+  "app_source_files_sha256": {
+    "booking_app/__init__.py": "58c6775ec02de2cacd56f810878d3db32b42e57535ddda59e3b98d15bcfc0657",
+    "booking_app/audit.py": "4ef81dffae285cea3d82ea7c393c9895f87d3977b900828adcf1165f2e0fad80",
+    "booking_app/auth.py": "c81a834f349872a0b367f9bef4d48e7f4e2c6d258667c2d6690bca2dba110ac4",
+    "booking_app/db.py": "67cdaf0b3f89334c1c6bf610c3f6ad8e174a3fe3c118aace3596309426df0585",
+    "booking_app/domain.py": "01f2223020b6630bd14bdbb9d716711b96ab13b94073f53e9d9d32289855982f",
+    "booking_app/dto.py": "6ad6400086c487934bb866b3c9c73c2eba063104c26caaf86925f8afb25c424c",
+    "booking_app/schema.sql": "7becf070ca3daf2c6437de6cda6cb1f0edd47badc15e1a081cd95735b666f4c7",
+    "booking_app/services.py": "1d044a44dbd978c1799e957a767be3ad6ce435fa41e9a927e07ba663939cdfe1",
+    "booking_app/static/app.css": "58d20eb2eeb17f8482df5c366df08fc57bd162c328d10853442e7ea84c96d467",
+    "booking_app/static/auth.js": "fb2bf86b5a273d25ece5780aa27fc25ab7b03074a9c1c830e774b11cf924ed31",
+    "booking_app/static/availability.js": "ee27c9e189d06f7456e3d2f44f10ddac172ea552c262b6947e9e4e43109afc87",
+    "booking_app/static/booking.js": "c075a1301696cfb8c1cfa16ccb85786491a7d6749e4c2c59461f08d6c32d3261",
+    "booking_app/static/history.js": "efdad21ab4ee619e9f8948768e9dbe10fc67234a62d4fab6d0f98e2f35ff3170",
+    "booking_app/static/schedule.js": "d7f62b158bbacd39eb51cc8ae2a6435650148b4e1997b18de6a62ca55d336352",
+    "booking_app/templates/base.html": "22736c122e252226cc06dda1f5507e0baefed62de1c9d43d54739c67a53f499b",
+    "booking_app/templates/home.html": "4ac1b84f72a40d4d8cde1bfb90b81edd960c7cef005d9ca3496d8ce0e05d87f3",
+    "booking_app/templates/login.html": "7e78fd3f5d83f9d97c33dea9776eeeab3bdc9825980dfcc34a956ac67b12f1bd",
+    "booking_app/templates/my.html": "8a4310d095be12ddfe3cf51af41f9d0b45ea3f0d22739db7ae60a33abe35bc43",
+    "booking_app/web.py": "02f3fb4d9378074aa82d68b0b66f06373737203979d124513d790487d22dfcce"
+  },
+  "verification_source_files_sha256": {
+    "scripts/verify_auth_browser.py": "dbd780cfadceeeae095bd453d578a79866bf6cd3176cc047cc8161d9e14fc2dc",
+    "scripts/verify_auth_browser.cjs": "34f2cd690215e7040cea9b735d9d56e557ef062f466debf36a4fddaf4b4d52e1",
+    "scripts/init_demo.py": "1e85b96d32582a31af98f7bef0c30761e261f81b50417795d7a29bb564c8fdbe",
+    "tests/schedule_fixtures.py": "93a77f4297e77c5a786037c770c9881eddd4566415f260e95d757d0f83f96751"
+  },
+  "screenshots_sha256": {
+    "runs/25e92d9e96d97a738692418ae85143bc/availability-1280.png": "11914b15687f389054381c18759ce994df6a7cce15ae2889a4c05a52754218c5",
+    "runs/25e92d9e96d97a738692418ae85143bc/availability-390.png": "048afb921fcf8e2e9adb4c7901ef25fb4ed4a3b7fb21c43744e7bb239fe2e853",
+    "runs/25e92d9e96d97a738692418ae85143bc/availability-empty-1280.png": "66dacab68419c75bca80f4c2643c4504c003f87044a245d6819cb2af8d5f9209",
+    "runs/25e92d9e96d97a738692418ae85143bc/availability-empty-390.png": "e58b3a433ff92f396d4ad28149da33cea31c2a8057c6dd46785e6bad7b4d63f9",
+    "runs/25e92d9e96d97a738692418ae85143bc/availability-error-1280.png": "0c6b30a1aeb3715310b4b8468c1dc34a80c79adad3987b6ece737e0b96d87563",
+    "runs/25e92d9e96d97a738692418ae85143bc/availability-error-390.png": "63ed377796cc2cc3231fb71987cd6ad3fd8d56e0ea68070d1c07df50e3d4cdf9",
+    "runs/25e92d9e96d97a738692418ae85143bc/availability-loading-1280.png": "65373204e542f047fe8e4be2fd7b4223b95ed1979c35d3e1d3df81d8c33aca09",
+    "runs/25e92d9e96d97a738692418ae85143bc/availability-loading-390.png": "88c039c90fd8cb876b3a77847fdc9d6e32059ee6c151214c7ba4baac4f56606a",
+    "runs/25e92d9e96d97a738692418ae85143bc/booking-committed-response-lost-1280.png": "0680bee2211eb1ae09db435ad9d9cb57516539cf870eaaaec16ab4d298d47430",
+    "runs/25e92d9e96d97a738692418ae85143bc/booking-committed-response-lost-390.png": "73a0df179b0af6223b9584a77182d513348bd9c934736edd365d422456d968cb",
+    "runs/25e92d9e96d97a738692418ae85143bc/booking-conflict-1280.png": "f772488abf50bca23dea0b55e9834022b06fdd03ed13b1bc429405d095dba65b",
+    "runs/25e92d9e96d97a738692418ae85143bc/booking-conflict-390.png": "e1e5a3c3d8915033980f89973d74a65d911ce7cf7979946baf5f29478ace66f9",
+    "runs/25e92d9e96d97a738692418ae85143bc/booking-loading-1280.png": "109cf318dbea9e35e98e50a5c4f6d42bcc507b1dc534642db94407b7a2ae9319",
+    "runs/25e92d9e96d97a738692418ae85143bc/booking-loading-390.png": "d2a197cdd4fc057964b6dd78c3b4d228b674dcecfa84bc6ef73598b0a93cb571",
+    "runs/25e92d9e96d97a738692418ae85143bc/booking-new-intent-1280.png": "42865c081edcd8b777251d8926c98162a359a405945d25e727f8a55565f240d9",
+    "runs/25e92d9e96d97a738692418ae85143bc/booking-new-intent-390.png": "80dbb07399adef8e544c65ab5a1293c946df7a927195cdf60c8d0ee695666326",
+    "runs/25e92d9e96d97a738692418ae85143bc/booking-not-delivered-retry-1280.png": "2c4095684079b110302f63ce4e4f72307b4eec3fd0d20ad19b99ee18023a8ac9",
+    "runs/25e92d9e96d97a738692418ae85143bc/booking-not-delivered-retry-390.png": "955f3a31ddb8ac195037240049516d907bcbd99173e3ec6676b307430eaa4617",
+    "runs/25e92d9e96d97a738692418ae85143bc/booking-replayed-1280.png": "e7edc51aa32ad6ba4dc86e73a781ca823e62bf90f2f44048f3a5841248f41f89",
+    "runs/25e92d9e96d97a738692418ae85143bc/booking-replayed-390.png": "9cb5f34ebb1be688a5c7df78a130712ac46234a880294ee0ec3129e8709859e2",
+    "runs/25e92d9e96d97a738692418ae85143bc/booking-success-1280.png": "0434cd188eb876418066d77d57c68ecf07d52ef5d499c035bdfb667196215cb0",
+    "runs/25e92d9e96d97a738692418ae85143bc/booking-success-390.png": "09a22da4e0b88cb19ecbf87de11d168532b926f99fb23f457fc6d2697da08fb4",
+    "runs/25e92d9e96d97a738692418ae85143bc/empty-1280.png": "e51887a544d534ed1f523c038bd7eea8f9bd0dee421cd0fab0174a7b515ef46e",
+    "runs/25e92d9e96d97a738692418ae85143bc/empty-390.png": "cfaec73a28195265357fb1d7142508ec0022a253e398e8c0a327479b1ea3aea9",
+    "runs/25e92d9e96d97a738692418ae85143bc/home-1280.png": "2a41d34b1784aaad75d603de60716c53a01cf0b9a7f5d04f58176a302f617118",
+    "runs/25e92d9e96d97a738692418ae85143bc/home-390.png": "1b33f620b70e6dd042e102fae6e52d96b9d3b337f2e084f152a6c895d0f1c2cf",
+    "runs/25e92d9e96d97a738692418ae85143bc/login-1280.png": "b4328e401ab7810f54b91fc1bd840517892f5df69b0c2beea6e725fc979a1c5f",
+    "runs/25e92d9e96d97a738692418ae85143bc/login-390.png": "4ebedf0568720aac14e1b82a252e3c0eebc357169464dfdcf460f26e9c938e18",
+    "runs/25e92d9e96d97a738692418ae85143bc/schedule-1280.png": "e8356c027ae6ff0b6618618f2abaaeb166d13e6cae04c4411f30b052193c862d",
+    "runs/25e92d9e96d97a738692418ae85143bc/schedule-390.png": "91f221ae3302241b62472fba2c26a2f520cabcfbd77d70e81642002eb5c273d7"
+  },
+  "completed": true,
+  "finished_at_utc": "2026-11-12T11:19:57.372196+00:00"
+}

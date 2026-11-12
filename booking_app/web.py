@@ -13,6 +13,7 @@ bp = Blueprint("web", __name__)
 STATUS = {"INVALID_INPUT": 400, "AUTH_REQUIRED": 401, "INVALID_CREDENTIALS": 401,
           "FORBIDDEN": 403, "CSRF_REJECTED": 403, "NOT_FOUND": 404,
           "OCCUPANCY_CONFLICT": 409, "CAPACITY_CONFLICT": 409, "IDEMPOTENCY_MISMATCH": 409,
+          "TRANSITION_CLOSED": 409,
           "STORE_BUSY": 503, "INTERNAL_ERROR": 500}
 
 
@@ -82,6 +83,14 @@ def booking_detail_api(booking_id):
 @bp.get("/api/rooms")
 def rooms_api():
     return jsonify(ok=True, data=services.list_rooms(auth.actor_for_token(token())))
+
+
+@bp.post("/api/bookings/<booking_id>/cancel")
+def member_cancel_booking_api(booking_id):
+    actor = auth.actor_for_token(token())
+    if request.mimetype != "application/json" or payload() != {}:
+        raise DomainError("INVALID_INPUT", "取消本人预约须提交空 JSON 对象，不接受原因或身份字段。")
+    return jsonify(ok=True, data=services.member_cancel_booking(actor, booking_id))
 
 
 @bp.get("/api/schedule")

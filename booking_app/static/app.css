@@ -80,3 +80,6 @@ textarea[aria-invalid="true"]{border:2px solid #a52b37}
 .history-items{list-style:none;padding:0;margin:24px 0 0}.history-items li{border-top:1px solid #dde6e8;padding:24px 0}.history-items h3{margin:0 0 10px;font-size:19px}.history-items p{margin:8px 0}.history-items button{margin-top:8px;max-width:100%;overflow-wrap:anywhere}
 .booking-fields{margin:24px 0 0}.booking-fields dt{font-size:14px;color:#54707a;margin-top:18px}.booking-fields dd{margin:4px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
 @media(max-width:800px){.header-content{flex-wrap:wrap}.history-layout{grid-template-columns:1fr}.primary-nav{gap:16px}.history-items li:last-child{padding-bottom:0}}
+#cancel-form{margin-top:28px;padding-top:20px;border-top:1px solid #dde6e8}
+#cancel-form label{display:flex;align-items:flex-start;gap:10px;font-weight:600}
+#cancel-confirm{width:20px;height:20px;min-height:20px;flex:0 0 20px;margin-top:3px;padding:0;accent-color:#126d65}

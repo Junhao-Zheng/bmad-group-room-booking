@@ -92,3 +92,11 @@ context:
 ## 父流程最终验收
 
 全量104项Python、49项JS通过且无skip；三条AC有独立值/边界/权限断言及真实1280/390浏览器证据。父流程核对本轮全部源码/辅助脚本SHA，并检查手机长文本截图。见[最终复验](../../docs/evidence/story-2.3-reviewed/verification.md)。实现调用2次（初次+同上下文修补），三层独立评审；初审13条，修补中另发现P1，共14条，12条已修复、2条低影响边界按规则拒绝，无高/中风险遗留。先由build置spec done/sprint review，再由父流程完成明确验收置done；不是人工/教师批准。
+
+## 完成后返工 R2：验证器退出竞争
+
+2.4验证期间复现原history浏览器清理helper在目标组仅剩Z状态时killpg(0)偶发PermissionError；100次快速退出探针有原始状态证据。作为真正的完成后返工重开2.3，限制修补在僵尸状态确认及活组权限错误拒绝；与2.4共用本次实现调用和评审，不额外算一次代理派发。证据见[2.4验证记录](../../docs/evidence/story-2.4-verification.md)。
+
+## 本轮接受结果
+
+121项唯一Python测试、86项JS及真实HTTP/双视口浏览器通过。Story2.4的16项评审已关闭，0defer；2.3验证器清理返工已闭环，单独保留完成后返工事件。最终[证据](../../docs/evidence/story-2.4-review-fixes/parent-final-qa.json)。AI技术接受，不是人类或教师验收。
