@@ -16,3 +16,4 @@
 {"timestamp": "2026-11-12T07:11:11.524691+00:00", "story": "2-1-create-booking", "from": "in-progress", "to": "review", "actor": "AI root", "head": "b27e57659d4c5063bc7d25caee667d5b5e768a82", "post_done_rework": false}
 {"timestamp": "2026-11-12T09:24:26.319204+00:00", "story": "2-1-create-booking", "from": "review", "to": "done", "actor": "AI root", "head": "b27e57659d4c5063bc7d25caee667d5b5e768a82", "post_done_rework": false}
 {"timestamp": "2026-11-12T09:24:46.563704+00:00", "story": "2-2-replay-intent", "from": "backlog", "to": "ready-for-dev", "actor": "AI root", "head": "325ad0a568e2ba82ba4a3d521606ca39867cd353", "post_done_rework": false}
+{"timestamp": "2026-11-12T09:24:46.636879+00:00", "story": "2-2-replay-intent", "from": "ready-for-dev", "to": "in-progress", "actor": "AI root", "head": "6ed26f50a70aa652df1796ff6d360240af70ca5c", "post_done_rework": false}

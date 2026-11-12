@@ -2,8 +2,9 @@
 title: '确认重复提交和网络重试结果'
 type: feature
 created: '2026-11-12'
-status: ready-for-dev
+status: in-progress
 route: dispatch
+baseline_commit: 6ed26f50a70aa652df1796ff6d360240af70ca5c
 story_key: 2-2-replay-intent
 review_loop_iteration: 0
 context:
