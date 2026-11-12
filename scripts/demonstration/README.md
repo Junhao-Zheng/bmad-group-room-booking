@@ -9,3 +9,5 @@
 `narration.py 场景.json 新音频目录`需要macOS系统Tingting语音与imageio-ffmpeg 0.8.1（本次附带FFmpeg 9.0）；合成语音明确披露。`subtitles.py 场景.json 音频目录/narration.json 字幕.srt`按字数近似对齐，不能宣称人工听写。最终视频合成/解码/元数据核验命令由交付说明记录。应用本身不依赖这些录制工具。
 
 正式录制可传`--ffmpeg-executable /实际/ffmpeg路径`。脚本只在独立临时缓存中提供指定编码器，保存其版本/SHA；不修改全局浏览器安装或系统安全设置。本次Playwright下载的FFmpeg未能成功启动（退出137），采用已实际运行通过的imageio-ffmpeg 0.8.1自带FFmpeg 9.0。实际录制与最终解码还须独立通过，预检不证明录像编码器工作。
+
+当前Chrome 157的原生录像与模拟viewport曾出现底部裁切；录制脚本使用原生内容区域，按实测窗口边框尺寸调整至1280×800，再断言页面实际innerWidth/innerHeight并保存几何信息。编码器预检的实际解码帧已确认底部完整，最终视频仍逐章抽帧检查。

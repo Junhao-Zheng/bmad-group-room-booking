@@ -13,7 +13,7 @@ const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
  const report={result:'INCOMPLETE',started_at_utc:new Date().toISOString(),scenes:[],mode:preflight?'preflight':'recording',synthetic_narration:true,operator:'AI automation',source_commit:data.source_commit};
  const write=()=>fs.writeFileSync(path.join(output,'recording.json'),JSON.stringify(report,null,2)+'\n');write();
  const browser=await chromium.launch({headless:true,executablePath:executable});
- const context=await browser.newContext({viewport:{width:1280,height:800},...(preflight?{}:{recordVideo:{dir:path.join(output,'raw-video'),size:{width:1280,height:800}}})});
+ const context=await browser.newContext({viewport:null,...(preflight?{}:{recordVideo:{dir:path.join(output,'raw-video'),size:{width:1280,height:800}}})});
  let page;
  async function login(username){
   const me=await context.request.get(appOrigin+'/api/me');
@@ -27,7 +27,16 @@ const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
  }
  try{
   await login('demo_member_a'); // Authentication happens before visible recording; no password in frames.
-  page=await context.newPage();const errors=[];page.on('pageerror',error=>errors.push(error.name));
+  page=await context.newPage();
+  // Size the native content area: current Chrome screencast can clip an emulated viewport.
+  const cdp=await context.newCDPSession(page);
+  const {windowId}=await cdp.send('Browser.getWindowForTarget');
+  const insets=await page.evaluate(()=>({width:outerWidth-innerWidth,height:outerHeight-innerHeight}));
+  await cdp.send('Browser.setWindowBounds',{windowId,bounds:{width:1280+insets.width,height:800+insets.height}});
+  await page.waitForFunction(()=>innerWidth===1280&&innerHeight===800);
+  report.viewport=await page.evaluate(()=>({width:innerWidth,height:innerHeight,outerWidth,outerHeight,devicePixelRatio}));
+  await cdp.detach();write();
+  const errors=[];page.on('pageerror',error=>errors.push(error.name));
   const start=performance.now();
   for(let i=0;i<12;i++){
    const scene=data.scenes[i];if(scene.username)await login(scene.username);
