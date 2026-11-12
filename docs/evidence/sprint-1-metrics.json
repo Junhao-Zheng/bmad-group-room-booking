@@ -1,0 +1,34 @@
+{
+  "recorded_at_utc": "2026-11-12T11:44:29.992715+00:00",
+  "accepted_code_commit": "b8069f377f17fdd83796ad06c4b6ce07091b891d",
+  "metrics": {
+    "initially_accepted_stories": 7,
+    "initial_implementation_calls": 17,
+    "post_done_unique_implementation_calls_completed": 3,
+    "post_done_root_implementation_passes": 2,
+    "initial_calls_plus_rework_calls_and_root_passes": 22,
+    "total_unique_implementation_calls_completed": 20,
+    "story_implementation_participations_completed": 26,
+    "story_root_pass_participations": 6,
+    "implementation_participations_per_story": 3.7142857142857144,
+    "first_review_pass_stories": 0,
+    "first_review_pass_rate": 0.0,
+    "initial_context_story_rule_pairs": 1,
+    "initial_distinct_context_rule_ids": [
+      13
+    ],
+    "initial_adr_story_conflict_pairs": 0,
+    "initial_distinct_adr_ids": [],
+    "post_done_rework_stories": [
+      "1-1-account-access",
+      "1-2-room-schedule",
+      "1-3-availability",
+      "2-3-personal-history"
+    ],
+    "post_done_rework_count": 4,
+    "unfinished_rework_ids": [],
+    "initial_review_contexts": 22,
+    "review_transport_failures": 5,
+    "implementation_transport_failures": 6
+  }
+}

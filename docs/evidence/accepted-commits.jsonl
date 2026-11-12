@@ -7,3 +7,5 @@
 {"recorded_at_utc": "2026-11-12T11:09:01.780327+00:00", "story": "1-1-account-access", "accepted_commit": "924dd095f2d948d1963e001392d89f636bc9f7e1", "kind": "post_done_rework_acceptance", "work_id": "epic-1-followup"}
 {"recorded_at_utc": "2026-11-12T11:09:01.780521+00:00", "story": "1-2-room-schedule", "accepted_commit": "924dd095f2d948d1963e001392d89f636bc9f7e1", "kind": "post_done_rework_acceptance", "work_id": "epic-1-followup"}
 {"recorded_at_utc": "2026-11-12T11:09:01.780528+00:00", "story": "1-3-availability", "accepted_commit": "924dd095f2d948d1963e001392d89f636bc9f7e1", "kind": "post_done_rework_acceptance", "work_id": "epic-1-followup"}
+{"recorded_at_utc": "2026-11-12T11:44:29.992715+00:00", "story": "2-4-member-cancel", "accepted_commit": "b8069f377f17fdd83796ad06c4b6ce07091b891d", "kind": "initial_acceptance"}
+{"recorded_at_utc": "2026-11-12T11:44:29.992715+00:00", "story": "2-3-personal-history", "accepted_commit": "b8069f377f17fdd83796ad06c4b6ce07091b891d", "kind": "post_done_rework_acceptance", "work_id": "history-runner-exit-race"}
