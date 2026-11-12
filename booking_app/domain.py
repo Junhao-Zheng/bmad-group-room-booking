@@ -68,7 +68,7 @@ def resource_id(value, field_name: str = "room_id") -> int:
     else:
         valid = False
     if not valid:
-        label = "预约" if field_name == "booking_id" else "会议室"
+        label = {"booking_id": "预约", "block_id": "停用"}.get(field_name, "会议室")
         raise DomainError("INVALID_INPUT", f"请检查{label}编号。",
                           {field_name: f"请选择有效的{label}。"})
     return int(value)
@@ -258,6 +258,15 @@ def validate_block_window(start_at: int, end_at: int, now: int) -> None:
         fields["end"] = "结束时间不能超过当前时刻起 30 天。"
     if fields:
         raise DomainError("INVALID_INPUT", "请检查停用起止时间。", fields)
+
+
+def normalize_revoke_payload(payload) -> str:
+    if not isinstance(payload, dict):
+        raise DomainError("INVALID_INPUT", "请求内容必须是一个对象。")
+    try:
+        return normalized_text(payload.get("reason"), "reason", 500)
+    except DomainError as error:
+        raise DomainError("INVALID_INPUT", "请检查撤销原因。", error.fields) from None
 
 
 def query_attendees(value) -> int:

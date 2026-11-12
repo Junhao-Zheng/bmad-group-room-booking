@@ -1,0 +1,95 @@
+{
+  "stage": "post-snapshot-quality-fixes",
+  "completed_at_utc": "2026-11-12T13:54:45.700791+00:00",
+  "fixed": [
+    "B1",
+    "B2",
+    "B4",
+    "B5",
+    "B6",
+    "B7",
+    "B8",
+    "B9",
+    "B10",
+    "V1"
+  ],
+  "unchanged_rejected_scope": [
+    "B3"
+  ],
+  "changes": [
+    "booking_app/static/blocks.js",
+    "booking_app/templates/admin.html",
+    "tests/test_blocks_js.cjs",
+    "tests/test_admin_cancel.py",
+    "tests/test_admin_cancel_browser_runner.py",
+    "scripts/verify_admin_cancel_http.py",
+    "scripts/verify_admin_cancel_browser.py",
+    "scripts/verify_admin_cancel_browser.cjs"
+  ],
+  "sha256": {
+    "booking_app/static/blocks.js": "af96c556f6e719bd6c7e2648b502fdd833e561668b20c03d26c4631fec3b0b9d",
+    "booking_app/templates/admin.html": "d1173147824d4a161a2c7f3669972f2d8d332dbf86a54fff3c9d04b24ae1d0bd",
+    "tests/test_blocks_js.cjs": "46c62141dfcc901d1b8f36f622e0322c636e1701ed1725c73a07abd7ed0314e8",
+    "tests/test_admin_cancel.py": "87723b758f2633f56600d030e68fefba6dad8767142205308e2bb5639341b77f",
+    "tests/test_admin_cancel_browser_runner.py": "768954c4d992cc2e167a2d9e4ec487da6043a8e96404570e369bcc4c279f2bb3",
+    "scripts/verify_admin_cancel_http.py": "fba09dabda3ee8ffb8fc8afed71ffee07545b0945c1318773392a650ee30e934",
+    "scripts/verify_admin_cancel_browser.py": "c4a378d59674e0501544147b0d2b93a044aed30184b96ed584c0264b35e12445",
+    "scripts/verify_admin_cancel_browser.cjs": "968b62bc6415a68f55e8e7a716b7e81fa326230f40fefdd7ea8708ffd91e53c0"
+  },
+  "targeted_checks": [
+    {
+      "command": "node --test tests/test_blocks_js.cjs",
+      "tests": 100,
+      "result": "PASS",
+      "skipped": 0,
+      "log": "blocks-js.log",
+      "includes": "actual handlers and removed-blocked-guard mutants for AUTH_REQUIRED/FORBIDDEN"
+    },
+    {
+      "command": ".venv/bin/python -m unittest tests.test_admin_cancel -v",
+      "tests": 13,
+      "result": "PASS",
+      "skipped": 0,
+      "log": "admin-cancel-python.log",
+      "includes": "real BEGIN IMMEDIATE contention at the end boundary and actual SQLite busy timeout mapping to 503"
+    },
+    {
+      "command": ".venv/bin/python -m unittest tests.test_admin_cancel_browser_runner -v",
+      "tests": 3,
+      "result": "PASS",
+      "skipped": 0,
+      "log": "browser-runner-python.log",
+      "includes": "nonzero driver, thrown timeout and storage assertion failure all retain changed before/after storage, safe diagnostics and replace old PASS with INCOMPLETE"
+    },
+    {
+      "command": ".venv/bin/python -m scripts.verify_admin_cancel_http --output-dir work/quality-review-fixes/http",
+      "result": "PASS",
+      "member_admin_rounds": 20,
+      "member_admin_http_200": 40,
+      "admin_admin_rounds": 1,
+      "admin_admin_http_200": 2,
+      "log": "http.log",
+      "result_file": "http/http-result.json",
+      "raw_run": "http/runs/caaf7d6c784cc97efe02a56630ea426b"
+    },
+    {
+      "command": ".venv/bin/python -m scripts.verify_admin_cancel_browser --output-dir work/quality-review-fixes/browser --port 8015 --browser-executable \"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\"",
+      "result": "PASS",
+      "viewports": [
+        "1280x800",
+        "390x844"
+      ],
+      "log": "browser.log",
+      "result_file": "browser/browser-results.json",
+      "raw_run": "browser/runs/52d7e554e46b2e3866e04e22694f8adc",
+      "includes": "real DOM aria-describedby and complete success summary after pending filtering; final panel screenshots visually inspected"
+    }
+  ],
+  "failure_evidence_directories": [
+    "browser-driver-vlvtgqbq",
+    "browser-storage-k0eecj8z",
+    "browser-timeout-ponwdr3m"
+  ],
+  "full_verification_rerun": false,
+  "scope": "Only X modified. Initial implementation evidence preserved. No Git operations, JSON contract changes or other experiment implementation."
+}

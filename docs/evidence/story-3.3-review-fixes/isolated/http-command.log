@@ -1,0 +1,18 @@
+ERROR:booking_app:request_id=03efaf44b72540639aa0cf7ddf2619df action=web.revoke_block_api error_type=RuntimeError
+ERROR:booking_app:request_id=21ddde00999446dca801445ef297abfb action=web.revoke_block_api error_type=RuntimeError
+{
+  "run_id": "38620960b6a0762b6f35d7a815bb0669",
+  "started_at_utc": "2026-11-12T14:01:36.784408+00:00",
+  "artifact_directory": "runs/38620960b6a0762b6f35d7a815bb0669",
+  "result": "PASS",
+  "completed": true,
+  "rounds": 20,
+  "independent_admin_sessions": 2,
+  "concurrent_http_200": 40,
+  "actual_race_transitions": 20,
+  "race_revoke_audits": 20,
+  "first_metadata_verified": true,
+  "rollback_before_and_after_audit_insert": true,
+  "restart_and_retry": true,
+  "finished_at_utc": "2026-11-12T14:01:38.901187+00:00"
+}

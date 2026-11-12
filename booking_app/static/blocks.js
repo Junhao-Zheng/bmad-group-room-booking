@@ -11,6 +11,10 @@
   const cancelForm = find("admin-cancel-form"), cancelReason = find("admin-cancel-reason"), cancelConfirm = find("admin-cancel-confirm");
   const cancelFeedback = find("admin-cancel-feedback");
   let cancelling = false, selectedBooking = null, cancelledMessage = "";
+  const revokeForm = find("revoke-form"), revokeReason = find("revoke-reason"), revokeConfirm = find("revoke-confirm");
+  const revokeSubmit = find("revoke-submit"), revokeFeedback = find("revoke-feedback");
+  let selectButtons = [];
+  let revokedMessage = "", revoking = false, selected = null;
   const lists = ["bookings", "blocks"].map(kind => ({kind, form:find(`admin-${kind}-form`),
     items:find(`admin-${kind}-items`), feedback:find(`admin-${kind}-feedback`), busy:false, revision:0}));
   const fields = list => ["room_id", "date", "status"].map(name => list.form.elements.namedItem(name));
@@ -59,20 +63,27 @@
     } finally { window.clearTimeout(timer); }
   }
   function controls() {
-    [...inputs,confirm,submit].forEach(node => { node.disabled = blocked || creating || cancelling || refreshing || lists.some(list => list.busy); });
-    refresh.disabled = blocked || creating || cancelling || refreshing || lists.some(list => list.busy);
+    const busy = creating || refreshing || revoking || cancelling || lists.some(list => list.busy);
+    [...inputs,confirm,submit].forEach(node => { node.disabled = blocked || busy; });
+    refresh.disabled = blocked || busy;
+    [...selectButtons,revokeReason,revokeConfirm,revokeSubmit].forEach(node => {
+      node.disabled = blocked || busy || ([revokeReason,revokeConfirm,revokeSubmit].includes(node) && (!selected || !["pending","in_progress"].includes(selected.status)));
+    });
+    if (revoking) revokeForm.setAttribute("aria-busy","true"); else revokeForm.removeAttribute("aria-busy");
     if (cancelForm) {
-      find("admin-cancel-fields").disabled = blocked || !selectedBooking || cancelling || creating || refreshing || lists.some(list => list.busy);
+      find("admin-cancel-fields").disabled = blocked || !selectedBooking || busy;
       if (cancelling) cancelForm.setAttribute("aria-busy","true"); else cancelForm.removeAttribute("aria-busy");
     }
     if (creating) form.setAttribute("aria-busy","true"); else form.removeAttribute("aria-busy");
     for (const list of lists) {
-      [...fields(list), find(`admin-${list.kind}-submit`), ...list.items.querySelectorAll("button")].forEach(node => { node.disabled = blocked || list.busy || refreshing || creating || cancelling; });
+      [...fields(list), find(`admin-${list.kind}-submit`), ...list.items.querySelectorAll("button")].forEach(node => { node.disabled = blocked || list.busy || refreshing || creating || cancelling || revoking; });
       if (list.busy) list.form.setAttribute("aria-busy","true"); else list.form.removeAttribute("aria-busy");
     }
   }
   function identityError(error, broadcast = true) {
-    if (["AUTH_REQUIRED","FORBIDDEN","CSRF_REJECTED"].includes(error.code)) relogin.hidden = false;
+    if (["AUTH_REQUIRED","FORBIDDEN","CSRF_REJECTED"].includes(error.code)) {
+      relogin.hidden = false; find("revoke-relogin").hidden = false;
+    }
     if (!["AUTH_REQUIRED","FORBIDDEN"].includes(error.code)) return false;
     const firstLoss = !blocked;
     blocked = true; conflicts.replaceChildren();
@@ -85,6 +96,9 @@
       say(cancelFeedback,`${cancelledMessage}${message} 原因已保留，不会自动提交。`,true);
     }
     for (const list of lists) { list.items.replaceChildren(); say(list.feedback,message,true); }
+    selected = null; selectButtons = []; revokeConfirm.checked = false;
+    find("revoke-summary").textContent = "";
+    say(revokeFeedback,`${revokedMessage}${message} 撤销原因已保留，不会自动提交。`,true);
     controls();
     if (broadcast && firstLoss) document.dispatchEvent(new CustomEvent("admin-auth-lost", {detail:{code:error.code}}));
     return true;
@@ -109,6 +123,7 @@
   }
   function render(list, records) {
     list.items.replaceChildren();
+    if (list.kind === "blocks") selectButtons = [];
     for (const row of records) {
       const booking = list.kind === "bookings", prefix = booking ? "cancelled" : "revoked";
       const item = document.createElement("li"), title = document.createElement("h3"), detail = document.createElement("dl");
@@ -128,7 +143,7 @@
         const button = document.createElement("button"); button.type = "button"; button.className = "button-secondary";
         button.textContent = `${row.status === "cancelled" ? "确认取消状态" : "管理员取消"} · 预约 ${row.id}`;
         button.addEventListener("click", () => {
-          if (blocked || cancelling || creating || refreshing || list.busy) return;
+          if (blocked || cancelling || revoking || creating || refreshing || list.busy) return;
           if (!Number.isSafeInteger(row.id)) { clearCancelTarget(); say(list.feedback,"当前浏览器无法安全提交此预约编号。",true); return; }
           selectedBooking = row;
           cancelReason.value = ""; cancelConfirm.checked = false; cancelledMessage = "";
@@ -140,12 +155,28 @@
         });
         item.append(button);
       }
+      if (!booking && ["pending","in_progress"].includes(row.status) && Number.isSafeInteger(row.id)) {
+        const button = document.createElement("button"); button.type = "button"; button.className = "button-secondary";
+        button.textContent = `选择撤销停用 ${row.id}`;
+        button.addEventListener("click", () => {
+          if (blocked || creating || refreshing || revoking || cancelling || lists.some(list => list.busy)) return;
+          if (selected?.id !== row.id) revokeReason.value = "";
+          selected = row; revokedMessage = ""; revokeConfirm.checked = false; revokeForm.hidden = false;
+          revokeReason.removeAttribute("aria-invalid"); find("revoke-reason-error").textContent = "";
+          find("revoke-panel").hidden = false; showSelected(); say(revokeFeedback,"");
+          controls(); find("revoke-title").focus();
+        });
+        item.append(button); selectButtons.push(button);
+      } else if (!booking && !Number.isSafeInteger(row.id)) {
+        const note = document.createElement("p"); note.textContent = "当前浏览器无法安全提交此编号，不能在此撤销该停用。"; item.append(note);
+      }
       list.items.append(item);
     }
   }
   async function load(list, automatic = false) {
     if (list.busy || blocked) return;
     if (list.kind === "bookings" && !automatic) clearCancelTarget();
+    if (list.kind === "blocks" && !automatic) clearSelected("正在重新查询，请从新结果选择停用；撤销原因草稿已保留。");
     const initiatedHere = list.form.contains(document.activeElement), params = new URLSearchParams(), revision = list.revision;
     let focusTarget = list.feedback;
     clearListErrors(list);
@@ -161,7 +192,7 @@
       const lostIdentity = failure.serverError && identityError(failure.serverError);
       if (!blocked && !lostIdentity && revision === list.revision) {
         const error = failure.serverError;
-        say(list.feedback,`${automatic ? (list.kind === "bookings" ? "取消已成功，但列表刷新失败。" : "停用已创建，但列表刷新失败。") : "管理记录查询失败。"} ${error ? error.message : "请稍后手动查询。"} 筛选条件已保留。`,true);
+        say(list.feedback,`${automatic ? `${typeof automatic === "string" ? automatic : (list.kind === "bookings" ? "取消已成功" : "停用已创建")}，但列表刷新失败。` : "管理记录查询失败。"} ${error ? error.message : "请稍后手动查询。"} 筛选条件已保留。`,true);
         for (const input of fields(list)) if (error?.fields[input.name]) {
           input.setAttribute("aria-invalid","true"); find(`admin-${list.kind}-${input.name}-error`).textContent = error.fields[input.name];
           if (focusTarget === list.feedback) focusTarget = input;
@@ -177,17 +208,23 @@
       input.removeAttribute("aria-invalid"); find(`admin-${list.kind}-${input.name}-error`).textContent = "";
     }
   }
+  function clearSelected(message) {
+    selected = null; revokedMessage = ""; revokeConfirm.checked = false;
+    find("revoke-summary").textContent = "";
+    say(revokeFeedback,message); controls();
+  }
   for (const list of lists) for (const input of fields(list)) for (const event of ["input","change"]) input.addEventListener(event, () => {
     if (blocked) return;
     list.revision++; list.items.replaceChildren(); clearListErrors(list);
     if (list.kind === "bookings") clearCancelTarget();
+    if (list.kind === "blocks") clearSelected("筛选条件已更改，请重新查询并选择停用；撤销原因草稿已保留。");
     say(list.feedback,"筛选条件已更改，请重新查询记录。");
   });
   for (const list of lists) list.form.addEventListener("submit",event => {
-    event.preventDefault(); if (!creating && !cancelling && !refreshing) return load(list);
+    event.preventDefault(); if (!creating && !cancelling && !revoking && !refreshing) return load(list);
   });
   form.addEventListener("submit", async event => {
-    event.preventDefault(); if (creating || cancelling || refreshing || blocked || lists.some(list => list.busy) || !confirm.checked) return;
+    event.preventDefault(); if (creating || cancelling || revoking || refreshing || blocked || lists.some(list => list.busy) || !confirm.checked) return;
     const values = {room_id:Number(inputs[0].value), start:inputs[1].value, end:inputs[2].value, reason:inputs[3].value};
     const initiatedHere = form.contains(document.activeElement); let focusTarget = feedback;
     for (const input of inputs) { input.removeAttribute("aria-invalid"); find(`block-${input.name}-error`).textContent = ""; }
@@ -228,7 +265,7 @@
     }
   });
   refresh.addEventListener("click", async () => {
-    if (blocked || refreshing || creating || cancelling || lists.some(list => list.busy)) return;
+    if (blocked || refreshing || creating || cancelling || revoking || lists.some(list => list.busy)) return;
     const initiatedHere = document.activeElement === refresh; refreshing = true; controls();
     const output = find("block-rooms-feedback"); say(output,"正在刷新会议室选项…");
     try {
@@ -253,7 +290,7 @@
     for (const event of ["input","change"]) cancelReason.addEventListener(event, () => { cancelConfirm.checked = false; });
     cancelForm.addEventListener("submit", async event => {
       event.preventDefault();
-      if (blocked || cancelling || creating || refreshing || lists.some(list => list.busy) || !selectedBooking || !cancelConfirm.checked) return;
+      if (blocked || cancelling || revoking || creating || refreshing || lists.some(list => list.busy) || !selectedBooking || !cancelConfirm.checked) return;
       const bookingId = selectedBooking.id, initiatedHere = cancelForm.contains(document.activeElement);
       let focusTarget = cancelFeedback;
       cancelledMessage = ""; cancelling = true; controls();
@@ -292,6 +329,53 @@
       }
     });
   }
+  function showSelected() {
+    const row = selected;
+    find("revoke-summary").textContent = `停用 ${row.id} · ${statuses[row.status]}\n会议室：${row.room.name} · ${row.room.location}\n北京时间：${formatted(row.start_local)} 至 ${formatted(row.end_local)}\n原停用原因：${row.reason}` +
+      (row.status === "revoked" ? `\n首次撤销：${formatted(row.revoked_local)}（北京时间） · ${row.revoked_by_id} · ${row.revoked_by_display_name}\n撤销原因：${row.revoke_reason}` : "");
+  }
+  for (const event of ["input","change"]) revokeReason.addEventListener(event, () => {
+    revokeConfirm.checked = false; revokeReason.removeAttribute("aria-invalid"); find("revoke-reason-error").textContent = "";
+  });
+  revokeForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    if (!selected || !["pending","in_progress"].includes(selected.status) || !revokeConfirm.checked || blocked || creating || refreshing || revoking || cancelling || lists.some(list => list.busy)) return;
+    const blockId = selected.id, initiatedHere = revokeForm.contains(document.activeElement);
+    let focusTarget = revokeFeedback;
+    revokeReason.removeAttribute("aria-invalid"); find("revoke-reason-error").textContent = "";
+    find("revoke-relogin").hidden = true; revoking = true; controls(); say(revokeFeedback,"正在撤销停用，请稍候…");
+    try {
+      const result = await request(`/api/admin/blocks/${blockId}/revoke`, {reason:revokeReason.value});
+      if (!recordShape(result,"blocks") || result.id !== blockId || result.status !== "revoked") throw new Error("Invalid revoked block");
+      revokedMessage = `停用 ${result.id} 已撤销，全部占用已释放。`;
+      if (blocked) {
+        say(revokeFeedback,`${revokedMessage}请重新登录查看首次撤销信息。撤销原因草稿已保留。`);
+        return;
+      }
+      selected = result; revokeConfirm.checked = false; revokeForm.hidden = true; showSelected();
+      say(revokeFeedback,`${revokedMessage}首次撤销信息已显示。`);
+      await load(lists[1],"停用已撤销");
+    } catch (failure) {
+      const error = failure.serverError;
+      if (error && identityError(error)) return;
+      if (!blocked) {
+        revokeConfirm.checked = false;
+        if (["TRANSITION_CLOSED","NOT_FOUND"].includes(error?.code)) {
+          clearSelected(`${error.message} 请重新查询并选择有效停用；撤销原因已保留。`);
+          say(revokeFeedback,revokeFeedback.textContent,true);
+          return;
+        }
+        say(revokeFeedback,error ? `${error.message} 撤销原因已保留，请核对后重新确认。` :
+          "未能确认撤销结果，撤销原因已保留。请查询记录核对；也可重新确认后重试，已撤销记录会返回首次结果。",true);
+        if (error?.fields.reason) {
+          revokeReason.setAttribute("aria-invalid","true"); find("revoke-reason-error").textContent = error.fields.reason; focusTarget = revokeReason;
+        }
+      }
+    } finally {
+      revoking = false; controls();
+      if (initiatedHere && focusAllowed(revokeForm)) focusTarget.focus();
+    }
+  });
   controls();
   find("block-script-unavailable").hidden = true;
   find("block-fields").disabled = false;

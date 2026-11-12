@@ -53,3 +53,8 @@
 {"timestamp": "2026-11-12T13:04:55.065936+00:00", "story": "3-3-revoke-block", "from": "ready-for-dev", "to": "in-progress", "actor": "AI root", "head": "39436f328eaf2b85d5bf72629e903db00ccc842b", "post_done_rework": false}
 {"timestamp": "2026-11-12T13:41:13.388358+00:00", "story": "2-5-admin-cancel", "from": "in-progress", "to": "review", "actor": "AI root", "head": "7b63ed9428334eaf91eaf941089a65c039990ebe", "post_done_rework": false}
 {"timestamp": "2026-11-12T13:41:13.429399+00:00", "story": "3-3-revoke-block", "from": "in-progress", "to": "review", "actor": "AI root", "head": "7b63ed9428334eaf91eaf941089a65c039990ebe", "post_done_rework": false}
+{"timestamp": "2026-11-12T14:08:02.171121+00:00", "story": "2-3-personal-history", "from": "done", "to": "in-progress", "actor": "AI root", "head": "3a33cfdf410837684fa32cd4f50d245ac81fb436", "post_done_rework": true}
+{"timestamp": "2026-11-12T14:13:23.439545+00:00", "story": "2-3-personal-history", "from": "in-progress", "to": "review", "actor": "AI root", "head": "3a33cfdf410837684fa32cd4f50d245ac81fb436", "post_done_rework": false}
+{"timestamp": "2026-11-12T14:13:23.608818+00:00", "story": "2-3-personal-history", "from": "review", "to": "done", "actor": "AI root", "head": "3a33cfdf410837684fa32cd4f50d245ac81fb436", "post_done_rework": false}
+{"timestamp": "2026-11-12T14:13:23.647688+00:00", "story": "2-5-admin-cancel", "from": "review", "to": "done", "actor": "AI root", "head": "3a33cfdf410837684fa32cd4f50d245ac81fb436", "post_done_rework": false}
+{"timestamp": "2026-11-12T14:13:23.688523+00:00", "story": "3-3-revoke-block", "from": "review", "to": "done", "actor": "AI root", "head": "3a33cfdf410837684fa32cd4f50d245ac81fb436", "post_done_rework": false}

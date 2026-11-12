@@ -61,3 +61,7 @@
 medium / patch：新增 test_admin_cancel_browser_runner 调用 main 的真实 environment_metadata，后者读取仓库 work/browser-tools/node_modules/playwright/package.json；driver 已被测试替身替换，故这三项应是Python/真实本地服务测试，却在按README只装应用依赖的干净检出中因缺Playwright元数据而提早失败。测试内提供明确的受控环境元数据，并用sys.executable作为不会真正启动的wrapper目标，不能改弱生产runner的真实环境核验。保留真实SQLite/Waitress、故障留证和秘密哨兵断言。此为首轮修补引入的测试可移植性问题，另一次修补调用，非done后返工。
 
 本次父流程在现有安装环境完整运行172项Python、241项JS通过，无skip；该成绩不宣称干净检出已过。最后统一集成后还要重新完整验证。
+
+## 最终技术接受
+
+全部接受修补经主仓库组合192 Python/282 JS及4套浏览器/2套HTTP检查，源哈希一致；[最终核验](../experiment-a-integration/parent-final-qa.json)。Y全量发现的既有2.3测试时限问题已单独返工闭环；无未处理阻塞项。

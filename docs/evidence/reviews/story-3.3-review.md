@@ -64,3 +64,7 @@
 |P5 终态拒绝仍保留过期目标供反复确认|medium|patch|TRANSITION_CLOSED/NOT_FOUND只清confirm，selected/status不变，提示重新确认但目标不可操作。清已有目标并提示重新查询，保留原因；可恢复错误仍可人工重试。|
 
 先逐条裁决后归并：B1/B2/E1为同一旧选择未失效；B4/P1为同一验证生命周期管理未复用。15条patch发现归并12项修补，1条false reject，0defer。
+
+## 最终技术接受
+
+全部接受修补经主仓库组合192 Python/282 JS及4套浏览器/2套HTTP检查，源哈希一致；[最终核验](../experiment-a-integration/parent-final-qa.json)。Y全量发现的既有2.3测试时限问题已单独返工闭环；无未处理阻塞项。

@@ -19,6 +19,8 @@ function harness({combined=false,transform=source=>source}={}){
       addEventListener(k,f){handlers[k]=f;},querySelectorAll(tag){return this.children.flatMap(c=>[...(c.tag===tag?[c]:[]),...c.querySelectorAll(tag)]);},contains(target){return this===target||this.children.some(c=>c.contains(target));},focus(){if(!disabled)active=this;}};
   }
   for(const id of ['block-fields','block-script-unavailable','block-form','block-submit','block-confirm','block-feedback','block-conflicts','block-relogin','block-summary','block-rooms-refresh','block-rooms-feedback','logout-form','room-name'])n[id]=node(id);
+  for(const name of ['form','panel','title','reason','reason-error','confirm','submit','feedback','summary','relogin'])n['revoke-'+name]=node('revoke-'+name);
+  n['revoke-form'].append(n['revoke-reason'],n['revoke-confirm'],n['revoke-submit']);
   const inputs=['room_id','start','end','reason'].map((name,i)=>{const item=n['block-'+name]=node('block-'+name);item.name=name;item.value=['30','2026-11-13T10:00','2026-11-14T16:00',block.reason][i];n['block-'+name+'-error']=node();return item;});
   n['block-form'].append(...inputs,n['block-submit'],n['block-confirm']);n['block-form'].elements={namedItem:name=>n['block-'+name]};
   for(const kind of ['bookings','blocks']){
@@ -310,3 +312,135 @@ for(const code of ['AUTH_REQUIRED','FORBIDDEN']){
     await assert.rejects(lateCancellationOracle(code,source=>{assert.ok(source.includes(guard));return source.replace(guard,'');}),assert.AssertionError);
   });
 }
+
+const revoked={...block,status:'revoked',revoked_at:1794448800,revoked_local:'2026-11-12T10:00:00+08:00',revoked_by_id:4,revoked_by_display_name:'首次管理员 <svg>',revoke_reason:'首次撤销 <script>纯文本</script>'};
+async function selectRevoke(ui){await ui.load();ui.n['admin-blocks-items'].querySelectorAll('button')[0].handlers.click();ui.n['revoke-reason'].value=' 修复完成 <img> ';}
+function submitRevoke(ui,confirm=true){ui.n['revoke-confirm'].checked=confirm;ui.n['revoke-submit'].focus();return ui.n['revoke-form'].handlers.submit({preventDefault(){}});}
+function revokeRestored(ui){restored(ui);assert.equal(ui.n['revoke-form'].getAttribute('aria-busy'),undefined);assert.equal(ui.n['revoke-reason'].value,' 修复完成 <img> ');}
+test('revocation is offered only for pending/ongoing safe block IDs, never bookings',async()=>{
+  const ui=harness();ui.setFetch(async()=>ok({items:fixtures('blocks'),total:4}));await ui.load();
+  assert.deepEqual(ui.n['admin-blocks-items'].querySelectorAll('button').map(n=>n.textContent),['选择撤销停用 200','选择撤销停用 201']);
+  ui.setFetch(async()=>ok({items:fixtures('bookings'),total:4}));await ui.load('bookings');assert.equal(ui.n['admin-bookings-items'].querySelectorAll('button').filter(button=>button.textContent.includes('撤销停用')).length,0);
+  ui.setFetch(async()=>ok({items:[{...block,id:Number('9007199254740993')}],total:1}));await ui.load();assert.equal(ui.n['admin-blocks-items'].querySelectorAll('button').length,0);assert.match(ui.n['admin-blocks-items'].textContent,/当前浏览器无法安全提交此编号/);
+});
+test('selected original facts and successful first revocation metadata render as text',async()=>{
+  const ui=harness();await selectRevoke(ui);assert.match(ui.n['revoke-summary'].textContent,/<script>纯文本/);assert.equal(ui.active,ui.n['revoke-title']);
+  await submitRevoke(ui,false);assert.equal(ui.fetches.length,1);
+  ui.setFetch(async(_url,options)=>ok(options.method?revoked:{items:[revoked],total:1}));await submitRevoke(ui);revokeRestored(ui);
+  const post=ui.fetches.find(r=>r.options.method);assert.equal(post.url,'/api/admin/blocks/120/revoke');assert.deepEqual(JSON.parse(post.options.body),{reason:' 修复完成 <img> '});
+  assert.equal(post.options.headers['X-CSRF-Token'],'synthetic');assert.match(ui.n['revoke-feedback'].textContent,/已撤销.*全部占用已释放/);
+  assert.match(ui.n['revoke-summary'].textContent,/首次管理员 <svg>.*\n撤销原因：首次撤销 <script>/);
+  assert.equal(ui.n['revoke-form'].hidden,true);assert.equal(ui.n['admin-blocks-items'].querySelectorAll('button').length,0);
+  await submitRevoke(ui);assert.equal(ui.fetches.length,3);
+});
+for(const event of ['input','change'])test(`revoke reason ${event} requires fresh confirmation`,async()=>{
+  const ui=harness();await selectRevoke(ui);ui.n['revoke-confirm'].checked=true;ui.n['revoke-reason'].handlers[event]();
+  assert.equal(ui.n['revoke-confirm'].checked,false);await ui.n['revoke-form'].handlers.submit({preventDefault(){}});assert.equal(ui.fetches.length,1);
+});
+test('waiting revocation disables competing controls and blocks double submission',async()=>{
+  const ui=harness();await selectRevoke(ui);let release;ui.setFetch(()=>new Promise(r=>{release=r;}));const pending=submitRevoke(ui);
+  assert.equal(ui.n['revoke-form'].getAttribute('aria-busy'),'true');assert.match(ui.n['revoke-feedback'].textContent,/正在撤销/);
+  for(const id of ['revoke-reason','revoke-submit','block-submit','admin-blocks-submit'])assert.equal(ui.n[id].disabled,true);
+  await submitRevoke(ui);await ui.submit();await ui.load();await ui.refresh();assert.equal(ui.fetches.length,2);
+  ui.n['room-name'].focus();release(fail('STORE_BUSY'));await pending;revokeRestored(ui);assert.equal(ui.active,ui.n['room-name']);
+});
+for(const code of ['INVALID_INPUT','STORE_BUSY','INTERNAL_ERROR','CSRF_REJECTED'])test(`revoke ${code} preserves reason and requires reconfirmation`,async()=>{
+  const ui=harness();await selectRevoke(ui);ui.setFetch(async()=>fail(code,code==='INVALID_INPUT'?{reason:'原因无效'}:{}));await submitRevoke(ui);revokeRestored(ui);
+  assert.match(ui.n['revoke-feedback'].textContent,/撤销原因已保留/);assert.equal(ui.n['revoke-confirm'].checked,false);assert.equal(ui.n['revoke-submit'].disabled,false);
+  if(code==='INVALID_INPUT'){assert.equal(ui.active,ui.n['revoke-reason']);assert.equal(ui.n['revoke-reason'].getAttribute('aria-invalid'),'true');}
+  if(code==='CSRF_REJECTED')assert.equal(ui.n['revoke-relogin'].hidden,false);
+});
+for(const failure of ['network','bad-json','wrong-id','not-revoked','missing-field'])test(`uncertain revoke ${failure} preserves input without auto retry`,async()=>{
+  const ui=harness();await selectRevoke(ui);ui.setFetch(async()=>{
+    if(failure==='network')throw Error();if(failure==='bad-json')return {ok:true,json:async()=>{throw Error();}};
+    if(failure==='wrong-id')return ok({...revoked,id:121});if(failure==='not-revoked')return ok(block);
+    const row={...revoked};delete row.revoke_reason;return ok(row);
+  });await submitRevoke(ui);revokeRestored(ui);assert.match(ui.n['revoke-feedback'].textContent,/未能确认.*重新确认后重试/);assert.equal(ui.fetches.length,2);
+  await ui.n['revoke-form'].handlers.submit({preventDefault(){}});assert.equal(ui.fetches.length,2);
+});
+for(const phase of ['headers','body'])test(`revoke timeout during ${phase} preserves reason and restores controls`,async()=>{
+  const ui=harness();await selectRevoke(ui);ui.setFetch(async(_url,{signal})=>{const stall=()=>new Promise((_r,reject)=>signal.addEventListener('abort',()=>reject(Error())));return phase==='headers'?stall():{ok:true,json:stall};});
+  const pending=submitRevoke(ui);await tick();[...ui.timers.values()][0].fn();await pending;revokeRestored(ui);assert.match(ui.n['revoke-feedback'].textContent,/未能确认/);
+});
+for(const code of ['AUTH_REQUIRED','FORBIDDEN'])test(`revoke ${code} blocks all admin controls and preserves reason`,async()=>{
+  const ui=harness({combined:true});await selectRevoke(ui);ui.setFetch(async()=>fail(code));await submitRevoke(ui);
+  assert.equal(ui.n['revoke-reason'].value,' 修复完成 <img> ');assert.equal(ui.n['revoke-submit'].disabled,true);assert.equal(ui.n['room-submit'].disabled,true);
+  assert.equal(ui.n['revoke-relogin'].hidden,false);assert.equal(ui.n['admin-blocks-items'].children.length,0);await submitRevoke(ui);assert.equal(ui.fetches.length,2);
+});
+for(const code of ['STORE_BUSY','AUTH_REQUIRED'])test(`successful revoke stays explicit when automatic refresh gets ${code}`,async()=>{
+  const ui=harness();await selectRevoke(ui);ui.setFetch(async(_url,options)=>options.method?ok(revoked):fail(code));await submitRevoke(ui);
+  assert.match(ui.n['revoke-feedback'].textContent,/停用 120 已撤销/);assert.equal(ui.n['revoke-reason'].value,' 修复完成 <img> ');
+  if(code==='STORE_BUSY')assert.match(ui.n['admin-blocks-feedback'].textContent,/停用已撤销.*列表刷新失败/);
+});
+for(const code of ['AUTH_REQUIRED','FORBIDDEN'])test(`late revoke success remains known after room panel detects ${code}`,async()=>{
+  const ui=harness({combined:true});await selectRevoke(ui);let release;ui.setFetch(async url=>url.endsWith('/revoke')?new Promise(r=>{release=r;}):fail(code));
+  const pending=submitRevoke(ui);await ui.roomSubmit();release(ok(revoked));await pending;
+  assert.equal(ui.n['revoke-submit'].disabled,true);assert.equal(ui.n['admin-blocks-items'].children.length,0);assert.equal(ui.n['revoke-summary'].textContent,'');assert.equal(ui.n['revoke-confirm'].checked,false);assert.equal(ui.n['room-submit'].disabled,true);assert.equal(ui.n['revoke-reason'].value,' 修复完成 <img> ');assert.match(ui.n['revoke-feedback'].textContent,/停用 120 已撤销.*重新登录查看/);
+});
+
+for(const code of ['TRANSITION_CLOSED','NOT_FOUND'])test(`revoke ${code} invalidates target and requests a new query`,async()=>{
+  const ui=harness();await selectRevoke(ui);ui.setFetch(async()=>fail(code));await submitRevoke(ui);revokeRestored(ui);
+  assert.equal(ui.n['revoke-summary'].textContent,'');assert.equal(ui.n['revoke-confirm'].checked,false);assert.equal(ui.n['revoke-submit'].disabled,true);assert.match(ui.n['revoke-feedback'].textContent,/重新查询/);
+  await submitRevoke(ui);assert.equal(ui.fetches.length,2);
+});
+for(const field of ['room_id','date','status'])for(const event of ['input','change'])test(`block filter ${field} ${event} invalidates selected target before a new query`,async()=>{
+  const ui=harness();await selectRevoke(ui);ui.n['revoke-confirm'].checked=true;
+  ui.n[`admin-blocks-${field}`].handlers[event]();
+  assert.equal(ui.n['revoke-confirm'].checked,false);assert.equal(ui.n['revoke-summary'].textContent,'');assert.equal(ui.n['revoke-reason'].value,' 修复完成 <img> ');assert.equal(ui.n['revoke-submit'].disabled,true);
+  await submitRevoke(ui);assert.equal(ui.fetches.length,1);
+});
+for(const status of ['ended','revoked'])test(`manual refresh clears target before returning fresh ${status} record`,async()=>{
+  const ui=harness();await selectRevoke(ui);ui.n['revoke-confirm'].checked=true;let release;ui.setFetch(()=>new Promise(resolve=>{release=resolve;}));
+  const pending=ui.load();assert.equal(ui.n['revoke-confirm'].checked,false);assert.equal(ui.n['revoke-summary'].textContent,'');await submitRevoke(ui);assert.equal(ui.fetches.length,2);
+  release(ok({items:[status==='revoked'?revoked:{...block,status}],total:1}));await pending;
+  assert.equal(ui.n['revoke-submit'].disabled,true);assert.equal(ui.n['revoke-reason'].value,' 修复完成 <img> ');assert.equal(ui.n['admin-blocks-items'].querySelectorAll('button').length,0);
+  await submitRevoke(ui);assert.equal(ui.fetches.length,2);
+});
+test('late list response after a filter edit cannot restore selection or protected summary',async()=>{
+  const ui=harness();await selectRevoke(ui);let release;ui.setFetch(()=>new Promise(resolve=>{release=resolve;}));const pending=ui.load();
+  ui.n['admin-blocks-status'].handlers.change();release(ok({items:[block],total:1}));await pending;
+  assert.equal(ui.n['admin-blocks-items'].children.length,0);assert.equal(ui.n['revoke-summary'].textContent,'');await submitRevoke(ui);assert.equal(ui.fetches.length,2);
+});
+test('submit guard rejects a selected record that is now ended',async()=>{
+  const current={...block},ui=harness();ui.setFetch(async()=>ok({items:[current],total:1}));await selectRevoke(ui);current.status='ended';await submitRevoke(ui);assert.equal(ui.fetches.length,1);
+});
+function assertSelectedInterval(ui,row){
+  const text=ui.n['revoke-summary'].textContent;
+  assert.equal(text.split('\n')[2],`北京时间：${row.start_local.replace('T',' ').slice(0,19)} 至 ${row.end_local.replace('T',' ').slice(0,19)}`);
+  assert.equal(text.split('\n')[3],`原停用原因：${row.reason}`);
+}
+test('selection summary binds exact distinct start and end for two different records',async()=>{
+  const rows=fixtures('blocks').slice(0,2),ui=harness();ui.setFetch(async()=>ok({items:rows,total:2}));await ui.load();
+  for(const [i,row] of rows.entries()){ui.n['admin-blocks-items'].querySelectorAll('button')[i].handlers.click();assertSelectedInterval(ui,row);}
+});
+test('summary interval oracle rejects end accidentally bound to start',async()=>{
+  const ui=harness({transform:source=>source.replace('formatted(row.end_local)}\\n原停用原因','formatted(row.start_local)}\\n原停用原因')});await selectRevoke(ui);
+  assert.throws(()=>assertSelectedInterval(ui,block),assert.AssertionError);
+});
+
+async function bothAdminTargets(){
+  const ui=harness({combined:true});
+  ui.setFetch(async url=>ok({items:[url.includes('/bookings')?adminBooking():block],total:1}));
+  await ui.load('bookings');ui.choose();ui.n['admin-cancel-reason'].value='取消草稿';
+  await selectRevoke(ui);return ui;
+}
+for(const first of ['cancel','revoke'])test(`integrated ${first} pending excludes the other admin transition and restores both drafts`,async()=>{
+  const ui=await bothAdminTargets();let release;ui.setFetch(()=>new Promise(resolve=>{release=resolve;}));
+  const pending=first==='cancel'?ui.cancel():submitRevoke(ui);
+  assert.equal(ui.n['admin-cancel-fields'].disabled,true);assert.equal(ui.n['revoke-submit'].disabled,true);
+  if(first==='cancel')await submitRevoke(ui);else await ui.cancel();
+  assert.equal(ui.fetches.filter(c=>c.options.method==='POST').length,1);
+  release(fail('STORE_BUSY'));await pending;
+  assert.equal(ui.n['admin-cancel-fields'].disabled,false);assert.equal(ui.n['revoke-submit'].disabled,false);
+  assert.equal(ui.n['admin-cancel-reason'].value,'取消草稿');assert.equal(ui.n['revoke-reason'].value,' 修复完成 <img> ');
+  assert.equal(ui.timers.size,0);
+});
+for(const first of ['cancel','revoke'])test(`integrated ${first} identity refusal clears both protected panels and prevents both writes`,async()=>{
+  const ui=await bothAdminTargets();ui.setFetch(async()=>fail('AUTH_REQUIRED'));
+  if(first==='cancel')await ui.cancel();else await submitRevoke(ui);
+  assert.equal(ui.n['admin-cancel-summary'].textContent,'');assert.equal(ui.n['revoke-summary'].textContent,'');
+  assert.equal(ui.n['admin-cancel-fields'].disabled,true);assert.equal(ui.n['revoke-submit'].disabled,true);
+  assert.equal(ui.n['room-submit'].disabled,true);assert.equal(ui.n['block-submit'].disabled,true);
+  await ui.cancel();await submitRevoke(ui);assert.equal(ui.fetches.filter(c=>c.options.method==='POST').length,1);
+  assert.equal(ui.n['admin-cancel-reason'].value,'取消草稿');assert.equal(ui.n['revoke-reason'].value,' 修复完成 <img> ');
+});

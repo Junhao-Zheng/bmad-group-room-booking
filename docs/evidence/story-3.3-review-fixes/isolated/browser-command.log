@@ -1,0 +1,62 @@
+{
+  "run_id": "d5794912e8ad0d6e94b89c5623528a31",
+  "started_at_utc": "2026-11-12T14:01:36.788398+00:00",
+  "artifact_directory": "runs/d5794912e8ad0d6e94b89c5623528a31",
+  "environment": {
+    "platform": "macOS-26.6-arm64-arm-64bit",
+    "supported_runtime": "macOS/Linux POSIX process groups; Playwright 1.58.2",
+    "python": "3.12.14 (main, Aug 25 2026, 13:50:33) [Clang 22.1.3 ]",
+    "sqlite": "3.53.1",
+    "packages": {
+      "Flask": "3.1.3",
+      "Jinja2": "3.1.6",
+      "Werkzeug": "3.1.9",
+      "waitress": "3.0.2"
+    },
+    "playwright": "1.58.2"
+  },
+  "result": "PASS",
+  "browser_version": "157.0.8103.51",
+  "viewports": [
+    {
+      "width": 1280,
+      "height": 800,
+      "exact_selected_intervals": true,
+      "refresh_and_filter_invalidate": true,
+      "validation": true,
+      "confirmation": true,
+      "csrf": true,
+      "waiting": true,
+      "success": true,
+      "unknown_then_idempotent_retry": true,
+      "expired_session": true,
+      "safe_text": true,
+      "no_horizontal_overflow": true,
+      "page_errors": []
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "exact_selected_intervals": true,
+      "refresh_and_filter_invalidate": true,
+      "validation": true,
+      "confirmation": true,
+      "csrf": true,
+      "waiting": true,
+      "success": true,
+      "unknown_then_idempotent_retry": true,
+      "expired_session": true,
+      "safe_text": true,
+      "no_horizontal_overflow": true,
+      "page_errors": []
+    }
+  ],
+  "storage_verified": true,
+  "revocations": 4,
+  "revoke_audits": 4,
+  "other_records_preserved": true,
+  "full_target_rows_and_ids_verified": true,
+  "rooms_and_old_audits_preserved": true,
+  "completed": true,
+  "finished_at_utc": "2026-11-12T14:01:43.097261+00:00"
+}

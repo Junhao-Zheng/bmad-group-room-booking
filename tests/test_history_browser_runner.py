@@ -88,7 +88,8 @@ class HistoryBrowserRunnerTests(unittest.TestCase):
                             ('time.sleep(30)\n' if timeout else 'raise SystemExit(17)\n'))
                         if timeout:
                             with self.assertRaises(subprocess.TimeoutExpired):
-                                runner.run_driver([sys.executable, '-c', driver], dict(os.environ), registry, timeout=1)
+                                # Include startup of the driver, wrapper and synthetic browser before the timeout probe.
+                                runner.run_driver([sys.executable, '-c', driver], dict(os.environ), registry, timeout=5)
                         else:
                             result = runner.run_driver([sys.executable, '-c', driver], dict(os.environ), registry, timeout=3)
                             self.assertEqual(result.returncode, 17)

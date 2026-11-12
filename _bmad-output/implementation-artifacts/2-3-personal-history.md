@@ -100,3 +100,7 @@ context:
 ## 本轮接受结果
 
 121项唯一Python测试、86项JS及真实HTTP/双视口浏览器通过。Story2.4的16项评审已关闭，0defer；2.3验证器清理返工已闭环，单独保留完成后返工事件。最终[证据](../../docs/evidence/story-2.4-review-fixes/parent-final-qa.json)。AI技术接受，不是人类或教师验收。
+
+## 后续测试启动预算校正
+
+一次真实全量检查暴露既有1秒启动预算不足；仅校正测试预算并经7项定向、192项Python/282项JS复核。计入done后返工，非产品行为改动。[证据](../../docs/evidence/history-timeout-fixture-fix/verification.md)。

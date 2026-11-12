@@ -1,0 +1,61 @@
+{
+  "run_id": "dabc487e453c868a2872ed7b5ba50098",
+  "os": "macOS-26.6-arm64-arm-64bit",
+  "machine": "arm64",
+  "cpu": "Apple M1 Pro",
+  "logical_cpus": 8,
+  "memory_bytes": "34359738368",
+  "python": "3.12.14 (main, Aug 25 2026, 13:50:33) [Clang 22.1.3 ]",
+  "sqlite": "3.53.1",
+  "dependencies": {
+    "Flask": "3.1.3",
+    "Jinja2": "3.1.6",
+    "Werkzeug": "3.1.9",
+    "waitress": "3.0.2"
+  },
+  "server_processes": 1,
+  "server_threads": 8,
+  "origin": "http://127.0.0.1:60565",
+  "invocation": [
+    ".venv/bin/python",
+    "-m",
+    "scripts.verify_block_revoke_browser"
+  ],
+  "server_start": [
+    "/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/.venv/bin/python",
+    "-m",
+    "waitress",
+    "--listen=127.0.0.1:60565",
+    "--threads=8",
+    "--call",
+    "scripts.verify_auth_browser:create_schedule_verification_app"
+  ],
+  "fixed_clock_injection": "TESTING=True only, no HTTP clock endpoint",
+  "database": "isolated temporary local file; WAL/FULL/foreign_keys; removed after run",
+  "fixed_now": 1794448800,
+  "viewports": [
+    {
+      "width": 1280,
+      "height": 800
+    },
+    {
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "browser": {
+    "platform": "macOS-26.6-arm64-arm-64bit",
+    "supported_runtime": "macOS/Linux POSIX process groups; Playwright 1.58.2",
+    "python": "3.12.14 (main, Aug 25 2026, 13:50:33) [Clang 22.1.3 ]",
+    "sqlite": "3.53.1",
+    "packages": {
+      "Flask": "3.1.3",
+      "Jinja2": "3.1.6",
+      "Werkzeug": "3.1.9",
+      "waitress": "3.0.2"
+    },
+    "playwright": "1.58.2"
+  },
+  "browser_executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "node": "v26.8.1"
+}

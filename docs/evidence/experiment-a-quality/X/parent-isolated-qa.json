@@ -1,0 +1,18 @@
+{
+  "checked_at_utc": "2026-11-12T14:00:28.595927+00:00",
+  "group": "X",
+  "isolated_runtime_checks": "PASS",
+  "parent_python_full": 172,
+  "parent_javascript_full": 241,
+  "skipped": 0,
+  "ordering": "父流程全量172/241在测试可移植性修补前跑；随后只改runner测试，3项定向复跑通过。主仓库合并后另做全量；不声称单元全量已经覆盖新组合。",
+  "actual_http_run": "caaf7d6c784cc97efe02a56630ea426b",
+  "actual_browser_run": "52d7e554e46b2e3866e04e22694f8adc",
+  "parent_recomputed_source_hashes": {
+    "http": 31,
+    "browser": 29
+  },
+  "visual_check": "父流程已目视390px最终取消面板：完整会议室/预约区间/取消时刻/人/原因可读；长文本纯文本换行，无水平溢出。",
+  "source_archive_sha256": "eb3b1458f5a64227d89c971aea96d6d9e45a9ce8835d2b3e651aa2b7de006fac",
+  "quality_initial_report_note": "work/quality-review-fixes/report.json对应第一次修补，tests/test_admin_cancel_browser_runner.py后来在P1再次修改；最终文件哈希见质量归档manifest，不覆盖第一次报告。"
+}

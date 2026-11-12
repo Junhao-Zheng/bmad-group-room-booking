@@ -1,0 +1,11 @@
+test_driver_exception_preserves_mutated_storage_without_private_output (tests.test_admin_cancel_browser_runner.AdminCancelBrowserFailureTests.test_driver_exception_preserves_mutated_storage_without_private_output) ... ok
+test_driver_nonzero_preserves_mutated_storage_without_private_output (tests.test_admin_cancel_browser_runner.AdminCancelBrowserFailureTests.test_driver_nonzero_preserves_mutated_storage_without_private_output) ... ok
+test_storage_assertion_failure_preserves_before_after_and_invalidates_old_pass (tests.test_admin_cancel_browser_runner.AdminCancelBrowserFailureTests.test_storage_assertion_failure_preserves_before_after_and_invalidates_old_pass) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 1.856s
+
+OK
+timeout safe failure evidence: work/quality-review-fixes/browser-timeout-jwq80xde
+driver safe failure evidence: work/quality-review-fixes/browser-driver-gftjcm85
+storage safe failure evidence: work/quality-review-fixes/browser-storage-hyhrylu2

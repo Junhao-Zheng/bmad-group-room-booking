@@ -1,0 +1,114 @@
+{
+  "group": "Y",
+  "integrated_at_utc": "2026-11-12T14:04:02.691786+00:00",
+  "baseline": "b0ce58a9b66144db5a4b15f61376132fa3f210e4",
+  "main_head_before": "3a33cfdf410837684fa32cd4f50d245ac81fb436",
+  "changes": [
+    {
+      "path": "booking_app/domain.py",
+      "base_sha256": "cd8a229bdec6ebe3ba5643223e7e13fe24c1beaa813fbb8bf1cd9dffae57b625",
+      "main_before_sha256": "cd8a229bdec6ebe3ba5643223e7e13fe24c1beaa813fbb8bf1cd9dffae57b625",
+      "group_sha256": "eedac62158fc42d68ee5b5f2d11d7546d3bddf33078c493e791d906f5afa4b1e",
+      "result": "copy"
+    },
+    {
+      "path": "booking_app/services.py",
+      "base_sha256": "9f6e09552d4d5777cb549f4aa348e47d07bef5fa18a94a618551cd489257983a",
+      "main_before_sha256": "01b2ed51fd7a0f29af46ed87b482a558dbefcae1db4b88abb2581e5d8fe3271a",
+      "group_sha256": "2b396c5d4d32d452aa2ba5eb2f8872f23bb90a5e5af4de3ce2d84e554107c3fa",
+      "result": "CONFLICT",
+      "conflict_file": "/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-merge-Y-5rfjc10_/booking_app/services.py/conflict"
+    },
+    {
+      "path": "booking_app/static/app.css",
+      "base_sha256": "2d061c5860e0a6e38e2237429b33b79413c9445f30df59dac73f6404c7eac131",
+      "main_before_sha256": "65c79e47f99c84ddfcabaa5e6dab9ac7fe9a9c0db97cb55918fe65a5f4d6ecd2",
+      "group_sha256": "a998fdc55d260de94c9e85d55cd101a79548fafac73b5408b64b57d140f973c5",
+      "result": "CONFLICT",
+      "conflict_file": "/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-merge-Y-5rfjc10_/booking_app/static/app.css/conflict"
+    },
+    {
+      "path": "booking_app/static/blocks.js",
+      "base_sha256": "512f420eb1af849c48fb05063d0f7941a9925c406637759f7c56029fcca5b369",
+      "main_before_sha256": "af96c556f6e719bd6c7e2648b502fdd833e561668b20c03d26c4631fec3b0b9d",
+      "group_sha256": "4f5b4bc05502cf029d4bba3e610d57801ffcbcceaa091dbad69a141e047528eb",
+      "result": "CONFLICT",
+      "conflict_file": "/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-merge-Y-5rfjc10_/booking_app/static/blocks.js/conflict"
+    },
+    {
+      "path": "booking_app/templates/admin.html",
+      "base_sha256": "7e0df499196c4bfdf2d0f26607a2acc8926f759f46f7e16db78ac12d459dc542",
+      "main_before_sha256": "d1173147824d4a161a2c7f3669972f2d8d332dbf86a54fff3c9d04b24ae1d0bd",
+      "group_sha256": "d0de7e7f1a91bb5d783a82bfd2302d1e68eb81ac665001469f1c3e109ebf28aa",
+      "result": "CONFLICT",
+      "conflict_file": "/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-merge-Y-5rfjc10_/booking_app/templates/admin.html/conflict"
+    },
+    {
+      "path": "booking_app/web.py",
+      "base_sha256": "877940376cd1d26a6d4d7ba9ac06ccd41a2e7747e2d4bc96db87fc7ebc86ba94",
+      "main_before_sha256": "ac532f17a7b1342ad06ae9931e3b123089ff37c038ce32dc0f1f48ec27861d75",
+      "group_sha256": "12580b50fd67dc091f1625409e984cc272a6e60dd139c0557981c631dd11b1e2",
+      "result": "CONFLICT",
+      "conflict_file": "/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-merge-Y-5rfjc10_/booking_app/web.py/conflict"
+    },
+    {
+      "path": "scripts/verify_block_revoke_browser.cjs",
+      "base_sha256": null,
+      "main_before_sha256": null,
+      "group_sha256": "22c1e138aa41b28b201f4e05d76b775dcbd701698dc890ea9ea6f5aebad9ffcd",
+      "result": "copy"
+    },
+    {
+      "path": "scripts/verify_block_revoke_browser.py",
+      "base_sha256": null,
+      "main_before_sha256": null,
+      "group_sha256": "1ee1abefdc98bdd4118b7602c71a8e6edfec06a5087afa7c3f7eb40423e80f5a",
+      "result": "copy"
+    },
+    {
+      "path": "scripts/verify_block_revoke_http.py",
+      "base_sha256": null,
+      "main_before_sha256": null,
+      "group_sha256": "fe90940d861adaee0df61c83ce988de1f283d9508fc57bf0c36ec405e30af14a",
+      "result": "copy"
+    },
+    {
+      "path": "tests/test_block_revoke.py",
+      "base_sha256": null,
+      "main_before_sha256": null,
+      "group_sha256": "9a156c6785bc80208b299bb6c6ac2d2f07b02cf6c2371b0dafeeccb25e78c3b4",
+      "result": "copy"
+    },
+    {
+      "path": "tests/test_block_revoke_browser_runner_js.cjs",
+      "base_sha256": null,
+      "main_before_sha256": null,
+      "group_sha256": "355241ec2d7dee98c4e8b8fd272849231247f65ddba8d514cc627b71d5e7230b",
+      "result": "copy"
+    },
+    {
+      "path": "tests/test_block_revoke_runner.py",
+      "base_sha256": null,
+      "main_before_sha256": null,
+      "group_sha256": "729bfde025271d9c7281db67148e9ef7ff88a39131886f81958eacbe27291786",
+      "result": "copy"
+    },
+    {
+      "path": "tests/test_blocks_js.cjs",
+      "base_sha256": "6cd62f18b3d19fb6ed21bdc4cd72b0f4b9a952a217086aba31d2d7738d205ed3",
+      "main_before_sha256": "46c62141dfcc901d1b8f36f622e0322c636e1701ed1725c73a07abd7ed0314e8",
+      "group_sha256": "14cfc4b137ee091a7936ae668dd679eeeef6f1a762c84f27e072e2827de6cecf",
+      "result": "CONFLICT",
+      "conflict_file": "/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-merge-Y-5rfjc10_/tests/test_blocks_js.cjs/conflict"
+    }
+  ],
+  "conflicts": [
+    "booking_app/services.py",
+    "booking_app/static/app.css",
+    "booking_app/static/blocks.js",
+    "booking_app/templates/admin.html",
+    "booking_app/web.py",
+    "tests/test_blocks_js.cjs"
+  ],
+  "note": "仅运行代码/验证脚本/测试；冲突源文件未被覆盖，必须人工（主代理）逐项整合并记录，三方原文保留。"
+}

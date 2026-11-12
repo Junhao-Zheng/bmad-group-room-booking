@@ -1,0 +1,1418 @@
+[
+  {
+    "phase": "create",
+    "path": "/api/admin/blocks",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 1,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": null,
+        "revoked_at": null,
+        "revoked_by_display_name": null,
+        "revoked_by_id": null,
+        "revoked_local": null,
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "pending"
+      },
+      "ok": true
+    },
+    "duration_ms": 5.961374845355749
+  },
+  {
+    "phase": "repeat",
+    "path": "/api/admin/blocks/1/revoke",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 1,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": "第 1 轮 · 管理员 2 完成维护",
+        "revoked_at": 1794448800,
+        "revoked_by_display_name": "合成撤销管理员 2",
+        "revoked_by_id": 2,
+        "revoked_local": "2026-11-12T10:00:00+08:00",
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "revoked"
+      },
+      "ok": true
+    },
+    "duration_ms": 5.295082926750183
+  },
+  {
+    "phase": "create",
+    "path": "/api/admin/blocks",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 2,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": null,
+        "revoked_at": null,
+        "revoked_by_display_name": null,
+        "revoked_by_id": null,
+        "revoked_local": null,
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "pending"
+      },
+      "ok": true
+    },
+    "duration_ms": 5.462584085762501
+  },
+  {
+    "phase": "repeat",
+    "path": "/api/admin/blocks/2/revoke",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 2,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": "第 2 轮 · 管理员 1 完成维护",
+        "revoked_at": 1794448800,
+        "revoked_by_display_name": "合成撤销管理员 1",
+        "revoked_by_id": 1,
+        "revoked_local": "2026-11-12T10:00:00+08:00",
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "revoked"
+      },
+      "ok": true
+    },
+    "duration_ms": 5.779708968475461
+  },
+  {
+    "phase": "create",
+    "path": "/api/admin/blocks",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 3,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": null,
+        "revoked_at": null,
+        "revoked_by_display_name": null,
+        "revoked_by_id": null,
+        "revoked_local": null,
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "pending"
+      },
+      "ok": true
+    },
+    "duration_ms": 5.6040838826447725
+  },
+  {
+    "phase": "repeat",
+    "path": "/api/admin/blocks/3/revoke",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 3,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": "第 3 轮 · 管理员 2 完成维护",
+        "revoked_at": 1794448800,
+        "revoked_by_display_name": "合成撤销管理员 2",
+        "revoked_by_id": 2,
+        "revoked_local": "2026-11-12T10:00:00+08:00",
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "revoked"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.656625049188733
+  },
+  {
+    "phase": "create",
+    "path": "/api/admin/blocks",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 4,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": null,
+        "revoked_at": null,
+        "revoked_by_display_name": null,
+        "revoked_by_id": null,
+        "revoked_local": null,
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "pending"
+      },
+      "ok": true
+    },
+    "duration_ms": 4.77187498472631
+  },
+  {
+    "phase": "repeat",
+    "path": "/api/admin/blocks/4/revoke",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 4,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": "第 4 轮 · 管理员 2 完成维护",
+        "revoked_at": 1794448800,
+        "revoked_by_display_name": "合成撤销管理员 2",
+        "revoked_by_id": 2,
+        "revoked_local": "2026-11-12T10:00:00+08:00",
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "revoked"
+      },
+      "ok": true
+    },
+    "duration_ms": 4.264666000381112
+  },
+  {
+    "phase": "create",
+    "path": "/api/admin/blocks",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 5,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": null,
+        "revoked_at": null,
+        "revoked_by_display_name": null,
+        "revoked_by_id": null,
+        "revoked_local": null,
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "pending"
+      },
+      "ok": true
+    },
+    "duration_ms": 4.378875019028783
+  },
+  {
+    "phase": "repeat",
+    "path": "/api/admin/blocks/5/revoke",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 5,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": "第 5 轮 · 管理员 1 完成维护",
+        "revoked_at": 1794448800,
+        "revoked_by_display_name": "合成撤销管理员 1",
+        "revoked_by_id": 1,
+        "revoked_local": "2026-11-12T10:00:00+08:00",
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "revoked"
+      },
+      "ok": true
+    },
+    "duration_ms": 4.045667126774788
+  },
+  {
+    "phase": "create",
+    "path": "/api/admin/blocks",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 6,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": null,
+        "revoked_at": null,
+        "revoked_by_display_name": null,
+        "revoked_by_id": null,
+        "revoked_local": null,
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "pending"
+      },
+      "ok": true
+    },
+    "duration_ms": 4.980582976713777
+  },
+  {
+    "phase": "repeat",
+    "path": "/api/admin/blocks/6/revoke",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 6,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": "第 6 轮 · 管理员 1 完成维护",
+        "revoked_at": 1794448800,
+        "revoked_by_display_name": "合成撤销管理员 1",
+        "revoked_by_id": 1,
+        "revoked_local": "2026-11-12T10:00:00+08:00",
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "revoked"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.882334101945162
+  },
+  {
+    "phase": "create",
+    "path": "/api/admin/blocks",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 7,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": null,
+        "revoked_at": null,
+        "revoked_by_display_name": null,
+        "revoked_by_id": null,
+        "revoked_local": null,
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "pending"
+      },
+      "ok": true
+    },
+    "duration_ms": 6.691999966278672
+  },
+  {
+    "phase": "repeat",
+    "path": "/api/admin/blocks/7/revoke",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 7,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": "第 7 轮 · 管理员 1 完成维护",
+        "revoked_at": 1794448800,
+        "revoked_by_display_name": "合成撤销管理员 1",
+        "revoked_by_id": 1,
+        "revoked_local": "2026-11-12T10:00:00+08:00",
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "revoked"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.6718749906867743
+  },
+  {
+    "phase": "create",
+    "path": "/api/admin/blocks",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 8,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": null,
+        "revoked_at": null,
+        "revoked_by_display_name": null,
+        "revoked_by_id": null,
+        "revoked_local": null,
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "pending"
+      },
+      "ok": true
+    },
+    "duration_ms": 5.901958094909787
+  },
+  {
+    "phase": "repeat",
+    "path": "/api/admin/blocks/8/revoke",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 8,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": "第 8 轮 · 管理员 1 完成维护",
+        "revoked_at": 1794448800,
+        "revoked_by_display_name": "合成撤销管理员 1",
+        "revoked_by_id": 1,
+        "revoked_local": "2026-11-12T10:00:00+08:00",
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "revoked"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.5449580755084753
+  },
+  {
+    "phase": "create",
+    "path": "/api/admin/blocks",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 9,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": null,
+        "revoked_at": null,
+        "revoked_by_display_name": null,
+        "revoked_by_id": null,
+        "revoked_local": null,
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "pending"
+      },
+      "ok": true
+    },
+    "duration_ms": 6.358833983540535
+  },
+  {
+    "phase": "repeat",
+    "path": "/api/admin/blocks/9/revoke",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 9,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": "第 9 轮 · 管理员 2 完成维护",
+        "revoked_at": 1794448800,
+        "revoked_by_display_name": "合成撤销管理员 2",
+        "revoked_by_id": 2,
+        "revoked_local": "2026-11-12T10:00:00+08:00",
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "revoked"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.888834035024047
+  },
+  {
+    "phase": "create",
+    "path": "/api/admin/blocks",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 10,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": null,
+        "revoked_at": null,
+        "revoked_by_display_name": null,
+        "revoked_by_id": null,
+        "revoked_local": null,
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "pending"
+      },
+      "ok": true
+    },
+    "duration_ms": 6.15929183550179
+  },
+  {
+    "phase": "repeat",
+    "path": "/api/admin/blocks/10/revoke",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 10,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": "第 10 轮 · 管理员 2 完成维护",
+        "revoked_at": 1794448800,
+        "revoked_by_display_name": "合成撤销管理员 2",
+        "revoked_by_id": 2,
+        "revoked_local": "2026-11-12T10:00:00+08:00",
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "revoked"
+      },
+      "ok": true
+    },
+    "duration_ms": 5.237375153228641
+  },
+  {
+    "phase": "create",
+    "path": "/api/admin/blocks",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 11,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": null,
+        "revoked_at": null,
+        "revoked_by_display_name": null,
+        "revoked_by_id": null,
+        "revoked_local": null,
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "pending"
+      },
+      "ok": true
+    },
+    "duration_ms": 7.396250031888485
+  },
+  {
+    "phase": "repeat",
+    "path": "/api/admin/blocks/11/revoke",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 11,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": "第 11 轮 · 管理员 1 完成维护",
+        "revoked_at": 1794448800,
+        "revoked_by_display_name": "合成撤销管理员 1",
+        "revoked_by_id": 1,
+        "revoked_local": "2026-11-12T10:00:00+08:00",
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "revoked"
+      },
+      "ok": true
+    },
+    "duration_ms": 4.021584056317806
+  },
+  {
+    "phase": "create",
+    "path": "/api/admin/blocks",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 12,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": null,
+        "revoked_at": null,
+        "revoked_by_display_name": null,
+        "revoked_by_id": null,
+        "revoked_local": null,
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "pending"
+      },
+      "ok": true
+    },
+    "duration_ms": 4.817957989871502
+  },
+  {
+    "phase": "repeat",
+    "path": "/api/admin/blocks/12/revoke",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 12,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": "第 12 轮 · 管理员 1 完成维护",
+        "revoked_at": 1794448800,
+        "revoked_by_display_name": "合成撤销管理员 1",
+        "revoked_by_id": 1,
+        "revoked_local": "2026-11-12T10:00:00+08:00",
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "revoked"
+      },
+      "ok": true
+    },
+    "duration_ms": 6.373249925673008
+  },
+  {
+    "phase": "create",
+    "path": "/api/admin/blocks",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 13,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": null,
+        "revoked_at": null,
+        "revoked_by_display_name": null,
+        "revoked_by_id": null,
+        "revoked_local": null,
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "pending"
+      },
+      "ok": true
+    },
+    "duration_ms": 5.178958177566528
+  },
+  {
+    "phase": "repeat",
+    "path": "/api/admin/blocks/13/revoke",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 13,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": "第 13 轮 · 管理员 2 完成维护",
+        "revoked_at": 1794448800,
+        "revoked_by_display_name": "合成撤销管理员 2",
+        "revoked_by_id": 2,
+        "revoked_local": "2026-11-12T10:00:00+08:00",
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "revoked"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.6056670360267162
+  },
+  {
+    "phase": "create",
+    "path": "/api/admin/blocks",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 14,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": null,
+        "revoked_at": null,
+        "revoked_by_display_name": null,
+        "revoked_by_id": null,
+        "revoked_local": null,
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "pending"
+      },
+      "ok": true
+    },
+    "duration_ms": 4.946459084749222
+  },
+  {
+    "phase": "repeat",
+    "path": "/api/admin/blocks/14/revoke",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 14,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": "第 14 轮 · 管理员 2 完成维护",
+        "revoked_at": 1794448800,
+        "revoked_by_display_name": "合成撤销管理员 2",
+        "revoked_by_id": 2,
+        "revoked_local": "2026-11-12T10:00:00+08:00",
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "revoked"
+      },
+      "ok": true
+    },
+    "duration_ms": 6.362249841913581
+  },
+  {
+    "phase": "create",
+    "path": "/api/admin/blocks",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 15,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": null,
+        "revoked_at": null,
+        "revoked_by_display_name": null,
+        "revoked_by_id": null,
+        "revoked_local": null,
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "pending"
+      },
+      "ok": true
+    },
+    "duration_ms": 12.186583830043674
+  },
+  {
+    "phase": "repeat",
+    "path": "/api/admin/blocks/15/revoke",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 15,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": "第 15 轮 · 管理员 1 完成维护",
+        "revoked_at": 1794448800,
+        "revoked_by_display_name": "合成撤销管理员 1",
+        "revoked_by_id": 1,
+        "revoked_local": "2026-11-12T10:00:00+08:00",
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "revoked"
+      },
+      "ok": true
+    },
+    "duration_ms": 4.576792009174824
+  },
+  {
+    "phase": "create",
+    "path": "/api/admin/blocks",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 16,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": null,
+        "revoked_at": null,
+        "revoked_by_display_name": null,
+        "revoked_by_id": null,
+        "revoked_local": null,
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "pending"
+      },
+      "ok": true
+    },
+    "duration_ms": 6.571791833266616
+  },
+  {
+    "phase": "repeat",
+    "path": "/api/admin/blocks/16/revoke",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 16,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": "第 16 轮 · 管理员 1 完成维护",
+        "revoked_at": 1794448800,
+        "revoked_by_display_name": "合成撤销管理员 1",
+        "revoked_by_id": 1,
+        "revoked_local": "2026-11-12T10:00:00+08:00",
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "revoked"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.4383751917630434
+  },
+  {
+    "phase": "create",
+    "path": "/api/admin/blocks",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 17,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": null,
+        "revoked_at": null,
+        "revoked_by_display_name": null,
+        "revoked_by_id": null,
+        "revoked_local": null,
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "pending"
+      },
+      "ok": true
+    },
+    "duration_ms": 5.488791037350893
+  },
+  {
+    "phase": "repeat",
+    "path": "/api/admin/blocks/17/revoke",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 17,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": "第 17 轮 · 管理员 1 完成维护",
+        "revoked_at": 1794448800,
+        "revoked_by_display_name": "合成撤销管理员 1",
+        "revoked_by_id": 1,
+        "revoked_local": "2026-11-12T10:00:00+08:00",
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "revoked"
+      },
+      "ok": true
+    },
+    "duration_ms": 4.3782079592347145
+  },
+  {
+    "phase": "create",
+    "path": "/api/admin/blocks",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 18,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": null,
+        "revoked_at": null,
+        "revoked_by_display_name": null,
+        "revoked_by_id": null,
+        "revoked_local": null,
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "pending"
+      },
+      "ok": true
+    },
+    "duration_ms": 4.852584097534418
+  },
+  {
+    "phase": "repeat",
+    "path": "/api/admin/blocks/18/revoke",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 18,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": "第 18 轮 · 管理员 2 完成维护",
+        "revoked_at": 1794448800,
+        "revoked_by_display_name": "合成撤销管理员 2",
+        "revoked_by_id": 2,
+        "revoked_local": "2026-11-12T10:00:00+08:00",
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "revoked"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.4302501007914543
+  },
+  {
+    "phase": "create",
+    "path": "/api/admin/blocks",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 19,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": null,
+        "revoked_at": null,
+        "revoked_by_display_name": null,
+        "revoked_by_id": null,
+        "revoked_local": null,
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "pending"
+      },
+      "ok": true
+    },
+    "duration_ms": 4.7047920525074005
+  },
+  {
+    "phase": "repeat",
+    "path": "/api/admin/blocks/19/revoke",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 19,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": "第 19 轮 · 管理员 2 完成维护",
+        "revoked_at": 1794448800,
+        "revoked_by_display_name": "合成撤销管理员 2",
+        "revoked_by_id": 2,
+        "revoked_local": "2026-11-12T10:00:00+08:00",
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "revoked"
+      },
+      "ok": true
+    },
+    "duration_ms": 6.567917065694928
+  },
+  {
+    "phase": "create",
+    "path": "/api/admin/blocks",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 20,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": null,
+        "revoked_at": null,
+        "revoked_by_display_name": null,
+        "revoked_by_id": null,
+        "revoked_local": null,
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "pending"
+      },
+      "ok": true
+    },
+    "duration_ms": 6.327959010377526
+  },
+  {
+    "phase": "repeat",
+    "path": "/api/admin/blocks/20/revoke",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 20,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": "第 20 轮 · 管理员 1 完成维护",
+        "revoked_at": 1794448800,
+        "revoked_by_display_name": "合成撤销管理员 1",
+        "revoked_by_id": 1,
+        "revoked_local": "2026-11-12T10:00:00+08:00",
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "revoked"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.4698329400271177
+  },
+  {
+    "phase": "fault_setup",
+    "path": "/api/admin/blocks",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 21,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": null,
+        "revoked_at": null,
+        "revoked_by_display_name": null,
+        "revoked_by_id": null,
+        "revoked_local": null,
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "pending"
+      },
+      "ok": true
+    },
+    "duration_ms": 5.038749892264605
+  },
+  {
+    "phase": "audit_fault_before",
+    "path": "/api/admin/blocks/21/revoke",
+    "http_status": 500,
+    "response": {
+      "error": {
+        "code": "INTERNAL_ERROR",
+        "conflicts": [],
+        "fields": {},
+        "message": "操作未完成，请稍后重试。"
+      },
+      "ok": false
+    },
+    "duration_ms": 5.512333940714598
+  },
+  {
+    "phase": "audit_fault_after",
+    "path": "/api/admin/blocks/21/revoke",
+    "http_status": 500,
+    "response": {
+      "error": {
+        "code": "INTERNAL_ERROR",
+        "conflicts": [],
+        "fields": {},
+        "message": "操作未完成，请稍后重试。"
+      },
+      "ok": false
+    },
+    "duration_ms": 4.561832873150706
+  },
+  {
+    "phase": "retry_after_restart",
+    "path": "/api/admin/blocks/21/revoke",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "creator_display_name": "合成撤销管理员 1",
+        "creator_id": 1,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 21,
+        "reason": "原始停用原因 <维护>",
+        "revoke_reason": "故障解除后成功",
+        "revoked_at": 1794448800,
+        "revoked_by_display_name": "合成撤销管理员 2",
+        "revoked_by_id": 2,
+        "revoked_local": "2026-11-12T10:00:00+08:00",
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "测试楼",
+          "name": "合成并发会议室"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "revoked"
+      },
+      "ok": true
+    },
+    "duration_ms": 4.401582991704345
+  }
+]

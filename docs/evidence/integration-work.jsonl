@@ -1,0 +1,1 @@
+{"work_id": "experiment-a-product-integration", "root_implementation_passes": 1, "stories": ["2-5-admin-cancel", "3-3-revoke-block"], "recorded_at_utc": "2026-11-12T14:13:23.702098+00:00", "event": "completed", "implementation_calls": 0, "result": "PASS", "evidence": "experiment-a-integration/parent-final-qa.json"}

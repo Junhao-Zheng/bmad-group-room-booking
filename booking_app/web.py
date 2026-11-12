@@ -123,6 +123,14 @@ def admin_cancel_booking_api(booking_id):
     return jsonify(ok=True, data=services.admin_cancel_booking(actor, booking_id, values["reason"]))
 
 
+@bp.post("/api/admin/blocks/<block_id>/revoke")
+def revoke_block_api(block_id):
+    actor = services.require_admin(auth.actor_for_token(token()))
+    if request.mimetype != "application/json":
+        raise DomainError("INVALID_INPUT", "请使用 JSON 格式提交撤销原因。")
+    return jsonify(ok=True, data=services.revoke_block(actor, block_id, payload()))
+
+
 @bp.get("/api/admin/blocks")
 def admin_blocks_api():
     actor = services.require_admin(auth.actor_for_token(token()))

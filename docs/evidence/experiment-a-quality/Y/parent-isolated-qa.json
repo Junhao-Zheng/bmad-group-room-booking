@@ -1,0 +1,24 @@
+{
+  "checked_at_utc": "2026-11-12T14:10:32.175027+00:00",
+  "group": "Y",
+  "parent_python_full": {
+    "tests": 176,
+    "failures": 1,
+    "cause": "既有tests/test_history_browser_runner.py 1秒timeout启动预算不足；合成浏览器ready文件未创建，未进入目标清理前提。原失败保留，非新增撤销行为失败。"
+  },
+  "parent_javascript_full": {
+    "tests": 245,
+    "failures": 0,
+    "skipped": 0
+  },
+  "runtime_reports_verified": {
+    "http_run_id": "38620960b6a0762b6f35d7a815bb0669",
+    "browser_run_id": "d5794912e8ad0d6e94b89c5623528a31",
+    "each_report_source_hash_values_recomputed": 74,
+    "unique_source_paths_each": 37
+  },
+  "parent_visual_qa": "390×844成功面板实际查看：原维护原因、房间、完整区间及首次撤销时刻/操作者/原因显示正确，纯文本换行，没有横向溢出。",
+  "lifecycle_injection": "实际secret-error与timeout均INCOMPLETE，已启动浏览器/服务组已清理、秘密哨兵未泄露，最终源指纹一致。",
+  "final_acceptance": "主仓库单独修正既有测试超时预算后，组合版本192 Python/282 JS已通过；正式接受另核对主仓库真实HTTP/浏览器报告，不能把此独立目录首次全量写成全部通过。",
+  "source_archive_sha256": "5906f4ffd6c87fc811d2a08889f8fa974675b3902d095989d6a19a3092eb89cf"
+}

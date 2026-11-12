@@ -2,7 +2,7 @@
 title: '管理员说明原因干预未结束预约'
 type: feature
 created: '2026-11-12'
-status: in-review
+status: done
 route: dispatch
 baseline_commit: 177dc64e5897a24850dcc79714cfcb87724c09d6
 experiment_baseline_commit: b0ce58a9b66144db5a4b15f61376132fa3f210e4
@@ -131,3 +131,7 @@ medium / patch：新增 test_admin_cancel_browser_runner 调用 main 的真实 e
 仅修改 `tests/test_admin_cancel_browser_runner.py`：测试内注入明确标为 `stubbed-driver-real-waitress-sqlite` 的受控 `environment_metadata`；不会执行的浏览器 wrapper 目标改为 `sys.executable`。三种故障路径均传入本次输出目录下明确不存在的 `deliberately-absent-playwright-root`，在 metadata 替身、driver 替身的 `NODE_PATH` 以及结束后分别断言目录仍不存在，证明不读取 node_modules。生产 runner 的环境核验、应用、HTTP/浏览器实现与既有证据未修改。
 
 实际仅运行 `.venv/bin/python -m unittest tests.test_admin_cancel_browser_runner -v`：3 tests PASS，0 skip，1.856s。真实 Waitress/SQLite、已变更 before/after 事实、旧 PASS 失效及全部秘密哨兵断言保留并通过。原始输出：`work/quality-review-fixes/portable-runner-tests.log`；本次新增失败证据目录分别为 `browser-timeout-jwq80xde`、`browser-driver-gftjcm85`、`browser-storage-hyhrylu2`（同属 `work/quality-review-fixes/`）。未重跑全量；父流程 P1 记录原样保留。
+
+## 本轮接受结果
+
+独立质量审查及修补完成，主流程最终合并后192个唯一Python、282项JS，4套真实浏览器及两套真实HTTP均PASS、无skip，源指纹已逐项复算。技术接受属于AI流程，不冒充人类/教师验收。[最终核验](../../docs/evidence/experiment-a-integration/parent-final-qa.json)。

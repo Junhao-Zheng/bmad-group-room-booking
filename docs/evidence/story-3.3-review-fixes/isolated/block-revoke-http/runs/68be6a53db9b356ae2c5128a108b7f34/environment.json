@@ -1,0 +1,33 @@
+{
+  "run_id": "68be6a53db9b356ae2c5128a108b7f34",
+  "os": "macOS-26.6-arm64-arm-64bit",
+  "machine": "arm64",
+  "cpu": "Apple M1 Pro",
+  "logical_cpus": 8,
+  "memory_bytes": "34359738368",
+  "python": "3.12.14 (main, Aug 25 2026, 13:50:33) [Clang 22.1.3 ]",
+  "sqlite": "3.53.1",
+  "dependencies": {
+    "Flask": "3.1.3",
+    "Jinja2": "3.1.6",
+    "Werkzeug": "3.1.9",
+    "waitress": "3.0.2"
+  },
+  "server_processes": 1,
+  "server_threads": 8,
+  "origin": "http://127.0.0.1:60560",
+  "invocation": [
+    ".venv/bin/python",
+    "-m",
+    "scripts.verify_block_revoke_http",
+    "--output-dir",
+    "/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/work/quality-review-fixes/block-revoke-http/runs/68be6a53db9b356ae2c5128a108b7f34"
+  ],
+  "server_start": "spawn scripts.verify_block_revoke_http.server_main; Waitress 1 process, 8 threads",
+  "fixed_clock_injection": "TESTING=True only, no HTTP clock endpoint",
+  "database": "isolated temporary local file; WAL/FULL/foreign_keys; removed after run",
+  "fixed_now": 1794448800,
+  "independent_admin_sessions": 2,
+  "rounds": 20,
+  "concurrency_scope": "Client barrier synchronizes dispatch; server write-lock waiting is not directly observed."
+}

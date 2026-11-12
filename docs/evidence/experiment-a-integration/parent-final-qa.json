@@ -1,0 +1,49 @@
+{
+  "checked_at_utc": "2026-11-12T14:13:23.411107+00:00",
+  "result": "PASS",
+  "python_unique_tests": 192,
+  "javascript_tests": 282,
+  "skipped": 0,
+  "reports": [
+    {
+      "file": "docs/evidence/experiment-a-integration/admin-cancel-browser/browser-results.json",
+      "run_id": "900e6bbc54b410b28ae4d934198b3f79",
+      "verified_source_hash_values": 29,
+      "result": "PASS"
+    },
+    {
+      "file": "docs/evidence/experiment-a-integration/block-revoke-browser/browser-result.json",
+      "run_id": "64fef417b1d27055fd04808637297fb2",
+      "verified_source_hash_values": 74,
+      "result": "PASS"
+    },
+    {
+      "file": "docs/evidence/experiment-a-integration/rooms-browser/browser-results.json",
+      "run_id": "825e2da309c6c2c7f764cc925417dc0e",
+      "verified_source_hash_values": 30,
+      "result": "PASS"
+    },
+    {
+      "file": "docs/evidence/experiment-a-integration/maintenance-browser/browser-results.json",
+      "run_id": "0579515aec69e324fc9ed42752308dcd",
+      "verified_source_hash_values": 32,
+      "result": "PASS"
+    },
+    {
+      "file": "docs/evidence/experiment-a-integration/admin-cancel-http/http-result.json",
+      "run_id": "9cf9aef13ec853630be2943b165e8948",
+      "verified_source_hash_values": 31,
+      "result": "PASS"
+    },
+    {
+      "file": "docs/evidence/experiment-a-integration/block-revoke-http/http-result.json",
+      "run_id": "28b9b25664549485a5b27d7168a37fd0",
+      "verified_source_hash_values": 74,
+      "result": "PASS"
+    }
+  ],
+  "integration": "三方保留X独立管理取消和Y独立撤销命令；6个文件17个冲突块逐项合并，4个新增组合处理器测试验证两方向等待互斥与双面板身份失效。1次父流程集成阶段，不等于2次子代理实现调用。",
+  "visual_qa": "主流程目视最终合并版本两个390px成功面板：房间/完整区间/原因和首操作人/时刻均可读，长文本纯文本换行；实际脚本还检查1280×800/390×844以及无页面横溢出。",
+  "quality_not_uniform": "初稿实验统一A1—A9两组均通过；本次质量检查更广，X实际3个实现/修补调用，Y2个，均无传输失败。两故事正式done之前集成，不算done后返工。",
+  "preexisting_failure": "Y独立全量176中既有历史浏览器超时测试启动预算不足，原失败保留。主仓库仅1→5秒测试预算机械校正，7项定向和192项完整已通过；独立post-done记录归属2.3。"
+}

@@ -1,0 +1,105 @@
+[
+  {
+    "path": "/api/admin/blocks/113/revoke",
+    "status": 400,
+    "body": {
+      "error": {
+        "code": "INVALID_INPUT",
+        "conflicts": [],
+        "fields": {
+          "reason": "请输入 1—500 个有效字符，不含空字符。"
+        },
+        "message": "请检查撤销原因。"
+      },
+      "ok": false
+    }
+  },
+  {
+    "path": "/api/admin/blocks/113/revoke",
+    "status": 403,
+    "body": {
+      "error": {
+        "code": "CSRF_REJECTED",
+        "conflicts": [],
+        "fields": {},
+        "message": "请求验证失败，请重新打开页面后重试。"
+      },
+      "ok": false
+    }
+  },
+  {
+    "path": "/api/admin/blocks/113/revoke",
+    "status": 200,
+    "body": {
+      "data": {
+        "created_at": 1794016800,
+        "created_local": "2026-11-07T10:00:00+08:00",
+        "creator_display_name": "演示管理员",
+        "creator_id": 3,
+        "end_at": 1794463200,
+        "end_local": "2026-11-12T14:00:00+08:00",
+        "id": 113,
+        "reason": "合成维护 <检查设备>",
+        "revoke_reason": "<img src=x onerror=\"window.revokeXss=1\">完成维护 1280",
+        "revoked_at": 1794448800,
+        "revoked_by_display_name": "演示管理员",
+        "revoked_by_id": 3,
+        "revoked_local": "2026-11-12T10:00:00+08:00",
+        "room": {
+          "capacity": 20,
+          "id": 20,
+          "location": "演示楼 202",
+          "name": "合成 A"
+        },
+        "start_at": 1794456000,
+        "start_local": "2026-11-12T12:00:00+08:00",
+        "status": "revoked"
+      },
+      "ok": true
+    }
+  },
+  {
+    "path": "/api/admin/blocks/114/revoke",
+    "status": 200,
+    "body": {
+      "data": {
+        "created_at": 1794016800,
+        "created_local": "2026-11-07T10:00:00+08:00",
+        "creator_display_name": "演示管理员",
+        "creator_id": 3,
+        "end_at": 1794459600,
+        "end_local": "2026-11-12T13:00:00+08:00",
+        "id": 114,
+        "reason": "合成维护 <检查设备>",
+        "revoke_reason": "首次撤销原因",
+        "revoked_at": 1794448800,
+        "revoked_by_display_name": "演示管理员",
+        "revoked_by_id": 3,
+        "revoked_local": "2026-11-12T10:00:00+08:00",
+        "room": {
+          "capacity": 30,
+          "id": 30,
+          "location": "演示楼 303",
+          "name": "合成 C <讨论室>"
+        },
+        "start_at": 1794456000,
+        "start_local": "2026-11-12T12:00:00+08:00",
+        "status": "revoked"
+      },
+      "ok": true
+    }
+  },
+  {
+    "path": "/api/admin/blocks/108/revoke",
+    "status": 401,
+    "body": {
+      "error": {
+        "code": "AUTH_REQUIRED",
+        "conflicts": [],
+        "fields": {},
+        "message": "登录已失效，请重新打开登录页并登录。"
+      },
+      "ok": false
+    }
+  }
+]

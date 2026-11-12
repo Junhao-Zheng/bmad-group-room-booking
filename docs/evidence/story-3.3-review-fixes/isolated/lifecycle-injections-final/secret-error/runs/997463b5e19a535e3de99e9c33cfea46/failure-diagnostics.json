@@ -1,0 +1,9 @@
+{
+  "stage": "fault",
+  "error_type": "Error",
+  "source": {
+    "file": "scripts/verify_block_revoke_browser.cjs",
+    "line": 26,
+    "column": 13
+  }
+}

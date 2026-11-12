@@ -1,0 +1,87 @@
+{
+  "group": "X",
+  "integrated_at_utc": "2026-11-12T13:58:05.948268+00:00",
+  "baseline": "b0ce58a9b66144db5a4b15f61376132fa3f210e4",
+  "main_head_before": "c33d62886e85858464eb4f9e59540c1548cfe2c5",
+  "changes": [
+    {
+      "path": "booking_app/services.py",
+      "base_sha256": "9f6e09552d4d5777cb549f4aa348e47d07bef5fa18a94a618551cd489257983a",
+      "main_before_sha256": "9f6e09552d4d5777cb549f4aa348e47d07bef5fa18a94a618551cd489257983a",
+      "group_sha256": "01b2ed51fd7a0f29af46ed87b482a558dbefcae1db4b88abb2581e5d8fe3271a",
+      "result": "copy"
+    },
+    {
+      "path": "booking_app/static/app.css",
+      "base_sha256": "2d061c5860e0a6e38e2237429b33b79413c9445f30df59dac73f6404c7eac131",
+      "main_before_sha256": "2d061c5860e0a6e38e2237429b33b79413c9445f30df59dac73f6404c7eac131",
+      "group_sha256": "65c79e47f99c84ddfcabaa5e6dab9ac7fe9a9c0db97cb55918fe65a5f4d6ecd2",
+      "result": "copy"
+    },
+    {
+      "path": "booking_app/static/blocks.js",
+      "base_sha256": "512f420eb1af849c48fb05063d0f7941a9925c406637759f7c56029fcca5b369",
+      "main_before_sha256": "512f420eb1af849c48fb05063d0f7941a9925c406637759f7c56029fcca5b369",
+      "group_sha256": "af96c556f6e719bd6c7e2648b502fdd833e561668b20c03d26c4631fec3b0b9d",
+      "result": "copy"
+    },
+    {
+      "path": "booking_app/templates/admin.html",
+      "base_sha256": "7e0df499196c4bfdf2d0f26607a2acc8926f759f46f7e16db78ac12d459dc542",
+      "main_before_sha256": "7e0df499196c4bfdf2d0f26607a2acc8926f759f46f7e16db78ac12d459dc542",
+      "group_sha256": "d1173147824d4a161a2c7f3669972f2d8d332dbf86a54fff3c9d04b24ae1d0bd",
+      "result": "copy"
+    },
+    {
+      "path": "booking_app/web.py",
+      "base_sha256": "877940376cd1d26a6d4d7ba9ac06ccd41a2e7747e2d4bc96db87fc7ebc86ba94",
+      "main_before_sha256": "877940376cd1d26a6d4d7ba9ac06ccd41a2e7747e2d4bc96db87fc7ebc86ba94",
+      "group_sha256": "ac532f17a7b1342ad06ae9931e3b123089ff37c038ce32dc0f1f48ec27861d75",
+      "result": "copy"
+    },
+    {
+      "path": "scripts/verify_admin_cancel_browser.cjs",
+      "base_sha256": null,
+      "main_before_sha256": null,
+      "group_sha256": "968b62bc6415a68f55e8e7a716b7e81fa326230f40fefdd7ea8708ffd91e53c0",
+      "result": "copy"
+    },
+    {
+      "path": "scripts/verify_admin_cancel_browser.py",
+      "base_sha256": null,
+      "main_before_sha256": null,
+      "group_sha256": "c4a378d59674e0501544147b0d2b93a044aed30184b96ed584c0264b35e12445",
+      "result": "copy"
+    },
+    {
+      "path": "scripts/verify_admin_cancel_http.py",
+      "base_sha256": null,
+      "main_before_sha256": null,
+      "group_sha256": "fba09dabda3ee8ffb8fc8afed71ffee07545b0945c1318773392a650ee30e934",
+      "result": "copy"
+    },
+    {
+      "path": "tests/test_admin_cancel.py",
+      "base_sha256": null,
+      "main_before_sha256": null,
+      "group_sha256": "87723b758f2633f56600d030e68fefba6dad8767142205308e2bb5639341b77f",
+      "result": "copy"
+    },
+    {
+      "path": "tests/test_admin_cancel_browser_runner.py",
+      "base_sha256": null,
+      "main_before_sha256": null,
+      "group_sha256": "c64097ecd5c727d60c06d946a278d03751a468cfb6140fb481830827bddb6107",
+      "result": "copy"
+    },
+    {
+      "path": "tests/test_blocks_js.cjs",
+      "base_sha256": "6cd62f18b3d19fb6ed21bdc4cd72b0f4b9a952a217086aba31d2d7738d205ed3",
+      "main_before_sha256": "6cd62f18b3d19fb6ed21bdc4cd72b0f4b9a952a217086aba31d2d7738d205ed3",
+      "group_sha256": "46c62141dfcc901d1b8f36f622e0322c636e1701ed1725c73a07abd7ed0314e8",
+      "result": "copy"
+    }
+  ],
+  "conflicts": [],
+  "note": "仅运行代码/验证脚本/测试；冲突源文件未被覆盖，必须人工（主代理）逐项整合并记录，三方原文保留。"
+}

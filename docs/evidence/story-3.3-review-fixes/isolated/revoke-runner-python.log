@@ -1,0 +1,16 @@
+test_available_before_after_facts_are_saved_before_oracle_rejection (tests.test_block_revoke_runner.RevokeRunnerTests.test_available_before_after_facts_are_saved_before_oracle_rejection) ... ok
+test_publication_failure_replaces_prior_pass_and_has_unique_run_id (tests.test_block_revoke_runner.RevokeRunnerTests.test_publication_failure_replaces_prior_pass_and_has_unique_run_id) ... ok
+test_safe_diagnostics_strip_sentinel_and_untrusted_shapes (tests.test_block_revoke_runner.RevokeRunnerTests.test_safe_diagnostics_strip_sentinel_and_untrusted_shapes) ... ok
+test_source_change_or_cleanup_exception_cannot_publish_pass (tests.test_block_revoke_runner.RevokeRunnerTests.test_source_change_or_cleanup_exception_cannot_publish_pass) ... ok
+test_source_hashes_cover_driver_runner_transitive_helpers_and_fixtures (tests.test_block_revoke_runner.RevokeRunnerTests.test_source_hashes_cover_driver_runner_transitive_helpers_and_fixtures) ... ok
+test_system_temporary_database_does_not_require_root_work (tests.test_block_revoke_runner.RevokeRunnerTests.test_system_temporary_database_does_not_require_root_work) ... ok
+test_complete_audit_snapshots_actor_time_reason_and_target_are_verified (tests.test_block_revoke_runner.RevokeStorageOracleTests.test_complete_audit_snapshots_actor_time_reason_and_target_are_verified) ... ok
+test_deleted_target_is_rejected_even_if_its_slots_and_audit_are_deleted (tests.test_block_revoke_runner.RevokeStorageOracleTests.test_deleted_target_is_rejected_even_if_its_slots_and_audit_are_deleted) ... ok
+test_exact_four_transitions_and_existing_facts_pass (tests.test_block_revoke_runner.RevokeStorageOracleTests.test_exact_four_transitions_and_existing_facts_pass) ... ok
+test_original_target_fields_must_not_change (tests.test_block_revoke_runner.RevokeStorageOracleTests.test_original_target_fields_must_not_change) ... ok
+test_rooms_other_records_old_audits_and_slots_cannot_change (tests.test_block_revoke_runner.RevokeStorageOracleTests.test_rooms_other_records_old_audits_and_slots_cannot_change) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.486s
+
+OK

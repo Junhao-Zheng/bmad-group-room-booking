@@ -1,0 +1,32 @@
+[
+  {
+    "path": "booking_app/services.py",
+    "conflict_chunks": 1,
+    "resolution": "保留独立的管理取消与停用撤销；合并共同表单状态和两组原测试，未改变业务/DTO合同。"
+  },
+  {
+    "path": "booking_app/static/app.css",
+    "conflict_chunks": 1,
+    "resolution": "保留独立的管理取消与停用撤销；合并共同表单状态和两组原测试，未改变业务/DTO合同。"
+  },
+  {
+    "path": "booking_app/static/blocks.js",
+    "conflict_chunks": 11,
+    "resolution": "保留独立的管理取消与停用撤销；合并共同表单状态和两组原测试，未改变业务/DTO合同。"
+  },
+  {
+    "path": "booking_app/templates/admin.html",
+    "conflict_chunks": 2,
+    "resolution": "保留独立的管理取消与停用撤销；合并共同表单状态和两组原测试，未改变业务/DTO合同。"
+  },
+  {
+    "path": "booking_app/web.py",
+    "conflict_chunks": 1,
+    "resolution": "保留独立的管理取消与停用撤销；合并共同表单状态和两组原测试，未改变业务/DTO合同。"
+  },
+  {
+    "path": "tests/test_blocks_js.cjs",
+    "conflict_chunks": 1,
+    "resolution": "保留独立的管理取消与停用撤销；合并共同表单状态和两组原测试，未改变业务/DTO合同。"
+  }
+]

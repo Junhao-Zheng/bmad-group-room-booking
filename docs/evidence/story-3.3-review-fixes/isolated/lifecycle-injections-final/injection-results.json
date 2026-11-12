@@ -1,0 +1,49 @@
+{
+  "result": "PASS",
+  "cases": [
+    {
+      "mode": "secret-error",
+      "result": "PASS",
+      "injected_run_result": "INCOMPLETE",
+      "run_id": "997463b5e19a535e3de99e9c33cfea46",
+      "browser_groups": [
+        71083
+      ],
+      "server_group": 71071,
+      "all_processes_reaped": true,
+      "no_prior_pass": true,
+      "before_after_preserved": true,
+      "sentinel_absent": true,
+      "source_hashes_unchanged": true,
+      "diagnostics": {
+        "stage": "fault",
+        "error_type": "Error",
+        "source": {
+          "file": "scripts/verify_block_revoke_browser.cjs",
+          "line": 26,
+          "column": 13
+        }
+      }
+    },
+    {
+      "mode": "timeout",
+      "result": "PASS",
+      "injected_run_result": "INCOMPLETE",
+      "run_id": "bcccf23d6c2e90d4075d5541880ad712",
+      "browser_groups": [
+        71138
+      ],
+      "server_group": 71133,
+      "all_processes_reaped": true,
+      "no_prior_pass": true,
+      "before_after_preserved": true,
+      "sentinel_absent": true,
+      "source_hashes_unchanged": true,
+      "diagnostics": {
+        "stage": "fault",
+        "error_type": "TimeoutError",
+        "source": null
+      }
+    }
+  ]
+}

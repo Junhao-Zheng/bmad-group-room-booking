@@ -8,7 +8,7 @@ from flask import current_app
 from . import auth, db, dto
 from .domain import DomainError, auth_required, beijing_day, booking_interval, query_attendees, resource_id
 from .domain import normalize_booking_payload, normalize_room_payload, validate_booking_window
-from .domain import normalize_block_payload, normalized_text, validate_block_window
+from .domain import normalize_block_payload, normalize_revoke_payload, normalized_text, validate_block_window
 
 
 def _require_actor(conn, actor: auth.Actor, now: int) -> auth.Actor:
@@ -218,6 +218,38 @@ _BOOKING_DETAIL_SELECT = (
 def _full_booking(row, now: int) -> dict:
     return dto.booking_full(row, {"id": row["room_id"], "name": row["room_name"],
                                  "location": row["room_location"], "capacity": row["room_capacity"]}, now)
+
+
+def revoke_block(actor: auth.Actor, block_id, payload: dict) -> dict:
+    with db.write_transaction() as conn:
+        # BEGIN IMMEDIATE serializes competing transitions before time and identity checks.
+        now = current_app.config["CLOCK"].now_epoch()
+        actor = require_admin(_require_actor(conn, actor, now))
+        normalized_id = resource_id(block_id, "block_id")
+        reason = normalize_revoke_payload(payload)
+        row = conn.execute(_BOOKING_DETAIL_SELECT + "WHERE r.kind='block' AND r.id=?",
+                           (normalized_id,)).fetchone()
+        if row is None:
+            raise DomainError("NOT_FOUND", "停用记录不存在。")
+        room = {"id": row["room_id"], "name": row["room_name"],
+                "location": row["room_location"], "capacity": row["room_capacity"]}
+        # Valid replays preserve the first result, including after the original end.
+        if row["cancelled_at"] is not None:
+            return dto.block_full(row, room, now)
+        if now >= row["end_at"]:
+            raise DomainError("TRANSITION_CLOSED", "停用已结束，不能撤销。")
+        before = dto.block_snapshot(row)
+        conn.execute("UPDATE reservations SET cancelled_at=?,cancelled_by=?,cancel_reason=? WHERE id=?",
+                     (now, actor.id, reason, normalized_id))
+        conn.execute("DELETE FROM occupancy_slots WHERE reservation_id=?", (normalized_id,))
+        row = conn.execute(_BOOKING_DETAIL_SELECT + "WHERE r.id=?", (normalized_id,)).fetchone()
+        current_app.config["AUDIT_WRITER"](conn, {
+            "actor_id": actor.id, "actor_display_name": actor.display_name,
+            "action": "block.revoked", "target_type": "block", "target_id": normalized_id,
+            "occurred_at": now, "before": before, "after": dto.block_snapshot(row), "reason": reason,
+        })
+        result = dto.block_full(row, room, now)
+    return result
 
 
 def member_cancel_booking(actor: auth.Actor, booking_id) -> dict:
