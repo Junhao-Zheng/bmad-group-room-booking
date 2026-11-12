@@ -10,6 +10,11 @@ SCHEMA_VERSION = 1
 REQUIRED_COLUMNS = {
     "users": {"id", "username", "display_name", "password_hash", "role", "created_at"},
     "sessions": {"token_hash", "user_id", "csrf_token", "created_at", "expires_at"},
+    "rooms": {"id", "name", "location", "capacity", "created_at", "updated_at"},
+    "reservations": {"id", "kind", "room_id", "user_id", "title", "purpose", "attendees",
+                     "reason", "start_at", "end_at", "intent_key", "request_payload", "created_at",
+                     "cancelled_at", "cancelled_by", "cancel_reason"},
+    "occupancy_slots": {"room_id", "slot_start", "reservation_id"},
 }
 
 
@@ -40,6 +45,23 @@ def get_db() -> sqlite3.Connection:
 def close_db(_error=None) -> None:
     conn = g.pop("db", None)
     if conn is not None:
+        conn.close()
+
+
+@contextmanager
+def read_transaction(database: str | Path | None = None):
+    """One consistent, read-only snapshot, closed before DTOs reach the renderer."""
+    conn = connect(database or current_app.config["DATABASE"])
+    try:
+        conn.execute("PRAGMA query_only=ON")
+        conn.execute("BEGIN")
+        yield conn
+        conn.execute("COMMIT")
+    except BaseException:
+        if conn.in_transaction:
+            conn.execute("ROLLBACK")
+        raise
+    finally:
         conn.close()
 
 

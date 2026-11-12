@@ -54,3 +54,14 @@ label{display:block;font-weight:650;margin-bottom:8px}
 .skip-link:focus{top:12px}
 @media(max-width:800px){.login-layout{gap:36px;grid-template-columns:1fr;max-width:510px;margin:auto}.main-content{padding:40px 24px}.intro h1{font-size:2rem}.intro .info-note{display:none}.intro-copy{margin-bottom:0}.eyebrow{margin-bottom:16px}.header-content{padding:18px 24px}.demo-tag{max-width:130px;text-align:center}.welcome{padding:32px}}
 @media(max-width:480px){.header-content{padding:16px;gap:16px;flex-wrap:wrap}.main-content{padding:32px 16px 40px}.card{padding:24px}.login-layout{gap:28px}.account{justify-content:flex-start;gap:10px;width:100%}.account form{margin-left:auto}.account-name{max-width:160px}.demo-tag{font-size:12px;max-width:110px}.welcome h1{font-size:1.8rem}.info-note{align-items:flex-start}.site-footer{padding-top:16px}}
+select{font:inherit;color:#183343;background:white;width:100%;max-width:100%;min-width:0;min-height:48px;padding:12px;border:1px solid #91a5ae;border-radius:8px;text-overflow:ellipsis}
+select[aria-invalid="true"]{border:2px solid #a52b37}
+.page-intro{margin-bottom:32px}.page-intro h1{margin-bottom:16px}.page-intro .eyebrow{margin-bottom:12px}
+.schedule-layout{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:24px;align-items:start}
+.room-list,.schedule-items{list-style:none;padding:0;margin:24px 0 0}
+.room-list li,.schedule-items li{border-top:1px solid #dde6e8;padding:20px 0;overflow-wrap:anywhere}
+.room-list li:last-child,.schedule-items li:last-child{padding-bottom:0}
+.room-list h3,.schedule-items h4{font-size:18px;margin:0 0 8px}.room-list p,.schedule-items p{margin:6px 0}
+.field-hint{font-size:14px;color:#54707a;margin:8px 0 0}.schedule-status{display:inline-block;color:#126d65;font-size:14px;margin-bottom:10px}
+#schedule-conditions{font-size:16px;overflow-wrap:anywhere;margin:24px 0 0}.schedule-panel,.room-directory{overflow-wrap:anywhere}
+@media(max-width:800px){.schedule-layout{grid-template-columns:1fr}.room-list{margin-top:8px}.room-list li{padding:16px 0}}

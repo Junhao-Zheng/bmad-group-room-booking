@@ -51,3 +51,54 @@ def validate_credentials(username, password) -> tuple[str, str]:
     if fields:
         raise DomainError("INVALID_INPUT", "请检查账号和密码。", fields)
     return username, password
+
+
+# Shared pure query rules. Input bounds are checked before int/SQLite conversion.
+SQLITE_ID_MAX = 9223372036854775807
+
+
+def resource_id(value, field_name: str = "room_id") -> int:
+    if type(value) is int:
+        valid = 1 <= value <= SQLITE_ID_MAX
+    elif isinstance(value, str):
+        limit = str(SQLITE_ID_MAX)
+        valid = (1 <= len(value) <= len(limit) and value[0] != "0"
+                 and all("0" <= char <= "9" for char in value)
+                 and (len(value) < len(limit) or value <= limit))
+    else:
+        valid = False
+    if not valid:
+        raise DomainError("INVALID_INPUT", "请检查会议室编号。",
+                          {field_name: "请选择有效的会议室。"})
+    return int(value)
+
+
+def beijing_day(value) -> tuple[int, int]:
+    from datetime import date, datetime, time as daytime, timedelta
+    import re
+    from zoneinfo import ZoneInfo
+
+    try:
+        if not isinstance(value, str) or not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", value):
+            raise ValueError
+        day = date.fromisoformat(value)
+        following = day + timedelta(days=1)
+        zone = ZoneInfo("Asia/Shanghai")
+        return (int(datetime.combine(day, daytime.min, zone).timestamp()),
+                int(datetime.combine(following, daytime.min, zone).timestamp()))
+    except (ValueError, OverflowError, OSError):
+        raise DomainError("INVALID_INPUT", "请检查查询日期。",
+                          {"date": "请输入有效的北京时间日期（YYYY-MM-DD），且不晚于 9999-12-30。"}) from None
+
+
+def local_time(epoch: int) -> str:
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+
+    return datetime.fromtimestamp(epoch, ZoneInfo("Asia/Shanghai")).isoformat(timespec="seconds")
+
+
+def active_status(start_at: int, end_at: int, now: int) -> str:
+    if now < start_at:
+        return "pending"
+    return "in_progress" if now < end_at else "ended"

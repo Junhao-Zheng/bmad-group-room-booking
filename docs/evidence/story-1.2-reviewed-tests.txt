@@ -1,0 +1,8 @@
+test_room_exact_contract_order_and_page_share_service (tests.test_room_schedule.RoomScheduleTests.test_room_exact_contract_order_and_page_share_service) ... ok
+test_schedule_exact_contract_current_status_and_private_fields_absent (tests.test_room_schedule.RoomScheduleTests.test_schedule_exact_contract_current_status_and_private_fields_absent) ... ok
+test_half_open_midnight_cross_day_and_historical_blocks (tests.test_room_schedule.RoomScheduleTests.test_half_open_midnight_cross_day_and_historical_blocks) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.647s
+
+OK

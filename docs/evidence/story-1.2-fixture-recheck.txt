@@ -1,0 +1,20 @@
+test_all_roles_only_receive_shared_schedule (tests.test_room_schedule.RoomScheduleTests.test_all_roles_only_receive_shared_schedule) ... ok
+test_authentication_precedes_validation_for_anonymous_temporary_expired_and_logout (tests.test_room_schedule.RoomScheduleTests.test_authentication_precedes_validation_for_anonymous_temporary_expired_and_logout) ... ok
+test_dates_reject_invalid_formats_and_overflow (tests.test_room_schedule.RoomScheduleTests.test_dates_reject_invalid_formats_and_overflow) ... ok
+test_empty_catalog_and_empty_schedule_are_successful (tests.test_room_schedule.RoomScheduleTests.test_empty_catalog_and_empty_schedule_are_successful) ... ok
+test_half_open_midnight_cross_day_and_historical_blocks (tests.test_room_schedule.RoomScheduleTests.test_half_open_midnight_cross_day_and_historical_blocks) ... ok
+test_ids_reject_noncanonical_out_of_range_and_huge_values (tests.test_room_schedule.RoomScheduleTests.test_ids_reject_noncanonical_out_of_range_and_huge_values) ... ok
+test_missing_query_schema_is_rejected_on_startup (tests.test_room_schedule.RoomScheduleTests.test_missing_query_schema_is_rejected_on_startup) ... ok
+test_query_captures_clock_once_for_auth_and_status (tests.test_room_schedule.RoomScheduleTests.test_query_captures_clock_once_for_auth_and_status) ... ok
+test_read_transaction_is_read_only_and_keeps_consistent_snapshot (tests.test_room_schedule.RoomScheduleTests.test_read_transaction_is_read_only_and_keeps_consistent_snapshot) ... ok
+test_room_exact_contract_order_and_page_share_service (tests.test_room_schedule.RoomScheduleTests.test_room_exact_contract_order_and_page_share_service) ... ok
+test_schedule_exact_contract_current_status_and_private_fields_absent (tests.test_room_schedule.RoomScheduleTests.test_schedule_exact_contract_current_status_and_private_fields_absent) ... ok
+test_schema_enforces_branches_cancellation_and_slot_constraints (tests.test_room_schedule.RoomScheduleTests.test_schema_enforces_branches_cancellation_and_slot_constraints) ... ok
+test_seed_is_repeatable_and_preserves_existing_business (tests.test_room_schedule.RoomScheduleTests.test_seed_is_repeatable_and_preserves_existing_business) ... ok
+test_service_rechecks_actor_session_before_invalid_input (tests.test_room_schedule.RoomScheduleTests.test_service_rechecks_actor_session_before_invalid_input) ... ok
+test_stable_sort_with_same_start_cancellation_and_other_room (tests.test_room_schedule.RoomScheduleTests.test_stable_sort_with_same_start_cancellation_and_other_room) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 2.605s
+
+OK

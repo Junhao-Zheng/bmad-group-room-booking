@@ -4,3 +4,5 @@
 {"timestamp": "2026-11-12T04:59:00.196060+00:00", "story": "1-1-account-access", "from": "review", "to": "done", "actor": "AI root", "head": "08237d0b112e9d1bd0f89836c62d65602762fb0c", "post_done_rework": false}
 {"timestamp": "2026-11-12T05:01:00.226261+00:00", "story": "1-2-room-schedule", "from": "backlog", "to": "ready-for-dev", "actor": "AI root", "head": "b80e331dc5c7ec0c0a0ca250aed93d2b67478856", "post_done_rework": false}
 {"timestamp": "2026-11-12T05:01:00.290913+00:00", "story": "1-2-room-schedule", "from": "ready-for-dev", "to": "in-progress", "actor": "AI root", "head": "3f0349edf4cb0dedd85e269fdb1530cd67aa95d5", "post_done_rework": false}
+{"timestamp": "2026-11-12T05:17:02.109756+00:00", "story": "1-2-room-schedule", "from": "in-progress", "to": "review", "actor": "AI root", "head": "64a8a27297fda34c849d1293f391d107fa5e776f", "post_done_rework": false}
+{"timestamp": "2026-11-12T05:29:04.273241+00:00", "story": "1-2-room-schedule", "from": "review", "to": "done", "actor": "AI root", "head": "64a8a27297fda34c849d1293f391d107fa5e776f", "post_done_rework": false}

@@ -1,6 +1,6 @@
 # 课题组活动与会议室预约
 
-软件工程管理课程项目。选题及使用对象已由用户确认。Story 1.1 已实现预置账号登录、身份显示和退出，会议室查询与预约能力待后续故事交付。
+软件工程管理课程项目。选题及使用对象已由用户确认。Story 1.1—1.2 已实现预置账号登录、身份显示、退出、会议室目录和共享日程；可用性查询、预约及管理能力待后续故事交付。
 
 本仓库按实际发生的工作保存 BMAD 产物和过程证据。实验 B 按用户转述的教师要求免做，实验 A 保留。人数和截止日期不作为当前阶段的阻塞条件。
 
@@ -46,7 +46,7 @@ npx --yes bmad-method@6.12.1 install --directory . --modules bmm --tools codex -
 
 本机已验证配置与定制解析脚本可运行。
 
-## 运行认证故事
+## 运行身份与日程故事
 
 从本项目目录运行。应用要求 Python **3.12.14**，其链接的 SQLite 须 ≥3.51.3；本机 `.tools/bin/python` 已核验为 SQLite 3.53.1。其他机器的 `.tools/bin/python` 可能只是用于安装 uv 的 Python 3.11，因此按以下命令让 uv 获取指定应用解释器，再按现有锁文件创建 `.venv`。数据库必须在本机磁盘，不能放在网络共享盘。
 
@@ -55,6 +55,7 @@ source .tools/bin/activate
 uv python install 3.12.14
 uv sync --frozen --python 3.12.14
 uv run --frozen python -m scripts.init_demo
+uv run --frozen python -m scripts.seed_demo_rooms
 uv run --frozen waitress-serve --listen=127.0.0.1:8000 --threads=8 --call booking_app:create_app
 ```
 
@@ -68,7 +69,9 @@ uv run --frozen waitress-serve --listen=127.0.0.1:8000 --threads=8 --call bookin
 | `demo_member_b` | 演示成员乙 | 成员 |
 | `demo_admin` | 演示管理员 | 管理员 |
 
-打开 [本机登录页](http://127.0.0.1:8000/login)，登录后首页显示本人及角色，使用顶栏按钮退出。刷新不会延长 8 小时绝对有效期，退出只撤销当前会话。界面可用键盘操作，并适配手机宽度。当前首页明确标注查询功能尚未开放。
+打开 [本机登录页](http://127.0.0.1:8000/login)，登录后在首页查看房间名称、地点和容量，选择会议室及北京时间日期，点击「查看日程」。结果区保留查询条件，明确显示查询中、成功、空结果或错误；共享预约仅显示活动名、预约人显示名、房间、时间与状态，停用显示时间及原因。历史日期和跨日停用同样可查询，结束恰为午夜的记录不进入下一天。使用顶栏按钮退出；刷新不会延长 8 小时绝对有效期，退出只撤销当前会话。界面可用键盘操作，并适配手机宽度。
+
+`seed_demo_rooms` 只补充三间名称含「合成演示」的房间，按名称/地点识别已有房间，可重复运行且不覆盖容量或业务数据。它与账号初始化一样使用 `BOOKING_DB_PATH`；在旧 Story 1.1 数据库上运行也会非破坏性补齐查询表，保持 `user_version=1`。不需要演示房间时可省略该命令，首页显示空目录。默认演示库没有预约或停用，因此查询显示空日程；下方 `--schedule` 浏览器验证会在独立临时库建立有完整占用槽的合成预约与跨日停用，以复现有日程、历史、取消排除和隐私场景。应用没有预约/停用写接口，也不把测试夹具写入演示库。
 
 初始化和启动命令可重复执行。重复初始化仍会提示输入合规口令，但只补缺失账号，**不会重置已有密码、显示名或角色，也不会清除已有数据**。停止后重启服务保留未到期会话。不要删除数据库来升级应用；schema 版本不兼容时启动会明确停止。
 
@@ -101,9 +104,12 @@ npm install --prefix work/browser-tools --no-save --package-lock=false playwrigh
 work/browser-tools/node_modules/.bin/playwright install chromium
 uv run --frozen python -m scripts.verify_auth_browser --output-dir work/browser-verification
 node --test tests/test_auth_js.cjs
+uv run --frozen python -m scripts.verify_auth_browser --schedule --output-dir work/schedule-verification
 ```
 
 浏览器 runner 使用独立临时数据库、权限 600 的临时随机凭证文件和 127.0.0.1:8002，自动启动/停止 Waitress 并清理临时数据。它保留桌面/390px 手机的标签、焦点、键盘登录/退出、身份 API、退出后匿名/旧 cookie 拒绝、错误反馈及宽度检查，输出无凭证的 JSON 与截图。`--output-dir` 可指定新的证据目录；不会写入原始 Story 1.1 证据文件。`--playwright-root` 可指定其他安装位置下的 `node_modules`；`--browser-executable` 可选择已有 Chrome/Chromium 可执行文件，不依赖任何特定机器路径。末条 Node 测试用可控计时器验证响应头/正文停滞均在设定的 20 秒期限取消并恢复控件，无须实际等待 20 秒。
+
+Story 1.2 的 49 项 Python 测试、认证 JavaScript 超时回归、桌面/手机有日程与空日程检查见 [Story 1.2 验证记录](docs/evidence/story-1.2-verification.md)。`--schedule` 仍执行完整的浏览器登录/退出检查，另验证等待反馈、字段错误、条件保留、半开午夜、JSON/DOM 白名单及 HTML 文本不执行。测试和浏览器库均独立于默认演示库。
 
 ## AI 使用声明
 

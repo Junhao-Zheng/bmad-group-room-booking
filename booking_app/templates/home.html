@@ -1,13 +1,58 @@
 {% extends "base.html" %}
-{% block title %}欢迎 · 课题组活动与会议室预约{% endblock %}
+{% block title %}会议室与共享日程 · 课题组活动与会议室预约{% endblock %}
 {% block content %}
-<section class="welcome card" aria-labelledby="welcome-title">
-  <p class="eyebrow">身份已确认</p>
-  <h1 id="welcome-title">欢迎，{{ user.display_name }}。</h1>
-  <p>您已作为<strong>{{ '管理员' if user.role == 'admin' else '成员' }}</strong>登录课题组。</p>
-  <p class="muted">当前开放账号登录与退出，会议室查询将在后续开放。</p>
-  <div class="info-note"><span aria-hidden="true">✓</span><p>请在使用结束后点击右上方「退出登录」。<br>刷新页面不会延长本次登录的有效期。</p></div>
+<div class="page-intro">
+  <p class="eyebrow">课题组空间 · 合成演示数据</p>
+  <h1>会议室与共享日程</h1>
+  <p class="muted">查看会议室与指定日期的占用，安排下一次讨论。所有时间均为北京时间。</p>
   <p id="auth-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>
   <a id="relogin-link" class="relogin-link" href="{{ url_for('web.login_page') }}" hidden>重新登录</a>
-</section>
+</div>
+<div class="schedule-layout">
+  <section class="card room-directory" aria-labelledby="rooms-title">
+    <p class="section-label">会议室目录</p>
+    <h2 id="rooms-title">选择讨论空间</h2>
+    <p class="muted">共 {{ rooms.total }} 间会议室</p>
+    {% if rooms.total %}
+    <ul class="room-list">
+      {% for room in rooms['items'] %}
+      <li><h3>{{ room.name }}</h3><p>{{ room.location }}</p><p class="muted">可容纳 {{ room.capacity }} 人</p></li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="notice" role="status">暂无会议室，请联系管理员确认演示资源。</p>
+    {% endif %}
+  </section>
+  <section class="card schedule-panel" aria-labelledby="schedule-title">
+    <p class="section-label">共享日程</p>
+    <h2 id="schedule-title">查看一天的安排</h2>
+    <noscript><p class="notice">查询日程需要启用 JavaScript 才能提交条件和显示结果；会议室目录仍可阅读。</p></noscript>
+    <form id="schedule-form" action="{{ url_for('web.schedule_api') }}" method="get" novalidate>
+      <div class="form-field">
+        <label for="room_id">会议室</label>
+        <select id="room_id" name="room_id" aria-describedby="room_id-error" {% if not rooms.total %}disabled{% endif %}>
+          <option value="">请选择会议室</option>
+          {% for room in rooms['items'] %}
+          <option value="{{ room.id }}">{{ room.name }} · {{ room.location }}（{{ room.capacity }} 人）</option>
+          {% endfor %}
+        </select>
+        <p id="room_id-error" class="field-error"></p>
+      </div>
+      <div class="form-field">
+        <label for="date">日期（北京时间）</label>
+        <input id="date" name="date" type="date" max="9999-12-30" aria-describedby="date-hint date-error" {% if not rooms.total %}disabled{% endif %}>
+        <p id="date-hint" class="field-hint">可查看历史日期；跨日停用会出现在每个覆盖日期。</p>
+        <p id="date-error" class="field-error"></p>
+      </div>
+      <button class="button-primary" type="submit" disabled>查看日程</button>
+    </form>
+    <p id="schedule-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1">{% if rooms.total %}选择会议室和日期后查看日程。{% else %}添加会议室后即可查询日程。{% endif %}</p>
+    <a id="schedule-relogin" class="relogin-link" href="{{ url_for('web.login_page') }}" hidden>重新登录后查询</a>
+    <div id="schedule-results" aria-labelledby="schedule-conditions" hidden>
+      <h3 id="schedule-conditions"></h3>
+      <ul id="schedule-items" class="schedule-items"></ul>
+    </div>
+  </section>
+</div>
+<script src="{{ url_for('static', filename='schedule.js') }}" defer></script>
 {% endblock %}

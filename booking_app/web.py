@@ -6,7 +6,7 @@ import uuid
 from flask import Blueprint, current_app, g, jsonify, make_response, redirect, render_template, request, url_for
 from werkzeug.exceptions import HTTPException
 
-from . import auth
+from . import auth, services
 from .domain import DomainError
 
 bp = Blueprint("web", __name__)
@@ -58,7 +58,19 @@ def login_page():
 @bp.get("/")
 def home():
     session = auth.require_session(token())
-    return render_template("home.html", user=auth.current_user(session))
+    actor = auth.Actor(session["user_id"], session["display_name"], session["role"], session["token_hash"])
+    return render_template("home.html", user=auth.current_user(session), rooms=services.list_rooms(actor))
+
+
+@bp.get("/api/rooms")
+def rooms_api():
+    return jsonify(ok=True, data=services.list_rooms(auth.actor_for_token(token())))
+
+
+@bp.get("/api/schedule")
+def schedule_api():
+    actor = auth.actor_for_token(token())
+    return jsonify(ok=True, data=services.schedule(actor, request.args.get("room_id"), request.args.get("date")))
 
 
 @bp.get("/api/me")

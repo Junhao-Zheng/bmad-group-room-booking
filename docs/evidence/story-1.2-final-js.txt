@@ -1,0 +1,15 @@
+✔ stalled response headers aborts at 20 seconds and restores manual controls (2.769541ms)
+✔ stalled response body aborts at 20 seconds and restores manual controls (0.812833ms)
+✔ schedule stalled response headers aborts at 20 seconds and can be queried again (3.212ms)
+✔ schedule stalled response body aborts at 20 seconds and can be queried again (0.952667ms)
+✔ schedule network failure preserves conditions, restores controls, and permits retry (0.606334ms)
+✔ schedule bad JSON preserves conditions, restores controls, and permits retry (0.980625ms)
+✔ pending conditions cannot be edited and a field error focuses the restored original input (0.788375ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 56.906083

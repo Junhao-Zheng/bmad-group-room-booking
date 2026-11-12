@@ -1,0 +1,15 @@
+{
+  "result": "PASS",
+  "runs": [
+    {
+      "exit_code": 0,
+      "stdout": "合成演示会议室初始化完成，新增 3 间；已有数据未覆盖。"
+    },
+    {
+      "exit_code": 0,
+      "stdout": "合成演示会议室初始化完成，新增 0 间；已有数据未覆盖。"
+    }
+  ],
+  "room_count": 3,
+  "temporary_database_removed": true
+}

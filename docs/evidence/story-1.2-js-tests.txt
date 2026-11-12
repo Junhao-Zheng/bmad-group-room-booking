@@ -1,0 +1,10 @@
+✔ stalled response headers aborts at 20 seconds and restores manual controls (2.464625ms)
+✔ stalled response body aborts at 20 seconds and restores manual controls (0.741292ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 53.394666
