@@ -58,3 +58,4 @@
 {"timestamp": "2026-11-12T14:13:23.608818+00:00", "story": "2-3-personal-history", "from": "review", "to": "done", "actor": "AI root", "head": "3a33cfdf410837684fa32cd4f50d245ac81fb436", "post_done_rework": false}
 {"timestamp": "2026-11-12T14:13:23.647688+00:00", "story": "2-5-admin-cancel", "from": "review", "to": "done", "actor": "AI root", "head": "3a33cfdf410837684fa32cd4f50d245ac81fb436", "post_done_rework": false}
 {"timestamp": "2026-11-12T14:13:23.688523+00:00", "story": "3-3-revoke-block", "from": "review", "to": "done", "actor": "AI root", "head": "3a33cfdf410837684fa32cd4f50d245ac81fb436", "post_done_rework": false}
+{"timestamp": "2026-11-12T14:19:53.336276+00:00", "story": "3-4-audit-and-restart", "from": "backlog", "to": "ready-for-dev", "actor": "AI root", "head": "2f23f3d2d88e4824d39989ad49a7bc2344aa1d7a", "post_done_rework": false}
