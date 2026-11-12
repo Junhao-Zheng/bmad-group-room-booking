@@ -52,7 +52,7 @@ development_status:
   epic-3: in-progress
   3-1-room-management: done
   3-2-maintenance-block: done
-  3-3-revoke-block: backlog
+  3-3-revoke-block: ready-for-dev
   3-4-audit-and-restart: backlog
   epic-3-retrospective: optional
 action_items:
