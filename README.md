@@ -1,6 +1,6 @@
 # 课题组活动与会议室预约
 
-软件工程管理课程项目。选题及使用对象已由用户确认。Story 1.1—1.2 已实现预置账号登录、身份显示、退出、会议室目录和共享日程；可用性查询、预约及管理能力待后续故事交付。
+软件工程管理课程项目。选题及使用对象已由用户确认。Story 1.1—1.3 已实现预置账号登录、身份显示、退出、会议室目录、共享日程和可用会议室查询；预约及管理能力待后续故事交付。
 
 本仓库按实际发生的工作保存 BMAD 产物和过程证据。实验 B 按用户转述的教师要求免做，实验 A 保留。人数和截止日期不作为当前阶段的阻塞条件。
 
@@ -110,6 +110,21 @@ uv run --frozen python -m scripts.verify_auth_browser --schedule --output-dir wo
 浏览器 runner 使用独立临时数据库、权限 600 的临时随机凭证文件和 127.0.0.1:8002，自动启动/停止 Waitress 并清理临时数据。它保留桌面/390px 手机的标签、焦点、键盘登录/退出、身份 API、退出后匿名/旧 cookie 拒绝、错误反馈及宽度检查，输出无凭证的 JSON 与截图。`--output-dir` 可指定新的证据目录；不会写入原始 Story 1.1 证据文件。`--playwright-root` 可指定其他安装位置下的 `node_modules`；`--browser-executable` 可选择已有 Chrome/Chromium 可执行文件，不依赖任何特定机器路径。末条 Node 测试用可控计时器验证响应头/正文停滞均在设定的 20 秒期限取消并恢复控件，无须实际等待 20 秒。
 
 Story 1.2 的 49 项 Python 测试、认证 JavaScript 超时回归、桌面/手机有日程与空日程检查见 [Story 1.2 验证记录](docs/evidence/story-1.2-verification.md)。`--schedule` 仍执行完整的浏览器登录/退出检查，另验证等待反馈、字段错误、条件保留、半开午夜、JSON/DOM 白名单及 HTML 文本不执行。测试和浏览器库均独立于默认演示库。
+
+Story 1.3 首页现可按北京时间起止时段和人数查询可用会议室；`GET /api/availability?start=2026-11-13T10:00&end=2026-11-13T11:00&attendees=10` 接受当前时刻之后、30 天内的同日半小时时段（最长 4 小时）。示例日期须按实际运行日期调整。无匹配返回 200 空列表，非法条件返回 400 字段提示；查询不保留时段。查询与现有日程、登录退出互相独立。
+
+完整复跑（浏览器依赖安装同上）：
+
+```bash
+.venv/bin/python -m unittest discover -s tests -v
+node --test tests/test_*js.cjs
+.venv/bin/python -m scripts.verify_auth_browser --availability --output-dir work/availability-browser
+.venv/bin/python -m scripts.verify_availability_performance --output-dir work/availability-performance
+```
+
+`--availability` 同时运行登录、退出及日程回归，检查 1280×800 和 390×844 布局，并检查成功/空结果后的按钮焦点及后续 Tab 顺序。性能脚本建立独立临时数据库和 10 个随机口令账号，以固定种子 20261112、固定北京时间 2026-11-12 08:00 准备 10 房间及 1000 条预约，启动单进程 8 线程 Waitress，10 个认证客户端执行 20 次预热及 200 次完整 HTTP 测量。结束后自动停止服务并删除临时账号、数据库，不需要运行默认演示服务。每轮首先以新 run_id 写入 INCOMPLETE，使旧 PASS 失效；完成测量、数据检查和服务清理后才发布最终结果。环境保存真实 UTC 开始时间、run_id、应用源文件及测量脚本 SHA-256。输出保留所有 220 个样本（包括慢请求/失败）、类型严格的完整预期与实际 DTO、夹具、环境、最近秩 P95；无法解析的响应只保存 HTTP 状态、错误类型、字节长度及 SHA-256，不保存原正文。任意错误、错误结果或 P95 超过 1000 ms 均以非零退出码报告。固定 Clock 只在测试配置下注入，没有 HTTP 时间后门。
+
+初版 59 项 Python 测试、13 项 JavaScript 测试及性能原始记录保留在 [Story 1.3 初版验证记录](docs/evidence/story-1.3-verification.md)。评审修复后的定向测试、真实浏览器及性能复跑见 [Story 1.3 评审修复验证](docs/evidence/story-1.3-reviewed-verification.md)。已登记性能负载全部为 30 分钟查询，其中 80% 执行 SQL 可用性筛选、20% 为人数 1001 的合法空结果快路径；报告分别列出两类样本数及 P95。该负载不代表 4 小时查询或长停用的最坏性能，也不代表实际课题组试用或生产规模。
 
 ## AI 使用声明
 

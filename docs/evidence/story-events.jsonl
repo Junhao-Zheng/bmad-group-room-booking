@@ -8,3 +8,6 @@
 {"timestamp": "2026-11-12T05:29:04.273241+00:00", "story": "1-2-room-schedule", "from": "review", "to": "done", "actor": "AI root", "head": "64a8a27297fda34c849d1293f391d107fa5e776f", "post_done_rework": false}
 {"timestamp": "2026-11-12T05:29:32.896848+00:00", "story": "1-3-availability", "from": "backlog", "to": "ready-for-dev", "actor": "AI root", "head": "3aa97dae13e4853405663e286e51ae2983511c85", "post_done_rework": false}
 {"timestamp": "2026-11-12T05:29:32.959057+00:00", "story": "1-3-availability", "from": "ready-for-dev", "to": "in-progress", "actor": "AI root", "head": "ea3fba136e8b6c3cbd5bc373c167a8527376981f", "post_done_rework": false}
+{"timestamp": "2026-11-12T05:43:52.880325+00:00", "story": "1-3-availability", "from": "in-progress", "to": "review", "actor": "AI root", "head": "5b059c577d95aad51ae2f108decbf2173c640fa7", "post_done_rework": false}
+{"timestamp": "2026-11-12T06:04:22.149875+00:00", "story": "1-3-availability", "from": "review", "to": "done", "actor": "AI root", "head": "5b059c577d95aad51ae2f108decbf2173c640fa7", "post_done_rework": false}
+{"timestamp": "2026-11-12T06:04:22.181132+00:00", "epic": "epic-1", "from_status": "in-progress", "to": "done", "actor": "AI root", "basis": "all three story acceptance/reviews complete", "head": "5b059c577d95aad51ae2f108decbf2173c640fa7"}

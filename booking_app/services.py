@@ -3,7 +3,7 @@
 from flask import current_app
 
 from . import auth, db, dto
-from .domain import DomainError, auth_required, beijing_day, resource_id
+from .domain import DomainError, auth_required, beijing_day, booking_interval, query_attendees, resource_id
 
 
 def _require_actor(conn, actor: auth.Actor, now: int) -> None:
@@ -20,6 +20,25 @@ def list_rooms(actor: auth.Actor) -> dict:
         now = current_app.config["CLOCK"].now_epoch()
         _require_actor(conn, actor, now)
         rows = conn.execute("SELECT id,name,location,capacity FROM rooms ORDER BY name,location,id").fetchall()
+        return dto.list_result([dto.room(row) for row in rows])
+
+
+def availability(actor: auth.Actor, start, end, attendees) -> dict:
+    with db.read_transaction() as conn:
+        now = current_app.config["CLOCK"].now_epoch()
+        _require_actor(conn, actor, now)
+        start_at, end_at = booking_interval(start, end, now)
+        count = query_attendees(attendees)
+        if count > 1000:
+            return dto.list_result([])
+        rows = conn.execute(
+            "SELECT room.id,room.name,room.location,room.capacity FROM rooms room "
+            "WHERE room.capacity>=? AND NOT EXISTS ("
+            "SELECT 1 FROM occupancy_slots s JOIN reservations r ON r.id=s.reservation_id "
+            "AND r.room_id=s.room_id WHERE s.room_id=room.id AND r.cancelled_at IS NULL "
+            "AND s.slot_start>=? AND s.slot_start<?) ORDER BY room.name,room.location,room.id",
+            (count, start_at, end_at),
+        ).fetchall()
         return dto.list_result([dto.room(row) for row in rows])
 
 

@@ -1,0 +1,21 @@
+✔ stalled response headers aborts at 20 seconds and restores manual controls (3.199458ms)
+✔ stalled response body aborts at 20 seconds and restores manual controls (0.832959ms)
+✔ availability stalled response headers aborts at 20 seconds, retains input, permits manual retry (4.759834ms)
+✔ availability stalled response body aborts at 20 seconds, retains input, permits manual retry (1.237208ms)
+✔ availability network failure restores controls without discarding conditions (0.579959ms)
+✔ availability bad JSON restores controls without discarding conditions (0.486333ms)
+✔ availability field errors focus enabled input; success clears errors and safely renders literal room text (0.67775ms)
+✔ availability expired session gives a login link, preserves input and hides old results (0.5095ms)
+✔ schedule stalled response headers aborts at 20 seconds and can be queried again (4.069708ms)
+✔ schedule stalled response body aborts at 20 seconds and can be queried again (0.986417ms)
+✔ schedule network failure preserves conditions, restores controls, and permits retry (0.619625ms)
+✔ schedule bad JSON preserves conditions, restores controls, and permits retry (0.583167ms)
+✔ pending conditions cannot be edited and a field error focuses the restored original input (1.084041ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 60.869792

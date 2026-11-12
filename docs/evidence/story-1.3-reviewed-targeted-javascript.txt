@@ -1,0 +1,14 @@
+✔ availability stalled response headers aborts at 20 seconds, retains input, permits manual retry (3.799792ms)
+✔ availability stalled response body aborts at 20 seconds, retains input, permits manual retry (0.95875ms)
+✔ availability network failure restores controls without discarding conditions (0.53925ms)
+✔ availability bad JSON restores controls without discarding conditions (0.810667ms)
+✔ availability field errors focus enabled input; success clears errors and safely renders literal room text (0.578208ms)
+✔ availability expired session gives a login link, preserves input and hides old results (0.431041ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 59.4435

@@ -11,6 +11,11 @@ async function submitSchedule(page) {
   await page.keyboard.press('Enter');
 }
 
+async function submitAvailability(page) {
+  await page.locator('#availability-form button').focus();
+  await page.keyboard.press('Enter');
+}
+
 (async () => {
   assert.equal(require('playwright/package.json').version, PINNED_PLAYWRIGHT);
   const [origin, credentialsFile, outputDir, executablePath, scenario] = process.argv.slice(2);
@@ -51,8 +56,8 @@ async function submitSchedule(page) {
       const homeWidth = await page.evaluate(() => ({document:document.documentElement.scrollWidth,viewport:innerWidth}));
       assert.ok(homeWidth.document <= homeWidth.viewport);
       await page.screenshot({path:path.join(outputDir,`home-${viewport.width}.png`),fullPage:true});
-      let scheduleChecks, stalePage;
-      if (scenario === 'schedule') {
+      let scheduleChecks, availabilityChecks, stalePage;
+      if (scenario === 'schedule' || scenario === 'availability') {
         assert.equal(await page.locator('label[for=room_id]').textContent(), '会议室');
         assert.equal(await page.locator('label[for=date]').textContent(), '日期（北京时间）');
         await submitSchedule(page);
@@ -129,12 +134,82 @@ async function submitSchedule(page) {
         const noScriptPage = await noScriptContext.newPage();
         await noScriptPage.goto(`${origin}/`);
         assert.equal(await noScriptPage.locator('.room-list > li').count(), 3);
-        assert.match(await noScriptPage.locator('noscript').textContent(), /查询日程需要启用 JavaScript/);
+        assert.match((await noScriptPage.locator('noscript').allTextContents()).join(' '), /查询日程需要启用 JavaScript/);
         assert.equal(await noScriptPage.locator('#schedule-form button').isDisabled(), true);
+        assert.equal(await noScriptPage.locator('#availability-form button').isDisabled(), true);
         await noScriptContext.close();
         scheduleChecks = {scheduleWidth,labels:'PASS',loading:'PASS',pending_inputs_disabled_and_restored:'PASS',field_error:'PASS',keyboard_schedule_submit:'PASS',keyboard_room_and_date_error_focus:'PASS',fixed_clock_status_texts:'PASS',exact_api_intervals:'PASS',exact_display_intervals:'PASS',no_script_notice_and_readable_directory:'PASS',shared_contract:'PASS',literal_html_and_xss:'PASS',private_values_absent:'PASS',half_open_midnight:'PASS',empty_result:'PASS',error_retains_conditions:'PASS'};
         stalePage = await context.newPage();
         await stalePage.goto(`${origin}/`);
+      }
+      if (scenario === 'availability') {
+        for (const name of ['start', 'end', 'attendees']) {
+          assert.equal(await page.locator(`label[for=${name}]`).count(), 1);
+          assert.equal(await page.locator(`#${name}`).evaluate(input => input.required), true);
+        }
+        assert.equal(await page.locator('#start').getAttribute('step'), '1800');
+        assert.equal(await page.locator('#end').getAttribute('step'), '1800');
+        assert.equal(await page.locator('#attendees').getAttribute('min'), '1');
+        await submitAvailability(page);
+        await page.waitForFunction(() => document.querySelector('#start').getAttribute('aria-invalid') === 'true');
+        assert.equal(await page.evaluate(() => document.activeElement.id), 'start');
+        await page.locator('#start').fill('2026-11-12T12:00');
+        await page.locator('#end').fill('2026-11-12T12:30');
+        await page.locator('#attendees').fill('0');
+        await submitAvailability(page);
+        await page.waitForFunction(() => document.querySelector('#attendees').getAttribute('aria-invalid') === 'true');
+        assert.equal(await page.evaluate(() => document.activeElement.id), 'attendees');
+        await page.locator('#attendees').fill('10');
+        let release;
+        const gate = new Promise(resolve => { release = resolve; });
+        await page.route('**/api/availability?**', async route => { await gate; await route.continue(); });
+        await submitAvailability(page);
+        assert.equal(await page.locator('#availability-form').getAttribute('aria-busy'), 'true');
+        for (const name of ['start', 'end', 'attendees']) assert.equal(await page.locator(`#${name}`).isDisabled(), true);
+        assert.match(await page.locator('#availability-feedback').textContent(), /正在查询/);
+        await page.screenshot({path:path.join(outputDir,`availability-loading-${viewport.width}.png`),fullPage:true});
+        release();
+        await page.waitForFunction(() => document.querySelector('#availability-feedback').textContent.includes('找到 3 间'));
+        assert.equal(await page.evaluate(() => document.activeElement === document.querySelector('#availability-form button')), true);
+        await page.keyboard.press('Tab');
+        assert.equal(await page.evaluate(() => document.activeElement.id), 'room_id');
+        await page.unroute('**/api/availability?**');
+        assert.equal(await page.locator('#availability-items > li').count(), 3);
+        assert.match(await page.locator('#availability-items').textContent(), /合成 C <讨论室>/);
+        assert.equal(await page.locator('#availability-items 讨论室').count(), 0);
+        assert.match(await page.locator('#availability-conditions').textContent(), /2026-11-12 12:00.*12:30.*北京时间.*10 人/);
+        assert.match(await page.locator('#availability-feedback').textContent(), /不保留时段/);
+        for (const name of ['start', 'end', 'attendees']) assert.equal(await page.locator(`#${name}`).isDisabled(), false);
+        const availableWidth = await page.evaluate(() => ({document:document.documentElement.scrollWidth,viewport:innerWidth}));
+        assert.ok(availableWidth.document <= availableWidth.viewport);
+        await page.evaluate(() => window.scrollTo(0, 0));
+        await page.screenshot({path:path.join(outputDir,`availability-${viewport.width}.png`),fullPage:true});
+        await page.locator('#attendees').fill('1001');
+        await submitAvailability(page);
+        await page.waitForFunction(() => document.querySelector('#availability-feedback').textContent.includes('没有符合条件'));
+        assert.equal(await page.evaluate(() => document.activeElement === document.querySelector('#availability-form button')), true);
+        await page.keyboard.press('Tab');
+        assert.equal(await page.evaluate(() => document.activeElement.id), 'room_id');
+        assert.equal(await page.locator('#availability-items > li').count(), 0);
+        assert.equal(await page.locator('#attendees').inputValue(), '1001');
+        await page.screenshot({path:path.join(outputDir,`availability-empty-${viewport.width}.png`),fullPage:true});
+        await page.locator('#start').fill('2026-11-12T23:30');
+        await page.locator('#end').fill('2026-11-13T00:00');
+        await submitAvailability(page);
+        await page.waitForFunction(() => document.querySelector('#end').getAttribute('aria-invalid') === 'true');
+        assert.equal(await page.evaluate(() => document.activeElement.id), 'end');
+        assert.match(await page.locator('#end-error').textContent(), /同一.*00:00/);
+        assert.equal(await page.locator('#end').inputValue(), '2026-11-13T00:00');
+        await page.screenshot({path:path.join(outputDir,`availability-error-${viewport.width}.png`),fullPage:true});
+        await page.locator('#start').fill('2026-11-12T12:00');
+        await page.locator('#end').fill('2026-11-12T12:30');
+        await page.route('**/api/availability?**', route => route.abort());
+        await submitAvailability(page);
+        await page.waitForFunction(() => document.querySelector('#availability-feedback').textContent.includes('检查网络'));
+        assert.equal(await page.locator('#attendees').inputValue(), '1001');
+        assert.equal(await page.locator('#availability-form button').isDisabled(), false);
+        await page.unroute('**/api/availability?**');
+        availabilityChecks = {availableWidth,labels:'PASS',required_semantics:'PASS',half_hour_controls:'PASS',keyboard_submit:'PASS',loading:'PASS',restored_controls:'PASS',success_and_empty_button_focus:'PASS',success_and_empty_next_tab:'PASS',success_exact_conditions:'PASS',literal_room_text:'PASS',empty_result:'PASS',time_and_attendees_field_errors:'PASS',network_failure_retains_conditions:'PASS',query_does_not_reserve_notice:'PASS'};
       }
       // Start from the stable header link, then traverse to logout by keyboard.
       await page.locator('.brand').focus();
@@ -146,7 +221,7 @@ async function submitSchedule(page) {
       assert.equal((await context.request.get(`${origin}/api/me`)).status(), 401);
       const replay = await context.request.get(`${origin}/api/me`, {headers:{Cookie:`grb_session=${oldCookie.value}`}});
       assert.equal(replay.status(), 401);
-      if (scenario === 'schedule') {
+      if (scenario === 'schedule' || scenario === 'availability') {
         assert.equal((await context.request.get(`${origin}/api/rooms`)).status(), 401);
         assert.equal((await context.request.get(`${origin}/api/schedule?room_id=10&date=2026-11-12`, {headers:{Cookie:`grb_session=${oldCookie.value}`}})).status(), 401);
         scheduleChecks.logout_rejects_queries = 'PASS';
@@ -157,6 +232,18 @@ async function submitSchedule(page) {
         assert.equal(await stalePage.locator('#schedule-relogin').isVisible(), true);
         assert.equal(await stalePage.locator('#date').inputValue(), '2026-11-12');
         scheduleChecks.session_loss_feedback = 'PASS';
+        if (scenario === 'availability') {
+          assert.equal((await context.request.get(`${origin}/api/availability?start=bad&end=bad&attendees=bad`, {headers:{Cookie:`grb_session=${oldCookie.value}`}})).status(), 401);
+          await stalePage.locator('#start').fill('2026-11-12T12:00');
+          await stalePage.locator('#end').fill('2026-11-12T12:30');
+          await stalePage.locator('#attendees').fill('10');
+          await submitAvailability(stalePage);
+          await stalePage.waitForFunction(() => document.querySelector('#availability-feedback').textContent.includes('登录已失效'));
+          assert.equal(await stalePage.locator('#availability-relogin').isVisible(), true);
+          assert.equal(await stalePage.locator('#start').inputValue(), '2026-11-12T12:00');
+          assert.equal(await stalePage.locator('#attendees').inputValue(), '10');
+          availabilityChecks.session_loss_and_old_cookie = 'PASS';
+        }
         await stalePage.close();
       }
       await page.locator('button[type=submit]').focus();
@@ -166,11 +253,17 @@ async function submitSchedule(page) {
       assert.ok((await page.locator('#auth-feedback').textContent()).includes('检查账号和密码'));
       assert.equal(await page.locator('#auth-feedback').getAttribute('role'), 'alert');
       assert.deepEqual(errors, []);
-      results.push({viewport,loginWidth,homeWidth,keyboard_login:'PASS',keyboard_logout:'PASS',identity_api:'PASS',logout_and_old_cookie:'PASS',empty_fields_feedback:'PASS',visible_labels:'PASS',page_errors:errors,...(scheduleChecks ? {schedule:scheduleChecks} : {})});
+      results.push({viewport,loginWidth,homeWidth,keyboard_login:'PASS',keyboard_logout:'PASS',identity_api:'PASS',logout_and_old_cookie:'PASS',empty_fields_feedback:'PASS',visible_labels:'PASS',page_errors:errors,...(scheduleChecks ? {schedule:scheduleChecks} : {}),...(availabilityChecks ? {availability:availabilityChecks} : {})});
       await context.close();
     }
     console.log(JSON.stringify({result:'PASS',browser:await browser.version(),runner:`Playwright ${PINNED_PLAYWRIGHT} (external verification tool only)`,results},null,2));
   } finally {
     await browser.close();
   }
-})().catch(error => { console.error(error.name); process.exitCode = 1; });
+})().catch(error => {
+  const source = String(error.stack).match(/verify_auth_browser\.cjs:[0-9]+:[0-9]+/);
+  // Persist only the error type and source line, never input values or raw diagnostics.
+  fs.writeFileSync(path.join(process.argv[4], 'browser-failure.json'), JSON.stringify({error_type:error.name, source:source ? source[0] : null}, null, 2));
+  console.error(error.name);
+  process.exitCode = 1;
+});

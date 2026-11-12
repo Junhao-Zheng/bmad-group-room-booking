@@ -34,7 +34,9 @@ def main():
     parser.add_argument("--browser-executable", type=Path, help="Optional existing Chrome/Chromium executable; default uses Playwright Chromium")
     parser.add_argument("--output-dir", type=Path, default=ROOT / "work/browser-verification")
     parser.add_argument("--schedule", action="store_true", help="Include Story 1.2 synthetic schedule fixtures and checks")
+    parser.add_argument("--availability", action="store_true", help="Include Story 1.3 availability plus login/logout and schedule checks")
     args = parser.parse_args()
+    args.schedule = args.schedule or args.availability
     origin = f"http://127.0.0.1:{args.port}"
     with socket.socket() as probe:
         probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -75,7 +77,7 @@ def main():
                 browser_command = ["node", str(ROOT / "scripts/verify_auth_browser.cjs"), origin,
                                    str(credentials), str(args.output_dir.resolve())]
                 browser_command.append(str(args.browser_executable.resolve()) if args.browser_executable else "")
-                browser_command.append("schedule" if args.schedule else "auth")
+                browser_command.append("availability" if args.availability else "schedule" if args.schedule else "auth")
                 result = subprocess.run(browser_command, cwd=ROOT, env=env, text=True, capture_output=True, timeout=120)
                 if result.returncode:
                     # Browser failures may include input values; do not print raw diagnostics.

@@ -1,0 +1,49 @@
+{
+  "run_id": "a4d3484a3facd8137f902ca059954269",
+  "started_at_utc": "2026-11-12T06:00:19.596560+00:00",
+  "app_source_files_sha256": {
+    "booking_app/__init__.py": "5a48db29ac5c601e3fd118131b0798e3d768e236067aaca7e938c7e709f9daef",
+    "booking_app/auth.py": "c81a834f349872a0b367f9bef4d48e7f4e2c6d258667c2d6690bca2dba110ac4",
+    "booking_app/db.py": "897b3046d9e8a514c569655451f4de6358f2819abe122516fb0829549346b5fb",
+    "booking_app/domain.py": "b426a5db66a7f026184af3106bab59b50b8755f98bf905f79d9d2e94458d10b0",
+    "booking_app/dto.py": "d6e1dc90f28668c697c781ba67e47ef8f9e311f6ef7e799db0c6744ac3644947",
+    "booking_app/schema.sql": "7c0fc9e54b91f954518b179f027f9c97a820ea51f649c68b9d79156be8aea080",
+    "booking_app/services.py": "9c71805c51e5d48afd2f4382089ae58562401b924ccb322917aeb76f0b67d7f9",
+    "booking_app/static/app.css": "8ca7eb25052f81a76b22155dda366c3fbe27df0e32c3c7ec6b8836f04a2ad452",
+    "booking_app/static/auth.js": "23a7dc6ffc7b83bfe7fe202454d8965630ae25e0c96473c9b27990adc645bfc6",
+    "booking_app/static/availability.js": "f5053c9a5c1da754a498f86d07db9b4576a8a758e00cc8bd7311697510afc70d",
+    "booking_app/static/schedule.js": "3b6395af918cbf648c9197c33565e87f54e03ed1a65e4790b8edc00e578cb21e",
+    "booking_app/templates/base.html": "a2f7d2f5be7e5fc07465d8dcef9549b4cfeea181ea54c102643488d7e871204c",
+    "booking_app/templates/home.html": "6bce0da0950e2ab50bcb4de4496123b1766ad56d31e1f883002eb3e008142506",
+    "booking_app/templates/login.html": "0fd042466f50de613a26bf84485564187024e1b2b0133137e59a0e64027891b6",
+    "booking_app/web.py": "a1685c93d81a74f0921b3044ef5c75aec0a7a3674a947d1b0bfabdc2188a58bc"
+  },
+  "app_source_sha256": "dcbd74169602d9ea348a1fa25d5ae9a3a7b54c962183b7a71371ae77eadaed46",
+  "performance_script_sha256": "ae395a435bfad8c79292de9d1b993e25c0549c738b2b4a0c7d18b2d9399387d0",
+  "os": "macOS-26.6-arm64-arm-64bit",
+  "machine": "arm64",
+  "cpu": "Apple M1 Pro",
+  "logical_cpus": 8,
+  "memory_bytes": "34359738368",
+  "python": "3.12.14 (main, Aug 25 2026, 13:50:33) [Clang 22.1.3 ]",
+  "sqlite": "3.53.1",
+  "dependencies": {
+    "Flask": "3.1.3",
+    "Jinja2": "3.1.6",
+    "Werkzeug": "3.1.9",
+    "waitress": "3.0.2"
+  },
+  "server_processes": 1,
+  "server_threads": 8,
+  "origin": "http://127.0.0.1:53330",
+  "invocation": [
+    "/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/.venv/bin/python",
+    "-m",
+    "scripts.verify_availability_performance",
+    "--output-dir",
+    "/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/docs/evidence/story-1.3-performance-reviewed"
+  ],
+  "server_start": "spawn scripts.verify_availability_performance.server_main(database, port); waitress.serve(app, host='127.0.0.1', port=port, threads=8)",
+  "fixed_clock_injection": "TESTING=True only, no HTTP clock endpoint",
+  "database": "isolated temporary local file; WAL/FULL/foreign_keys; removed after run"
+}

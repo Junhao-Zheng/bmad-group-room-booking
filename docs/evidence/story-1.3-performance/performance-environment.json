@@ -1,0 +1,28 @@
+{
+  "os": "macOS-26.6-arm64-arm-64bit",
+  "machine": "arm64",
+  "cpu": "Apple M1 Pro",
+  "logical_cpus": 8,
+  "memory_bytes": "34359738368",
+  "python": "3.12.14 (main, Aug 25 2026, 13:50:33) [Clang 22.1.3 ]",
+  "sqlite": "3.53.1",
+  "dependencies": {
+    "Flask": "3.1.3",
+    "Jinja2": "3.1.6",
+    "Werkzeug": "3.1.9",
+    "waitress": "3.0.2"
+  },
+  "server_processes": 1,
+  "server_threads": 8,
+  "origin": "http://127.0.0.1:50333",
+  "invocation": [
+    "/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/.venv/bin/python",
+    "-m",
+    "scripts.verify_availability_performance",
+    "--output-dir",
+    "/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/docs/evidence/story-1.3-performance"
+  ],
+  "server_start": "spawn scripts.verify_availability_performance.server_main(database, port); waitress.serve(app, host='127.0.0.1', port=port, threads=8)",
+  "fixed_clock_injection": "TESTING=True only, no HTTP clock endpoint",
+  "database": "isolated temporary local file; WAL/FULL/foreign_keys; removed after run"
+}

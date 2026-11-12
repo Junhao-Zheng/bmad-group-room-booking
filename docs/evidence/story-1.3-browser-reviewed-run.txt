@@ -1,0 +1,158 @@
+{
+  "result": "PASS",
+  "browser": "157.0.8103.51",
+  "runner": "Playwright 1.58.2 (external verification tool only)",
+  "results": [
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "loginWidth": {
+        "document": 1280,
+        "viewport": 1280
+      },
+      "homeWidth": {
+        "document": 1280,
+        "viewport": 1280
+      },
+      "keyboard_login": "PASS",
+      "keyboard_logout": "PASS",
+      "identity_api": "PASS",
+      "logout_and_old_cookie": "PASS",
+      "empty_fields_feedback": "PASS",
+      "visible_labels": "PASS",
+      "page_errors": [],
+      "schedule": {
+        "scheduleWidth": {
+          "document": 1280,
+          "viewport": 1280
+        },
+        "labels": "PASS",
+        "loading": "PASS",
+        "pending_inputs_disabled_and_restored": "PASS",
+        "field_error": "PASS",
+        "keyboard_schedule_submit": "PASS",
+        "keyboard_room_and_date_error_focus": "PASS",
+        "fixed_clock_status_texts": "PASS",
+        "exact_api_intervals": "PASS",
+        "exact_display_intervals": "PASS",
+        "no_script_notice_and_readable_directory": "PASS",
+        "shared_contract": "PASS",
+        "literal_html_and_xss": "PASS",
+        "private_values_absent": "PASS",
+        "half_open_midnight": "PASS",
+        "empty_result": "PASS",
+        "error_retains_conditions": "PASS",
+        "logout_rejects_queries": "PASS",
+        "session_loss_feedback": "PASS"
+      },
+      "availability": {
+        "availableWidth": {
+          "document": 1280,
+          "viewport": 1280
+        },
+        "labels": "PASS",
+        "required_semantics": "PASS",
+        "half_hour_controls": "PASS",
+        "keyboard_submit": "PASS",
+        "loading": "PASS",
+        "restored_controls": "PASS",
+        "success_and_empty_button_focus": "PASS",
+        "success_and_empty_next_tab": "PASS",
+        "success_exact_conditions": "PASS",
+        "literal_room_text": "PASS",
+        "empty_result": "PASS",
+        "time_and_attendees_field_errors": "PASS",
+        "network_failure_retains_conditions": "PASS",
+        "query_does_not_reserve_notice": "PASS",
+        "session_loss_and_old_cookie": "PASS"
+      }
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "loginWidth": {
+        "document": 390,
+        "viewport": 390
+      },
+      "homeWidth": {
+        "document": 390,
+        "viewport": 390
+      },
+      "keyboard_login": "PASS",
+      "keyboard_logout": "PASS",
+      "identity_api": "PASS",
+      "logout_and_old_cookie": "PASS",
+      "empty_fields_feedback": "PASS",
+      "visible_labels": "PASS",
+      "page_errors": [],
+      "schedule": {
+        "scheduleWidth": {
+          "document": 390,
+          "viewport": 390
+        },
+        "labels": "PASS",
+        "loading": "PASS",
+        "pending_inputs_disabled_and_restored": "PASS",
+        "field_error": "PASS",
+        "keyboard_schedule_submit": "PASS",
+        "keyboard_room_and_date_error_focus": "PASS",
+        "fixed_clock_status_texts": "PASS",
+        "exact_api_intervals": "PASS",
+        "exact_display_intervals": "PASS",
+        "no_script_notice_and_readable_directory": "PASS",
+        "shared_contract": "PASS",
+        "literal_html_and_xss": "PASS",
+        "private_values_absent": "PASS",
+        "half_open_midnight": "PASS",
+        "empty_result": "PASS",
+        "error_retains_conditions": "PASS",
+        "logout_rejects_queries": "PASS",
+        "session_loss_feedback": "PASS"
+      },
+      "availability": {
+        "availableWidth": {
+          "document": 390,
+          "viewport": 390
+        },
+        "labels": "PASS",
+        "required_semantics": "PASS",
+        "half_hour_controls": "PASS",
+        "keyboard_submit": "PASS",
+        "loading": "PASS",
+        "restored_controls": "PASS",
+        "success_and_empty_button_focus": "PASS",
+        "success_and_empty_next_tab": "PASS",
+        "success_exact_conditions": "PASS",
+        "literal_room_text": "PASS",
+        "empty_result": "PASS",
+        "time_and_attendees_field_errors": "PASS",
+        "network_failure_retains_conditions": "PASS",
+        "query_does_not_reserve_notice": "PASS",
+        "session_loss_and_old_cookie": "PASS"
+      }
+    }
+  ],
+  "server": {
+    "processes": 1,
+    "threads": 8,
+    "origin": "http://127.0.0.1:8002",
+    "command": [
+      "/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/.venv/bin/python",
+      "-m",
+      "waitress",
+      "--listen=127.0.0.1:8002",
+      "--threads=8",
+      "--call",
+      "scripts.verify_auth_browser:create_schedule_verification_app"
+    ]
+  },
+  "clock": {
+    "kind": "fixed_fixture",
+    "now_epoch": 1794448800,
+    "now_local": "2026-11-12T10:00:00+08:00"
+  }
+}

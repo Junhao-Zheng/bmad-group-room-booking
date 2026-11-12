@@ -65,3 +65,9 @@ select[aria-invalid="true"]{border:2px solid #a52b37}
 .field-hint{font-size:14px;color:#54707a;margin:8px 0 0}.schedule-status{display:inline-block;color:#126d65;font-size:14px;margin-bottom:10px}
 #schedule-conditions{font-size:16px;overflow-wrap:anywhere;margin:24px 0 0}.schedule-panel,.room-directory{overflow-wrap:anywhere}
 @media(max-width:800px){.schedule-layout{grid-template-columns:1fr}.room-list{margin-top:8px}.room-list li{padding:16px 0}}
+.availability-panel{margin-bottom:24px;overflow-wrap:anywhere}
+.availability-fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(100px,.6fr);gap:20px}
+.availability-fields .form-field{min-width:0;margin-top:12px}
+.availability-panel .button-primary{max-width:280px}
+#availability-conditions{font-size:16px;overflow-wrap:anywhere;margin:24px 0 0}
+@media(max-width:800px){.availability-fields{grid-template-columns:1fr;gap:8px}.availability-panel .button-primary{max-width:none}}

@@ -8,6 +8,38 @@
   <p id="auth-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>
   <a id="relogin-link" class="relogin-link" href="{{ url_for('web.login_page') }}" hidden>重新登录</a>
 </div>
+<section class="card availability-panel" aria-labelledby="availability-title">
+  <p class="section-label">可用会议室</p>
+  <h2 id="availability-title">按时段和人数找房间</h2>
+  <p class="muted" id="availability-hint">所有时间均为北京时间。请选择未来 30 天内、同一天的 30 分钟至 4 小时时段，起止分钟为 00 或 30。查询不锁定资源。</p>
+  <noscript><p class="notice">查询可用会议室需要启用 JavaScript；会议室目录仍可阅读。</p></noscript>
+  <form id="availability-form" action="{{ url_for('web.availability_api') }}" method="get" aria-describedby="availability-hint" novalidate>
+    <div class="availability-fields">
+      <div class="form-field">
+        <label for="start">开始时间（北京时间）</label>
+        <input id="start" name="start" type="datetime-local" step="1800" required aria-describedby="start-error">
+        <p id="start-error" class="field-error"></p>
+      </div>
+      <div class="form-field">
+        <label for="end">结束时间（北京时间）</label>
+        <input id="end" name="end" type="datetime-local" step="1800" required aria-describedby="end-error">
+        <p id="end-error" class="field-error"></p>
+      </div>
+      <div class="form-field">
+        <label for="attendees">预计人数</label>
+        <input id="attendees" name="attendees" type="number" min="1" step="1" required inputmode="numeric" aria-describedby="attendees-error">
+        <p id="attendees-error" class="field-error"></p>
+      </div>
+    </div>
+    <button class="button-primary" type="submit" disabled>查询可用会议室</button>
+  </form>
+  <p id="availability-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1">输入起止时间和人数后查询。</p>
+  <a id="availability-relogin" class="relogin-link" href="{{ url_for('web.login_page') }}" hidden>重新登录后查询</a>
+  <div id="availability-results" aria-labelledby="availability-conditions" hidden>
+    <h3 id="availability-conditions"></h3>
+    <ul id="availability-items" class="room-list"></ul>
+  </div>
+</section>
 <div class="schedule-layout">
   <section class="card room-directory" aria-labelledby="rooms-title">
     <p class="section-label">会议室目录</p>
@@ -55,4 +87,5 @@
   </section>
 </div>
 <script src="{{ url_for('static', filename='schedule.js') }}" defer></script>
+<script src="{{ url_for('static', filename='availability.js') }}" defer></script>
 {% endblock %}

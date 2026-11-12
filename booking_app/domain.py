@@ -102,3 +102,77 @@ def active_status(start_at: int, end_at: int, now: int) -> str:
     if now < start_at:
         return "pending"
     return "in_progress" if now < end_at else "ended"
+
+
+def beijing_datetime(value, field_name: str) -> int:
+    """Parse one strict half-hour local input; also reusable for future blocks."""
+    from datetime import datetime
+    import re
+    from zoneinfo import ZoneInfo
+
+    try:
+        if (not isinstance(value, str) or len(value) != 16
+                or not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:(00|30)", value)):
+            raise ValueError
+        local = datetime.fromisoformat(value).replace(tzinfo=ZoneInfo("Asia/Shanghai"))
+        return int(local.timestamp())
+    except (ValueError, OverflowError, OSError):
+        raise DomainError("INVALID_INPUT", "请检查查询时间。", {
+            field_name: "请输入有效的北京时间（YYYY-MM-DDTHH:MM），分钟仅限 00 或 30。",
+        }) from None
+
+
+def validate_booking_window(start_at: int, end_at: int, now: int) -> None:
+    """Pure shared query/booking rule; callers provide one captured server time."""
+    fields = {}
+    if start_at <= now:
+        fields["start"] = "开始时间必须晚于当前北京时间。"
+    if end_at <= start_at:
+        fields["end"] = "结束时间必须晚于开始时间。"
+    elif end_at - start_at < 1800 or end_at - start_at > 14400:
+        fields["end"] = "时长须为 30 分钟至 4 小时。"
+    if end_at > now + 30 * 86400:
+        fields["end"] = "结束时间不能超过当前时刻起 30 天。"
+    if fields:
+        raise DomainError("INVALID_INPUT", "请检查起止时间。", fields)
+    # Reject out-of-window dates before formatting: year 0001 Beijing can map
+    # to UTC year 0000, which datetime.fromtimestamp cannot represent.
+    if local_time(start_at)[:10] != local_time(end_at)[:10]:
+        raise DomainError("INVALID_INPUT", "请检查起止时间。", {
+            "end": "起止时间须在同一北京时间日期内，次日 00:00 也算跨日。",
+        })
+
+
+def booking_interval(start, end, now: int) -> tuple[int, int]:
+    fields, parsed = {}, {}
+    for name, value in (("start", start), ("end", end)):
+        try:
+            parsed[name] = beijing_datetime(value, name)
+        except DomainError as error:
+            fields.update(error.fields)
+    if fields:
+        raise DomainError("INVALID_INPUT", "请检查起止时间。", fields)
+    validate_booking_window(parsed["start"], parsed["end"], now)
+    return parsed["start"], parsed["end"]
+
+
+def positive_integer(value, field_name: str = "attendees") -> int:
+    """Strict JSON/service integer rule: bool, float and numeric text are invalid."""
+    if type(value) is not int or value < 1:
+        raise DomainError("INVALID_INPUT", "请检查预计人数。", {field_name: "预计人数须为正整数。"})
+    return value
+
+
+def query_attendees(value) -> int:
+    """Canonical URL integer, capped at 1001 (the no-matching-room sentinel).
+
+    Never convert unbounded text to int or bind an unbounded integer to SQLite.
+    Future JSON commands must use positive_integer rather than this URL adapter.
+    """
+    if isinstance(value, str):
+        if not value or value[0] == "0" or not all("0" <= char <= "9" for char in value):
+            raise DomainError("INVALID_INPUT", "请检查预计人数。", {"attendees": "预计人数须为无前导零的正整数。"})
+        if len(value) > 4 or (len(value) == 4 and value > "1000"):
+            return 1001
+        return int(value)
+    return min(positive_integer(value), 1001)

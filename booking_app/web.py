@@ -73,6 +73,14 @@ def schedule_api():
     return jsonify(ok=True, data=services.schedule(actor, request.args.get("room_id"), request.args.get("date")))
 
 
+@bp.get("/api/availability")
+def availability_api():
+    actor = auth.actor_for_token(token())
+    return jsonify(ok=True, data=services.availability(
+        actor, request.args.get("start"), request.args.get("end"), request.args.get("attendees"),
+    ))
+
+
 @bp.get("/api/me")
 def me():
     return jsonify(ok=True, data=auth.current_user(auth.require_session(token())))
