@@ -1,0 +1,11 @@
+{
+  "frozen_at_utc": "2026-11-12T13:05:46.539801+00:00",
+  "baseline": "b0ce58a9b66144db5a4b15f61376132fa3f210e4",
+  "dispatch_prompt_sha256": {
+    "X": "ade054a2a53ec44d01168a5790fa0a4ec52b51388cbcd03f0695e58ca6209f0d",
+    "Y": "900e2044f019867ccc0ff96ff6a670cb21658aa1ddac7773fd1c866c496cf6d6"
+  },
+  "status": "INPUTS_FROZEN_BEFORE_DISPATCH",
+  "same_day_target": "2026-11-12 Asia/Shanghai",
+  "exact_model_id": null
+}

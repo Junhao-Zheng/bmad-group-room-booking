@@ -1,0 +1,191 @@
+{
+  "protocol": "experiment-a-uniform-review-v1",
+  "status": "FROZEN_BEFORE_IMPLEMENTATION",
+  "groups": [
+    "X-admin-cancel",
+    "Y-revoke-block"
+  ],
+  "scoring": {
+    "first_review_pass": "all nine criteria PASS with no requested implementation/test changes",
+    "context_violations": "unique proven project-context rule IDs, not failed assertions or missing test counts",
+    "adr_conflicts": "unique proven ADR IDs; missing test alone is not an architecture conflict",
+    "post_done_rework": "changes after formal done, never initial review repair",
+    "implementation_calls": "initial plus each repair dispatch; transport retries also counted and separately disclosed",
+    "transport_sensitivity": "Report raw dispatch calls and transport failures separately; also report productive implementation/repair passes. Transport wall time is not model coding quality."
+  },
+  "criteria": [
+    {
+      "id": "A1",
+      "name": "身份",
+      "cases": [
+        "anonymous",
+        "member",
+        "expired",
+        "logged_out",
+        "database_role_demoted",
+        "forged_actor"
+      ],
+      "rules": [
+        7,
+        8
+      ],
+      "adrs": [
+        5,
+        6
+      ]
+    },
+    {
+      "id": "A2",
+      "name": "输入",
+      "cases": [
+        "strip_1_and_500",
+        "empty_and_501",
+        "non_string",
+        "NUL_and_invalid_UTF8",
+        "invalid_reason_even_repeated",
+        "wrong_kind",
+        "strict_64_bit_id"
+      ],
+      "rules": [
+        10,
+        13
+      ],
+      "adrs": [
+        7
+      ]
+    },
+    {
+      "id": "A3",
+      "name": "时间",
+      "cases": [
+        "pending",
+        "in_progress",
+        "first_exact_end_rejected",
+        "repeat_past_end_returns_original",
+        "single_clock_after_write_lock"
+      ],
+      "rules": [
+        5,
+        10
+      ],
+      "adrs": [
+        2,
+        7
+      ]
+    },
+    {
+      "id": "A4",
+      "name": "幂等",
+      "cases": [
+        "repeat_same_full_shape",
+        "first_actor_time_reason_preserved",
+        "repeat_zero_audit"
+      ],
+      "rules": [
+        10,
+        12
+      ],
+      "adrs": [
+        7
+      ]
+    },
+    {
+      "id": "A5",
+      "name": "占用与历史",
+      "cases": [
+        "all_target_slots_removed",
+        "other_slots_unchanged",
+        "history_kept",
+        "no_automatic_restoration"
+      ],
+      "rules": [
+        4,
+        10
+      ],
+      "adrs": [
+        3,
+        7
+      ]
+    },
+    {
+      "id": "A6",
+      "name": "原子性",
+      "cases": [
+        "BEGIN_IMMEDIATE",
+        "one_connection",
+        "one_audit",
+        "writer_before_failure",
+        "writer_after_insert_failure",
+        "commit_failure",
+        "real_HTTP_twenty_pair_races_final_storage"
+      ],
+      "rules": [
+        3,
+        12,
+        14
+      ],
+      "adrs": [
+        3,
+        7,
+        8
+      ]
+    },
+    {
+      "id": "A7",
+      "name": "HTTP与DTO",
+      "cases": [
+        "contract_endpoint",
+        "ok_data_once",
+        "exact_full_keys_and_nulls",
+        "Origin_and_CSRF",
+        "authorization_before_object_validation",
+        "safe_error_codes"
+      ],
+      "rules": [
+        9,
+        13
+      ],
+      "adrs": [
+        1,
+        6
+      ]
+    },
+    {
+      "id": "A8",
+      "name": "UI",
+      "cases": [
+        "reason_and_confirmation",
+        "waiting_disabled",
+        "success_refresh",
+        "failure_input_preserved",
+        "safe_text",
+        "desktop_and_mobile"
+      ],
+      "rules": [
+        9
+      ],
+      "adrs": []
+    },
+    {
+      "id": "A9",
+      "name": "验证",
+      "cases": [
+        "regression_no_skips",
+        "normal_and_refusal",
+        "boundary_and_repeat",
+        "concurrent_final_DB",
+        "rollback",
+        "actual_browser"
+      ],
+      "rules": [
+        14
+      ],
+      "adrs": [
+        8
+      ]
+    }
+  ],
+  "results": [],
+  "note": "Freeze this rubric and matching baseline before initial implementation; preserve initial snapshots before evaluation. No results recorded here.",
+  "baseline": "b0ce58a9b66144db5a4b15f61376132fa3f210e4"
+}

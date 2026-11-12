@@ -1,0 +1,1 @@
+请在独立项目目录 /Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y 中工作。先完整阅读该目录的 EXPERIMENT-INPUT.md 和 TASK.txt，再按 TASK.txt 实现。只读取该目录内的项目材料；不读取外部项目、其他组或历史会话，不另开代理、不操作 Git 或远端。完成后报告改动、实际验证和剩余问题。
