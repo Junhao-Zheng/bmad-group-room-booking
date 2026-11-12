@@ -46,7 +46,7 @@ development_status:
   2-2-replay-intent: done
   2-3-personal-history: done
   2-4-member-cancel: done
-  2-5-admin-cancel: ready-for-dev
+  2-5-admin-cancel: in-progress
   epic-2-retrospective: optional
 
   epic-3: in-progress

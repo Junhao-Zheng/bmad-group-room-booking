@@ -2,8 +2,9 @@
 title: '管理员说明原因干预未结束预约'
 type: feature
 created: '2026-11-12'
-status: ready-for-dev
+status: in-progress
 route: dispatch
+baseline_commit: 177dc64e5897a24850dcc79714cfcb87724c09d6
 story_key: 2-5-admin-cancel
 review_loop_iteration: 0
 context:
