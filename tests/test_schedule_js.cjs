@@ -24,18 +24,21 @@ function harness(initialFetch) {
       focus() { if (!this.disabled) activeElement = this; },
     };
   }
+  const body=node('body'); activeElement=body;
   const room = node('room_id'), date = node('date'), button = node('submit');
   room.value = '10'; room.selectedOptions = [{textContent: '合成会议室'}];
   date.value = '2026-11-12'; button.textContent = '查看日程'; button.disabled = true;
   const elements = {room_id: room, date, namedItem(name) { return this[name]; }};
   const form = node('schedule-form');
   form.elements = elements;
+  form.contains = value => [room,date,button].includes(value);
   form.querySelector = selector => selector === 'button[type=submit]' ? button : [room, date].find(input => input.getAttribute('aria-invalid') === 'true');
   form.addEventListener = (event, callback) => { assert.equal(event, 'submit'); submitHandler = callback; };
   const nodes = Object.fromEntries(['schedule-feedback', 'schedule-results', 'schedule-items', 'schedule-conditions', 'schedule-relogin', 'room_id-error', 'date-error'].map(id => [id, node(id)]));
   const context = vm.createContext({
     AbortController, URLSearchParams,
     document: {
+      body, get activeElement() { return activeElement; },
       querySelector: selector => selector === '#schedule-form' ? form : nodes[selector.slice(1)],
       getElementById: id => nodes[id], createElement: () => node(),
     },
@@ -50,6 +53,7 @@ function harness(initialFetch) {
   return {
     room, date, button, form, nodes, timers, fetches,
     get activeElement() { return activeElement; },
+    focusElsewhere() { const other=node('other-input'); other.focus(); return other; },
     setFetch(value) { fetchImplementation = value; },
     submit() { let prevented = false; const pending = submitHandler({preventDefault() { prevented = true; }}); assert.equal(prevented, true); return pending; },
     userEdit(input, value) { if (!input.disabled) input.value = value; },
@@ -81,6 +85,7 @@ async function retrySuccessfully(ui) {
   assert.equal(ui.fetches.length, 2);
   assert.match(ui.nodes['schedule-feedback'].textContent, /当天暂无/);
   assert.equal(ui.nodes['schedule-results'].hidden, false);
+  assert.equal(ui.activeElement, ui.button);
 }
 
 for (const stage of ['response headers', 'response body']) {
@@ -152,4 +157,19 @@ test('pending conditions cannot be edited and a field error focuses the restored
   assert.equal(ui.date.disabled, false);
   assert.equal(ui.button.disabled, false);
   assert.equal(ui.form.getAttribute('aria-busy'), undefined);
+});
+
+for (const records of [[],[{kind:'block',record:{status:'pending',start_local:'2026-11-12T12:00:00+08:00',end_local:'2026-11-12T12:30:00+08:00',reason:'合成维护 <检查设备>'}}]]) {
+  test(`schedule success with ${records.length} items restores button focus and exact reason`,async()=>{
+    const ui=harness(async()=>success(records));await ui.submit();assertRestored(ui);
+    assert.equal(ui.activeElement,ui.button);
+    if(records.length) assert.equal(ui.nodes['schedule-items'].children[0].children[3].textContent,'原因：合成维护 <检查设备>');
+  });
+}
+
+
+test('delayed schedule success preserves focus in another enabled form',async()=>{
+  let release; const ui=harness(()=>new Promise(resolve=>release=resolve));
+  const pending=ui.submit(); const other=ui.focusElsewhere();
+  release(success()); await pending;assertRestored(ui);assert.equal(ui.activeElement,other);
 });

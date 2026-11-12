@@ -3,6 +3,10 @@
 import argparse
 from datetime import datetime, timezone
 import json
+import hashlib
+import importlib.metadata
+import platform
+import sqlite3
 import os
 from pathlib import Path
 import secrets
@@ -134,6 +138,11 @@ def run_browser(args):
         if args.schedule:
             from tests.schedule_fixtures import seed_schedule_fixture
             seed_schedule_fixture(temporary / "booking.sqlite3")
+            # Browser-only variant: ID must differ from capacity to detect wrong DOM bindings.
+            from booking_app import db
+            with db.write_transaction(temporary / "booking.sqlite3") as conn:
+                conn.execute("UPDATE rooms SET capacity=31 WHERE id=30")
+                conn.execute("UPDATE reservations SET reason=? WHERE id=108", ("合成晚间维护 <校准投影>",))
         factory = "scripts.verify_auth_browser:create_schedule_verification_app" if args.schedule else "booking_app:create_app"
         command = [sys.executable, "-m", "waitress", f"--listen=127.0.0.1:{args.port}",
                    "--threads=8", "--call", factory]
@@ -159,6 +168,9 @@ def run_browser(args):
                     # Browser failures may include input values; do not print raw diagnostics.
                     raise RuntimeError("Browser verification failed; no credential-bearing diagnostics were printed.")
                 report = json.loads(result.stdout)
+                executed_package = Path(report['execution']['playwright_package_path']).resolve()
+                if executed_package != (args.playwright_root / 'playwright/package.json').resolve():
+                    raise RuntimeError('Loaded Playwright differs from the requested installation')
                 if args.booking:
                     report["committed_response_loss_storage"] = verify_committed_response_loss(temporary / "booking.sqlite3", report)
                 report["server"] = {"processes": 1, "threads": 8, "origin": origin, "command": command}
@@ -178,6 +190,22 @@ def write_report(path, report):
     temporary.replace(path)
 
 
+def source_fingerprints():
+    app_files = sorted(path for path in (ROOT / 'booking_app').rglob('*')
+                       if path.is_file() and path.suffix in {'.py','.sql','.js','.css','.html'})
+    helpers = [ROOT / path for path in ('scripts/verify_auth_browser.py',
+        'scripts/verify_auth_browser.cjs', 'scripts/init_demo.py', 'tests/schedule_fixtures.py')]
+    def hashes(paths):
+        return {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
+    return {'app_source_files_sha256': hashes(app_files), 'verification_source_files_sha256': hashes(helpers)}
+
+
+def environment_metadata(args):
+    return {'platform': platform.platform(), 'python': sys.version, 'sqlite': sqlite3.sqlite_version,
+            'packages': {name: importlib.metadata.version(name) for name in ('Flask','Jinja2','Werkzeug','waitress')},
+            'playwright': json.loads((args.playwright_root / 'playwright/package.json').read_text())['version']}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port", type=int, default=8002)
@@ -195,12 +223,23 @@ def main():
     args.output_dir.mkdir(parents=True, exist_ok=True)
     meta = dict(run_id=secrets.token_hex(16), started_at_utc=datetime.now(timezone.utc).isoformat())
     meta['artifact_directory'] = f"runs/{meta['run_id']}"
+    meta['configuration'] = {'port': args.port, 'schedule':args.schedule, 'availability':args.availability,
+        'booking':args.booking, 'replay':args.replay, 'playwright_root':str(args.playwright_root.resolve()),
+        'browser_executable':str(args.browser_executable.resolve()) if args.browser_executable else None}
     target = args.output_dir / 'browser-results.json'
     write_report(target, meta | dict(result='INCOMPLETE', completed=False))
     try:
+        meta.update(environment=environment_metadata(args), **source_fingerprints())
         run_args = argparse.Namespace(**(vars(args) | {'output_dir': args.output_dir / meta['artifact_directory']}))
         run_args.output_dir.mkdir(parents=True)
         report = run_browser(run_args)
+        if any(meta[key] != value for key, value in source_fingerprints().items()):
+            raise RuntimeError('Verification sources changed during this run')
+        meta['screenshots_sha256'] = {
+            str(path.relative_to(args.output_dir)): hashlib.sha256(path.read_bytes()).hexdigest()
+            for path in sorted(run_args.output_dir.glob('*.png'))}
+        if not meta['screenshots_sha256']:
+            raise RuntimeError('Browser verification produced no screenshots')
         report = report | meta | dict(result='PASS', completed=True, finished_at_utc=datetime.now(timezone.utc).isoformat())
         write_report(target, report)
     except BaseException as error:

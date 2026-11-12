@@ -1,0 +1,236 @@
+✔ stalled response headers aborts at 20 seconds and restores manual controls (4.469333ms)
+✔ stalled response body aborts at 20 seconds and restores manual controls (1.74775ms)
+✔ login field failure unlocks credentials before focus and preserves submitted values (3.230292ms)
+✔ login network failure unlocks credentials before focus and preserves submitted values (3.060875ms)
+✔ availability stalled response headers aborts at 20 seconds, retains input, permits manual retry (5.159875ms)
+✔ availability stalled response body aborts at 20 seconds, retains input, permits manual retry (2.889791ms)
+✔ availability network failure restores controls without discarding conditions (0.668208ms)
+✔ availability bad JSON restores controls without discarding conditions (0.92475ms)
+✔ availability field errors focus enabled input; success clears errors and safely renders literal room text (1.932459ms)
+✔ availability expired session gives a login link, preserves input and hides old results (0.77825ms)
+✔ each room selection has a distinct accessible name containing room and location (1.504ms)
+✔ selected query creates 32-byte intent; pending disables controls and success is plain text (6.146708ms)
+✔ field validation focuses restored control; conflicts and internal failure preserve content and key (1.020875ms)
+✔ unknown network and malformed response allow explicit same-key retry without claiming failure (2.0725ms)
+✔ 20-second timeout covers stalled response body and does not resend (4.291208ms)
+✔ session loss shows relogin and never automatically submits again (0.856291ms)
+✔ a query in progress blocks creation; after it settles creation restores all controls (0.9045ms)
+✔ creation in progress blocks queries; unknown result permits queries and explicit confirmation (0.911917ms)
+✔ selecting a room after a field error resets feedback style and role (0.635416ms)
+✔ malformed success envelopes or displayed fields never claim success (8.06775ms)
+✔ unknown codes, inconsistent status, and malformed error envelopes are unknown outcomes (2.700458ms)
+✔ Python strip equivalence preserves intent while FEFF rotates it (0.832458ms)
+✔ each of the six substantive fields alone rotates the intent from its own baseline (6.10025ms)
+✔ header timeout retains original intent and pending new/selection controls cannot replace input (0.659667ms)
+✔ replay accepts all current states with exact DTO, rejects stale/malformed cancellation facts (6.162167ms)
+✔ lost first outcome remains unknown through an explicit error until a same-key success (3.74025ms)
+✔ replacing an unconfirmed intent retains its reminder through further edits and a new success (0.838584ms)
+✔ confirmed ID survives a failed refresh without casting doubt on original success (0.722416ms)
+✔ replay refreshes room name and location in confirmation conditions without changing intent (0.666458ms)
+✔ history list timeout in headers restores controls and permits explicit retry (6.863708ms)
+✔ history list timeout in body restores controls and permits explicit retry (4.023666ms)
+✔ history network clears results and allows manual recovery (2.133917ms)
+✔ history bad-json clears results and allows manual recovery (0.999542ms)
+✔ status field error focuses enabled select; successful empty filter clears error (1.573958ms)
+✔ detail is plain text, focus moves to heading, and all uncancelled nulls have meaning (2.194875ms)
+✔ detail network restores filters and offers only an explicit read retry (4.745584ms)
+✔ detail bad-json restores filters and offers only an explicit read retry (2.790625ms)
+✔ detail not-found restores filters and offers only an explicit read retry (3.547209ms)
+✔ detail timeout restores filters and offers only an explicit read retry (2.622417ms)
+✔ list session loss clears personal data and does not retry automatically (2.131667ms)
+✔ detail session loss clears personal data and does not retry automatically (0.827834ms)
+✔ successful populated keyboard filter restores submit focus after unlocking (1.102667ms)
+✔ successful empty keyboard filter restores submit focus after unlocking (1.837625ms)
+✔ complete admin cancellation detail uses each independent label/value (1.2875ms)
+✔ complete member cancellation detail uses each independent label/value (0.809375ms)
+✔ detail can cross a boundary while list retains its stated snapshot until explicit refresh (0.916458ms)
+✖ schedule stalled response headers aborts at 20 seconds and can be queried again (4.733625ms)
+✖ schedule stalled response body aborts at 20 seconds and can be queried again (2.183792ms)
+✖ schedule network failure preserves conditions, restores controls, and permits retry (0.899291ms)
+✖ schedule bad JSON preserves conditions, restores controls, and permits retry (0.67775ms)
+✔ pending conditions cannot be edited and a field error focuses the restored original input (1.161ms)
+✔ schedule success with 0 items restores button focus and exact reason (0.526291ms)
+✔ schedule success with 1 items restores button focus and exact reason (0.468875ms)
+✔ delayed schedule success preserves focus in another enabled form (0.442458ms)
+ℹ tests 54
+ℹ suites 0
+ℹ pass 50
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 116.492042
+
+✖ failing tests:
+
+test at tests/test_schedule_js.cjs:92:3
+✖ schedule stalled response headers aborts at 20 seconds and can be queried again (4.733625ms)
+  AssertionError [ERR_ASSERTION]: Expected "actual" to be reference-equal to "expected":
+  + actual - expected
+  ... Skipped lines
+  
+    {
+  +   _text: '当天暂无预约或停用安排。',
+  -   _text: '查看日程',
+      append: [Function: append],
+  +   attributes: Map(1) {
+  +     'role' => 'status'
+  +   },
+  -   attributes: Map(0) {},
+      children: [],
+      classList: {
+        toggle: [Function: toggle]
+      },
+      disabled: false,
+  ...
+      hidden: false,
+  +   id: 'schedule-feedback',
+  -   id: 'submit',
+      removeAttribute: [Function: removeAttribute],
+      replaceChildren: [Function: replaceChildren],
+      setAttribute: [Function: setAttribute],
+  +   textContent: [Getter/Setter: '当天暂无预约或停用安排。'],
+  -   textContent: [Getter/Setter: '查看日程'],
+      value: ''
+    }
+  
+      at retrySuccessfully (/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/tests/test_schedule_js.cjs:88:10)
+      at async TestContext.<anonymous> (/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/tests/test_schedule_js.cjs:111:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [Object],
+    expected: [Object],
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/test_schedule_js.cjs:92:3
+✖ schedule stalled response body aborts at 20 seconds and can be queried again (2.183792ms)
+  AssertionError [ERR_ASSERTION]: Expected "actual" to be reference-equal to "expected":
+  + actual - expected
+  ... Skipped lines
+  
+    {
+  +   _text: '当天暂无预约或停用安排。',
+  -   _text: '查看日程',
+      append: [Function: append],
+  +   attributes: Map(1) {
+  +     'role' => 'status'
+  +   },
+  -   attributes: Map(0) {},
+      children: [],
+      classList: {
+        toggle: [Function: toggle]
+      },
+      disabled: false,
+  ...
+      hidden: false,
+  +   id: 'schedule-feedback',
+  -   id: 'submit',
+      removeAttribute: [Function: removeAttribute],
+      replaceChildren: [Function: replaceChildren],
+      setAttribute: [Function: setAttribute],
+  +   textContent: [Getter/Setter: '当天暂无预约或停用安排。'],
+  -   textContent: [Getter/Setter: '查看日程'],
+      value: ''
+    }
+  
+      at retrySuccessfully (/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/tests/test_schedule_js.cjs:88:10)
+      at async TestContext.<anonymous> (/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/tests/test_schedule_js.cjs:111:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [Object],
+    expected: [Object],
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/test_schedule_js.cjs:116:3
+✖ schedule network failure preserves conditions, restores controls, and permits retry (0.899291ms)
+  AssertionError [ERR_ASSERTION]: Expected "actual" to be reference-equal to "expected":
+  + actual - expected
+  ... Skipped lines
+  
+    {
+  +   _text: '当天暂无预约或停用安排。',
+  -   _text: '查看日程',
+      append: [Function: append],
+  +   attributes: Map(1) {
+  +     'role' => 'status'
+  +   },
+  -   attributes: Map(0) {},
+      children: [],
+      classList: {
+        toggle: [Function: toggle]
+      },
+      disabled: false,
+  ...
+      hidden: false,
+  +   id: 'schedule-feedback',
+  -   id: 'submit',
+      removeAttribute: [Function: removeAttribute],
+      replaceChildren: [Function: replaceChildren],
+      setAttribute: [Function: setAttribute],
+  +   textContent: [Getter/Setter: '当天暂无预约或停用安排。'],
+  -   textContent: [Getter/Setter: '查看日程'],
+      value: ''
+    }
+  
+      at retrySuccessfully (/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/tests/test_schedule_js.cjs:88:10)
+      at async TestContext.<anonymous> (/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/tests/test_schedule_js.cjs:126:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [Object],
+    expected: [Object],
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/test_schedule_js.cjs:116:3
+✖ schedule bad JSON preserves conditions, restores controls, and permits retry (0.67775ms)
+  AssertionError [ERR_ASSERTION]: Expected "actual" to be reference-equal to "expected":
+  + actual - expected
+  ... Skipped lines
+  
+    {
+  +   _text: '当天暂无预约或停用安排。',
+  -   _text: '查看日程',
+      append: [Function: append],
+  +   attributes: Map(1) {
+  +     'role' => 'status'
+  +   },
+  -   attributes: Map(0) {},
+      children: [],
+      classList: {
+        toggle: [Function: toggle]
+      },
+      disabled: false,
+  ...
+      hidden: false,
+  +   id: 'schedule-feedback',
+  -   id: 'submit',
+      removeAttribute: [Function: removeAttribute],
+      replaceChildren: [Function: replaceChildren],
+      setAttribute: [Function: setAttribute],
+  +   textContent: [Getter/Setter: '当天暂无预约或停用安排。'],
+  -   textContent: [Getter/Setter: '查看日程'],
+      value: ''
+    }
+  
+      at retrySuccessfully (/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/tests/test_schedule_js.cjs:88:10)
+      at async TestContext.<anonymous> (/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/tests/test_schedule_js.cjs:126:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [Object],
+    expected: [Object],
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

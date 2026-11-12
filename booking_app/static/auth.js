@@ -14,14 +14,18 @@ function showFeedback(message, isError = false) {
 
 async function submitAuth(form, endpoint, values, successUrl) {
   const button = form.querySelector("button[type=submit]");
+  if (button.disabled) return;
+  const inputs = form === loginForm ? [form.elements.username, form.elements.password] : [];
   const oldLabel = button.textContent;
   button.disabled = true;
+  inputs.forEach(input => { input.disabled = true; });
   button.textContent = "正在提交…";
   form.setAttribute("aria-busy", "true");
   relogin.hidden = true;
   showFeedback("正在验证，请稍候…");
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), 20000);
+  let invalidInput;
   try {
     const response = await fetch(endpoint, {
       method: "POST",
@@ -42,8 +46,7 @@ async function submitAuth(form, endpoint, values, successUrl) {
           hint.textContent = message;
         }
       }
-      const invalid = form.querySelector('[aria-invalid="true"]');
-      if (invalid) invalid.focus();
+      invalidInput = form.querySelector('[aria-invalid="true"]');
       if (["AUTH_REQUIRED", "CSRF_REJECTED"].includes(error.code)) relogin.hidden = false;
       return;
     }
@@ -55,13 +58,16 @@ async function submitAuth(form, endpoint, values, successUrl) {
   } finally {
     window.clearTimeout(timeout);
     button.disabled = false;
+    inputs.forEach(input => { input.disabled = false; });
     button.textContent = oldLabel;
     form.removeAttribute("aria-busy");
+    if (invalidInput) invalidInput.focus();
   }
 }
 
 if (loginForm) loginForm.addEventListener("submit", (event) => {
   event.preventDefault();
+  if (loginForm.querySelector("button[type=submit]").disabled) return;
   for (const name of ["username", "password"]) {
     loginForm.elements[name].removeAttribute("aria-invalid");
     document.getElementById(`${name}-error`).textContent = "";

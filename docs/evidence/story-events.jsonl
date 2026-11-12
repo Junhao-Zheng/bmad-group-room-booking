@@ -26,3 +26,9 @@
 {"timestamp": "2026-11-12T10:41:58.258526+00:00", "story": "1-1-account-access", "from": "done", "to": "in-progress", "actor": "AI root", "head": "d545ca5ab8d339ecb037d802193ed310e0969fee", "post_done_rework": true}
 {"timestamp": "2026-11-12T10:41:58.295022+00:00", "story": "1-2-room-schedule", "from": "done", "to": "in-progress", "actor": "AI root", "head": "d545ca5ab8d339ecb037d802193ed310e0969fee", "post_done_rework": true}
 {"timestamp": "2026-11-12T10:41:58.333193+00:00", "story": "1-3-availability", "from": "done", "to": "in-progress", "actor": "AI root", "head": "d545ca5ab8d339ecb037d802193ed310e0969fee", "post_done_rework": true}
+{"timestamp": "2026-11-12T11:08:05.836806+00:00", "story": "1-1-account-access", "from": "in-progress", "to": "review", "actor": "AI root", "head": "1a26f292d8ca9d5dfd3559b6fcdbcf58ffda7da3", "post_done_rework": false}
+{"timestamp": "2026-11-12T11:08:05.874799+00:00", "story": "1-1-account-access", "from": "review", "to": "done", "actor": "AI root", "head": "1a26f292d8ca9d5dfd3559b6fcdbcf58ffda7da3", "post_done_rework": false}
+{"timestamp": "2026-11-12T11:08:05.910007+00:00", "story": "1-2-room-schedule", "from": "in-progress", "to": "review", "actor": "AI root", "head": "1a26f292d8ca9d5dfd3559b6fcdbcf58ffda7da3", "post_done_rework": false}
+{"timestamp": "2026-11-12T11:08:05.947160+00:00", "story": "1-2-room-schedule", "from": "review", "to": "done", "actor": "AI root", "head": "1a26f292d8ca9d5dfd3559b6fcdbcf58ffda7da3", "post_done_rework": false}
+{"timestamp": "2026-11-12T11:08:05.982809+00:00", "story": "1-3-availability", "from": "in-progress", "to": "review", "actor": "AI root", "head": "1a26f292d8ca9d5dfd3559b6fcdbcf58ffda7da3", "post_done_rework": false}
+{"timestamp": "2026-11-12T11:08:06.019856+00:00", "story": "1-3-availability", "from": "review", "to": "done", "actor": "AI root", "head": "1a26f292d8ca9d5dfd3559b6fcdbcf58ffda7da3", "post_done_rework": false}

@@ -37,7 +37,8 @@ def run(port=8000):
             {"username": name, "display_name": display, "role": role, "password": password}
             for name, display, role in DEMO_IDENTITIES
         ]}), encoding="utf-8")
-        env = dict(os.environ, BOOKING_DB_PATH=str(database), APP_ORIGIN=origin)
+        env = dict(os.environ, BOOKING_DB_PATH=str(database), APP_ORIGIN=origin,
+                   COOKIE_SECURE="false", TRUSTED_HOSTS="127.0.0.1")
         for expected in (3, 0):
             result = subprocess.run([sys.executable, "-m", "scripts.init_demo", "--credentials-file", str(credentials)],
                                     env=env, cwd=ROOT, text=True, capture_output=True, check=True)
@@ -120,6 +121,8 @@ def run(port=8000):
                 assert csrf not in log and raw not in log and auth.token_digest(raw) not in log
         print(json.dumps({
             "result": "PASS", "initialization_added_counts": [3, 0], "requests": samples,
+            "http_isolation": {"parent": {key: os.environ.get(key) for key in ("COOKIE_SECURE", "TRUSTED_HOSTS")},
+                               "child": {key: env[key] for key in ("COOKIE_SECURE", "TRUSTED_HOSTS", "APP_ORIGIN")}},
             "final_users": 3, "final_authenticated_sessions": 1, "credential_log_check": "PASS",
             "runtime": {"python": platform.python_version(), "sqlite": sqlite3.sqlite_version,
                         "platform": platform.platform(), "machine": platform.machine(),

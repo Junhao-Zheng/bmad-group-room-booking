@@ -47,7 +47,7 @@
     announce("正在查询日程，请稍候…");
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 20000);
-    let invalidInput;
+    let invalidInput, succeeded = false;
     try {
       const params = new URLSearchParams({room_id: roomId, date});
       const response = await fetch(`/api/schedule?${params}`, {
@@ -81,6 +81,7 @@
       }
       results.hidden = false;
       announce(body.data.total ? `查询成功，共 ${body.data.total} 项安排。` : "当天暂无预约或停用安排。");
+      succeeded = true;
     } catch {
       announce("未能查询日程，请检查网络后重试。查询条件已保留。", true);
     } finally {
@@ -90,6 +91,7 @@
       button.textContent = "查看日程";
       form.removeAttribute("aria-busy");
       if (invalidInput) invalidInput.focus();
+      else if (succeeded && (document.activeElement === document.body || document.activeElement === feedback || form.contains(document.activeElement))) button.focus();
     }
   });
 })();

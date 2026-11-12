@@ -43,8 +43,19 @@ async function submitAvailability(page) {
       await page.keyboard.press('Tab');
       assert.equal(await page.evaluate(() => document.activeElement.id), 'password');
       await page.keyboard.type(users[0].password);
+      let releaseLogin, loginRequests = 0;
+      const loginGate = new Promise(resolve => { releaseLogin = resolve; });
+      await page.route('**/api/login', async route => { loginRequests++; await loginGate; await route.continue(); });
       await page.keyboard.press('Enter');
+      await page.waitForFunction(() => document.querySelector('#login-form').getAttribute('aria-busy') === 'true');
+      assert.equal(await page.locator('#username').isDisabled(), true);
+      assert.equal(await page.locator('#password').isDisabled(), true);
+      assert.equal(await page.locator('#username').inputValue(), users[0].username);
+      await page.locator('#login-form').evaluate(form => form.requestSubmit());
+      releaseLogin();
       await page.waitForURL(`${origin}/`);
+      assert.equal(loginRequests, 1);
+      await page.unroute('**/api/login');
       assert.ok((await page.locator('.account-name').textContent()).includes(users[0].display_name));
       assert.equal(await page.locator('.role').textContent(), '成员');
       const me = await context.request.get(`${origin}/api/me`);
@@ -61,6 +72,7 @@ async function submitAvailability(page) {
       if (scenario === 'schedule' || scenario === 'availability' || scenario === 'booking') {
         assert.equal(await page.locator('label[for=room_id]').textContent(), '会议室');
         assert.equal(await page.locator('label[for=date]').textContent(), '日期（北京时间）');
+        for (const id of ['room_id','date']) assert.equal(await page.locator(`#${id}`).evaluate(input=>input.required), true);
         await submitSchedule(page);
         await page.waitForFunction(() => document.querySelector('#room_id').getAttribute('aria-invalid') === 'true');
         assert.equal(await page.evaluate(() => document.activeElement.id), 'room_id');
@@ -86,6 +98,11 @@ async function submitAvailability(page) {
         assert.equal(await page.locator('#schedule-form button').isDisabled(), false);
         assert.equal(await page.locator('#schedule-form').getAttribute('aria-busy'), null);
         assert.equal(await page.locator('#schedule-items > li').count(), 5);
+        assert.equal(await page.evaluate(() => document.activeElement === document.querySelector('#schedule-form button')), true);
+        await page.keyboard.press('Shift+Tab');
+        assert.equal(await page.evaluate(() => document.activeElement.id), 'date');
+        await page.keyboard.press('Tab');
+        assert.equal(await page.evaluate(() => document.activeElement === document.querySelector('#schedule-form button')), true);
         assert.match(await page.locator('#schedule-conditions').textContent(), /合成 A.*2026-11-12.*北京时间/);
         assert.ok((await page.locator('#schedule-items').textContent()).includes('<img src=x onerror="window.fixtureXss=1">合成活动'));
         assert.ok((await page.locator('#schedule-items').textContent()).includes('<script>window.fixtureXss=2</script>演示乙'));
@@ -99,6 +116,9 @@ async function submitAvailability(page) {
         assert.deepEqual([booking.start_at, booking.end_at, booking.start_local, booking.end_local], [1794448800, 1794452400, '2026-11-12T10:00:00+08:00', '2026-11-12T11:00:00+08:00']);
         assert.equal(await page.locator('#schedule-items > li').nth(0).locator('p').first().textContent(), '2026-11-11 23:00 — 2026-11-12 01:00');
         assert.equal(await page.locator('#schedule-items > li').nth(2).locator('p').first().textContent(), '2026-11-12 10:00 — 2026-11-12 11:00');
+        for (const [index,reason] of [[0,'合成维护 <检查设备>'],[4,'合成晚间维护 <校准投影>']]) {
+          assert.equal(await page.locator('#schedule-items > li').nth(index).locator('p.muted').textContent(), `原因：${reason}`);
+        }
         const common = ['room_id','room_name','start_at','start_local','end_at','end_local','status'];
         for (const item of schedule.items) {
           assert.deepEqual(Object.keys(item).sort(), ['kind','record']);
@@ -111,15 +131,29 @@ async function submitAvailability(page) {
         await page.evaluate(() => window.scrollTo(0, 0));
         await page.screenshot({path:path.join(outputDir,`schedule-${viewport.width}.png`),fullPage:true});
         await page.locator('#date').fill('2026-11-13');
+        let releaseLater;
+        const laterGate=new Promise(resolve=>releaseLater=resolve);
+        await page.route('**/api/schedule?**',async route=>{await laterGate;await route.continue();});
         await submitSchedule(page);
+        await page.locator('#attendees').fill('7');
+        releaseLater();
         await page.waitForFunction(() => document.querySelector('#schedule-feedback').textContent.includes('共 1 项'));
         assert.equal(await page.locator('#schedule-items > li').count(), 1);
+        assert.equal(await page.evaluate(()=>document.activeElement.id),'attendees');
+        assert.equal(await page.locator('#attendees').inputValue(),'7');
+        await page.locator('#attendees').fill('');
+        await page.unroute('**/api/schedule?**');
         assert.match(await page.locator('#schedule-items').textContent(), /2026-11-13 00:00/);
         await page.locator('#room_id').selectOption('30');
         await page.locator('#date').fill('2026-11-12');
         await submitSchedule(page);
         await page.waitForFunction(() => document.querySelector('#schedule-feedback').textContent.includes('当天暂无'));
         assert.equal(await page.locator('#schedule-items > li').count(), 0);
+        assert.equal(await page.evaluate(() => document.activeElement === document.querySelector('#schedule-form button')), true);
+        await page.keyboard.press('Shift+Tab');
+        assert.equal(await page.evaluate(() => document.activeElement.id), 'date');
+        await page.keyboard.press('Tab');
+        assert.equal(await page.evaluate(() => document.activeElement === document.querySelector('#schedule-form button')), true);
         assert.equal(await page.locator('#date').inputValue(), '2026-11-12');
         assert.equal(await page.locator('#room_id').inputValue(), '30');
         await page.evaluate(() => window.scrollTo(0, 0));
@@ -139,7 +173,7 @@ async function submitAvailability(page) {
         assert.equal(await noScriptPage.locator('#schedule-form button').isDisabled(), true);
         assert.equal(await noScriptPage.locator('#availability-form button').isDisabled(), true);
         await noScriptContext.close();
-        scheduleChecks = {scheduleWidth,labels:'PASS',loading:'PASS',pending_inputs_disabled_and_restored:'PASS',field_error:'PASS',keyboard_schedule_submit:'PASS',keyboard_room_and_date_error_focus:'PASS',fixed_clock_status_texts:'PASS',exact_api_intervals:'PASS',exact_display_intervals:'PASS',no_script_notice_and_readable_directory:'PASS',shared_contract:'PASS',literal_html_and_xss:'PASS',private_values_absent:'PASS',half_open_midnight:'PASS',empty_result:'PASS',error_retains_conditions:'PASS'};
+        scheduleChecks = {scheduleWidth,labels:'PASS',loading:'PASS',pending_inputs_disabled_and_restored:'PASS',field_error:'PASS',keyboard_schedule_submit:'PASS',success_and_empty_focus_and_tab:'PASS',preserves_other_form_focus:'PASS',required_semantics:'PASS',block_reason_value:'PASS',keyboard_room_and_date_error_focus:'PASS',fixed_clock_status_texts:'PASS',exact_api_intervals:'PASS',exact_display_intervals:'PASS',no_script_notice_and_readable_directory:'PASS',shared_contract:'PASS',literal_html_and_xss:'PASS',private_values_absent:'PASS',half_open_midnight:'PASS',empty_result:'PASS',error_retains_conditions:'PASS'};
         stalePage = await context.newPage();
         await stalePage.goto(`${origin}/`);
       }
@@ -177,6 +211,11 @@ async function submitAvailability(page) {
         await page.unroute('**/api/availability?**');
         assert.equal(await page.locator('#availability-items > li').count(), 3);
         assert.match(await page.locator('#availability-items').textContent(), /合成 C <讨论室>/);
+        const expectedRooms = [['合成 A','演示楼 101','可容纳 10 人'],['合成 A','演示楼 202','可容纳 20 人'],['合成 C <讨论室>','演示楼 303','可容纳 31 人']];
+        for (let i=0; i<expectedRooms.length; i++) {
+          const card = page.locator('#availability-items > li').nth(i);
+          assert.deepEqual([await card.locator('h3').textContent(), ...await card.locator('p').allTextContents()], expectedRooms[i]);
+        }
         assert.equal(await page.locator('#availability-items 讨论室').count(), 0);
         assert.match(await page.locator('#availability-conditions').textContent(), /2026-11-12 12:00.*12:30.*北京时间.*10 人/);
         assert.match(await page.locator('#availability-feedback').textContent(), /不保留时段/);
@@ -210,7 +249,7 @@ async function submitAvailability(page) {
         assert.equal(await page.locator('#attendees').inputValue(), '1001');
         assert.equal(await page.locator('#availability-form button').isDisabled(), false);
         await page.unroute('**/api/availability?**');
-        availabilityChecks = {availableWidth,labels:'PASS',required_semantics:'PASS',half_hour_controls:'PASS',keyboard_submit:'PASS',loading:'PASS',restored_controls:'PASS',success_and_empty_button_focus:'PASS',success_and_empty_next_tab:'PASS',success_exact_conditions:'PASS',literal_room_text:'PASS',empty_result:'PASS',time_and_attendees_field_errors:'PASS',network_failure_retains_conditions:'PASS',query_does_not_reserve_notice:'PASS'};
+        availabilityChecks = {availableWidth,labels:'PASS',required_semantics:'PASS',half_hour_controls:'PASS',keyboard_submit:'PASS',loading:'PASS',restored_controls:'PASS',success_and_empty_button_focus:'PASS',success_and_empty_next_tab:'PASS',success_exact_conditions:'PASS',literal_room_text:'PASS',card_location_capacity_values:'PASS',empty_result:'PASS',time_and_attendees_field_errors:'PASS',network_failure_retains_conditions:'PASS',query_does_not_reserve_notice:'PASS'};
       }
       let bookingChecks;
       if (scenario === 'booking') {
@@ -489,10 +528,10 @@ async function submitAvailability(page) {
       assert.ok((await page.locator('#auth-feedback').textContent()).includes('检查账号和密码'));
       assert.equal(await page.locator('#auth-feedback').getAttribute('role'), 'alert');
       assert.deepEqual(errors, []);
-      results.push({viewport,loginWidth,homeWidth,...(bookingChecks ? {booking:bookingChecks} : {}),keyboard_login:'PASS',keyboard_logout:'PASS',identity_api:'PASS',logout_and_old_cookie:'PASS',empty_fields_feedback:'PASS',visible_labels:'PASS',page_errors:errors,...(scheduleChecks ? {schedule:scheduleChecks} : {}),...(availabilityChecks ? {availability:availabilityChecks} : {})});
+      results.push({viewport,loginWidth,homeWidth,...(bookingChecks ? {booking:bookingChecks} : {}),keyboard_login:'PASS',login_pending_inputs_and_no_duplicate:'PASS',keyboard_logout:'PASS',identity_api:'PASS',logout_and_old_cookie:'PASS',empty_fields_feedback:'PASS',visible_labels:'PASS',page_errors:errors,...(scheduleChecks ? {schedule:scheduleChecks} : {}),...(availabilityChecks ? {availability:availabilityChecks} : {})});
       await context.close();
     }
-    console.log(JSON.stringify({result:'PASS',browser:await browser.version(),runner:`Playwright ${PINNED_PLAYWRIGHT} (external verification tool only)`,results},null,2));
+    console.log(JSON.stringify({result:'PASS',browser:await browser.version(),execution:{node:process.version,playwright_package_path:require.resolve('playwright/package.json'),playwright:require('playwright/package.json').version,browser_executable:executablePath || chromium.executablePath(),scenario},runner:`Playwright ${PINNED_PLAYWRIGHT} (external verification tool only)`,results},null,2));
   } finally {
     await browser.close();
   }

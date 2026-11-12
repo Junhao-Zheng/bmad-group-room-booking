@@ -131,6 +131,8 @@ test('availability field errors focus enabled input; success clears errors and s
   assert.equal(ui.nodes['attendees-error'].textContent, '');
   assert.equal(ui.nodes['availability-items'].children.length, 1);
   assert.match(ui.nodes['availability-items'].textContent, /<img src=x onerror=evil\(\)>/);
+  assert.deepEqual(ui.nodes['availability-items'].children[0].children.map(child=>child.textContent),
+    ['<img src=x onerror=evil()>', '<script>evil()</script>', '可容纳 10 人']);
   assert.match(ui.nodes['availability-conditions'].textContent, /2026-11-12 12:00.*12:30.*北京时间.*10 人/);
   assert.match(ui.nodes['availability-feedback'].textContent, /不保留时段/);
   assert.equal(ui.fetches[0].url, '/api/availability?start=2026-11-12T12%3A00&end=2026-11-12T12%3A30&attendees=10');
@@ -158,6 +160,8 @@ test('each room selection has a distinct accessible name containing room and loc
   const buttons=ui.nodes['availability-items'].children.map(row=>row.children.at(-1));
   assert.deepEqual(buttons.map(button=>button.getAttribute('aria-label')),
     ['选择 合成 A（101）并填写活动','选择 合成 A（202）并填写活动']);
+  assert.deepEqual(ui.nodes['availability-items'].children.map(row=>row.children.slice(0,3).map(child=>child.textContent)),
+    [['合成 A','101','可容纳 10 人'],['合成 A','202','可容纳 20 人']]);
   buttons[1].click();assert.equal(selected[0].room.id,2);
   assert.equal(selected[0].query.start,'2026-11-12T12:00');
 });

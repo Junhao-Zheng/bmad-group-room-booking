@@ -2,7 +2,7 @@
 title: '使用预置账号安全登录和退出'
 type: feature
 created: '2026-11-12'
-status: in-progress
+status: done
 route: dispatch
 baseline_commit: 837f30b48199ede90c4bfbb970080361db051070
 story_key: 1-1-account-access
@@ -108,3 +108,5 @@ context:
 ## 完成后返工 R1
 
 2026-11-12跨故事复盘发现后重新进入in-progress；保留初始baseline和原验收证据。统一修补见[工作项](epic-1-followup.md)，不把本次AI评审写成人类否决。
+
+完成后返工R1已关闭：最终108项Python/54项JS与真实双视口验证通过；原初次实现/评审指标保持，补充证据见[epic-1-followup](epic-1-followup.md)。

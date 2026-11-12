@@ -84,19 +84,32 @@ class RoomScheduleTests(unittest.TestCase):
     def assert_error(self, response, status, code):
         self.assertEqual(response.status_code, status, response.text)
         self.assertEqual(set(response.json), {"ok", "error"})
+        self.assertIs(type(response.json["ok"]), bool)
         self.assertFalse(response.json["ok"])
         self.assertEqual(set(response.json["error"]), {"code", "message", "fields", "conflicts"})
         self.assertEqual(response.json["error"]["code"], code)
         self.assertNotIn("Set-Cookie", response.headers)
 
+    def assert_list_envelope(self, response):
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(set(response.json), {"ok", "data"})
+        self.assertIs(type(response.json["ok"]), bool)
+        self.assertIs(response.json["ok"], True)
+        self.assertIs(type(response.json["data"]["items"]), list)
+        self.assertIs(type(response.json["data"]["total"]), int)
+        self.assertEqual(response.json["data"]["total"], len(response.json["data"]["items"]))
+
     def test_room_exact_contract_order_and_page_share_service(self):
         result = self.get("/api/rooms")
+        self.assert_list_envelope(result)
         self.assertEqual(set(result.json), {"ok", "data"})
         self.assertEqual(set(result.json["data"]), {"items", "total"})
         self.assertEqual(result.json["data"]["total"], 3)
         self.assertEqual([row["id"] for row in result.json["data"]["items"]], [10, 20, 30])
         for room in result.json["data"]["items"]:
             self.assertEqual(set(room), ROOM_KEYS)
+            for key, value in room.items():
+                self.assertIs(type(value), int if key in {"id", "capacity"} else str)
         with self.app.app_context():
             self.assertEqual(services.list_rooms(self.actor()), result.json["data"])
         with patch("booking_app.web.services.list_rooms", wraps=services.list_rooms) as query:
@@ -112,12 +125,15 @@ class RoomScheduleTests(unittest.TestCase):
         self.assertEqual(result.headers["Cache-Control"], "no-store")
 
     def test_empty_catalog_and_empty_schedule_are_successful(self):
+        for response in [self.schedule("30"), self.schedule(date="2026-11-14")]:
+            self.assert_list_envelope(response)
         self.assertEqual(self.schedule("30").json["data"], {"items": [], "total": 0})
         self.assertEqual(self.schedule(date="2026-11-14").json["data"], {"items": [], "total": 0})
         with db.write_transaction(self.database) as conn:
             conn.execute("DELETE FROM occupancy_slots")
             conn.execute("DELETE FROM reservations")
             conn.execute("DELETE FROM rooms")
+        self.assert_list_envelope(self.get("/api/rooms"))
         self.assertEqual(self.get("/api/rooms").json["data"], {"items": [], "total": 0})
         self.assertIn("暂无会议室", self.get("/").text)
 
@@ -126,13 +142,23 @@ class RoomScheduleTests(unittest.TestCase):
         self.assertEqual(result.status_code, 200)
         self.assertEqual(set(result.json["data"]), {"items", "total"})
         data = result.json["data"]
+        self.assertIs(type(result.json["ok"]), bool)
+        self.assertIs(result.json["ok"], True)
+        self.assertIs(type(data["total"]), int)
+        self.assertIs(type(data["items"]), list)
         self.assertEqual(data["total"], 5)
         self.assertEqual([item["record"]["status"] for item in data["items"]],
                          ["ended", "ended", "in_progress", "pending", "pending"])
         for item in data["items"]:
             self.assertEqual(set(item), {"kind", "record"})
             self.assertEqual(set(item["record"]), BOOKING_KEYS if item["kind"] == "booking" else BLOCK_KEYS)
-            self.assertIs(type(item["record"]["start_at"]), int)
+            self.assertIs(type(item["kind"]), str)
+            for key, value in item["record"].items():
+                self.assertIs(type(value), int if key in {"id", "room_id", "start_at", "end_at"} else str)
+            self.assertEqual(item["record"]["room_id"], 10)
+            self.assertEqual(item["record"]["room_name"], "合成 A")
+            if item["kind"] == "block":
+                self.assertEqual(item["record"]["reason"], "合成维护 <检查设备>")
             self.assertRegex(item["record"]["start_local"], r"^2026-11-[0-9]{2}T[0-9]{2}:[0-9]{2}:00\+08:00$")
         self.assertEqual(data["items"][2]["record"]["title"], TITLE)
         self.assertEqual(data["items"][2]["record"]["owner_display_name"], OWNER)
@@ -293,6 +319,7 @@ class RoomScheduleTests(unittest.TestCase):
             self.assertEqual([tuple(row) for row in conn.execute("SELECT * FROM users ORDER BY id")], users)
             self.assertEqual([tuple(row) for row in conn.execute("SELECT * FROM sessions ORDER BY token_hash")], sessions)
             self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0], 1)
+        self.assert_list_envelope(self.get("/api/rooms"))
         self.assertEqual(self.get("/api/rooms").json["data"], {"items": [], "total": 0})
 
     def test_schema_enforces_branches_cancellation_and_slot_constraints(self):

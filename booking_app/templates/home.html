@@ -87,7 +87,7 @@
     <form id="schedule-form" action="{{ url_for('web.schedule_api') }}" method="get" novalidate>
       <div class="form-field">
         <label for="room_id">会议室</label>
-        <select id="room_id" name="room_id" aria-describedby="room_id-error" {% if not rooms.total %}disabled{% endif %}>
+        <select id="room_id" name="room_id" required aria-describedby="room_id-error" {% if not rooms.total %}disabled{% endif %}>
           <option value="">请选择会议室</option>
           {% for room in rooms['items'] %}
           <option value="{{ room.id }}">{{ room.name }} · {{ room.location }}（{{ room.capacity }} 人）</option>
@@ -97,7 +97,7 @@
       </div>
       <div class="form-field">
         <label for="date">日期（北京时间）</label>
-        <input id="date" name="date" type="date" max="9999-12-30" aria-describedby="date-hint date-error" {% if not rooms.total %}disabled{% endif %}>
+        <input id="date" name="date" type="date" required max="9999-12-30" aria-describedby="date-hint date-error" {% if not rooms.total %}disabled{% endif %}>
         <p id="date-hint" class="field-hint">可查看历史日期；跨日停用会出现在每个覆盖日期。</p>
         <p id="date-error" class="field-error"></p>
       </div>

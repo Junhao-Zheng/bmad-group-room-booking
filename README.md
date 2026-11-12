@@ -178,3 +178,6 @@ node --test tests/test_*js.cjs
 
 AI 自主提出的业务规则按假设标注，不作为已完成访谈或用户已逐条批准的证据。人工决策与 AI 的编辑、检查记录分开保存。Git 提交以 Codex 标识记录本次 AI 操作，不代表组员贡献。
 
+
+
+第一个史诗的复盘修补及复跑证据见 [epic-1-followup](docs/evidence/epic-1-followup/verification.md)。认证浏览器报告先写 `INCOMPLETE`，通过后包含真实环境版本、运行前后未变化的应用/验证源码哈希，以及本次截图哈希。HTTP 验证器显式使用 loopback HTTP 配置，父环境的 HTTPS cookie/host 配置不会影响隔离测试。

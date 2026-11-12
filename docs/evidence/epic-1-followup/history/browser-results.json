@@ -1,0 +1,151 @@
+{
+  "result": "PASS",
+  "browser": "157.0.8103.51",
+  "runner": "Playwright 1.58.2",
+  "node_version": "v26.8.1",
+  "playwright_version": "1.58.2",
+  "results": [
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "listWidth": {
+        "document": 1280,
+        "viewport": 1280
+      },
+      "detailWidth": {
+        "document": 1280,
+        "viewport": 1280
+      },
+      "filters": {
+        "pending": [
+          104,
+          103
+        ],
+        "in_progress": [
+          102
+        ],
+        "ended": [
+          101
+        ],
+        "cancelled": [
+          106,
+          105
+        ]
+      },
+      "exact_dto": "PASS",
+      "literal_long_text": "PASS",
+      "keyboard_navigation_detail_logout": "PASS",
+      "list_detail_error_recovery": "PASS",
+      "empty": "PASS",
+      "member_privacy_admin_read": "PASS",
+      "session_expiry": "PASS",
+      "page_errors": []
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "listWidth": {
+        "document": 390,
+        "viewport": 390
+      },
+      "detailWidth": {
+        "document": 390,
+        "viewport": 390
+      },
+      "filters": {
+        "pending": [
+          104,
+          103
+        ],
+        "in_progress": [
+          102
+        ],
+        "ended": [
+          101
+        ],
+        "cancelled": [
+          106,
+          105
+        ]
+      },
+      "exact_dto": "PASS",
+      "literal_long_text": "PASS",
+      "keyboard_navigation_detail_logout": "PASS",
+      "list_detail_error_recovery": "PASS",
+      "empty": "PASS",
+      "member_privacy_admin_read": "PASS",
+      "session_expiry": "PASS",
+      "page_errors": []
+    }
+  ],
+  "storage": {
+    "unchanged": true,
+    "reservations": 9,
+    "slots": 13,
+    "audits": 0
+  },
+  "server": {
+    "command": [
+      "/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/.venv/bin/python",
+      "-m",
+      "waitress",
+      "--listen=127.0.0.1:8004",
+      "--threads=8",
+      "--call",
+      "scripts.verify_auth_browser:create_schedule_verification_app"
+    ],
+    "threads": 8,
+    "processes": 1
+  },
+  "run_id": "fb0211b06172e9e64492de5401246931",
+  "started_at_utc": "2026-11-12T10:54:02.980212+00:00",
+  "artifact_directory": "runs/fb0211b06172e9e64492de5401246931",
+  "environment": {
+    "platform": "macOS-26.6-arm64-arm-64bit",
+    "supported_runtime": "macOS/Linux POSIX process groups; Playwright 1.58.2",
+    "python": "3.12.14 (main, Aug 25 2026, 13:50:33) [Clang 22.1.3 ]",
+    "sqlite": "3.53.1",
+    "packages": {
+      "Flask": "3.1.3",
+      "Jinja2": "3.1.6",
+      "Werkzeug": "3.1.9",
+      "waitress": "3.0.2"
+    },
+    "playwright": "1.58.2"
+  },
+  "app_source_files_sha256": {
+    "booking_app/__init__.py": "58c6775ec02de2cacd56f810878d3db32b42e57535ddda59e3b98d15bcfc0657",
+    "booking_app/audit.py": "4ef81dffae285cea3d82ea7c393c9895f87d3977b900828adcf1165f2e0fad80",
+    "booking_app/auth.py": "c81a834f349872a0b367f9bef4d48e7f4e2c6d258667c2d6690bca2dba110ac4",
+    "booking_app/db.py": "67cdaf0b3f89334c1c6bf610c3f6ad8e174a3fe3c118aace3596309426df0585",
+    "booking_app/domain.py": "01f2223020b6630bd14bdbb9d716711b96ab13b94073f53e9d9d32289855982f",
+    "booking_app/dto.py": "6ad6400086c487934bb866b3c9c73c2eba063104c26caaf86925f8afb25c424c",
+    "booking_app/schema.sql": "7becf070ca3daf2c6437de6cda6cb1f0edd47badc15e1a081cd95735b666f4c7",
+    "booking_app/services.py": "0af32a441c374eaa34ffbd385c1049466a7c0de64f094cf4a204333c8acea5e2",
+    "booking_app/static/app.css": "ecc875152f9bbfa07e4a166873c9d6a8b978fe5ba23254bef19842c30632a718",
+    "booking_app/static/auth.js": "fb2bf86b5a273d25ece5780aa27fc25ab7b03074a9c1c830e774b11cf924ed31",
+    "booking_app/static/availability.js": "ee27c9e189d06f7456e3d2f44f10ddac172ea552c262b6947e9e4e43109afc87",
+    "booking_app/static/booking.js": "c075a1301696cfb8c1cfa16ccb85786491a7d6749e4c2c59461f08d6c32d3261",
+    "booking_app/static/history.js": "f2b1596e3897754cc562070b561eb85d3a1065c494669c0c7049c5351911d48f",
+    "booking_app/static/schedule.js": "5eb53add891d4444dca4e3339272e6c3f38a492ce55f321743cf54d41c704f99",
+    "booking_app/templates/base.html": "22736c122e252226cc06dda1f5507e0baefed62de1c9d43d54739c67a53f499b",
+    "booking_app/templates/home.html": "4ac1b84f72a40d4d8cde1bfb90b81edd960c7cef005d9ca3496d8ce0e05d87f3",
+    "booking_app/templates/login.html": "7e78fd3f5d83f9d97c33dea9776eeeab3bdc9825980dfcc34a956ac67b12f1bd",
+    "booking_app/templates/my.html": "da4ff0b40bf9df5cf82aaceeabdb04b091bd41a1eacebe5b3fa91764ed33a6a7",
+    "booking_app/web.py": "fd922b47b98f0e3b52001d0dc8f064850406185b07db2cb13814061097506957"
+  },
+  "verification_source_files_sha256": {
+    "scripts/verify_history_browser.py": "185344202a215cd9653cb9fb89768d690b095a58486e9599c7ad6d84035fb1c9",
+    "scripts/verify_history_browser.cjs": "f64023a8b39bc89ca4700aa7b3579487ce90a69c05dac57951c62eab86106d87",
+    "scripts/verify_auth_browser.py": "d55fd6ccc9b881c1142235fa68ae984ad0476a9218dbff87ae540ba9a5f524d9",
+    "scripts/init_demo.py": "1e85b96d32582a31af98f7bef0c30761e261f81b50417795d7a29bb564c8fdbe",
+    "tests/history_fixtures.py": "fc87b9201d85a5a2cedc4a1819d68564639f8b939874a4add0d0a077f75a4a35",
+    "tests/schedule_fixtures.py": "93a77f4297e77c5a786037c770c9881eddd4566415f260e95d757d0f83f96751"
+  },
+  "completed": true,
+  "finished_at_utc": "2026-11-12T10:54:11.988718+00:00"
+}
