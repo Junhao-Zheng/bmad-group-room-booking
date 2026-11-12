@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}欢迎 · 课题组活动与会议室预约{% endblock %}
+{% block content %}
+<section class="welcome card" aria-labelledby="welcome-title">
+  <p class="eyebrow">身份已确认</p>
+  <h1 id="welcome-title">欢迎，{{ user.display_name }}。</h1>
+  <p>您已作为<strong>{{ '管理员' if user.role == 'admin' else '成员' }}</strong>登录课题组。</p>
+  <p class="muted">当前开放账号登录与退出，会议室查询将在后续开放。</p>
+  <div class="info-note"><span aria-hidden="true">✓</span><p>请在使用结束后点击右上方「退出登录」。<br>刷新页面不会延长本次登录的有效期。</p></div>
+  <p id="auth-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>
+  <a id="relogin-link" class="relogin-link" href="{{ url_for('web.login_page') }}" hidden>重新登录</a>
+</section>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}登录 · 课题组活动与会议室预约{% endblock %}
+{% block content %}
+<div class="login-layout">
+  <section class="intro" aria-labelledby="intro-title">
+    <p class="eyebrow">GROUP ROOM BOOKING</p>
+    <h1 id="intro-title">让每次讨论，<br>都有相聚的空间。</h1>
+    <p class="intro-copy">课题组专属的活动与会议室入口。<br>使用预置账号登录，确认您的成员身份。</p>
+    <div class="info-note"><span aria-hidden="true">↗</span><p>当前开放账号登录与退出。<br>会议室查询将在后续开放。</p></div>
+  </section>
+  <section class="card login-card" aria-labelledby="login-title">
+    <span class="section-label">欢迎回来</span>
+    <h2 id="login-title">登录课题组</h2>
+    <p class="muted">请使用部署者提供的演示账号和密码。</p>
+    {% if request.args.get('expired') == '1' %}<p class="notice" role="status">请重新登录后继续访问。</p>{% endif %}
+    {% if request.args.get('logged_out') == '1' %}<p class="notice" role="status">已退出登录，当前会话已失效。</p>{% endif %}
+    <form id="login-form" action="{{ url_for('web.login_api') }}" method="post" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div class="form-field">
+        <label for="username">账号</label>
+        <input id="username" name="username" autocomplete="username" required aria-describedby="username-error" spellcheck="false" autocapitalize="none">
+        <p id="username-error" class="field-error"></p>
+      </div>
+      <div class="form-field">
+        <label for="password">密码</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required aria-describedby="password-error">
+        <p id="password-error" class="field-error"></p>
+      </div>
+      <p id="auth-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>
+      <a id="relogin-link" class="relogin-link" href="{{ url_for('web.login_page') }}" hidden>重新打开登录页</a>
+      <button type="submit" class="button-primary">登录</button>
+    </form>
+    <p class="session-note">登录有效期为 8 小时。使用结束后请主动退出。</p>
+    <noscript><p class="notice">此交互页面需要启用 JavaScript 才能完成登录与反馈。</p></noscript>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{
+  "result": "PASS",
+  "browser": "157.0.8103.51",
+  "runner": "Playwright 1.58.2 (external verification tool only)",
+  "results": [
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "loginWidth": {
+        "document": 1280,
+        "viewport": 1280
+      },
+      "homeWidth": {
+        "document": 1280,
+        "viewport": 1280
+      },
+      "keyboard_login": "PASS",
+      "keyboard_logout": "PASS",
+      "empty_fields_feedback": "PASS",
+      "visible_labels": "PASS",
+      "page_errors": []
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "loginWidth": {
+        "document": 390,
+        "viewport": 390
+      },
+      "homeWidth": {
+        "document": 390,
+        "viewport": 390
+      },
+      "keyboard_login": "PASS",
+      "keyboard_logout": "PASS",
+      "empty_fields_feedback": "PASS",
+      "visible_labels": "PASS",
+      "page_errors": []
+    }
+  ]
+}

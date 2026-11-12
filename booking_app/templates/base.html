@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}课题组活动与会议室预约{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+  <script src="{{ url_for('static', filename='auth.js') }}" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+  <header class="site-header">
+    <div class="header-content">
+      <a class="brand" href="{{ url_for('web.home') }}"><span class="brand-mark" aria-hidden="true">组</span><span>课题组活动<br><small>会议室预约</small></span></a>
+      {% if user %}
+      <div class="account">
+        <span class="account-name">{{ user.display_name }}</span>
+        <span class="role">{{ '管理员' if user.role == 'admin' else '成员' }}</span>
+        <form id="logout-form" action="{{ url_for('web.logout_api') }}" method="post">
+          <input type="hidden" name="csrf_token" value="{{ user.csrf_token }}">
+          <button class="button-secondary" type="submit">退出登录</button>
+        </form>
+      </div>
+      {% else %}<span class="demo-tag">课程原型 · 演示环境</span>{% endif %}
+    </div>
+  </header>
+  <main id="main" class="main-content" tabindex="-1">{% block content %}{% endblock %}</main>
+  <footer class="site-footer">课题组活动与会议室预约 · 合成演示数据</footer>
+</body>
+</html>

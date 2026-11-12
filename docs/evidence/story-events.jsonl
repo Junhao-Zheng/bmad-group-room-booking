@@ -1,2 +1,4 @@
 {"timestamp": "2026-11-12T04:25:04.341540+00:00", "story": "1-1-account-access", "from": "backlog", "to": "ready-for-dev", "actor": "AI root", "head": "117501b8c93775652e0a1fed535681ed6ee0b5ff", "post_done_rework": false}
 {"timestamp": "2026-11-12T04:25:17.396476+00:00", "story": "1-1-account-access", "from": "ready-for-dev", "to": "in-progress", "actor": "AI root", "head": "837f30b48199ede90c4bfbb970080361db051070", "post_done_rework": false}
+{"timestamp": "2026-11-12T04:40:43.390345+00:00", "story": "1-1-account-access", "from": "in-progress", "to": "review", "actor": "AI root", "head": "08237d0b112e9d1bd0f89836c62d65602762fb0c", "post_done_rework": false}
+{"timestamp": "2026-11-12T04:59:00.196060+00:00", "story": "1-1-account-access", "from": "review", "to": "done", "actor": "AI root", "head": "08237d0b112e9d1bd0f89836c62d65602762fb0c", "post_done_rework": false}

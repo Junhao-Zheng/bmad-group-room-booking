@@ -1,6 +1,6 @@
 # 课题组活动与会议室预约
 
-软件工程管理课程项目。选题及使用对象已由用户确认，当前处于分析阶段，尚未实现应用。
+软件工程管理课程项目。选题及使用对象已由用户确认。Story 1.1 已实现预置账号登录、身份显示和退出，会议室查询与预约能力待后续故事交付。
 
 本仓库按实际发生的工作保存 BMAD 产物和过程证据。实验 B 按用户转述的教师要求免做，实验 A 保留。人数和截止日期不作为当前阶段的阻塞条件。
 
@@ -13,21 +13,21 @@
 - [下一会话交接](docs/next-session-prd.md)：在独立会话中执行 PRD 工作流的输入说明。
 - [初始化证据](docs/evidence/setup-2026-11-12.md)与[用户输入摘录](docs/evidence/user-inputs.md)。
 
-当前只完成分析草案。PRD、架构、故事、冲刺、实验 A 和应用实现尚未完成；M1 尚未评审。
+当前 PRD、架构及故事基线见 `_bmad-output/`；首个认证故事的技术验证见 [Story 1.1 验证记录](docs/evidence/story-1.1-verification.md)。实验 A 尚未执行；本次 AI 实施与测试不代表人工验收或教师 M1/M2 评审。
 
 ## 环境
 
 - BMAD Core 与 BMad Method：6.12.1，与讲义参考版本一致。
 - 项目级技能：`.agents/skills/`，配置和共享脚本：`_bmad/`。
 - 本机工具环境：Python 3.12.14、uv 0.13.7，位于未入库的 `.tools/`。
-- 应用技术栈尚未决定，由后续架构阶段依据需求选择。
+- 应用采用 Python 3.12.14、SQLite 3.53.1、Flask 3.1.3、Jinja2 3.1.6、Werkzeug 3.1.9、Waitress 3.0.2；直接与传递依赖均记录于 `uv.lock`。
 
 在本目录使用 BMAD 前，激活工具环境：
 
 ```bash
 source .tools/bin/activate
 uv --version
-uv run --python .tools/bin/python _bmad/scripts/resolve_config.py --project-root .
+uv run --no-project --python .tools/bin/python _bmad/scripts/resolve_config.py --project-root .
 ```
 
 其他机器需先安装 Python 3.11+，再在本目录重建工具环境：
@@ -44,7 +44,66 @@ BMAD 已随仓库保存，无需覆盖安装。若需要恢复项目级安装，
 npx --yes bmad-method@6.12.1 install --directory . --modules bmm --tools codex --communication-language Chinese --document-output-language Chinese --user-name 课程项目组 --no-shims --yes
 ```
 
-本机已验证配置与定制解析脚本可运行。应用尚未创建，因此当前没有应用启动步骤或功能测试结果。
+本机已验证配置与定制解析脚本可运行。
+
+## 运行认证故事
+
+从本项目目录运行。应用要求 Python **3.12.14**，其链接的 SQLite 须 ≥3.51.3；本机 `.tools/bin/python` 已核验为 SQLite 3.53.1。其他机器的 `.tools/bin/python` 可能只是用于安装 uv 的 Python 3.11，因此按以下命令让 uv 获取指定应用解释器，再按现有锁文件创建 `.venv`。数据库必须在本机磁盘，不能放在网络共享盘。
+
+```bash
+source .tools/bin/activate
+uv python install 3.12.14
+uv sync --frozen --python 3.12.14
+uv run --frozen python -m scripts.init_demo
+uv run --frozen waitress-serve --listen=127.0.0.1:8000 --threads=8 --call booking_app:create_app
+```
+
+应用启动仍会检查实际链接的 SQLite 版本与 Asia/Shanghai 时区；版本低于 3.51.3 时拒绝启动，不会因为 Python 版本正确而跳过检查。
+
+初始化时以隐藏输入分别设置三个**合成演示账号**的密码，每个至少 12 字符。账号去掉首尾空白后最多 **256 UTF-8 字节**，密码最多 **1024 UTF-8 字节**；密码不去空白，初始化和登录共用上述字节限制并拒绝无效 Unicode。没有内置共享密码；请保存自己输入的密码。数据库只保存 scrypt 哈希。若终端无法隐藏输入，CLI 会停止，须改用支持隐藏输入的终端或权限 600 的私有配置文件，不会回退到明文回显。
+
+| 账号 | 显示名 | 角色 |
+| --- | --- | --- |
+| `demo_member_a` | 演示成员甲 | 成员 |
+| `demo_member_b` | 演示成员乙 | 成员 |
+| `demo_admin` | 演示管理员 | 管理员 |
+
+打开 [本机登录页](http://127.0.0.1:8000/login)，登录后首页显示本人及角色，使用顶栏按钮退出。刷新不会延长 8 小时绝对有效期，退出只撤销当前会话。界面可用键盘操作，并适配手机宽度。当前首页明确标注查询功能尚未开放。
+
+初始化和启动命令可重复执行。重复初始化仍会提示输入合规口令，但只补缺失账号，**不会重置已有密码、显示名或角色，也不会清除已有数据**。停止后重启服务保留未到期会话。不要删除数据库来升级应用；schema 版本不兼容时启动会明确停止。
+
+默认数据文件是项目目录下 `instance/booking.sqlite3`，与启动时的临时工作目录无关。可用环境变量 `BOOKING_DB_PATH` 指定另一个本地文件；初始化与服务必须使用同一路径。新建数据库权限为 600，默认目录权限为 700，运行库、私密配置和备份均已忽略。
+
+非交互初始化接受权限为 600 的私有 JSON 文件：顶层必须是对象，其中 `users` 为数组，每项含 `username`、`display_name`、`password`、`role`；至少两个 `member` 和一个 `admin`。文件放在 `instance/` 或以 `.credentials.json` 结尾，切勿提交真实口令。
+
+```bash
+chmod 600 instance/demo.credentials.json
+uv run python -m scripts.init_demo --credentials-file instance/demo.credentials.json
+```
+
+默认只在 `127.0.0.1:8000` 运行一个 Waitress 进程、8 个线程，无 debug/reloader。`APP_ORIGIN` 默认精确为 `http://127.0.0.1:8000`；浏览器也须使用该地址，不要替换成 `localhost`。如修改端口，启动时同步设置 `APP_ORIGIN`。端口须为 1—65535；配置中的 HTTP `:80` 和 HTTPS `:443` 会按浏览器 Origin 格式省略，其他端口保留。`TRUSTED_HOSTS` 默认 `127.0.0.1,localhost`，不信任代理头。HTTP 仅供 loopback 课堂演示；其他部署需要 HTTPS、`COOKIE_SECURE=true` 和匹配的 `APP_ORIGIN`/`TRUSTED_HOSTS`，公网部署不属于当前交付。
+
+交互登录页需要 JavaScript。登录和退出请求含响应正文读取最多等待 20 秒，超时会恢复按钮并提示结果未确认；不会自动重试，需自行重试或重新打开页面。
+
+## 验证
+
+```bash
+.venv/bin/python -m unittest discover -s tests -v
+uv run python -m scripts.verify_auth_http
+```
+
+第二条命令要求本机 8000 端口空闲（先停止手动启动的服务），会生成私有临时合成账号、重复初始化、启动同一 Waitress 命令，验证 HTTP 登录、身份、退出、旧 cookie 重放和独立会话，并自动停止服务、删除临时数据。也可加 `--port 8001`。结果不打印口令、cookie、CSRF 或 token 摘要。验证证据与桌面/手机截图见 [Story 1.1 验证记录](docs/evidence/story-1.1-verification.md)。
+
+浏览器检查已交付为 `scripts/verify_auth_browser.py` 和 `.cjs`，需要 Node.js 20+，外部 Playwright 固定为 **1.58.2**，不属于应用运行依赖。以下安装到忽略的 `work/`，并下载其匹配的 Chromium：
+
+```bash
+npm install --prefix work/browser-tools --no-save --package-lock=false playwright@1.58.2
+work/browser-tools/node_modules/.bin/playwright install chromium
+uv run --frozen python -m scripts.verify_auth_browser --output-dir work/browser-verification
+node --test tests/test_auth_js.cjs
+```
+
+浏览器 runner 使用独立临时数据库、权限 600 的临时随机凭证文件和 127.0.0.1:8002，自动启动/停止 Waitress 并清理临时数据。它保留桌面/390px 手机的标签、焦点、键盘登录/退出、身份 API、退出后匿名/旧 cookie 拒绝、错误反馈及宽度检查，输出无凭证的 JSON 与截图。`--output-dir` 可指定新的证据目录；不会写入原始 Story 1.1 证据文件。`--playwright-root` 可指定其他安装位置下的 `node_modules`；`--browser-executable` 可选择已有 Chrome/Chromium 可执行文件，不依赖任何特定机器路径。末条 Node 测试用可控计时器验证响应头/正文停滞均在设定的 20 秒期限取消并恢复控件，无须实际等待 20 秒。
 
 ## AI 使用声明
 

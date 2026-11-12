@@ -1,0 +1,56 @@
+:root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:#183343;background:#f5f7f8;font-size:16px;line-height:1.5;font-synthesis:none}
+*{box-sizing:border-box}
+body{margin:0;min-width:0}
+a{color:#126d65;text-underline-offset:4px}
+button,input{font:inherit}
+button,a,input{-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:3px solid #b36312;outline-offset:4px}
+button{cursor:pointer;min-height:46px;border-radius:8px;font-weight:650;padding:10px 18px;transition:background .15s}
+button:disabled{cursor:wait;opacity:.7}
+input{width:100%;min-width:0;padding:12px;border:1px solid #91a5ae;border-radius:8px;color:#183343;background:white;min-height:48px}
+input[aria-invalid="true"]{border:2px solid #a52b37}
+h1,h2,p{margin-top:0}
+h1{font-size:clamp(1.8rem,3.6vw,2.75rem);line-height:1.3;letter-spacing:-.02em;margin-bottom:24px;overflow-wrap:anywhere}
+h2{font-size:1.75rem;line-height:1.3;margin:8px 0 12px}
+.site-header{background:#fff;border-bottom:1px solid #dde6e8}
+.header-content{max-width:1184px;margin:auto;padding:22px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#183343;font-size:17px;font-weight:700;line-height:1.35;flex-shrink:0}
+.brand small{font-size:14px;color:#54707a;font-weight:400}
+.brand-mark{display:grid;place-items:center;width:46px;height:46px;border-radius:13px;background:#126d65;color:white;font-size:24px}
+.demo-tag,.role{font-size:14px;color:#42645d;background:#edf5f2;padding:6px 10px;border-radius:6px}
+.account{display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-wrap:wrap;min-width:0}
+.account-name{overflow-wrap:anywhere;max-width:260px}
+.account form{margin:0}
+.main-content{max-width:1184px;margin:auto;padding:72px 32px 64px;min-height:calc(100vh - 180px)}
+.login-layout{display:grid;grid-template-columns:1fr 430px;align-items:center;gap:72px}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.13em;color:#126d65;margin-bottom:24px}
+.intro-copy{color:#54707a;line-height:1.9}
+.info-note{display:flex;align-items:center;gap:18px;border-top:1px solid #d8e4e4;padding-top:24px;margin-top:36px;color:#42645d}
+.info-note>span{font-size:24px;color:#126d65}
+.info-note p{margin:0;font-size:15px;line-height:1.7}
+.card{background:white;border:1px solid #e0e8e8;border-radius:18px;padding:36px;box-shadow:0 12px 40px #18334306;min-width:0}
+.section-label{color:#126d65;font-size:14px;font-weight:700}
+.muted{color:#54707a}
+.form-field{margin-top:24px}
+label{display:block;font-weight:650;margin-bottom:8px}
+.field-error{margin:6px 0 0;font-size:14px;color:#a52b37;min-height:0}
+.field-error:empty{display:none}
+.feedback{margin:18px 0;color:#126d65;overflow-wrap:anywhere}
+.feedback:empty{display:none}
+.feedback.error{color:#a52b37}
+.button-primary{width:100%;color:#fff;background:#126d65;border:1px solid #126d65;margin-top:26px}
+.button-primary:hover{background:#0c5852}
+.button-secondary{color:#126d65;background:white;border:1px solid #93b5ad}
+.button-secondary:hover{background:#edf5f2}
+.session-note{font-size:14px;color:#54707a;margin:22px 0 0}
+.notice{background:#edf5f2;border-left:3px solid #126d65;padding:12px;font-size:15px}
+.relogin-link{display:inline-block;margin:0 0 8px}
+[hidden]{display:none!important}
+.welcome{max-width:800px;margin:0 auto;padding:48px}
+.welcome .eyebrow{margin-bottom:16px}
+.welcome strong{margin:0 4px;color:#126d65}
+.site-footer{text-align:center;color:#617782;font-size:13px;padding:24px 16px}
+.skip-link{position:fixed;left:16px;top:-100px;background:white;padding:12px;z-index:10}
+.skip-link:focus{top:12px}
+@media(max-width:800px){.login-layout{gap:36px;grid-template-columns:1fr;max-width:510px;margin:auto}.main-content{padding:40px 24px}.intro h1{font-size:2rem}.intro .info-note{display:none}.intro-copy{margin-bottom:0}.eyebrow{margin-bottom:16px}.header-content{padding:18px 24px}.demo-tag{max-width:130px;text-align:center}.welcome{padding:32px}}
+@media(max-width:480px){.header-content{padding:16px;gap:16px;flex-wrap:wrap}.main-content{padding:32px 16px 40px}.card{padding:24px}.login-layout{gap:28px}.account{justify-content:flex-start;gap:10px;width:100%}.account form{margin-left:auto}.account-name{max-width:160px}.demo-tag{font-size:12px;max-width:110px}.welcome h1{font-size:1.8rem}.info-note{align-items:flex-start}.site-footer{padding-top:16px}}

@@ -10,4 +10,6 @@
 - Epic2共享服务基础，Epic3增加资源维护领域；共享文件是必要耦合。保留三个史诗满足用户结果及课程要求，前后两次可运行增量为反馈边界。
 - final表示拆分工作流结束。人类规则反馈到来后按真实变更更新，不改写已有历史。
 
-追踪生成：首次直接python运行缺少ruamel.yaml，改为官方uv run脚本内联依赖后成功；生成器识别3史诗12故事，无非法状态/遗失项。两个warning仅涉及模板标题“Epic Breakdown”“Epic List”，不是漏故事，已人工核对所有12项。生成时间使用宿主实际date（UTC）；事件日志采用ISO UTC。
+追踪生成：首次直接python运行缺少ruamel.yaml，改为官方uv run脚本内联依赖后成功；生成器识别3史诗12故事，无非法状态/遗失项。两个warning仅涉及模板标题“Epic Breakdown”“Epic List”，不是漏故事，已人工核对所有12项。生成时间使用宿主实际date（Asia/Shanghai，+08:00）；事件日志采用ISO UTC。
+
+主代理在1.1评审时发现last_updated辅助脚本误用UTC字符串而generated使用北京时间；现已统一二者为Asia/Shanghai，JSONL事件仍明确使用ISO UTC。旧提交保持原样，不倒改历史。

@@ -1,0 +1,14 @@
+[project]
+name = "group-room-booking"
+version = "0.1.0"
+description = "课题组活动与会议室预约课程原型"
+requires-python = "==3.12.14"
+dependencies = [
+  "Flask==3.1.3",
+  "Jinja2==3.1.6",
+  "Werkzeug==3.1.9",
+  "waitress==3.0.2",
+]
+
+[tool.uv]
+package = false

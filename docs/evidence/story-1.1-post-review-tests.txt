@@ -1,0 +1,18 @@
+test_shared_credential_byte_boundaries_can_initialize_and_login (test_auth.AuthTests.test_shared_credential_byte_boundaries_can_initialize_and_login) ... ok
+test_login_rejects_oversize_and_invalid_unicode_without_state_change (test_auth.AuthTests.test_login_rejects_oversize_and_invalid_unicode_without_state_change) ... ok
+test_initialization_rejects_oversize_and_invalid_unicode_before_database_changes (test_auth.AuthTests.test_initialization_rejects_oversize_and_invalid_unicode_before_database_changes) ... ok
+test_cli_rejects_nonobject_json_without_traceback_or_secret_output (test_auth.AuthTests.test_cli_rejects_nonobject_json_without_traceback_or_secret_output) ... ok
+test_cli_rejects_readable_credentials_file_without_database_changes (test_auth.AuthTests.test_cli_rejects_readable_credentials_file_without_database_changes) ... ok
+test_cli_rejects_unavailable_hidden_input_with_private_file_guidance (test_auth.AuthTests.test_cli_rejects_unavailable_hidden_input_with_private_file_guidance) ... ok
+test_origin_validates_ports_and_matches_browser_default_port_requests (test_auth.AuthTests.test_origin_validates_ports_and_matches_browser_default_port_requests) ... ok
+test_runtime_configuration_guards (test_auth.AuthTests.test_runtime_configuration_guards) ... ok
+test_execute_commit_failure_rolls_back_and_never_issues_or_clears_cookie (test_auth.AuthTests.test_execute_commit_failure_rolls_back_and_never_issues_or_clears_cookie) ... ok
+test_pre_commit_failure_rolls_back_login_logout_and_preauth_without_cookie (test_auth.AuthTests.test_pre_commit_failure_rolls_back_login_logout_and_preauth_without_cookie) ... ok
+test_invalid_credentials_use_identical_error_and_do_not_change_data (test_auth.AuthTests.test_invalid_credentials_use_identical_error_and_do_not_change_data) ... ok
+test_initialization_rejects_invalid_accounts_without_creating_database (test_auth.AuthTests.test_initialization_rejects_invalid_accounts_without_creating_database) ... ok
+test_noscript_notice_requires_javascript_without_changing_json_api (test_auth.AuthTests.test_noscript_notice_requires_javascript_without_changing_json_api) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 2.868s
+
+OK
