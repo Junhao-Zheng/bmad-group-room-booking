@@ -40,3 +40,4 @@
 {"timestamp": "2026-11-12T11:43:19.593119+00:00", "story": "2-3-personal-history", "from": "review", "to": "done", "actor": "AI root", "head": "11def7fb3326e72642fd2555651cce92b14b5971", "post_done_rework": false}
 {"timestamp": "2026-11-12T11:43:19.630326+00:00", "story": "2-4-member-cancel", "from": "review", "to": "done", "actor": "AI root", "head": "11def7fb3326e72642fd2555651cce92b14b5971", "post_done_rework": false}
 {"timestamp": "2026-11-12T11:44:30.138642+00:00", "story": "3-1-room-management", "from": "backlog", "to": "ready-for-dev", "actor": "AI root", "head": "1ac9921859d72f526f431434e5624d0a5ba35e1b", "post_done_rework": false}
+{"timestamp": "2026-11-12T11:44:30.211155+00:00", "story": "3-1-room-management", "from": "ready-for-dev", "to": "in-progress", "actor": "AI root", "head": "6644902c9e3880482d1edef75c42a1ee303ba6dd", "post_done_rework": false}

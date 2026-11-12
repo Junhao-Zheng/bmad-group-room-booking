@@ -2,8 +2,9 @@
 title: '维护房间资料并保护现有容量需求'
 type: feature
 created: '2026-11-12'
-status: ready-for-dev
+status: in-progress
 route: dispatch
+baseline_commit: 6644902c9e3880482d1edef75c42a1ee303ba6dd
 story_key: 3-1-room-management
 review_loop_iteration: 0
 context:
