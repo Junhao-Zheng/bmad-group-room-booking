@@ -16,6 +16,7 @@
       <nav class="primary-nav" aria-label="主要导航">
         <a href="{{ url_for('web.home') }}"{% if request.endpoint == 'web.home' %} aria-current="page"{% endif %}>预约</a>
         <a href="{{ url_for('web.my_page') }}"{% if request.endpoint == 'web.my_page' %} aria-current="page"{% endif %}>我的预约</a>
+        {% if user.role == 'admin' %}<a href="{{ url_for('web.admin_page') }}"{% if request.endpoint == 'web.admin_page' %} aria-current="page"{% endif %}>管理</a>{% endif %}
       </nav>
       <div class="account">
         <span class="account-name">{{ user.display_name }}</span>

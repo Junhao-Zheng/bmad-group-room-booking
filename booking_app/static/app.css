@@ -83,3 +83,6 @@ textarea[aria-invalid="true"]{border:2px solid #a52b37}
 #cancel-form{margin-top:28px;padding-top:20px;border-top:1px solid #dde6e8}
 #cancel-form label{display:flex;align-items:flex-start;gap:10px;font-weight:600}
 #cancel-confirm{width:20px;height:20px;min-height:20px;flex:0 0 20px;margin-top:3px;padding:0;accent-color:#126d65}
+.room-confirm-label{display:flex;align-items:flex-start;gap:10px;margin-top:24px}
+#room-confirm{width:20px;height:20px;min-height:20px;flex:0 0 20px;margin-top:3px;padding:0;accent-color:#126d65}
+#room-cancel{margin-top:12px}#admin-rooms button{max-width:100%;overflow-wrap:anywhere}

@@ -1,0 +1,162 @@
+{
+  "rooms": [
+    {
+      "id": 1,
+      "name": "合成竞争房间 00",
+      "location": "测试楼",
+      "capacity": 20,
+      "created_at": 1794448800,
+      "updated_at": 1794448800
+    },
+    {
+      "id": 2,
+      "name": "合成竞争房间 01",
+      "location": "测试楼",
+      "capacity": 5,
+      "created_at": 1794448800,
+      "updated_at": 1794448800
+    },
+    {
+      "id": 3,
+      "name": "合成竞争房间 02",
+      "location": "测试楼",
+      "capacity": 20,
+      "created_at": 1794448800,
+      "updated_at": 1794448800
+    }
+  ],
+  "reservations": [
+    {
+      "id": 1,
+      "kind": "booking",
+      "room_id": 1,
+      "user_id": 1,
+      "title": "并发预约",
+      "purpose": "合成测试",
+      "attendees": 10,
+      "reason": null,
+      "start_at": 1794456000,
+      "end_at": 1794459600,
+      "intent_key": "capacity-race-intent-000",
+      "request_payload": "{\"attendees\":10,\"end_at\":1794459600,\"purpose\":\"合成测试\",\"room_id\":1,\"start_at\":1794456000,\"title\":\"并发预约\"}",
+      "created_at": 1794448800,
+      "cancelled_at": null,
+      "cancelled_by": null,
+      "cancel_reason": null
+    },
+    {
+      "id": 2,
+      "kind": "booking",
+      "room_id": 3,
+      "user_id": 1,
+      "title": "并发预约",
+      "purpose": "合成测试",
+      "attendees": 10,
+      "reason": null,
+      "start_at": 1794456000,
+      "end_at": 1794459600,
+      "intent_key": "capacity-race-intent-002",
+      "request_payload": "{\"attendees\":10,\"end_at\":1794459600,\"purpose\":\"合成测试\",\"room_id\":3,\"start_at\":1794456000,\"title\":\"并发预约\"}",
+      "created_at": 1794448800,
+      "cancelled_at": null,
+      "cancelled_by": null,
+      "cancel_reason": null
+    }
+  ],
+  "occupancy_slots": [
+    {
+      "room_id": 1,
+      "slot_start": 1794456000,
+      "reservation_id": 1
+    },
+    {
+      "room_id": 1,
+      "slot_start": 1794457800,
+      "reservation_id": 1
+    },
+    {
+      "room_id": 3,
+      "slot_start": 1794456000,
+      "reservation_id": 2
+    },
+    {
+      "room_id": 3,
+      "slot_start": 1794457800,
+      "reservation_id": 2
+    }
+  ],
+  "audit_events": [
+    {
+      "id": 1,
+      "actor_id": 3,
+      "actor_display_name": "演示管理员",
+      "action": "room.created",
+      "target_type": "room",
+      "target_id": 1,
+      "occurred_at": 1794448800,
+      "before_json": null,
+      "after_json": "{\"capacity\":20,\"id\":1,\"location\":\"测试楼\",\"name\":\"合成竞争房间 00\"}",
+      "reason": null
+    },
+    {
+      "id": 2,
+      "actor_id": 1,
+      "actor_display_name": "演示成员甲",
+      "action": "booking.created",
+      "target_type": "booking",
+      "target_id": 1,
+      "occurred_at": 1794448800,
+      "before_json": null,
+      "after_json": "{\"attendees\":10,\"cancel_reason\":null,\"cancelled_at\":null,\"cancelled_by_id\":null,\"created_at\":1794448800,\"end_at\":1794459600,\"id\":1,\"owner_id\":1,\"purpose\":\"合成测试\",\"room_id\":1,\"start_at\":1794456000,\"title\":\"并发预约\"}",
+      "reason": null
+    },
+    {
+      "id": 3,
+      "actor_id": 3,
+      "actor_display_name": "演示管理员",
+      "action": "room.created",
+      "target_type": "room",
+      "target_id": 2,
+      "occurred_at": 1794448800,
+      "before_json": null,
+      "after_json": "{\"capacity\":20,\"id\":2,\"location\":\"测试楼\",\"name\":\"合成竞争房间 01\"}",
+      "reason": null
+    },
+    {
+      "id": 4,
+      "actor_id": 3,
+      "actor_display_name": "演示管理员",
+      "action": "room.updated",
+      "target_type": "room",
+      "target_id": 2,
+      "occurred_at": 1794448800,
+      "before_json": "{\"capacity\":20,\"id\":2,\"location\":\"测试楼\",\"name\":\"合成竞争房间 01\"}",
+      "after_json": "{\"capacity\":5,\"id\":2,\"location\":\"测试楼\",\"name\":\"合成竞争房间 01\"}",
+      "reason": null
+    },
+    {
+      "id": 5,
+      "actor_id": 3,
+      "actor_display_name": "演示管理员",
+      "action": "room.created",
+      "target_type": "room",
+      "target_id": 3,
+      "occurred_at": 1794448800,
+      "before_json": null,
+      "after_json": "{\"capacity\":20,\"id\":3,\"location\":\"测试楼\",\"name\":\"合成竞争房间 02\"}",
+      "reason": null
+    },
+    {
+      "id": 6,
+      "actor_id": 1,
+      "actor_display_name": "演示成员甲",
+      "action": "booking.created",
+      "target_type": "booking",
+      "target_id": 2,
+      "occurred_at": 1794448800,
+      "before_json": null,
+      "after_json": "{\"attendees\":10,\"cancel_reason\":null,\"cancelled_at\":null,\"cancelled_by_id\":null,\"created_at\":1794448800,\"end_at\":1794459600,\"id\":2,\"owner_id\":1,\"purpose\":\"合成测试\",\"room_id\":3,\"start_at\":1794456000,\"title\":\"并发预约\"}",
+      "reason": null
+    }
+  ]
+}

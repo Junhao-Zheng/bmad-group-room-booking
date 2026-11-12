@@ -1,0 +1,46 @@
+{
+  "checked_at_utc": "2026-11-12T12:17:27.339556+00:00",
+  "result": "PASS",
+  "python_tests": 139,
+  "unique_python_test_ids": 139,
+  "js_tests": 141,
+  "reports": [
+    {
+      "file": "docs/evidence/story-3.1-review-fixes/browser/browser-results.json",
+      "run_id": "99fa9567a50c39554bae0e0b2983f8a5",
+      "result": "PASS",
+      "verified_hash_counts": {
+        "app_source_files_sha256": 21,
+        "verification_source_files_sha256": 8
+      }
+    },
+    {
+      "file": "docs/evidence/story-3.1-review-fixes/replay/browser-results.json",
+      "run_id": "5f18830c1bbc0c1d9e1967070ac51969",
+      "result": "PASS",
+      "verified_hash_counts": {
+        "app_source_files_sha256": 21,
+        "verification_source_files_sha256": 4
+      }
+    },
+    {
+      "file": "docs/evidence/story-3.1-review-fixes/cancel/browser-results.json",
+      "run_id": "b2937460524f060b25ff8cd3e44c79d4",
+      "result": "PASS",
+      "verified_hash_counts": {
+        "app_source_files_sha256": 21,
+        "verification_source_files_sha256": 7
+      }
+    },
+    {
+      "file": "docs/evidence/story-3.1-review-fixes/http/http-result.json",
+      "run_id": "d13eac0dc32d35f84044a23df7885f09",
+      "result": "PASS",
+      "verified_hash_counts": {
+        "app_source_files_sha256": 21,
+        "verification_source_files_sha256": 9
+      }
+    }
+  ],
+  "visual_inspection": "主流程检查390px容量冲突完整截图：多行编辑控件、两条不同起止区间、长文本安全换行，无页面横向溢出。"
+}

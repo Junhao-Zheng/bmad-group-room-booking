@@ -1,6 +1,6 @@
 # 课题组活动与会议室预约
 
-软件工程管理课程项目。选题及使用对象已由用户确认。Story 1.1—1.3 与 2.1—2.4 已实现预置账号登录、身份显示、退出、会议室目录、共享日程、可用会议室查询、创建预约、原提交意图可靠确认、个人预约四态查询/完整详情及确认取消本人未开始预约；管理员管理能力待第二轮交付。
+软件工程管理课程项目。选题及使用对象已由用户确认。Story 1.1—1.3、2.1—2.4 与 3.1 已实现预置账号登录、身份显示、退出、会议室目录、共享日程、可用会议室查询、创建预约、原提交意图可靠确认、个人预约四态查询/完整详情、确认取消本人未开始预约，以及管理员新增/修改会议室和容量保护。停用管理与管理员取消属于后续故事。
 
 本仓库按实际发生的工作保存 BMAD 产物和过程证据。实验 B 按用户转述的教师要求免做，实验 A 保留。人数和截止日期不作为当前阶段的阻塞条件。
 
@@ -193,6 +193,27 @@ node --test tests/test_*js.cjs
 
 本次 **119 项 Python、71 项 JavaScript** 全部通过，无 skip；新取消、原个人历史与原预约创建/重放浏览器回归均通过 1280×800 和 390×844。完整 AC 映射、原始输出和截图见 [Story 2.4 验证记录](docs/evidence/story-2.4-verification.md)。成员与管理员取消竞争保留到 Story 2.5 联合验收，本次没有实现或声称验证管理员取消/停用撤销。Sprint 1 的成员闭环是 2026-11-12 实际压缩迭代成果，不代表四周研发、真实团队会议或人类/教师验收。
 
+## 会议室管理与容量保护（Story 3.1）
+
+管理员登录后通过顶栏「管理」进入 `/admin`，首次打开即可填写新增资料或选择会议室编辑。名称、地点去首尾空白后分别为 1—80、1—120 个 Unicode 字符，容量为 1—1000 整数；勾选核对确认后提交。编辑保留原编号，名称与地点组合唯一，同值保存不增加审计。取消编辑可回到新增表单；普通成员没有管理入口，直接打开管理页或请求管理 API 均返回 403，匿名页面跳登录、API 返回 401。
+
+`POST /api/admin/rooms` 返回 201 Room；`POST /api/admin/rooms/ID` 接受完整 `name,location,capacity` JSON 对象，返回 200 Room。容量不接受布尔、浮点和数字字符串；路径编号必须是规范正 64 位整数。全部写入要求 Origin、CSRF 和真实有效管理员会话，服务在取得 SQLite 写锁后再次确认身份/角色。重复组合返回 409 `ROOM_DUPLICATE`。降低容量会在同一事务检查所有尚未结束且未取消预约，包括进行中预约；不足返回 409 `CAPACITY_CONFLICT`，管理员看到冲突编号、北京时间和人数，名称/地点也不保存。容量等于人数允许，已结束、已取消和停用记录不阻止降低。
+
+一次真实新增/修改与一条 `room.created`/`room.updated` 审计共同提交；快照仅含 `id,name,location,capacity`，修改包含 before/after，reason 为 null。审计失败全部回滚。预约创建和降容量共用写锁，旧成功预约意图仍可在取消或结束后降容时重放。没有房间硬删除或永久下线开关。
+
+提交期间锁定管理控件；字段错误、冲突和服务失败保留输入。网络断开、响应未知或 20 秒超时（含正文）不会自动重提，请先「刷新目录」核对实际保存结果；新建请求已提交时可从目录选择原房间继续编辑。会话失效保留表单并提示重新登录，不自动提交；成功后的目录刷新失败会明确保留已保存结果。等待期间移到退出等其他表单的焦点不会被完成提示抢走。
+
+```bash
+.venv/bin/python -m unittest discover -s tests -v
+node --test tests/test_*js.cjs
+.venv/bin/python -m scripts.verify_room_management_http --output-dir work/room-management-http
+.venv/bin/python -m scripts.verify_room_management_browser --output-dir work/room-management-browser
+.venv/bin/python -m scripts.verify_auth_browser --replay --port 8005 --output-dir work/room-booking-regression
+.venv/bin/python -m scripts.verify_member_cancel_browser --output-dir work/room-cancel-regression
+```
+
+浏览器工具安装方法和 `--browser-executable` 参数同上；管理 runner 默认端口 8007。新验证器使用独立临时文件库、私有随机凭证、固定测试 Clock，复用已验证的进程清理，先写 INCOMPLETE，完成原始 HTTP/DOM/存储断言和清理后才写 PASS，记录运行前后源码指纹。此次 **133 项 Python、103 项 JavaScript 全部通过，无 skip**；20 轮真实预约/降容量竞争、故障回滚、停服重启和旧意图重放通过。1280×800、390×844 管理路径和原预约/取消浏览器回归通过。逐项 AC、原始输出、网络响应和截图见 [Story 3.1 验证记录](docs/evidence/story-3.1-verification.md)。
+
 ## AI 使用声明
 
 当前材料由 Codex 协助整理和起草，用户负责确认选题、使用对象及任务边界。精确模型版本未在当前可核验输出中提供，后续会话应保存界面中的模型信息，不能猜填。
@@ -204,3 +225,5 @@ AI 自主提出的业务规则按假设标注，不作为已完成访谈或用�
 第一个史诗的复盘修补及复跑证据见 [epic-1-followup](docs/evidence/epic-1-followup/verification.md)。认证浏览器报告先写 `INCOMPLETE`，通过后包含真实环境版本、运行前后未变化的应用/验证源码哈希，以及本次截图哈希。HTTP 验证器显式使用 loopback HTTP 配置，父环境的 HTTPS cookie/host 配置不会影响隔离测试。
 
 Story2.4评审后主流程全量复验121项Python/86项JS，16项发现全部闭环，0defer；[最终证据](docs/evidence/story-2.4-review-fixes/parent-final-qa.json)。
+
+Story3.1评审后全量139项Python、141项JS通过；[最终验收证据](docs/evidence/story-3.1-review-fixes/parent-final-qa.json)。

@@ -7,7 +7,7 @@ from flask import current_app
 
 from . import auth, db, dto
 from .domain import DomainError, auth_required, beijing_day, booking_interval, query_attendees, resource_id
-from .domain import normalize_booking_payload, validate_booking_window
+from .domain import normalize_booking_payload, normalize_room_payload, validate_booking_window
 
 
 def _require_actor(conn, actor: auth.Actor, now: int) -> auth.Actor:
@@ -88,12 +88,80 @@ def create_booking(actor: auth.Actor, payload: dict) -> dict:
     return result
 
 
-def list_rooms(actor: auth.Actor) -> dict:
+def list_rooms(actor: auth.Actor, *, admin_only=False) -> dict:
     with db.read_transaction() as conn:
         now = current_app.config["CLOCK"].now_epoch()
-        _require_actor(conn, actor, now)
+        actor = _require_actor(conn, actor, now)
+        if admin_only:
+            require_admin(actor)
         rows = conn.execute("SELECT id,name,location,capacity FROM rooms ORDER BY name,location,id").fetchall()
         return dto.list_result([dto.room(row) for row in rows])
+
+
+def require_admin(actor: auth.Actor) -> auth.Actor:
+    if actor.role != "admin":
+        raise DomainError("FORBIDDEN", "仅管理员可管理会议室。")
+    return actor
+
+
+def _room_duplicate(conn, values: dict, room_id=None) -> None:
+    duplicate = conn.execute(
+        "SELECT id FROM rooms WHERE name=? AND location=? AND (? IS NULL OR id<>?)",
+        (values["name"], values["location"], room_id, room_id),
+    ).fetchone()
+    if duplicate is not None:
+        raise DomainError("ROOM_DUPLICATE", "相同名称和地点的会议室已存在，请检查资料。")
+
+
+def create_room(actor: auth.Actor, payload: dict) -> dict:
+    with db.write_transaction() as conn:
+        now = current_app.config["CLOCK"].now_epoch()
+        actor = require_admin(_require_actor(conn, actor, now))
+        values = normalize_room_payload(payload)
+        _room_duplicate(conn, values)
+        inserted = conn.execute(
+            "INSERT INTO rooms(name,location,capacity,created_at,updated_at) VALUES(?,?,?,?,?)",
+            (values["name"], values["location"], values["capacity"], now, now),
+        )
+        result = dict(id=inserted.lastrowid, **values)
+        current_app.config["AUDIT_WRITER"](conn, {
+            "actor_id": actor.id, "actor_display_name": actor.display_name, "action": "room.created",
+            "target_type": "room", "target_id": result["id"], "occurred_at": now,
+            "before": None, "after": result, "reason": None,
+        })
+    return result
+
+
+def update_room(actor: auth.Actor, room_id, payload: dict) -> dict:
+    with db.write_transaction() as conn:
+        now = current_app.config["CLOCK"].now_epoch()
+        actor = require_admin(_require_actor(conn, actor, now))
+        normalized_id = resource_id(room_id)
+        values = normalize_room_payload(payload)
+        row = conn.execute("SELECT id,name,location,capacity FROM rooms WHERE id=?", (normalized_id,)).fetchone()
+        if row is None:
+            raise DomainError("NOT_FOUND", "会议室不存在，请重新选择。")
+        before, result = dto.room(row), dict(id=normalized_id, **values)
+        if result == before:
+            return before
+        _room_duplicate(conn, values, normalized_id)
+        if values["capacity"] < before["capacity"]:
+            conflicts = conn.execute(
+                "SELECT id,kind,room_id,start_at,end_at,attendees,reason FROM reservations "
+                "WHERE room_id=? AND kind='booking' AND cancelled_at IS NULL AND end_at>? "
+                "AND attendees>? ORDER BY start_at,id", (normalized_id, now, values["capacity"]),
+            ).fetchall()
+            if conflicts:
+                raise DomainError("CAPACITY_CONFLICT", "新容量不足以容纳未结束的有效预约，会议室资料未修改。",
+                                  conflicts=[dto.conflict(row, now, admin=True) for row in conflicts])
+        conn.execute("UPDATE rooms SET name=?,location=?,capacity=?,updated_at=? WHERE id=?",
+                     (values["name"], values["location"], values["capacity"], now, normalized_id))
+        current_app.config["AUDIT_WRITER"](conn, {
+            "actor_id": actor.id, "actor_display_name": actor.display_name, "action": "room.updated",
+            "target_type": "room", "target_id": normalized_id, "occurred_at": now,
+            "before": before, "after": result, "reason": None,
+        })
+    return result
 
 
 _BOOKING_DETAIL_SELECT = (

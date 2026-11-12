@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}会议室管理 · 课题组活动与会议室预约{% endblock %}
+{% block content %}
+<script src="{{ url_for('static', filename='rooms.js') }}" defer></script>
+<section class="page-intro">
+  <p class="eyebrow">管理员</p><h1>会议室管理</h1>
+  <p class="muted">维护名称、地点及容量。降低容量须满足所有未结束有效预约的人数，包含进行中预约。</p>
+  <p id="auth-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>
+  <a id="relogin-link" class="relogin-link" href="{{ url_for('web.login_page') }}" hidden>重新登录</a>
+</section>
+<div class="history-layout">
+  <section class="card" aria-labelledby="room-list-title">
+    <h2 id="room-list-title">会议室目录</h2>
+    <button id="rooms-refresh" class="button-secondary" type="button">刷新目录</button>
+    <p id="rooms-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1">共 {{ rooms.total }} 间会议室。选择编辑或填写右侧新增表单。</p>
+    <ul id="admin-rooms" class="room-list">
+      {% for room in rooms['items'] %}<li><h3>{{ room.name }}</h3><p>{{ room.location }} · 容量 {{ room.capacity }} 人</p>
+        <button class="button-secondary" type="button" data-room="{{ room|tojson|forceescape }}">编辑会议室 {{ room.id }}</button>
+      </li>{% else %}<li>暂无会议室，请新增。</li>{% endfor %}
+    </ul>
+  </section>
+  <section class="card" aria-labelledby="room-form-title">
+    <h2 id="room-form-title" tabindex="-1">新增会议室</h2>
+    <form id="room-form">
+      <div class="form-field"><label for="room-name">名称</label><textarea id="room-name" name="name" rows="2" required aria-describedby="room-name-error"></textarea><p id="room-name-error" class="field-error"></p></div>
+      <div class="form-field"><label for="room-location">地点</label><textarea id="room-location" name="location" rows="2" required aria-describedby="room-location-error"></textarea><p id="room-location-error" class="field-error"></p></div>
+      <div class="form-field"><label for="room-capacity">容量（1—1000 人）</label><input id="room-capacity" name="capacity" type="number" min="1" max="1000" step="1" required aria-describedby="room-capacity-error"><p id="room-capacity-error" class="field-error"></p></div>
+      <label class="room-confirm-label" for="room-confirm"><input id="room-confirm" type="checkbox" required>我已核对资料，确认提交</label>
+      <button id="room-submit" class="button-primary" type="submit">确认新增会议室</button>
+      <button id="room-cancel" class="button-secondary" type="button" hidden>取消编辑，填写新增</button>
+    </form>
+    <p id="room-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>
+    <a id="room-relogin" class="relogin-link" href="{{ url_for('web.login_page') }}" hidden>重新登录（不会自动提交）</a>
+    <ul id="room-conflicts" class="schedule-items" aria-label="容量冲突预约（北京时间）"></ul>
+    <noscript><p>请启用 JavaScript 以新增或修改会议室。</p></noscript>
+  </section>
+</div>
+{% endblock %}

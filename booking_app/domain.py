@@ -207,6 +207,26 @@ def normalize_booking_payload(payload) -> tuple[dict, str]:
     return normalized, key
 
 
+def normalize_room_payload(payload) -> dict:
+    """Room writes always validate a complete object before changing any field."""
+    if not isinstance(payload, dict):
+        raise DomainError("INVALID_INPUT", "请求内容必须是一个对象。")
+    fields, values = {}, {}
+    for name, limit in (("name", 80), ("location", 120)):
+        try:
+            values[name] = normalized_text(payload.get(name), name, limit)
+        except DomainError as error:
+            fields.update(error.fields)
+    capacity = payload.get("capacity")
+    if type(capacity) is not int or not 1 <= capacity <= 1000:
+        fields["capacity"] = "容量须为 1—1000 的整数。"
+    else:
+        values["capacity"] = capacity
+    if fields:
+        raise DomainError("INVALID_INPUT", "请检查会议室资料。", fields)
+    return values
+
+
 def query_attendees(value) -> int:
     """Canonical URL integer, capped at 1001 (the no-matching-room sentinel).
 

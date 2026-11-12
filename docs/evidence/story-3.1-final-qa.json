@@ -1,0 +1,40 @@
+{
+  "result": "PASS",
+  "verified_at_utc": "2026-11-12T11:58:45.653866+00:00",
+  "python_tests": 133,
+  "javascript_tests": 103,
+  "skipped": 0,
+  "integration_reports": {
+    "story-3.1-http/http-result.json": {
+      "result": "PASS",
+      "run_id": "baddceb00604a6836025fc322e7ea4d5",
+      "report_sha256": "56935e9318db1e95a21399b0523370598c3cd99c546444b64ed61da489e6b282",
+      "current_source_fingerprints_verified": true
+    },
+    "story-3.1-browser/browser-results.json": {
+      "result": "PASS",
+      "run_id": "54e2f87c41c1a5e383cb6f283e248dac",
+      "report_sha256": "41cb56dda7fc123b7433f543cd95b76d7e1951c0c89129916a5c43120a37f220",
+      "current_source_fingerprints_verified": true
+    },
+    "story-3.1-booking-regression/browser-results.json": {
+      "result": "PASS",
+      "run_id": "00329020c51c9df182ea2b75940ab503",
+      "report_sha256": "f722aa758f97d80e5bd53badc9955fe9319a17860a3acc4e75d490101eafedc8",
+      "current_source_fingerprints_verified": true
+    },
+    "story-3.1-cancel-regression/browser-results.json": {
+      "result": "PASS",
+      "run_id": "91cf183cdd38d28541e73ef070707138",
+      "report_sha256": "83c03b824d767cad6a6adda71a2fdb70adc34bd2c11f7beb482b8b97a05a46f2",
+      "current_source_fingerprints_verified": true
+    }
+  },
+  "test_source_sha256": {
+    "tests/test_room_management.py": "4fc23fd5893485ab5fd7817e7be8170c9aea5ea16706e1aeb31e943fa257ab0c",
+    "tests/test_rooms_js.cjs": "1f14564e975f92222809b1da707760e9db899e848502e86a4b0c0896882b6e79"
+  },
+  "experimental_commands_implemented": false,
+  "git_remote_operations": false,
+  "incomplete_implementation_items": []
+}

@@ -2,7 +2,7 @@
 title: '维护房间资料并保护现有容量需求'
 type: feature
 created: '2026-11-12'
-status: in-progress
+status: done
 route: dispatch
 baseline_commit: 6644902c9e3880482d1edef75c42a1ee303ba6dd
 story_key: 3-1-room-management
@@ -51,18 +51,42 @@ context:
 
 ## Tasks & Acceptance
 
-- [ ] 完整实现本故事用户路径。
-- [ ] 验收矩阵逐项有执行断言；新测试不能通过继承已有test类重复计数。
-- [ ] 实际运行所列验证，保存原始证据。
-- [ ] 更新README当前能力和复跑命令、证据入口；使用独立临时库，凭证不进仓库。
+- [x] 完整实现本故事用户路径。
+- [x] 验收矩阵逐项有执行断言；新测试不能通过继承已有test类重复计数。
+- [x] 实际运行所列验证，保存原始证据。
+- [x] 更新README当前能力和复跑命令、证据入口；使用独立临时库，凭证不进仓库。
 
 ## Implementation Notes
 
 遵守上游合同，技术选择为AI实施。
 
+- `domain.normalize_room_payload` 校验完整文本/容量；`services.create_room/update_room` 在同一写锁内复核真实管理员、检查重复与未结束预约人数，并一次写审计。无变化不更新 timestamp、不调用 writer。
+- `web.py` 提供管理页面和新增/修改 API；`admin.html/rooms.js` 提供目录、确认、编辑取消、完整错误恢复与跨表单焦点保护，顶栏仅管理员显示管理入口。
+- 独立 `RoomManagementTests` 与真实 JS 处理器测试，不继承既有测试类。新增 HTTP/browser 验证器复用已验证的清理/INCOMPLETE/源码指纹；README 已更新。
+- 实际验证：Python 133 项、JS 103 项全部通过无 skip；真实 HTTP 20 轮竞争、故障/重启/旧意图重放通过；1280×800 和 390×844 新管理、既有预约重放与本人取消浏览器通过。完整执行记录见 [Story 3.1 验证记录](../../docs/evidence/story-3.1-verification.md)。
+- 未实现管理员取消或停用撤销；无 Git/远端操作。
+
 ## Spec Change Log
 
 ## Review Triage Log
+
+|编号|裁决|处置|核对证据与理由|
+|---|---|---|---|
+|B1|low|reject|64位ID超过2^53的舍入确实存在；与已接受历史/取消页面边界同源。本地课题组正常自增不可能接近此规模，且无ID导入入口；跨JSON无损ID重构不属直接更正，按低频低影响规则拒绝，未缩小后端64位合同。|
+|B2|medium|patch|服务接受内部CR/LF，text输入会删换行，纯容量修改可意外改名。改用可保留多行的现有字段编辑控件；对浏览器CR标准化后仍未编辑的字段保留原值，确保仅修改容量时原名称/地点逐字符往返，不改既有文本合同。|
+|B3|low|reject|两个旧页面完整保存会后写覆盖前写的名称等字段，风险真实；当前是已确认三字段的完整替换而非局部补丁。低频房间资料编辑中影响是可审计、可重新修改的元数据，容量/历史安全仍被锁内保护。版本预条件会增加读写协议和冲突交互复杂度，按低频低影响规则拒绝；不声称提供乐观编辑并发控制。|
+|B4|medium|patch|number控件允许1e2/10.0/01，但正十进制正则将其发成null。直接按数值解析再检查整数与1—1000范围，保持服务器严格JSON整数约束，补真实浏览器及处理器断言。|
+|B5|medium|patch|两种刷新catch覆盖sessionError登录说明，且blocked已禁用刷新。保留身份错误专属说明；成功保存后的失效同时保留通用已保存事实，禁止指向已禁用操作。|
+|B6|medium|patch|错误conflicts非数组或缺时间字符串会在catch内再次抛出。渲染前检查当前实际使用的错误fields/conflicts结构，不合法走未知响应且保留草稿/恢复控件，新增定向用例。|
+|B7|low|reject|当前只保留当前页草稿，导航登录后不会恢复；8小时会话边界上的三字段管理草稿损失真实但影响小且少见。跨登录草稿存储、恢复、CSRF轮换和权限复核需要新状态/交互，不是直接修正，按低频低影响规则拒绝；说明不支持跨页面草稿恢复。|
+|B8|medium|patch|勾选确认后修改任何字段仍可提交未重新核对的值。给现有字段input/change直接清确认，不改接口，不在未知响应时自动重提。|
+|B9|low|patch|非零driver只保留通用RuntimeError，丢失失败定位。直接记录受控阶段名、错误类别和本脚本断言行号等白名单诊断；不保存原始可能含密码/cookie/CSRF的stderr或服务器异常正文，补失败仍INCOMPLETE及脱敏断言。|
+|B10|medium|patch|room专属创建/修改路径没有STORE_BUSY的实际持锁拒绝及UI恢复验证。加独立连接持写锁使事务实际超时，验证503、零业务/审计改动、释放后成功；JS503草稿/控件/主动重试。|
+|E1|low|reject|与B1相同已证实超大ID舍入边界，独立裁决后同样按低频低影响拒绝，避免为不可达自增规模加入无损JSON层。|
+|E2|medium|patch|与B2相同已接受CR/LF被编辑器更改，独立裁决后合并直接修补与往返断言。|
+|E3|medium|patch|与B6相同畸形冲突数据在catch内抛错，独立裁决后合并错误结构验证。|
+|V1|medium|patch|预验证把显示end换为start，17项JS仍过，浏览器也只匹配标签。直接补不同起止的精确文本值，在真实DOM核对。|
+|V2|medium|patch|其他发现经父流程读两刷新catch和blocked确认：覆盖专属登录说明，和B5同根，独立裁决后合并。|
 
 ## Verification
 
@@ -70,3 +94,7 @@ context:
 - `node --test tests/test_*js.cjs`，新增实际处理器关键错误恢复回归。
 - 新功能真实浏览器1280x800及390x844正常/拒绝路径、登录退出和既有关键流程；精确DTO与纯文本，无页面横向溢出。
 - 矩阵及Code Map中的并发、故障与持久化验证须实际执行；保存原始结果，不以计划替代结果。
+
+## 本轮接受结果
+
+139项唯一Python、141项JS及真实HTTP/浏览器验证通过，8项修补闭环，4项low reject有理由，0defer。AI技术接受；[最终核验](../../docs/evidence/story-3.1-review-fixes/parent-final-qa.json)。

@@ -13,7 +13,7 @@ bp = Blueprint("web", __name__)
 STATUS = {"INVALID_INPUT": 400, "AUTH_REQUIRED": 401, "INVALID_CREDENTIALS": 401,
           "FORBIDDEN": 403, "CSRF_REJECTED": 403, "NOT_FOUND": 404,
           "OCCUPANCY_CONFLICT": 409, "CAPACITY_CONFLICT": 409, "IDEMPOTENCY_MISMATCH": 409,
-          "TRANSITION_CLOSED": 409,
+          "TRANSITION_CLOSED": 409, "ROOM_DUPLICATE": 409,
           "STORE_BUSY": 503, "INTERNAL_ERROR": 500}
 
 
@@ -67,6 +67,29 @@ def home():
 @bp.get("/my")
 def my_page():
     return render_template("my.html", user=auth.current_user(auth.require_session(token())))
+
+
+@bp.get("/admin")
+def admin_page():
+    session = auth.require_session(token())
+    actor = services.require_admin(auth.actor_for_token(token()))
+    return render_template("admin.html", user=auth.current_user(session), rooms=services.list_rooms(actor, admin_only=True))
+
+
+@bp.post("/api/admin/rooms")
+def create_room_api():
+    actor = services.require_admin(auth.actor_for_token(token()))
+    if request.mimetype != "application/json":
+        raise DomainError("INVALID_INPUT", "请使用 JSON 格式提交会议室资料。")
+    return jsonify(ok=True, data=services.create_room(actor, payload())), 201
+
+
+@bp.post("/api/admin/rooms/<room_id>")
+def update_room_api(room_id):
+    actor = services.require_admin(auth.actor_for_token(token()))
+    if request.mimetype != "application/json":
+        raise DomainError("INVALID_INPUT", "请使用 JSON 格式提交会议室资料。")
+    return jsonify(ok=True, data=services.update_room(actor, room_id, payload()))
 
 
 @bp.get("/api/bookings/mine")

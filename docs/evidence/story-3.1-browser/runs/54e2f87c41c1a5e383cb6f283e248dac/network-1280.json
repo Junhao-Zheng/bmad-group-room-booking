@@ -1,0 +1,210 @@
+[
+  {
+    "phase": "csrf-rejected",
+    "path": "/api/admin/rooms",
+    "status": 403,
+    "body": {
+      "error": {
+        "code": "CSRF_REJECTED",
+        "conflicts": [],
+        "fields": {},
+        "message": "请求验证失败，请重新打开页面后重试。"
+      },
+      "ok": false
+    }
+  },
+  {
+    "phase": "created",
+    "path": "/api/admin/rooms",
+    "status": 201,
+    "body": {
+      "data": {
+        "capacity": 20,
+        "id": 4,
+        "location": "合成楼 <script>纯文本</script>",
+        "name": "<img src=x onerror=\"window.roomXss=1\">新 1280"
+      },
+      "ok": true
+    }
+  },
+  {
+    "phase": "unchanged",
+    "path": "/api/admin/rooms/4",
+    "status": 200,
+    "body": {
+      "data": {
+        "capacity": 20,
+        "id": 4,
+        "location": "合成楼 <script>纯文本</script>",
+        "name": "<img src=x onerror=\"window.roomXss=1\">新 1280"
+      },
+      "ok": true
+    }
+  },
+  {
+    "phase": "field-invalid",
+    "path": "/api/admin/rooms/4",
+    "status": 400,
+    "body": {
+      "error": {
+        "code": "INVALID_INPUT",
+        "conflicts": [],
+        "fields": {
+          "name": "请输入 1—80 个有效字符，不含空字符。"
+        },
+        "message": "请检查会议室资料。"
+      },
+      "ok": false
+    }
+  },
+  {
+    "phase": "duplicate",
+    "path": "/api/admin/rooms",
+    "status": 409,
+    "body": {
+      "error": {
+        "code": "ROOM_DUPLICATE",
+        "conflicts": [],
+        "fields": {},
+        "message": "相同名称和地点的会议室已存在，请检查资料。"
+      },
+      "ok": false
+    }
+  },
+  {
+    "phase": "capacity-conflict",
+    "path": "/api/admin/rooms/1",
+    "status": 409,
+    "body": {
+      "error": {
+        "code": "CAPACITY_CONFLICT",
+        "conflicts": [
+          {
+            "attendees": 5,
+            "end_at": 1794452400,
+            "end_local": "2026-11-12T11:00:00+08:00",
+            "id": 102,
+            "reason": null,
+            "room_id": 1,
+            "start_at": 1794448800,
+            "start_local": "2026-11-12T10:00:00+08:00",
+            "status": "in_progress",
+            "type": "booking"
+          },
+          {
+            "attendees": 5,
+            "end_at": 1794459600,
+            "end_local": "2026-11-12T13:00:00+08:00",
+            "id": 103,
+            "reason": null,
+            "room_id": 1,
+            "start_at": 1794456000,
+            "start_local": "2026-11-12T12:00:00+08:00",
+            "status": "pending",
+            "type": "booking"
+          }
+        ],
+        "fields": {},
+        "message": "新容量不足以容纳未结束的有效预约，会议室资料未修改。"
+      },
+      "ok": false
+    }
+  },
+  {
+    "phase": "equal-capacity-saved",
+    "path": "/api/admin/rooms/1",
+    "status": 200,
+    "body": {
+      "data": {
+        "capacity": 5,
+        "id": 1,
+        "location": "新地点",
+        "name": "管理修改 1280"
+      },
+      "ok": true
+    }
+  },
+  {
+    "phase": "committed-response-dropped",
+    "path": "/api/admin/rooms",
+    "status": 201,
+    "body": {
+      "data": {
+        "capacity": 8,
+        "id": 5,
+        "location": "临时楼",
+        "name": "响应未知房间 1280"
+      },
+      "ok": true
+    }
+  },
+  {
+    "phase": "session-expired",
+    "path": "/api/admin/rooms",
+    "status": 401,
+    "body": {
+      "error": {
+        "code": "AUTH_REQUIRED",
+        "conflicts": [],
+        "fields": {},
+        "message": "登录已失效，请重新打开登录页并登录。"
+      },
+      "ok": false
+    }
+  },
+  {
+    "phase": "existing-schedule",
+    "path": "/api/schedule",
+    "status": 200,
+    "body": {
+      "data": {
+        "items": [
+          {
+            "kind": "booking",
+            "record": {
+              "end_at": 1794448800,
+              "end_local": "2026-11-12T10:00:00+08:00",
+              "owner_display_name": "演示成员甲",
+              "room_id": 1,
+              "room_name": "管理修改 1280",
+              "start_at": 1794445200,
+              "start_local": "2026-11-12T09:00:00+08:00",
+              "status": "ended",
+              "title": "合成历史活动 101"
+            }
+          },
+          {
+            "kind": "booking",
+            "record": {
+              "end_at": 1794452400,
+              "end_local": "2026-11-12T11:00:00+08:00",
+              "owner_display_name": "演示成员甲",
+              "room_id": 1,
+              "room_name": "管理修改 1280",
+              "start_at": 1794448800,
+              "start_local": "2026-11-12T10:00:00+08:00",
+              "status": "in_progress",
+              "title": "合成历史活动 102"
+            }
+          },
+          {
+            "kind": "booking",
+            "record": {
+              "end_at": 1794459600,
+              "end_local": "2026-11-12T13:00:00+08:00",
+              "owner_display_name": "演示成员甲",
+              "room_id": 1,
+              "room_name": "管理修改 1280",
+              "start_at": 1794456000,
+              "start_local": "2026-11-12T12:00:00+08:00",
+              "status": "pending",
+              "title": "合成历史活动 103"
+            }
+          }
+        ],
+        "total": 3
+      },
+      "ok": true
+    }
+  }
+]
