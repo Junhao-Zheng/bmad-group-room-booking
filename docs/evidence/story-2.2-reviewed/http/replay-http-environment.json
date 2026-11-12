@@ -1,0 +1,63 @@
+{
+  "run_id": "08e96ac4658bb3a464d7f43bb551e72f",
+  "started_at_utc": "2026-11-12T09:51:57.446895+00:00",
+  "app_source_files_sha256": {
+    "booking_app/__init__.py": "58c6775ec02de2cacd56f810878d3db32b42e57535ddda59e3b98d15bcfc0657",
+    "booking_app/audit.py": "4ef81dffae285cea3d82ea7c393c9895f87d3977b900828adcf1165f2e0fad80",
+    "booking_app/auth.py": "c81a834f349872a0b367f9bef4d48e7f4e2c6d258667c2d6690bca2dba110ac4",
+    "booking_app/db.py": "67cdaf0b3f89334c1c6bf610c3f6ad8e174a3fe3c118aace3596309426df0585",
+    "booking_app/domain.py": "4b47dee609913efc759636ac3e33d0b8c552b7cfb0ab11accd74b91b46295396",
+    "booking_app/dto.py": "6ad6400086c487934bb866b3c9c73c2eba063104c26caaf86925f8afb25c424c",
+    "booking_app/schema.sql": "7becf070ca3daf2c6437de6cda6cb1f0edd47badc15e1a081cd95735b666f4c7",
+    "booking_app/services.py": "b2b28df858758e591d1594b148ebc42c08926717988752bfb0ca13bfa52e3f0e",
+    "booking_app/static/app.css": "a79d864f5df6bd7f7396d3c73ed4e0611305a02cbbbc58c6ff1f59abc64bb59c",
+    "booking_app/static/auth.js": "23a7dc6ffc7b83bfe7fe202454d8965630ae25e0c96473c9b27990adc645bfc6",
+    "booking_app/static/availability.js": "ee27c9e189d06f7456e3d2f44f10ddac172ea552c262b6947e9e4e43109afc87",
+    "booking_app/static/booking.js": "c075a1301696cfb8c1cfa16ccb85786491a7d6749e4c2c59461f08d6c32d3261",
+    "booking_app/static/schedule.js": "3b6395af918cbf648c9197c33565e87f54e03ed1a65e4790b8edc00e578cb21e",
+    "booking_app/templates/base.html": "a2f7d2f5be7e5fc07465d8dcef9549b4cfeea181ea54c102643488d7e871204c",
+    "booking_app/templates/home.html": "4318d2de2f222effbfd9af15b9366d9d4889f05b4c7a5a93c02c83415f6b28c4",
+    "booking_app/templates/login.html": "0fd042466f50de613a26bf84485564187024e1b2b0133137e59a0e64027891b6",
+    "booking_app/web.py": "197c3901aaf6498aac48817e5fee827bd4a99df2ab383cc612b70aa6c3d64eb8"
+  },
+  "app_source_sha256": "e6d4dbed02e7db36fa907550499f0664bc447b00d429692a55e40acde4bbe9f1",
+  "performance_script_sha256": "ae395a435bfad8c79292de9d1b993e25c0549c738b2b4a0c7d18b2d9399387d0",
+  "replay_script_sha256": "b1d2fc2fd088fdf576d02e87ade91d10f95d51a80d602019850a1dc4f3f4c1cc",
+  "verification_dependencies_sha256": {
+    "scripts/verify_create_booking_http.py": "6b36382c48a35cc0a6f1152122acae966c37417bbddef2340725588f98973133",
+    "scripts/verify_availability_performance.py": "ae395a435bfad8c79292de9d1b993e25c0549c738b2b4a0c7d18b2d9399387d0",
+    "scripts/init_demo.py": "1e85b96d32582a31af98f7bef0c30761e261f81b50417795d7a29bb564c8fdbe",
+    "tests/schedule_fixtures.py": "93a77f4297e77c5a786037c770c9881eddd4566415f260e95d757d0f83f96751"
+  },
+  "os": "macOS-26.6-arm64-arm-64bit",
+  "machine": "arm64",
+  "cpu": "Apple M1 Pro",
+  "logical_cpus": 8,
+  "memory_bytes": "34359738368",
+  "python": "3.12.14 (main, Aug 25 2026, 13:50:33) [Clang 22.1.3 ]",
+  "sqlite": "3.53.1",
+  "dependencies": {
+    "Flask": "3.1.3",
+    "Jinja2": "3.1.6",
+    "Werkzeug": "3.1.9",
+    "waitress": "3.0.2"
+  },
+  "server_processes": 1,
+  "server_threads": 8,
+  "origin": "http://127.0.0.1:59581",
+  "invocation": [
+    ".venv/bin/python",
+    "-m",
+    "scripts.verify_replay_intent_http",
+    "--output-dir",
+    "docs/evidence/story-2.2-reviewed/http"
+  ],
+  "server_start": "spawn scripts.verify_create_booking_http.server_main; Waitress threads=8",
+  "fixed_clock_injection": "TESTING=True only, no HTTP clock endpoint",
+  "database": "isolated temporary local file; WAL/FULL/foreign_keys; removed after run",
+  "fixed_now": 1794448800,
+  "independent_clients": 20,
+  "shared_identity": true,
+  "independent_cookie_jars": true,
+  "intent_key_sha256": "a091bcaadac494c3526371013c9e6de3e1dc220a01f57971ab60d5371518b631"
+}

@@ -1,0 +1,15 @@
+test_all_six_material_changes_mismatch_before_new_business_rules (tests.test_replay_intent.ReplayIntentTests.test_all_six_material_changes_mismatch_before_new_business_rules) ... ok
+test_cancelled_record_replays_after_new_booking_reuses_slots (tests.test_replay_intent.ReplayIntentTests.test_cancelled_record_replays_after_new_booking_reuses_slots) ... ok
+test_current_started_ended_and_cancelled_facts_with_lower_capacity (tests.test_replay_intent.ReplayIntentTests.test_current_started_ended_and_cancelled_facts_with_lower_capacity) ... ok
+test_equivalent_python_whitespace_and_persistent_six_fields (tests.test_replay_intent.ReplayIntentTests.test_equivalent_python_whitespace_and_persistent_six_fields) ... ok
+test_failed_validation_and_conflict_do_not_claim_key (tests.test_replay_intent.ReplayIntentTests.test_failed_validation_and_conflict_do_not_claim_key) ... ok
+test_reconstructed_application_retains_original_intent (tests.test_replay_intent.ReplayIntentTests.test_reconstructed_application_retains_original_intent) ... ok
+test_replay_authentication_is_rechecked_after_lock_and_one_clock (tests.test_replay_intent.ReplayIntentTests.test_replay_authentication_is_rechecked_after_lock_and_one_clock) ... ok
+test_same_key_other_user_cannot_replay_or_leak_private_facts (tests.test_replay_intent.ReplayIntentTests.test_same_key_other_user_cannot_replay_or_leak_private_facts) ... ok
+test_static_format_rejection_still_precedes_replay (tests.test_replay_intent.ReplayIntentTests.test_static_format_rejection_still_precedes_replay) ... ok
+test_existing_pass_is_invalidated_before_real_startup_failure (tests.test_browser_verification.BrowserVerificationTests.test_existing_pass_is_invalidated_before_real_startup_failure) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 1.918s
+
+OK

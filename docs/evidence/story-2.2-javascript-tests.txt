@@ -1,0 +1,35 @@
+✔ stalled response headers aborts at 20 seconds and restores manual controls (3.4345ms)
+✔ stalled response body aborts at 20 seconds and restores manual controls (0.925584ms)
+✔ availability stalled response headers aborts at 20 seconds, retains input, permits manual retry (4.23725ms)
+✔ availability stalled response body aborts at 20 seconds, retains input, permits manual retry (1.930834ms)
+✔ availability network failure restores controls without discarding conditions (0.641125ms)
+✔ availability bad JSON restores controls without discarding conditions (0.481583ms)
+✔ availability field errors focus enabled input; success clears errors and safely renders literal room text (0.658584ms)
+✔ availability expired session gives a login link, preserves input and hides old results (0.516416ms)
+✔ each room selection has a distinct accessible name containing room and location (0.895542ms)
+✔ selected query creates 32-byte intent; pending disables controls and success is plain text (5.70625ms)
+✔ field validation focuses restored control; conflicts and internal failure preserve content and key (0.917292ms)
+✔ unknown network and malformed response allow explicit same-key retry without claiming failure (1.974417ms)
+✔ 20-second timeout covers stalled response body and does not resend (3.1855ms)
+✔ session loss shows relogin and never automatically submits again (0.692834ms)
+✔ a query in progress blocks creation; after it settles creation restores all controls (0.835ms)
+✔ creation in progress blocks queries; unknown result permits queries and explicit confirmation (1.133083ms)
+✔ selecting a room after a field error resets feedback style and role (0.72175ms)
+✔ malformed success envelopes or displayed fields never claim success (8.322292ms)
+✔ unknown codes, inconsistent status, and malformed error envelopes are unknown outcomes (2.401333ms)
+✔ Python strip equivalence preserves intent; FEFF and all substantive fields rotate it (1.169875ms)
+✔ header timeout retains original intent and pending new/selection controls cannot replace input (0.704625ms)
+✔ replay accepts all current states with exact DTO, rejects stale/malformed cancellation facts (4.966041ms)
+✔ schedule stalled response headers aborts at 20 seconds and can be queried again (4.725958ms)
+✔ schedule stalled response body aborts at 20 seconds and can be queried again (1.426583ms)
+✔ schedule network failure preserves conditions, restores controls, and permits retry (0.672041ms)
+✔ schedule bad JSON preserves conditions, restores controls, and permits retry (0.833709ms)
+✔ pending conditions cannot be edited and a field error focuses the restored original input (1.917083ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 95.237583

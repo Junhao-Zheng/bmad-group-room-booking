@@ -2,6 +2,7 @@
 const { chromium } = require('playwright');
 const fs = require('node:fs');
 const path = require('node:path');
+const {createHash} = require('node:crypto');
 const assert = require('node:assert/strict');
 const PINNED_PLAYWRIGHT = '1.58.2';
 
@@ -244,7 +245,7 @@ async function submitAvailability(page) {
         await page.route('**/api/availability?**', async route => { await queryGate; await route.continue(); });
         await submitAvailability(page);
         await page.waitForFunction(() => document.querySelector('#availability-form').getAttribute('aria-busy') === 'true');
-        await page.locator('#booking-form button').click();
+        await page.locator('#booking-form button[type=submit]').click();
         assert.match(await page.locator('#booking-feedback').textContent(), /仍在查询.*稍候/);
         assert.equal(bookingRequests, 0);
         assert.equal(await page.locator('#booking-form').getAttribute('aria-busy'), null);
@@ -256,9 +257,9 @@ async function submitAvailability(page) {
         let release;
         const gate = new Promise(resolve => { release = resolve; });
         await page.route('**/api/bookings', async route => { await gate; await route.continue(); });
-        await page.locator('#booking-form button').click();
+        await page.locator('#booking-form button[type=submit]').click();
         await page.waitForFunction(() => document.querySelector('#booking-form').getAttribute('aria-busy') === 'true');
-        for (const selector of ['#booking-name','#booking-purpose','#booking-form button','#availability-form button','.booking-select']) {
+        for (const selector of ['#booking-name','#booking-purpose','#booking-new','#booking-form button[type=submit]','#availability-form button','.booking-select']) {
           assert.equal(await page.locator(selector).first().isDisabled(), true);
         }
         // Creation first: even an explicit submit event cannot start a read until controls restore.
@@ -275,8 +276,13 @@ async function submitAvailability(page) {
         assert.ok((await page.locator('#booking-feedback').textContent()).includes(title));
         assert.equal(await page.locator('#booking-feedback img, #booking-feedback script').count(), 0);
         assert.equal(await page.evaluate(() => window.bookingXss), undefined);
-        assert.equal(await page.locator('#booking-form button').isDisabled(), true);
+        assert.equal(await page.locator('#booking-form button[type=submit]').isDisabled(), false);
         assert.equal(bookingRequests, 1);
+        const repeatResponse=page.waitForResponse(response=>response.url().endsWith('/api/bookings'));
+        await page.locator('#booking-form button[type=submit]').click();
+        assert.equal((await repeatResponse).status(),200);
+        await page.waitForFunction(()=>document.querySelector('#booking-feedback').textContent.includes('已确认原预约'));
+        assert.equal(bookingRequests,2);
         for (const selector of ['#start','#end','#attendees','#availability-form button']) {
           assert.equal(await page.locator(selector).isDisabled(), false);
         }
@@ -286,11 +292,11 @@ async function submitAvailability(page) {
         await page.screenshot({path:path.join(outputDir,`booking-success-${viewport.width}.png`),fullPage:true});
         await competing.locator('#booking-name').fill('冲突输入保留');
         await competing.locator('#booking-purpose').fill('用途保留 🧪');
-        await competing.locator('#booking-form button').click();
+        await competing.locator('#booking-form button[type=submit]').click();
         await competing.waitForFunction(() => document.querySelector('#booking-feedback').textContent.includes('已被占用'));
         assert.equal(await competing.locator('#booking-name').inputValue(), '冲突输入保留');
         assert.equal(await competing.locator('#booking-purpose').inputValue(), '用途保留 🧪');
-        assert.equal(await competing.locator('#booking-form button').isDisabled(), false);
+        assert.equal(await competing.locator('#booking-form button[type=submit]').isDisabled(), false);
         assert.ok((await competing.locator('#booking-conditions').textContent()).includes(`${date} 12:00`));
         await competing.evaluate(() => window.scrollTo(0, 0));
         await competing.screenshot({path:path.join(outputDir,`booking-conflict-${viewport.width}.png`),fullPage:true});
@@ -306,54 +312,136 @@ async function submitAvailability(page) {
         await competing.locator('#booking-name').fill(lostTitle);
         await competing.locator('#booking-purpose').fill('成功提交但响应丢失，保留输入 🧪');
         let attempted = 0, committed;
+        const network=[];
+        const networkFile=path.join(outputDir,`replay-network-${viewport.width}.jsonl`);
+        fs.writeFileSync(networkFile,'');
         await competing.route('**/api/bookings', async route => {
           attempted++;
           const response = await route.fetch();
-          committed = {status:response.status(), body:await response.json()};
-          await route.abort();
+          const observed = {status:response.status(), body:await response.json()};
+          const request=route.request().postDataJSON();
+          const {intent_key,...fields}=request;
+          network.push({phase:attempted===1?'committed_response_lost':attempted===2?'same_intent_retry':'edited_new_intent',
+            method:'POST',path:'/api/bookings',request:{...fields,intent_key_sha256:createHash('sha256').update(intent_key).digest('hex')},
+            delivery:attempted===1?'aborted_after_server_commit':'fulfilled',...observed});
+          fs.appendFileSync(networkFile,JSON.stringify(network.at(-1))+'\n');
+          if(attempted===1) {committed=observed;await route.abort();}
+          else await route.fulfill({response});
         });
-        await competing.locator('#booking-form button').click();
+        await competing.locator('#booking-form button[type=submit]').click();
         await competing.waitForFunction(() => document.querySelector('#booking-feedback').textContent.includes('未能确认'));
         assert.equal(committed.status, 201);
         assert.equal(committed.body.ok, true);
         assert.equal(attempted, 1);
-        assert.equal(await competing.locator('#booking-form button').isDisabled(), true);
+        assert.equal(await competing.locator('#booking-form button[type=submit]').isDisabled(), false);
         assert.equal(await competing.locator('#booking-name').inputValue(), lostTitle);
         assert.equal(await competing.locator('#booking-purpose').inputValue(), '成功提交但响应丢失，保留输入 🧪');
         for (const selector of ['#start','#end','#attendees','#availability-form button']) {
           assert.equal(await competing.locator(selector).isDisabled(), false);
         }
-        // Both read-only views remain useful, while room selection and explicit submit remain guarded.
-        const selectedConditions = await competing.locator('#booking-conditions').textContent();
-        await submitAvailability(competing);
-        await competing.waitForFunction(() => document.querySelector('#availability-feedback').textContent.includes('找到 2 间'));
-        await competing.locator('.booking-select').first().click();
-        assert.equal(await competing.locator('#booking-conditions').textContent(), selectedConditions);
-        await competing.locator('#booking-form').evaluate(form => form.requestSubmit());
-        await competing.locator('#room_id').selectOption('30');
-        await competing.locator('#date').fill(date);
-        await submitSchedule(competing);
-        await competing.waitForFunction(() => document.querySelector('#schedule-feedback').textContent.includes('共 2 项'));
-        assert.ok((await competing.locator('#schedule-items').textContent()).includes(lostTitle));
-        assert.equal(attempted, 1);
-        assert.match(await competing.locator('#booking-feedback').textContent(), /未能确认/);
-        assert.equal(await competing.locator('#booking-name').inputValue(), lostTitle);
-        assert.equal(await competing.locator('#availability-form button').isDisabled(), false);
         const committedBooking = committed.body.data.booking;
         const lostResponse = {http_status:committed.status, request_count:attempted, booking_id:committedBooking.id,
           room_id:committedBooking.room.id, start_at:committedBooking.start_at, end_at:committedBooking.end_at, title:lostTitle};
         await competing.evaluate(() => window.scrollTo(0, 0));
         await competing.screenshot({path:path.join(outputDir,`booking-committed-response-lost-${viewport.width}.png`),fullPage:true});
+        // Python-equivalent whitespace preserves the key even after the committed response was lost.
+        await competing.locator('#booking-name').fill(`\u0085\u001c ${lostTitle} \u001f`);
+        await competing.locator('#booking-form button[type=submit]').click();
+        await competing.waitForFunction(()=>document.querySelector('#booking-feedback').textContent.includes('已确认原预约'));
+        assert.equal(attempted,2);
+        assert.equal(network[1].status,200);
+        assert.equal(network[1].body.data.replayed,true);
+        assert.equal(network[1].body.data.booking.id,committedBooking.id);
+        assert.equal(network[0].request.intent_key_sha256,network[1].request.intent_key_sha256);
+        const fullKeys=['id','room','title','purpose','attendees','owner_id','owner_display_name','start_at','start_local',
+          'end_at','end_local','status','created_at','created_local','cancelled_at','cancelled_local',
+          'cancelled_by_id','cancelled_by_display_name','cancel_reason'].sort();
+        assert.deepEqual(Object.keys(network[1].body.data.booking).sort(),fullKeys);
+        assert.deepEqual(Object.keys(network[1].body.data.booking.room).sort(),['id','name','location','capacity'].sort());
+        await competing.evaluate(() => window.scrollTo(0, 0));
+        await competing.screenshot({path:path.join(outputDir,`booking-replayed-${viewport.width}.png`),fullPage:true});
+        // A material edit and explicit new room selection produce a new intent and a new record.
+        await competing.locator('#booking-purpose').fill('实质编辑后的新预约用途');
+        assert.match(await competing.locator('#booking-feedback').textContent(),/新预约意图/);
+        await competing.locator('#start').fill(`${date}T16:00`);
+        await competing.locator('#end').fill(`${date}T17:00`);
+        await submitAvailability(competing);
+        await competing.waitForFunction(()=>document.querySelector('#availability-feedback').textContent.includes('找到 3 间'));
+        await competing.locator('.booking-select').last().click();
+        await competing.locator('#booking-form button[type=submit]').click();
+        await competing.waitForFunction(()=>document.querySelector('#booking-feedback').textContent.includes('预约成功'));
+        assert.equal(attempted,3);assert.equal(network[2].status,201);
+        assert.equal(network[2].body.data.replayed,false);
+        assert.notEqual(network[2].body.data.booking.id,committedBooking.id);
+        assert.notEqual(network[2].request.intent_key_sha256,network[0].request.intent_key_sha256);
+        const editedBooking=network[2].body.data.booking;
+        const replayEvidence={original_id:committedBooking.id,replayed_id:network[1].body.data.booking.id,
+          new_id:editedBooking.id,key_retained:true,edited_key_changed:true,
+          request_hashes:network.map(row=>row.request.intent_key_sha256),
+          statuses:network.map(row=>row.status),new_booking:editedBooking,network_file:path.basename(networkFile)};
+        const replayWidth=await competing.evaluate(()=>({document:document.documentElement.scrollWidth,viewport:innerWidth}));
+        assert.ok(replayWidth.document<=replayWidth.viewport);
+        await competing.evaluate(() => window.scrollTo(0, 0));
+        await competing.screenshot({path:path.join(outputDir,`booking-new-intent-${viewport.width}.png`),fullPage:true});
+        await competing.locator('#booking-new').click();
+        assert.equal(await competing.locator('#booking-panel').isVisible(),false);
+        assert.equal(await competing.locator('#booking-name').inputValue(),'');
+        assert.equal(await competing.evaluate(()=>document.activeElement.id),'start');
+        // This first request is aborted before route.fetch/continue: it never reaches Waitress.
+        await competing.unroute('**/api/bookings');
+        await competing.locator('#start').fill(`${date}T18:00`);
+        await competing.locator('#end').fill(`${date}T19:00`);
+        await submitAvailability(competing);
+        await competing.waitForFunction(()=>document.querySelector('#availability-feedback').textContent.includes('找到 3 间'));
+        await competing.locator('.booking-select').last().click();
+        const notSentTitle=`首次请求未送达 ${viewport.width}`;
+        await competing.locator('#booking-name').fill(notSentTitle);
+        await competing.locator('#booking-purpose').fill('仅在主动原键重试时到达服务端');
+        const notSentNetwork=[];
+        const notSentFile=path.join(outputDir,`not-delivered-network-${viewport.width}.jsonl`);
+        fs.writeFileSync(notSentFile,'');
+        await competing.route('**/api/bookings', async route=>{
+          const {intent_key,...fields}=route.request().postDataJSON();
+          const first=notSentNetwork.length===0;
+          let observed={status:null,body:null}, response;
+          if(!first) {response=await route.fetch();observed={status:response.status(),body:await response.json()};}
+          notSentNetwork.push({phase:first?'request_not_delivered':'explicit_same_key_retry',method:'POST',path:'/api/bookings',
+            request:{...fields,intent_key_sha256:createHash('sha256').update(intent_key).digest('hex')},
+            delivery:first?'aborted_before_server':'fulfilled',...observed});
+          fs.appendFileSync(notSentFile,JSON.stringify(notSentNetwork.at(-1))+'\n');
+          if(first) await route.abort();else await route.fulfill({response});
+        });
+        await competing.locator('#booking-form button[type=submit]').click();
+        await competing.waitForFunction(()=>document.querySelector('#booking-feedback').textContent.includes('未能确认'));
+        assert.equal(notSentNetwork.length,1);
+        const beforeRetry=await context.request.get(`${origin}/api/schedule?room_id=30&date=${date}`);
+        assert.equal(beforeRetry.status(),200);
+        const preRetryMatches=(await beforeRetry.json()).data.items.filter(item=>item.kind==='booking'&&item.record.title===notSentTitle);
+        assert.equal(preRetryMatches.length,0);
+        assert.equal(await competing.locator('#booking-form button[type=submit]').textContent(),'重试确认原预约');
+        await competing.locator('#booking-form button[type=submit]').click();
+        await competing.waitForFunction(()=>document.querySelector('#booking-feedback').textContent.includes('预约成功'));
+        assert.equal(notSentNetwork.length,2);
+        assert.equal(notSentNetwork[1].status,201);
+        assert.equal(notSentNetwork[1].body.data.replayed,false);
+        assert.equal(notSentNetwork[0].request.intent_key_sha256,notSentNetwork[1].request.intent_key_sha256);
+        const notSentBooking=notSentNetwork[1].body.data.booking;
+        const notDeliveredEvidence={booking_id:notSentBooking.id,room_id:notSentBooking.room.id,title:notSentTitle,
+          start_at:notSentBooking.start_at,end_at:notSentBooking.end_at,key_retained:true,pre_retry_matching_records:0,
+          statuses:notSentNetwork.map(row=>row.status),request_hashes:notSentNetwork.map(row=>row.request.intent_key_sha256),
+          network_file:path.basename(notSentFile)};
+        await competing.evaluate(()=>window.scrollTo(0,0));
+        await competing.screenshot({path:path.join(outputDir,`booking-not-delivered-retry-${viewport.width}.png`),fullPage:true});
         await competing.close();
         // Newly created plain text is visible in shared schedule, without purpose.
         await page.locator('#room_id').selectOption('30');
         await page.locator('#date').fill(date);
         await submitSchedule(page);
-        await page.waitForFunction(() => document.querySelector('#schedule-feedback').textContent.includes('共 2 项'));
+        await page.waitForFunction(() => document.querySelector('#schedule-feedback').textContent.includes('共 4 项'));
         assert.ok((await page.locator('#schedule-items').textContent()).includes(title));
         assert.equal(await page.locator('#schedule-items img, #schedule-items script').count(), 0);
         assert.equal(await page.evaluate(() => window.bookingXss), undefined);
-        bookingChecks = {width,query_first_blocks_creation:'PASS',creation_first_blocks_query:'PASS',neutral_room_selection_feedback:'PASS',room_selection_accessible_names:'PASS',committed_response_lost:lostResponse,readonly_queries_after_unknown:'PASS',created:'PASS',conflict_retains_inputs:'PASS',loading_disables_controls:'PASS',literal_unicode_xss:'PASS',unknown_no_retry:'PASS',schedule_updated:'PASS'};
+        bookingChecks = {width,query_first_blocks_creation:'PASS',creation_first_blocks_query:'PASS',neutral_room_selection_feedback:'PASS',room_selection_accessible_names:'PASS',committed_response_lost:lostResponse,explicit_new_booking:'PASS',created:'PASS',conflict_retains_inputs:'PASS',loading_disables_controls:'PASS',literal_unicode_xss:'PASS',explicit_retry_same_intent:replayEvidence,not_delivered_retry:notDeliveredEvidence,schedule_updated:'PASS'};
       }
       // Start from the stable header link, then traverse to logout by keyboard.
       await page.locator('.brand').focus();

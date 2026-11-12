@@ -1,6 +1,7 @@
 """Portable browser verification using a separately installed pinned Playwright."""
 
 import argparse
+from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
@@ -66,21 +67,52 @@ def verify_committed_response_loss(database, report):
                 cancelled_at=None,cancelled_by_id=None,cancel_reason=None)
             verified.append(dict(viewport=result["viewport"], booking_id=booking["id"], matching_reservations=1,
                                  slots=slots, creation_audits=audits, result="PASS"))
+        for result in report["results"]:
+            evidence = result["booking"]["explicit_retry_same_intent"]
+            assert evidence["statuses"] == [201, 200, 201]
+            assert evidence["original_id"] == evidence["replayed_id"] != evidence["new_id"]
+            rows = conn.execute("SELECT * FROM reservations WHERE id IN (?,?) ORDER BY id",
+                                (evidence["original_id"], evidence["new_id"])).fetchall()
+            assert len(rows) == 2
+            import hashlib
+            hashes = [hashlib.sha256(row["intent_key"].encode()).hexdigest() for row in rows]
+            assert hashes == [evidence["request_hashes"][0], evidence["request_hashes"][2]]
+            assert evidence["request_hashes"][0] == evidence["request_hashes"][1] != evidence["request_hashes"][2]
+            for row in rows:
+                slots = [slot[0] for slot in conn.execute(
+                    "SELECT slot_start FROM occupancy_slots WHERE reservation_id=? ORDER BY slot_start", (row["id"],))]
+                assert slots == list(range(row["start_at"], row["end_at"], 1800))
+                assert conn.execute("SELECT count(*) FROM audit_events WHERE target_type='booking' AND target_id=? AND action='booking.created'",
+                                    (row["id"],)).fetchone()[0] == 1
+            verified.append(dict(viewport=result["viewport"], original_id=evidence["original_id"],
+                replayed_id=evidence["replayed_id"], edited_new_id=evidence["new_id"],
+                key_hashes_match=True, records=2, creation_audits=2, slots_per_booking=2, result="PASS"))
+        for result in report["results"]:
+            expected = result["booking"]["not_delivered_retry"]
+            assert expected["statuses"] == [None, 201]
+            assert expected["pre_retry_matching_records"] == 0
+            assert expected["request_hashes"][0] == expected["request_hashes"][1]
+            rows = conn.execute("SELECT * FROM reservations WHERE room_id=? AND start_at=? AND end_at=?",
+                                (expected["room_id"], expected["start_at"], expected["end_at"])).fetchall()
+            assert len(rows) == 1
+            row = rows[0]
+            assert row["id"] == expected["booking_id"] and row["title"] == expected["title"]
+            assert hashlib.sha256(row["intent_key"].encode()).hexdigest() == expected["request_hashes"][0]
+            slots = [dict(slot) for slot in conn.execute(
+                "SELECT room_id,slot_start,reservation_id FROM occupancy_slots WHERE reservation_id=? ORDER BY slot_start",
+                (row["id"],))]
+            assert slots == [dict(room_id=row["room_id"], slot_start=t, reservation_id=row["id"])
+                             for t in range(row["start_at"], row["end_at"], 1800)]
+            audits = [dict(event) for event in conn.execute(
+                "SELECT id,action,target_id FROM audit_events WHERE target_type='booking' AND target_id=?", (row["id"],))]
+            assert len(audits) == 1 and audits[0]["action"] == 'booking.created'
+            verified.append(dict(viewport=result["viewport"], scenario='request_not_delivered_then_retry',
+                booking_id=row["id"], matching_reservations=1, key_hash_match=True,
+                slots=slots, creation_audits=audits, result='PASS'))
     return verified
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--port", type=int, default=8002)
-    parser.add_argument("--playwright-root", type=Path, default=ROOT / "work/browser-tools/node_modules")
-    parser.add_argument("--browser-executable", type=Path, help="Optional existing Chrome/Chromium executable; default uses Playwright Chromium")
-    parser.add_argument("--output-dir", type=Path, default=ROOT / "work/browser-verification")
-    parser.add_argument("--schedule", action="store_true", help="Include Story 1.2 synthetic schedule fixtures and checks")
-    parser.add_argument("--availability", action="store_true", help="Include Story 1.3 availability plus login/logout and schedule checks")
-    parser.add_argument("--booking", action="store_true", help="Include Story 2.1 booking creation and conflict checks")
-    args = parser.parse_args()
-    args.availability = args.availability or args.booking
-    args.schedule = args.schedule or args.availability
+def run_browser(args):
     origin = f"http://127.0.0.1:{args.port}"
     with socket.socket() as probe:
         probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -134,12 +166,50 @@ def main():
                     from booking_app.domain import local_time
                     from tests.schedule_fixtures import NOW
                     report["clock"] = {"kind": "fixed_fixture", "now_epoch": NOW, "now_local": local_time(NOW)}
-                evidence = json.dumps(report, ensure_ascii=False, indent=2)
-                (args.output_dir / "browser-results.json").write_text(evidence + "\n", encoding="utf-8")
-                print(evidence)
             finally:
                 server.terminate()
                 server.wait(timeout=10)
+    return report
+
+
+def write_report(path, report):
+    temporary = path.with_suffix('.tmp')
+    temporary.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    temporary.replace(path)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--port", type=int, default=8002)
+    parser.add_argument("--playwright-root", type=Path, default=ROOT / "work/browser-tools/node_modules")
+    parser.add_argument("--browser-executable", type=Path, help="Optional existing Chrome/Chromium executable; default uses Playwright Chromium")
+    parser.add_argument("--output-dir", type=Path, default=ROOT / "work/browser-verification")
+    parser.add_argument("--schedule", action="store_true", help="Include Story 1.2 synthetic schedule fixtures and checks")
+    parser.add_argument("--availability", action="store_true", help="Include Story 1.3 availability plus login/logout and schedule checks")
+    parser.add_argument("--booking", action="store_true", help="Include Story 2.1 booking creation and conflict checks")
+    parser.add_argument("--replay", action="store_true", help="Include Story 2.2 lost-response replay and edited new intent checks")
+    args = parser.parse_args()
+    args.booking = args.booking or args.replay
+    args.availability = args.availability or args.booking
+    args.schedule = args.schedule or args.availability
+    args.output_dir.mkdir(parents=True, exist_ok=True)
+    meta = dict(run_id=secrets.token_hex(16), started_at_utc=datetime.now(timezone.utc).isoformat())
+    meta['artifact_directory'] = f"runs/{meta['run_id']}"
+    target = args.output_dir / 'browser-results.json'
+    write_report(target, meta | dict(result='INCOMPLETE', completed=False))
+    try:
+        run_args = argparse.Namespace(**(vars(args) | {'output_dir': args.output_dir / meta['artifact_directory']}))
+        run_args.output_dir.mkdir(parents=True)
+        report = run_browser(run_args)
+        report = report | meta | dict(result='PASS', completed=True, finished_at_utc=datetime.now(timezone.utc).isoformat())
+        write_report(target, report)
+    except BaseException as error:
+        report = meta | dict(result='INCOMPLETE', completed=False, error_type=type(error).__name__,
+                             finished_at_utc=datetime.now(timezone.utc).isoformat())
+        write_report(target, report)
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+        return 1
+    print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0
 
 

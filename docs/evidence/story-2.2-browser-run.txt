@@ -1,0 +1,394 @@
+{
+  "result": "PASS",
+  "browser": "157.0.8103.51",
+  "runner": "Playwright 1.58.2 (external verification tool only)",
+  "results": [
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "loginWidth": {
+        "document": 1280,
+        "viewport": 1280
+      },
+      "homeWidth": {
+        "document": 1280,
+        "viewport": 1280
+      },
+      "booking": {
+        "width": {
+          "document": 1280,
+          "viewport": 1280
+        },
+        "query_first_blocks_creation": "PASS",
+        "creation_first_blocks_query": "PASS",
+        "neutral_room_selection_feedback": "PASS",
+        "room_selection_accessible_names": "PASS",
+        "committed_response_lost": {
+          "http_status": 201,
+          "request_count": 1,
+          "booking_id": 113,
+          "room_id": 30,
+          "start_at": 1794808800,
+          "end_at": 1794812400,
+          "title": "响应丢失的合成活动 1280"
+        },
+        "explicit_new_booking": "PASS",
+        "created": "PASS",
+        "conflict_retains_inputs": "PASS",
+        "loading_disables_controls": "PASS",
+        "literal_unicode_xss": "PASS",
+        "explicit_retry_same_intent": {
+          "original_id": 113,
+          "replayed_id": 113,
+          "new_id": 114,
+          "key_retained": true,
+          "edited_key_changed": true,
+          "request_hashes": [
+            "7077bf95ed39b88061544f0f6497661eebe313a67e08528f97c70c59119ee439",
+            "7077bf95ed39b88061544f0f6497661eebe313a67e08528f97c70c59119ee439",
+            "0ff0c0ed50bdc484154686ab276ce69c9f6893cef22caeeb80c6eadb1914211e"
+          ],
+          "statuses": [
+            201,
+            200,
+            201
+          ],
+          "new_booking": {
+            "attendees": 5,
+            "cancel_reason": null,
+            "cancelled_at": null,
+            "cancelled_by_display_name": null,
+            "cancelled_by_id": null,
+            "cancelled_local": null,
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "end_at": 1794819600,
+            "end_local": "2026-11-16T17:00:00+08:00",
+            "id": 114,
+            "owner_display_name": "演示成员甲",
+            "owner_id": 1,
+            "purpose": "实质编辑后的新预约用途",
+            "room": {
+              "capacity": 30,
+              "id": 30,
+              "location": "演示楼 303",
+              "name": "合成 C <讨论室>"
+            },
+            "start_at": 1794816000,
+            "start_local": "2026-11-16T16:00:00+08:00",
+            "status": "pending",
+            "title": "响应丢失的合成活动 1280"
+          },
+          "network_file": "replay-network-1280.jsonl"
+        },
+        "schedule_updated": "PASS"
+      },
+      "keyboard_login": "PASS",
+      "keyboard_logout": "PASS",
+      "identity_api": "PASS",
+      "logout_and_old_cookie": "PASS",
+      "empty_fields_feedback": "PASS",
+      "visible_labels": "PASS",
+      "page_errors": [],
+      "schedule": {
+        "scheduleWidth": {
+          "document": 1280,
+          "viewport": 1280
+        },
+        "labels": "PASS",
+        "loading": "PASS",
+        "pending_inputs_disabled_and_restored": "PASS",
+        "field_error": "PASS",
+        "keyboard_schedule_submit": "PASS",
+        "keyboard_room_and_date_error_focus": "PASS",
+        "fixed_clock_status_texts": "PASS",
+        "exact_api_intervals": "PASS",
+        "exact_display_intervals": "PASS",
+        "no_script_notice_and_readable_directory": "PASS",
+        "shared_contract": "PASS",
+        "literal_html_and_xss": "PASS",
+        "private_values_absent": "PASS",
+        "half_open_midnight": "PASS",
+        "empty_result": "PASS",
+        "error_retains_conditions": "PASS",
+        "logout_rejects_queries": "PASS",
+        "session_loss_feedback": "PASS"
+      },
+      "availability": {
+        "availableWidth": {
+          "document": 1280,
+          "viewport": 1280
+        },
+        "labels": "PASS",
+        "required_semantics": "PASS",
+        "half_hour_controls": "PASS",
+        "keyboard_submit": "PASS",
+        "loading": "PASS",
+        "restored_controls": "PASS",
+        "success_and_empty_button_focus": "PASS",
+        "success_and_empty_next_tab": "PASS",
+        "success_exact_conditions": "PASS",
+        "literal_room_text": "PASS",
+        "empty_result": "PASS",
+        "time_and_attendees_field_errors": "PASS",
+        "network_failure_retains_conditions": "PASS",
+        "query_does_not_reserve_notice": "PASS",
+        "session_loss_and_old_cookie": "PASS"
+      }
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "loginWidth": {
+        "document": 390,
+        "viewport": 390
+      },
+      "homeWidth": {
+        "document": 390,
+        "viewport": 390
+      },
+      "booking": {
+        "width": {
+          "document": 390,
+          "viewport": 390
+        },
+        "query_first_blocks_creation": "PASS",
+        "creation_first_blocks_query": "PASS",
+        "neutral_room_selection_feedback": "PASS",
+        "room_selection_accessible_names": "PASS",
+        "committed_response_lost": {
+          "http_status": 201,
+          "request_count": 1,
+          "booking_id": 116,
+          "room_id": 30,
+          "start_at": 1794895200,
+          "end_at": 1794898800,
+          "title": "响应丢失的合成活动 390"
+        },
+        "explicit_new_booking": "PASS",
+        "created": "PASS",
+        "conflict_retains_inputs": "PASS",
+        "loading_disables_controls": "PASS",
+        "literal_unicode_xss": "PASS",
+        "explicit_retry_same_intent": {
+          "original_id": 116,
+          "replayed_id": 116,
+          "new_id": 117,
+          "key_retained": true,
+          "edited_key_changed": true,
+          "request_hashes": [
+            "27ad094d5e27832b7b3eeaa59322e6b702e2148a65f30c003a19777d15019523",
+            "27ad094d5e27832b7b3eeaa59322e6b702e2148a65f30c003a19777d15019523",
+            "ae3268288220243112d9188e0ff3e555a7f756b0c3a0ff7d77b256718d1b8f30"
+          ],
+          "statuses": [
+            201,
+            200,
+            201
+          ],
+          "new_booking": {
+            "attendees": 5,
+            "cancel_reason": null,
+            "cancelled_at": null,
+            "cancelled_by_display_name": null,
+            "cancelled_by_id": null,
+            "cancelled_local": null,
+            "created_at": 1794448800,
+            "created_local": "2026-11-12T10:00:00+08:00",
+            "end_at": 1794906000,
+            "end_local": "2026-11-17T17:00:00+08:00",
+            "id": 117,
+            "owner_display_name": "演示成员甲",
+            "owner_id": 1,
+            "purpose": "实质编辑后的新预约用途",
+            "room": {
+              "capacity": 30,
+              "id": 30,
+              "location": "演示楼 303",
+              "name": "合成 C <讨论室>"
+            },
+            "start_at": 1794902400,
+            "start_local": "2026-11-17T16:00:00+08:00",
+            "status": "pending",
+            "title": "响应丢失的合成活动 390"
+          },
+          "network_file": "replay-network-390.jsonl"
+        },
+        "schedule_updated": "PASS"
+      },
+      "keyboard_login": "PASS",
+      "keyboard_logout": "PASS",
+      "identity_api": "PASS",
+      "logout_and_old_cookie": "PASS",
+      "empty_fields_feedback": "PASS",
+      "visible_labels": "PASS",
+      "page_errors": [],
+      "schedule": {
+        "scheduleWidth": {
+          "document": 390,
+          "viewport": 390
+        },
+        "labels": "PASS",
+        "loading": "PASS",
+        "pending_inputs_disabled_and_restored": "PASS",
+        "field_error": "PASS",
+        "keyboard_schedule_submit": "PASS",
+        "keyboard_room_and_date_error_focus": "PASS",
+        "fixed_clock_status_texts": "PASS",
+        "exact_api_intervals": "PASS",
+        "exact_display_intervals": "PASS",
+        "no_script_notice_and_readable_directory": "PASS",
+        "shared_contract": "PASS",
+        "literal_html_and_xss": "PASS",
+        "private_values_absent": "PASS",
+        "half_open_midnight": "PASS",
+        "empty_result": "PASS",
+        "error_retains_conditions": "PASS",
+        "logout_rejects_queries": "PASS",
+        "session_loss_feedback": "PASS"
+      },
+      "availability": {
+        "availableWidth": {
+          "document": 390,
+          "viewport": 390
+        },
+        "labels": "PASS",
+        "required_semantics": "PASS",
+        "half_hour_controls": "PASS",
+        "keyboard_submit": "PASS",
+        "loading": "PASS",
+        "restored_controls": "PASS",
+        "success_and_empty_button_focus": "PASS",
+        "success_and_empty_next_tab": "PASS",
+        "success_exact_conditions": "PASS",
+        "literal_room_text": "PASS",
+        "empty_result": "PASS",
+        "time_and_attendees_field_errors": "PASS",
+        "network_failure_retains_conditions": "PASS",
+        "query_does_not_reserve_notice": "PASS",
+        "session_loss_and_old_cookie": "PASS"
+      }
+    }
+  ],
+  "committed_response_loss_storage": [
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "booking_id": 113,
+      "matching_reservations": 1,
+      "slots": [
+        {
+          "room_id": 30,
+          "slot_start": 1794808800,
+          "reservation_id": 113
+        },
+        {
+          "room_id": 30,
+          "slot_start": 1794810600,
+          "reservation_id": 113
+        }
+      ],
+      "creation_audits": [
+        {
+          "id": 2,
+          "actor_id": 1,
+          "action": "booking.created",
+          "target_type": "booking",
+          "target_id": 113,
+          "occurred_at": 1794448800,
+          "before_json": null,
+          "after_json": "{\"attendees\":5,\"cancel_reason\":null,\"cancelled_at\":null,\"cancelled_by_id\":null,\"created_at\":1794448800,\"end_at\":1794812400,\"id\":113,\"owner_id\":1,\"purpose\":\"成功提交但响应丢失，保留输入 🧪\",\"room_id\":30,\"start_at\":1794808800,\"title\":\"响应丢失的合成活动 1280\"}",
+          "reason": null
+        }
+      ],
+      "result": "PASS"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "booking_id": 116,
+      "matching_reservations": 1,
+      "slots": [
+        {
+          "room_id": 30,
+          "slot_start": 1794895200,
+          "reservation_id": 116
+        },
+        {
+          "room_id": 30,
+          "slot_start": 1794897000,
+          "reservation_id": 116
+        }
+      ],
+      "creation_audits": [
+        {
+          "id": 5,
+          "actor_id": 1,
+          "action": "booking.created",
+          "target_type": "booking",
+          "target_id": 116,
+          "occurred_at": 1794448800,
+          "before_json": null,
+          "after_json": "{\"attendees\":5,\"cancel_reason\":null,\"cancelled_at\":null,\"cancelled_by_id\":null,\"created_at\":1794448800,\"end_at\":1794898800,\"id\":116,\"owner_id\":1,\"purpose\":\"成功提交但响应丢失，保留输入 🧪\",\"room_id\":30,\"start_at\":1794895200,\"title\":\"响应丢失的合成活动 390\"}",
+          "reason": null
+        }
+      ],
+      "result": "PASS"
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "original_id": 113,
+      "replayed_id": 113,
+      "edited_new_id": 114,
+      "key_hashes_match": true,
+      "records": 2,
+      "creation_audits": 2,
+      "slots_per_booking": 2,
+      "result": "PASS"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "original_id": 116,
+      "replayed_id": 116,
+      "edited_new_id": 117,
+      "key_hashes_match": true,
+      "records": 2,
+      "creation_audits": 2,
+      "slots_per_booking": 2,
+      "result": "PASS"
+    }
+  ],
+  "server": {
+    "processes": 1,
+    "threads": 8,
+    "origin": "http://127.0.0.1:8002",
+    "command": [
+      "/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/.venv/bin/python",
+      "-m",
+      "waitress",
+      "--listen=127.0.0.1:8002",
+      "--threads=8",
+      "--call",
+      "scripts.verify_auth_browser:create_schedule_verification_app"
+    ]
+  },
+  "clock": {
+    "kind": "fixed_fixture",
+    "now_epoch": 1794448800,
+    "now_local": "2026-11-12T10:00:00+08:00"
+  }
+}

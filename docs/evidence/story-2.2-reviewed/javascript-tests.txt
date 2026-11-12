@@ -1,0 +1,40 @@
+✔ stalled response headers aborts at 20 seconds and restores manual controls (3.487375ms)
+✔ stalled response body aborts at 20 seconds and restores manual controls (0.845208ms)
+✔ availability stalled response headers aborts at 20 seconds, retains input, permits manual retry (3.890916ms)
+✔ availability stalled response body aborts at 20 seconds, retains input, permits manual retry (1.401334ms)
+✔ availability network failure restores controls without discarding conditions (0.68825ms)
+✔ availability bad JSON restores controls without discarding conditions (0.500083ms)
+✔ availability field errors focus enabled input; success clears errors and safely renders literal room text (0.731417ms)
+✔ availability expired session gives a login link, preserves input and hides old results (0.54575ms)
+✔ each room selection has a distinct accessible name containing room and location (0.929042ms)
+✔ selected query creates 32-byte intent; pending disables controls and success is plain text (5.35675ms)
+✔ field validation focuses restored control; conflicts and internal failure preserve content and key (0.92225ms)
+✔ unknown network and malformed response allow explicit same-key retry without claiming failure (1.938792ms)
+✔ 20-second timeout covers stalled response body and does not resend (3.361042ms)
+✔ session loss shows relogin and never automatically submits again (0.786291ms)
+✔ a query in progress blocks creation; after it settles creation restores all controls (0.910459ms)
+✔ creation in progress blocks queries; unknown result permits queries and explicit confirmation (0.980667ms)
+✔ selecting a room after a field error resets feedback style and role (0.766083ms)
+✔ malformed success envelopes or displayed fields never claim success (7.347916ms)
+✔ unknown codes, inconsistent status, and malformed error envelopes are unknown outcomes (2.198791ms)
+✔ Python strip equivalence preserves intent while FEFF rotates it (0.603667ms)
+✔ each of the six substantive fields alone rotates the intent from its own baseline (4.238208ms)
+✔ header timeout retains original intent and pending new/selection controls cannot replace input (0.595375ms)
+✔ replay accepts all current states with exact DTO, rejects stale/malformed cancellation facts (3.735042ms)
+✔ lost first outcome remains unknown through an explicit error until a same-key success (2.598ms)
+✔ replacing an unconfirmed intent retains its reminder through further edits and a new success (0.643958ms)
+✔ confirmed ID survives a failed refresh without casting doubt on original success (0.708083ms)
+✔ replay refreshes room name and location in confirmation conditions without changing intent (0.904541ms)
+✔ schedule stalled response headers aborts at 20 seconds and can be queried again (3.458ms)
+✔ schedule stalled response body aborts at 20 seconds and can be queried again (1.860333ms)
+✔ schedule network failure preserves conditions, restores controls, and permits retry (0.883208ms)
+✔ schedule bad JSON preserves conditions, restores controls, and permits retry (0.594875ms)
+✔ pending conditions cannot be edited and a field error focuses the restored original input (0.795ms)
+ℹ tests 32
+ℹ suites 0
+ℹ pass 32
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 99.997584

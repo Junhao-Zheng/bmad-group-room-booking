@@ -1,0 +1,29 @@
+WARNING:waitress.queue:Task queue depth is 1
+WARNING:waitress.queue:Task queue depth is 2
+WARNING:waitress.queue:Task queue depth is 3
+WARNING:waitress.queue:Task queue depth is 4
+WARNING:waitress.queue:Task queue depth is 5
+WARNING:waitress.queue:Task queue depth is 6
+WARNING:waitress.queue:Task queue depth is 7
+WARNING:waitress.queue:Task queue depth is 8
+WARNING:waitress.queue:Task queue depth is 9
+WARNING:waitress.queue:Task queue depth is 10
+WARNING:waitress.queue:Task queue depth is 11
+WARNING:waitress.queue:Task queue depth is 12
+ERROR:booking_app:request_id=c56616b0dfa94f41b81dbd78068f9276 action=web.create_booking_api error_type=RuntimeError
+{
+  "result": "PASS",
+  "completed": true,
+  "requests": 20,
+  "newly_created": 1,
+  "replayed": 19,
+  "unique_booking_ids": 1,
+  "race_reservations": 1,
+  "race_slots": 4,
+  "race_creation_audits": 1,
+  "independent_cookie_jars": 20,
+  "restart_preserves_intents": true,
+  "replay_writer_calls": 0,
+  "audit_failure_rollback": true,
+  "failed_key_reusable": true
+}

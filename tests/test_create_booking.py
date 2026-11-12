@@ -199,8 +199,8 @@ class CreateBookingTests(unittest.TestCase):
 
     def test_duplicate_key_is_controlled_409_and_user_scoped(self):
         self.assertEqual(self.post().status_code,201)
-        for changes in ({},{'title':'不同活动'}):
-            self.error(self.post(**changes),409,'IDEMPOTENCY_MISMATCH')
+        self.assertEqual(self.post().status_code,200)
+        self.error(self.post(title='不同活动'),409,'IDEMPOTENCY_MISMATCH')
         self.client=self.app.test_client()
         self.identity=self.login(self.client,'demo_member_b')
         self.assertEqual(self.post(room_id=2).status_code,201)

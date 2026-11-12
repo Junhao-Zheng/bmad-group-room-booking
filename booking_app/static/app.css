@@ -74,3 +74,4 @@ select[aria-invalid="true"]{border:2px solid #a52b37}
 .booking-panel{margin-bottom:24px;overflow-wrap:anywhere}.booking-select{margin-top:12px}
 textarea{font:inherit;width:100%;max-width:100%;min-width:0;resize:vertical;padding:12px;border:1px solid #91a5ae;border-radius:8px;color:#183343;background:white}
 textarea[aria-invalid="true"]{border:2px solid #a52b37}
+#booking-new{margin-top:12px}

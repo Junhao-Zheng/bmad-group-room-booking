@@ -1,6 +1,6 @@
 # 课题组活动与会议室预约
 
-软件工程管理课程项目。选题及使用对象已由用户确认。Story 1.1—1.3 与 2.1 已实现预置账号登录、身份显示、退出、会议室目录、共享日程、可用会议室查询及创建预约；可靠重试、个人预约管理及管理员能力待后续故事交付。
+软件工程管理课程项目。选题及使用对象已由用户确认。Story 1.1—1.3 与 2.1—2.2 已实现预置账号登录、身份显示、退出、会议室目录、共享日程、可用会议室查询、创建预约及原提交意图可靠确认；个人预约管理及管理员能力待后续故事交付。
 
 本仓库按实际发生的工作保存 BMAD 产物和过程证据。实验 B 按用户转述的教师要求免做，实验 A 保留。人数和截止日期不作为当前阶段的阻塞条件。
 
@@ -126,13 +126,15 @@ node --test tests/test_*js.cjs
 
 初版 59 项 Python 测试、13 项 JavaScript 测试及性能原始记录保留在 [Story 1.3 初版验证记录](docs/evidence/story-1.3-verification.md)。评审修复后的定向测试、真实浏览器及性能复跑见 [Story 1.3 评审修复验证](docs/evidence/story-1.3-reviewed-verification.md)。已登记性能负载全部为 30 分钟查询，其中 80% 执行 SQL 可用性筛选、20% 为人数 1001 的合法空结果快路径；报告分别列出两类样本数及 P95。该负载不代表 4 小时查询或长停用的最坏性能，也不代表实际课题组试用或生产规模。
 
-## 创建预约（Story 2.1）
+## 创建预约与重复确认（Story 2.1—2.2）
 
 在首页先查询时段和人数，点击结果房间的「选择并填写活动」，填写活动名称、用途并确认。提交过程中锁定创建输入与查询选择控件；成功显示预约编号及北京时间时段。服务在 `BEGIN IMMEDIATE` 后重新检查真实会话、当前容量、时间窗口及预约/停用占用，预约、完整半小时槽及一条 `booking.created` 审计原子提交。用途与人数不进入共享日程或普通成员冲突详情。文本按 Unicode 字符计数，以纯文本显示。
 
 接口为 `POST /api/bookings`，接受 JSON 整数 `room_id`、`attendees`，以及 `title`、`purpose`、`start`、`end`、`intent_key`。人数不接受布尔、浮点或数字字符串；时间复用查询规则。首次成功为 201，响应仅一层 `data={booking:BookingFull,replayed:false}`。所有 POST 仍须同源 Origin 及 CSRF。重复初始化可在原 `user_version=1` 数据库补齐 `audit_events`，保留全部旧数据；旧库首次运行新版前请执行上面的初始化命令，启动检查不会静默升级缺失表。
 
-**本增量尚未交付可靠重试。** 成功 key 及规范化六字段 JSON 已持久保存，但重复 key 暂返回 409 `IDEMPOTENCY_MISMATCH`，不会重放成功结果。明确冲突或失败保留输入；网络断开、超时或响应无法解析时显示「未能确认」，保留输入并停止本页重提，需先查共享日程或联系管理员核对，避免重复创建。Story 2.2 将补充原 key 的可靠确认和重放。这里没有实现取消、管理员取消或停用撤销。
+成功 key 与规范化六字段 JSON 持久保存在数据库，按成员隔离。同成员相同 key、相同规范化内容返回 **200**，`data={booking:BookingFull,replayed:true}`；原预约已开始、已结束、已取消或房间容量降低也能确认原 ID 与查询时当前状态、房间及显示名。相同 key 变更实质字段返回 409 `IDEMPOTENCY_MISMATCH`；明确失败不会占用 key，重放不会新增预约、占用槽或审计。
+
+本页表单使用 32 字节安全随机提交键，相同规范化六字段保留原键。网络断开、20 秒超时（含正文）或响应格式异常会显示「未能确认」，保留内容；点击「重试确认原预约」即可用原键确认。成功后仍可点击「再次确认原预约」，不会自动清空表单。活动名称/用途的实质编辑、选择不同房间或不同查询条件会生成新意图；仅 Python `str.strip()` 等价的首尾空白不算修改，包括 U+0085 和 U+001C—1F，但不去除 U+FEFF。点击「开始新预约」明确结束当前表单，再查询选房。提交期间锁定相关输入、查询、房间选择及新预约按钮；不会自动重提。取消和管理接口仍属于后续故事。
 
 复跑本故事（均使用隔离临时文件库，自动停止服务和清理测试凭证）：
 
@@ -141,9 +143,13 @@ node --test tests/test_*js.cjs
 node --test tests/test_*js.cjs
 .venv/bin/python -m scripts.verify_create_booking_http --output-dir work/create-booking-http
 .venv/bin/python -m scripts.verify_auth_browser --booking --output-dir work/create-booking-browser
+.venv/bin/python -m scripts.verify_replay_intent_http --output-dir work/replay-intent-http
+.venv/bin/python -m scripts.verify_auth_browser --replay --output-dir work/replay-intent-browser
 ```
 
 浏览器验证沿用上述 Playwright 1.58.2 安装；未下载匹配 Chromium 时可通过 `--browser-executable /absolute/path/to/chrome` 指定已有浏览器。`--booking` 同时验证登录退出、日程与可用性回归，使用 1280×800 和 390×844 视口。HTTP 验证器使用 20 个不同成员、独立 cookie 会话及不同 key，经 8 线程 Waitress 同时争用同室同槽，保存全部响应、最终预约/槽/审计及审计故障回滚证据；不把锁超时视为占用冲突。完整结果见 [Story 2.1 验证记录](docs/evidence/story-2.1-verification.md)。
+
+Story 2.2 的 HTTP 验证器让 20 个独立客户端复制同一登录凭证，但各自拥有 CookieJar，通过屏障同时提交同一意图，断言 1×201 + 19×200、原 ID 一致及数据库一条预约/一次创建审计。随后实际停止并重启 Waitress，以故障 writer 证实重放不调用审计、失败整体回滚且原失败 key 可重用。`--replay` 浏览器验证涵盖原有登录退出、查询与创建回归，并截断已成功提交的首个响应，保存原键重试与实质编辑新意图的原始网络证据和 key SHA-256，不保存会话凭证。当前 `--booking` 同样验证最新创建/确认行为。原始结果与验收映射见 [Story 2.2 验证记录](docs/evidence/story-2.2-verification.md)。
 
 ## AI 使用声明
 

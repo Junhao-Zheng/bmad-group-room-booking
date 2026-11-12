@@ -25,10 +25,18 @@ def create_booking(actor: auth.Actor, payload: dict) -> dict:
         now = current_app.config["CLOCK"].now_epoch()
         actor = _require_actor(conn, actor, now)
         values, intent_key = normalize_booking_payload(payload)
-        if conn.execute("SELECT id FROM reservations WHERE kind='booking' AND user_id=? AND intent_key=?",
-                        (actor.id, intent_key)).fetchone() is not None:
-            # Story 2.1 stores successful intents; reliable replay is Story 2.2.
-            raise DomainError("IDEMPOTENCY_MISMATCH", "此提交标识已使用，请先核对已提交的安排；当前版本不支持结果重放。")
+        previous = conn.execute(
+            "SELECT r.*,u.display_name AS owner_display_name,c.display_name AS cancelled_by_display_name "
+            "FROM reservations r JOIN users u ON u.id=r.user_id LEFT JOIN users c ON c.id=r.cancelled_by "
+            "WHERE r.kind='booking' AND r.user_id=? AND r.intent_key=?", (actor.id, intent_key),
+        ).fetchone()
+        if previous is not None:
+            if json.loads(previous["request_payload"]) != values:
+                raise DomainError("IDEMPOTENCY_MISMATCH", "此提交标识已用于不同预约内容，请核对原预约或开始新预约。")
+            room = conn.execute("SELECT id,name,location,capacity FROM rooms WHERE id=?", (previous["room_id"],)).fetchone()
+            # Rebuild current facts, before any new-booking time/capacity/occupancy rules.
+            # Exiting the transaction commits even this read-only replay; no audit is emitted.
+            return {"booking": dto.booking_full(previous, room, now), "replayed": True}
         room = conn.execute("SELECT id,name,location,capacity FROM rooms WHERE id=?", (values["room_id"],)).fetchone()
         if room is None:
             raise DomainError("NOT_FOUND", "会议室不存在，请重新选择。")

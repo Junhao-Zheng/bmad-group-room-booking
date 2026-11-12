@@ -93,7 +93,7 @@ def create_booking_api():
     if request.mimetype != "application/json":
         raise DomainError("INVALID_INPUT", "请使用 JSON 格式提交预约。")
     result = services.create_booking(actor, payload())
-    return jsonify(ok=True, data=result), 201
+    return jsonify(ok=True, data=result), 200 if result["replayed"] else 201
 
 
 @bp.post("/api/login")

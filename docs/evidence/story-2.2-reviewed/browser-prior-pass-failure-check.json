@@ -1,0 +1,16 @@
+{
+  "result": "PASS",
+  "scenario": "real_occupied_port_failure_after_existing_pass",
+  "previous_run_id": "55b83173121bc5a253476d14059acfce",
+  "current_run_id": "be54072aee6bf6666e4a8e865e49a1d4",
+  "previous_result": "PASS",
+  "current_result": "INCOMPLETE",
+  "returncode": 1,
+  "error_type": "OSError",
+  "previous_artifact_sha256": "56da965b91bfa59826db1b6c747a740cc8aa0c9021ef7f55c8e8e1b1b10da142",
+  "prior_artifact_preserved": true,
+  "new_artifacts_isolated": true,
+  "stderr_empty": true,
+  "started_at_utc": "2026-11-12T09:53:40.971475+00:00",
+  "finished_at_utc": "2026-11-12T09:53:41.074965+00:00"
+}
