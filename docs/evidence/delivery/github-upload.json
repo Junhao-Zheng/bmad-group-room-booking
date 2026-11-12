@@ -1,0 +1,13 @@
+{
+  "verified_at_utc": "2026-11-12T16:01:25.639008+00:00",
+  "repository": "https://github.com/Junhao-Zheng/bmad-group-room-booking",
+  "private": true,
+  "main_commit": "0906104427866e0fd0985221c2112bf68aa83d49",
+  "remote_main_matches_local": true,
+  "tags": {
+    "sprint-1": "1ac9921859d72f526f431434e5624d0a5ba35e1b",
+    "sprint-2": "0906104427866e0fd0985221c2112bf68aa83d49"
+  },
+  "root_contents_verified": true,
+  "note": "实际GitHub API及git ls-remote核对；此记录加入后会产生一个仅文档提交，最终HEAD另由交付时核对。"
+}

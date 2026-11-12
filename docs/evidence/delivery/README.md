@@ -7,3 +7,5 @@
 [课程静态核对](delivery-final-audit.json)、[文本凭证模式扫描](evidence-secrets-final.json)、[Git历史核对](git-history-audit.json)分别注明检查时的提交/范围。后续仅文档和交付记录更新；产品、测试、锁文件不变。
 
 视频和演示按用户最新要求暂缓。人工决策/本人资料与修补后独立复核缺口见课程核对，不因上传而自动通过。
+
+[GitHub上传与标签核对](github-upload.json)已完成，仓库为私有。新副本验收提交与上传提交的产品/测试/依赖相同，见[源码连续性](final-source-continuity.json)。
