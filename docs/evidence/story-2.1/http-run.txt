@@ -1,0 +1,24 @@
+WARNING:waitress.queue:Task queue depth is 1
+WARNING:waitress.queue:Task queue depth is 2
+WARNING:waitress.queue:Task queue depth is 3
+WARNING:waitress.queue:Task queue depth is 4
+WARNING:waitress.queue:Task queue depth is 5
+WARNING:waitress.queue:Task queue depth is 6
+WARNING:waitress.queue:Task queue depth is 7
+WARNING:waitress.queue:Task queue depth is 8
+WARNING:waitress.queue:Task queue depth is 9
+WARNING:waitress.queue:Task queue depth is 10
+ERROR:booking_app:request_id=78b5e8a54fe04dd68e2e9df598971f17 action=web.create_booking_api error_type=RuntimeError
+{
+  "result": "PASS",
+  "completed": true,
+  "concurrent_requests": 20,
+  "successes": 1,
+  "occupancy_conflicts": 19,
+  "race_records": 1,
+  "race_slots": 4,
+  "race_creation_audits": 1,
+  "audit_failure_rollback": true,
+  "failed_key_reusable": true,
+  "restart_preserves_business": true
+}

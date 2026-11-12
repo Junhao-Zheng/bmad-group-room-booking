@@ -12,6 +12,7 @@ from .domain import DomainError
 bp = Blueprint("web", __name__)
 STATUS = {"INVALID_INPUT": 400, "AUTH_REQUIRED": 401, "INVALID_CREDENTIALS": 401,
           "FORBIDDEN": 403, "CSRF_REJECTED": 403, "NOT_FOUND": 404,
+          "OCCUPANCY_CONFLICT": 409, "CAPACITY_CONFLICT": 409, "IDEMPOTENCY_MISMATCH": 409,
           "STORE_BUSY": 503, "INTERNAL_ERROR": 500}
 
 
@@ -84,6 +85,15 @@ def availability_api():
 @bp.get("/api/me")
 def me():
     return jsonify(ok=True, data=auth.current_user(auth.require_session(token())))
+
+
+@bp.post("/api/bookings")
+def create_booking_api():
+    actor = auth.actor_for_token(token())
+    if request.mimetype != "application/json":
+        raise DomainError("INVALID_INPUT", "请使用 JSON 格式提交预约。")
+    result = services.create_booking(actor, payload())
+    return jsonify(ok=True, data=result), 201
 
 
 @bp.post("/api/login")

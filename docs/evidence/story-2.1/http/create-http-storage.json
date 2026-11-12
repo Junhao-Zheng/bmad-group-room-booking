@@ -1,0 +1,60 @@
+{
+  "reservations": [
+    {
+      "id": 1,
+      "kind": "booking",
+      "room_id": 1,
+      "user_id": 1,
+      "title": "合成并发活动 🧪",
+      "purpose": "仅用于测试",
+      "attendees": 10,
+      "reason": null,
+      "start_at": 1794456000,
+      "end_at": 1794463200,
+      "intent_key": "independent-intent-000",
+      "request_payload": "{\"attendees\":10,\"end_at\":1794463200,\"purpose\":\"仅用于测试\",\"room_id\":1,\"start_at\":1794456000,\"title\":\"合成并发活动 🧪\"}",
+      "created_at": 1794448800,
+      "cancelled_at": null,
+      "cancelled_by": null,
+      "cancel_reason": null
+    }
+  ],
+  "slots": [
+    {
+      "room_id": 1,
+      "slot_start": 1794456000,
+      "reservation_id": 1
+    },
+    {
+      "room_id": 1,
+      "slot_start": 1794457800,
+      "reservation_id": 1
+    },
+    {
+      "room_id": 1,
+      "slot_start": 1794459600,
+      "reservation_id": 1
+    },
+    {
+      "room_id": 1,
+      "slot_start": 1794461400,
+      "reservation_id": 1
+    }
+  ],
+  "audit_events": [
+    {
+      "id": 1,
+      "actor_id": 1,
+      "actor_display_name": "合成成员 00",
+      "action": "booking.created",
+      "target_type": "booking",
+      "target_id": 1,
+      "occurred_at": 1794448800,
+      "before_json": null,
+      "after_json": "{\"attendees\":10,\"cancel_reason\":null,\"cancelled_at\":null,\"cancelled_by_id\":null,\"created_at\":1794448800,\"end_at\":1794463200,\"id\":1,\"owner_id\":1,\"purpose\":\"仅用于测试\",\"room_id\":1,\"start_at\":1794456000,\"title\":\"合成并发活动 🧪\"}",
+      "reason": null
+    }
+  ],
+  "integrity_check": "ok",
+  "foreign_key_check": "ok"
+}

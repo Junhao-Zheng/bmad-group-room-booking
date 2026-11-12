@@ -1,0 +1,26 @@
+✔ stalled response headers aborts at 20 seconds and restores manual controls (2.873167ms)
+✔ stalled response body aborts at 20 seconds and restores manual controls (0.853ms)
+✔ availability stalled response headers aborts at 20 seconds, retains input, permits manual retry (3.406042ms)
+✔ availability stalled response body aborts at 20 seconds, retains input, permits manual retry (1.125625ms)
+✔ availability network failure restores controls without discarding conditions (0.656125ms)
+✔ availability bad JSON restores controls without discarding conditions (1.125958ms)
+✔ availability field errors focus enabled input; success clears errors and safely renders literal room text (0.722583ms)
+✔ availability expired session gives a login link, preserves input and hides old results (0.499791ms)
+✔ selected query creates 32-byte intent; pending disables controls and success is plain text (2.184291ms)
+✔ field validation focuses restored control; conflicts and internal failure preserve content and key (1.158333ms)
+✔ unknown network and malformed response lock repeat submission without claiming failure (1.400875ms)
+✔ 20-second timeout covers stalled response body and does not resend (2.149709ms)
+✔ session loss shows relogin and never automatically submits again (0.5115ms)
+✔ schedule stalled response headers aborts at 20 seconds and can be queried again (3.495042ms)
+✔ schedule stalled response body aborts at 20 seconds and can be queried again (0.964083ms)
+✔ schedule network failure preserves conditions, restores controls, and permits retry (0.624042ms)
+✔ schedule bad JSON preserves conditions, restores controls, and permits retry (0.539167ms)
+✔ pending conditions cannot be edited and a field error focuses the restored original input (1.089959ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 61.350292

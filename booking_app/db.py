@@ -15,6 +15,8 @@ REQUIRED_COLUMNS = {
                      "reason", "start_at", "end_at", "intent_key", "request_payload", "created_at",
                      "cancelled_at", "cancelled_by", "cancel_reason"},
     "occupancy_slots": {"room_id", "slot_start", "reservation_id"},
+    "audit_events": {"id", "actor_id", "actor_display_name", "action", "target_type", "target_id",
+                     "occurred_at", "before_json", "after_json", "reason"},
 }
 
 

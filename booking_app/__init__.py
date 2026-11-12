@@ -12,6 +12,7 @@ from werkzeug.security import generate_password_hash
 
 from . import db
 from .domain import SystemClock
+from .audit import audit_writer
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -55,6 +56,7 @@ def create_app(test_config=None) -> Flask:
     app.config.from_mapping(
         DATABASE=default_database(),
         CLOCK=SystemClock(),
+        AUDIT_WRITER=audit_writer,
         APP_ORIGIN=os.environ.get("APP_ORIGIN", "http://127.0.0.1:8000"),
         TRUSTED_HOSTS=os.environ.get("TRUSTED_HOSTS", "127.0.0.1,localhost").split(","),
         SESSION_COOKIE_SECURE=os.environ.get("COOKIE_SECURE", "false").lower() == "true",

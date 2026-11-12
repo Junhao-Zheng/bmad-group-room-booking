@@ -77,3 +77,18 @@ CREATE TABLE IF NOT EXISTS occupancy_slots (
     FOREIGN KEY (reservation_id, room_id) REFERENCES reservations(id, room_id) ON DELETE RESTRICT
 );
 CREATE INDEX IF NOT EXISTS occupancy_slots_reservation ON occupancy_slots(reservation_id);
+
+CREATE TABLE IF NOT EXISTS audit_events (
+    id INTEGER PRIMARY KEY,
+    actor_id INTEGER NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+    actor_display_name TEXT NOT NULL CHECK (length(trim(actor_display_name)) > 0),
+    action TEXT NOT NULL CHECK (action IN ('room.created','room.updated','booking.created',
+        'booking.cancelled_by_member','booking.cancelled_by_admin','block.created','block.revoked')),
+    target_type TEXT NOT NULL CHECK (target_type IN ('room','booking','block')),
+    target_id INTEGER NOT NULL CHECK (typeof(target_id) = 'integer' AND target_id > 0),
+    occurred_at INTEGER NOT NULL CHECK (typeof(occurred_at) = 'integer'),
+    before_json TEXT CHECK (before_json IS NULL OR (json_valid(before_json) AND json_type(before_json) = 'object')),
+    after_json TEXT NOT NULL CHECK (json_valid(after_json) AND json_type(after_json) = 'object' AND after_json != '{}'),
+    reason TEXT CHECK (reason IS NULL OR length(trim(reason)) BETWEEN 1 AND 500)
+);
+CREATE INDEX IF NOT EXISTS audit_events_target_time ON audit_events(target_type, occurred_at, id);

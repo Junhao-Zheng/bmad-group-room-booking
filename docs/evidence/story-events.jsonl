@@ -13,3 +13,5 @@
 {"timestamp": "2026-11-12T06:04:22.181132+00:00", "epic": "epic-1", "from_status": "in-progress", "to": "done", "actor": "AI root", "basis": "all three story acceptance/reviews complete", "head": "5b059c577d95aad51ae2f108decbf2173c640fa7"}
 {"timestamp": "2026-11-12T06:14:53.033480+00:00", "story": "2-1-create-booking", "from": "backlog", "to": "ready-for-dev", "actor": "AI root", "head": "911e8c50a3346e853a4e177a80485b2bfb88e127", "post_done_rework": false}
 {"timestamp": "2026-11-12T06:14:53.105085+00:00", "story": "2-1-create-booking", "from": "ready-for-dev", "to": "in-progress", "actor": "AI root", "head": "85263cf6526ea9dab8c359aa59ae04cccc060a9e", "post_done_rework": false}
+{"timestamp": "2026-11-12T07:11:11.524691+00:00", "story": "2-1-create-booking", "from": "in-progress", "to": "review", "actor": "AI root", "head": "b27e57659d4c5063bc7d25caee667d5b5e768a82", "post_done_rework": false}
+{"timestamp": "2026-11-12T09:24:26.319204+00:00", "story": "2-1-create-booking", "from": "review", "to": "done", "actor": "AI root", "head": "b27e57659d4c5063bc7d25caee667d5b5e768a82", "post_done_rework": false}

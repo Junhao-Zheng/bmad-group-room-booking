@@ -163,6 +163,49 @@ def positive_integer(value, field_name: str = "attendees") -> int:
     return value
 
 
+def normalized_text(value, field_name: str, limit: int) -> str:
+    if isinstance(value, str):
+        value = value.strip()
+        try:
+            valid = 1 <= len(value) <= limit and "\x00" not in value
+            value.encode("utf-8")
+        except UnicodeEncodeError:
+            valid = False
+        if valid:
+            return value
+    raise DomainError("INVALID_INPUT", "请检查活动内容。", {
+        field_name: f"请输入 1—{limit} 个有效字符，不含空字符。",
+    })
+
+
+def normalize_booking_payload(payload) -> tuple[dict, str]:
+    """Static normalization only; current time/capacity require the write snapshot."""
+    import re
+
+    if not isinstance(payload, dict):
+        raise DomainError("INVALID_INPUT", "请求内容必须是一个对象。")
+    fields, normalized = {}, {}
+    validators = {
+        "room_id": lambda value: resource_id(value) if type(value) is int else resource_id(None),
+        "title": lambda value: normalized_text(value, "title", 80),
+        "purpose": lambda value: normalized_text(value, "purpose", 500),
+        "attendees": positive_integer,
+        "start": lambda value: beijing_datetime(value, "start"),
+        "end": lambda value: beijing_datetime(value, "end"),
+    }
+    for name, validate in validators.items():
+        try:
+            normalized[name + "_at" if name in ("start", "end") else name] = validate(payload.get(name))
+        except DomainError as error:
+            fields.update(error.fields)
+    key = payload.get("intent_key")
+    if not isinstance(key, str) or not re.fullmatch(r"[A-Za-z0-9_-]{16,80}", key):
+        fields["intent_key"] = "提交标识无效，请重新选择会议室填写活动。"
+    if fields:
+        raise DomainError("INVALID_INPUT", "请检查预约信息。", fields)
+    return normalized, key
+
+
 def query_attendees(value) -> int:
     """Canonical URL integer, capped at 1001 (the no-matching-room sentinel).
 

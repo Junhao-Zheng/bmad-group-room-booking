@@ -71,3 +71,6 @@ select[aria-invalid="true"]{border:2px solid #a52b37}
 .availability-panel .button-primary{max-width:280px}
 #availability-conditions{font-size:16px;overflow-wrap:anywhere;margin:24px 0 0}
 @media(max-width:800px){.availability-fields{grid-template-columns:1fr;gap:8px}.availability-panel .button-primary{max-width:none}}
+.booking-panel{margin-bottom:24px;overflow-wrap:anywhere}.booking-select{margin-top:12px}
+textarea{font:inherit;width:100%;max-width:100%;min-width:0;resize:vertical;padding:12px;border:1px solid #91a5ae;border-radius:8px;color:#183343;background:white}
+textarea[aria-invalid="true"]{border:2px solid #a52b37}

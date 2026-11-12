@@ -40,6 +40,30 @@
     <ul id="availability-items" class="room-list"></ul>
   </div>
 </section>
+<section id="booking-panel" class="card booking-panel" aria-labelledby="booking-title" hidden>
+  <p class="section-label">新建预约</p>
+  <h2 id="booking-title">填写活动信息</h2>
+  <p id="booking-conditions" class="notice"></p>
+  <p class="muted">时段与人数沿用所选查询结果。提交时会再次检查容量和占用。</p>
+  <form id="booking-form" action="{{ url_for('web.create_booking_api') }}" method="post" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ user.csrf_token }}">
+    <div class="form-field">
+      <label for="booking-name">活动名称</label>
+      <input id="booking-name" name="title" type="text" required aria-describedby="booking-title-hint booking-title-error">
+      <p id="booking-title-hint" class="field-hint">去除首尾空白后 1—80 个字符。</p>
+      <p id="booking-title-error" class="field-error"></p>
+    </div>
+    <div class="form-field">
+      <label for="booking-purpose">活动用途</label>
+      <textarea id="booking-purpose" name="purpose" rows="3" required aria-describedby="booking-purpose-hint booking-purpose-error"></textarea>
+      <p id="booking-purpose-hint" class="field-hint">去除首尾空白后 1—500 个字符，仅本人及管理员可见。</p>
+      <p id="booking-purpose-error" class="field-error"></p>
+    </div>
+    <button class="button-primary" type="submit" disabled>确认预约</button>
+  </form>
+  <p id="booking-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>
+  <a id="booking-relogin" class="relogin-link" href="{{ url_for('web.login_page') }}" hidden>重新登录</a>
+</section>
 <div class="schedule-layout">
   <section class="card room-directory" aria-labelledby="rooms-title">
     <p class="section-label">会议室目录</p>
@@ -88,4 +112,5 @@
 </div>
 <script src="{{ url_for('static', filename='schedule.js') }}" defer></script>
 <script src="{{ url_for('static', filename='availability.js') }}" defer></script>
+<script src="{{ url_for('static', filename='booking.js') }}" defer></script>
 {% endblock %}

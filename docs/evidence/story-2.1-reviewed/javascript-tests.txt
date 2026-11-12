@@ -1,0 +1,32 @@
+✔ stalled response headers aborts at 20 seconds and restores manual controls (6.04225ms)
+✔ stalled response body aborts at 20 seconds and restores manual controls (0.807583ms)
+✔ availability stalled response headers aborts at 20 seconds, retains input, permits manual retry (5.265834ms)
+✔ availability stalled response body aborts at 20 seconds, retains input, permits manual retry (1.717667ms)
+✔ availability network failure restores controls without discarding conditions (0.679875ms)
+✔ availability bad JSON restores controls without discarding conditions (1.673625ms)
+✔ availability field errors focus enabled input; success clears errors and safely renders literal room text (0.727291ms)
+✔ availability expired session gives a login link, preserves input and hides old results (0.541209ms)
+✔ each room selection has a distinct accessible name containing room and location (0.928583ms)
+✔ selected query creates 32-byte intent; pending disables controls and success is plain text (8.093834ms)
+✔ field validation focuses restored control; conflicts and internal failure preserve content and key (0.881833ms)
+✔ unknown network and malformed response lock repeat submission without claiming failure (1.592666ms)
+✔ 20-second timeout covers stalled response body and does not resend (2.255625ms)
+✔ session loss shows relogin and never automatically submits again (0.595917ms)
+✔ a query in progress blocks creation; after it settles creation restores all controls (0.814083ms)
+✔ creation in progress blocks queries; unknown result then permits queries without permitting another write (0.61925ms)
+✔ selecting a room after a field error resets feedback style and role (1.021375ms)
+✔ malformed success envelopes or displayed fields never claim success (7.184083ms)
+✔ unknown codes, inconsistent status, and malformed error envelopes are unknown outcomes (1.886292ms)
+✔ schedule stalled response headers aborts at 20 seconds and can be queried again (4.314625ms)
+✔ schedule stalled response body aborts at 20 seconds and can be queried again (1.209958ms)
+✔ schedule network failure preserves conditions, restores controls, and permits retry (0.76525ms)
+✔ schedule bad JSON preserves conditions, restores controls, and permits retry (1.047959ms)
+✔ pending conditions cannot be edited and a field error focuses the restored original input (1.761875ms)
+ℹ tests 24
+ℹ suites 0
+ℹ pass 24
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 89.971166

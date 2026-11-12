@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 
-function harness(initialFetch) {
+function harness(initialFetch, selectBookingRoom) {
   let activeElement, submitHandler, fetchImplementation = initialFetch, timerId = 0;
   const timers = new Map(), fetches = [];
   function node(id = '') {
@@ -20,6 +20,7 @@ function harness(initialFetch) {
       append(child) { this.children.push(child); },
       replaceChildren() { this.children = []; },
       focus() { if (!this.disabled) activeElement = this; },
+      addEventListener(event, handler) { this[event] = handler; },
     };
   }
   const inputs = Object.fromEntries(['start', 'end', 'attendees'].map(name => [name, node(name)]));
@@ -36,6 +37,7 @@ function harness(initialFetch) {
       getElementById: id => nodes[id], createElement: () => node(),
     },
     window: {
+      selectBookingRoom,
       setTimeout(callback, ms) { const id = ++timerId; timers.set(id, {callback, ms}); return id; },
       clearTimeout(id) { assert.equal(timers.delete(id), true); },
     },
@@ -145,4 +147,17 @@ test('availability expired session gives a login link, preserves input and hides
   assert.equal(ui.nodes['availability-relogin'].hidden, false);
   assert.equal(ui.activeElement, ui.nodes['availability-feedback']);
   assert.equal(ui.fetches.length, 2);
+});
+
+
+test('each room selection has a distinct accessible name containing room and location', async () => {
+  const rooms=[{id:1,name:'合成 A',location:'101',capacity:10},{id:2,name:'合成 A',location:'202',capacity:20}];
+  const selected=[];
+  const ui=harness(async()=>success(rooms),(room,query)=>selected.push({room,query}));
+  await ui.submit();
+  const buttons=ui.nodes['availability-items'].children.map(row=>row.children.at(-1));
+  assert.deepEqual(buttons.map(button=>button.getAttribute('aria-label')),
+    ['选择 合成 A（101）并填写活动','选择 合成 A（202）并填写活动']);
+  buttons[1].click();assert.equal(selected[0].room.id,2);
+  assert.equal(selected[0].query.start,'2026-11-12T12:00');
 });

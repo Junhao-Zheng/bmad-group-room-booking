@@ -1,0 +1,20 @@
+test_audit_failure_before_and_after_insert_rolls_back_and_key_reusable (tests.test_create_booking.CreateBookingTests.test_audit_failure_before_and_after_insert_rolls_back_and_key_reusable) ... ok
+test_authorization_csrf_origin_content_type_first (tests.test_create_booking.CreateBookingTests.test_authorization_csrf_origin_content_type_first) ... ok
+test_booking_and_block_overlap_privacy_adjacency_and_other_room (tests.test_create_booking.CreateBookingTests.test_booking_and_block_overlap_privacy_adjacency_and_other_room) ... ok
+test_cancelled_booking_and_revoked_block_release_slots_without_changing_history (tests.test_create_booking.CreateBookingTests.test_cancelled_booking_and_revoked_block_release_slots_without_changing_history) ... ok
+test_commit_failure_and_unrelated_integrity_error_are_safe_500 (tests.test_create_booking.CreateBookingTests.test_commit_failure_and_unrelated_integrity_error_are_safe_500) ... ok
+test_duplicate_key_is_controlled_409_and_user_scoped (tests.test_create_booking.CreateBookingTests.test_duplicate_key_is_controlled_409_and_user_scoped) ... ok
+test_exact_creation_dto_slots_normalized_payload_and_audit (tests.test_create_booking.CreateBookingTests.test_exact_creation_dto_slots_normalized_payload_and_audit) ... ok
+test_legacy_v1_initialization_preserves_history_and_requires_audit_columns (tests.test_create_booking.CreateBookingTests.test_legacy_v1_initialization_preserves_history_and_requires_audit_columns) ... ok
+test_missing_room_capacity_and_huge_counts_do_not_bind_or_serialize (tests.test_create_booking.CreateBookingTests.test_missing_room_capacity_and_huge_counts_do_not_bind_or_serialize) ... ok
+test_real_member_with_stale_admin_actor_gets_only_shared_conflict (tests.test_create_booking.CreateBookingTests.test_real_member_with_stale_admin_actor_gets_only_shared_conflict) ... ok
+test_service_refreshes_identity_and_one_clock_after_lock (tests.test_create_booking.CreateBookingTests.test_service_refreshes_identity_and_one_clock_after_lock) ... ok
+test_session_expiry_and_start_boundary_are_rechecked_after_lock (tests.test_create_booking.CreateBookingTests.test_session_expiry_and_start_boundary_are_rechecked_after_lock) ... ok
+test_slot_constraint_collision_rolls_back_every_part_of_creation (tests.test_create_booking.CreateBookingTests.test_slot_constraint_collision_rolls_back_every_part_of_creation) ... ok
+test_text_integer_and_intent_validation_no_mutation (tests.test_create_booking.CreateBookingTests.test_text_integer_and_intent_validation_no_mutation) ... ok
+test_window_edges_and_formats (tests.test_create_booking.CreateBookingTests.test_window_edges_and_formats) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 2.605s
+
+OK

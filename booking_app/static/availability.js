@@ -69,6 +69,15 @@
         addText(row, "h3", room.name);
         addText(row, "p", room.location);
         addText(row, "p", `可容纳 ${room.capacity} 人`);
+        if (window.selectBookingRoom) {
+          const select = document.createElement("button");
+          select.type = "button";
+          select.className = "button-secondary booking-select";
+          select.textContent = "选择并填写活动";
+          select.setAttribute("aria-label", `选择 ${room.name}（${room.location}）并填写活动`);
+          select.addEventListener("click", () => window.selectBookingRoom(room, query));
+          row.append(select);
+        }
         items.append(row);
       }
       results.hidden = false;
