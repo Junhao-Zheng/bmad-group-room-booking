@@ -1,0 +1,15 @@
+{
+  "compiled_at_utc": "2026-11-12T09:49:09.547977+00:00",
+  "compiler": "AI parent fallback after two child transport errors",
+  "method": "读取当前Epic/PRD/architecture/UX，逐项核对前次摘要并纳入文本格式澄清；未把复制文件的新mtime当作重新编译依据。",
+  "output": "_bmad-output/implementation-artifacts/epic-3-context.md",
+  "sha256": "0a51835b7a8e3bfc7f85f6eabc778fb360f5a0558278348a2485e05254db5e7f",
+  "input_sha256": {
+    "product-brief.md": "d0bcef8994752236780e40dc001c2e0aa571abe154e7ba199f9fdbcc083a8e3c",
+    "PRD.md": "b1f5bef73469288c55c66c3b5bd247ee845e143b734dcc88dbe3f4405169a6f8",
+    "architecture.md": "3ad93c682565b7f5c939e2f18232f7588400737b458a26d5d500cd0b978685cf",
+    "epics.md": "08d316c027a592afe35d739a5be929e1bfa38275429f42e7eeb6b408f2bd8e2b",
+    "ux-designs/course/DESIGN.md": "7bfdfbae3c2c250834cfe68f9bd94a8f36b8c0291a668b169bce842c6f2a8c44",
+    "ux-designs/course/EXPERIENCE.md": "27f1e1495e47727aadea3af8e9010b2398a8c9b35850c466dcf330906dfb074b"
+  }
+}
