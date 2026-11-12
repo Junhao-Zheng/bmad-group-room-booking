@@ -6,4 +6,3 @@
     "potential_consequence": "Previously confirmed block can submit using room details that may already have changed."
   }
 ]
-

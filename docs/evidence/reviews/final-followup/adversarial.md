@@ -27,4 +27,3 @@
   `trigger_condition`: An existing room is saved with completely unchanged values.
   `guard_snippet`: Dispatch the change event only when the saved room differs from the editing baseline, while still dispatching it for newly created rooms.
   `potential_consequence`: A successful no-op save incorrectly announces that room information changed, discards a valid block confirmation, and forces another directory request. A probe reproduced this with identical room values.
-

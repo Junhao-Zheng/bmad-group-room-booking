@@ -9,3 +9,5 @@
 视频和演示按用户最新要求暂缓。人工决策/本人资料缺口见课程核对，不因上传而自动通过。
 
 [GitHub上传与标签核对](github-upload.json)已完成，仓库为私有。当时新副本验收提交与当时上传提交的产品/测试/依赖相同，见[源码连续性](final-source-continuity.json)。
+
+2026-11-13独立复核修补已同步，[本轮上传与标签核对](../reviews/final-followup/github-upload.json)对应d38c5ad30a4b095a1fe7af258a17df7f379dda23。两个冲刺标签保持原位置；新前端及测试与旧新副本不相同，最终验证单独归档。

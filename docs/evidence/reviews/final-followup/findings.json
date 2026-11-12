@@ -59,4 +59,3 @@
     "evidence": "Searched errorShape, CAPACITY_CONFLICT, unsafe-number fixtures, and rooms.js references, then read the relevant handler and browser tests. tests/test_rooms_js.cjs:67 verifies ID 102 and 5 attendees; its malformed-response matrix at line 125 tests object IDs and malformed fields but no unsafe numeric conflict values. scripts/verify_room_management_browser.cjs:103 checks conflicts using IDs 102/201 and 5 attendees. The unsafe-ID tests at tests/test_rooms_js.cjs:149 exercise room-directory objects, not conflict records. Both the unchanged suite and the isolated mutation passed 376 tests with zero skips."
   }
 ]
-
