@@ -14,3 +14,4 @@
 {"recorded_at_utc": "2026-11-12T14:14:15.185051+00:00", "story": "2-5-admin-cancel", "accepted_commit": "79fdc6a665379f40ab2561c9f3f2e5aed7bb1577", "kind": "initial_acceptance"}
 {"recorded_at_utc": "2026-11-12T14:14:15.185257+00:00", "story": "3-3-revoke-block", "accepted_commit": "79fdc6a665379f40ab2561c9f3f2e5aed7bb1577", "kind": "initial_acceptance"}
 {"recorded_at_utc": "2026-11-12T14:14:15.185265+00:00", "story": "2-3-personal-history", "accepted_commit": "79fdc6a665379f40ab2561c9f3f2e5aed7bb1577", "kind": "post_done_rework_acceptance", "work_id": "history-timeout-fixture-startup-budget"}
+{"recorded_at_utc": "2026-11-12T15:03:00.118233+00:00", "story": "3-4-audit-and-restart", "accepted_commit": "82b4b567f27c788e062a7bc8310d0c660c69d666", "kind": "initial_acceptance"}

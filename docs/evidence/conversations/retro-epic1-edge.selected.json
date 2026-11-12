@@ -1,0 +1,16 @@
+{
+  "export_kind": "selected_visible_messages",
+  "source_export": "retro-epic1-edge.json",
+  "source_sha256": "1665309efcd95f241269da443d5ec84e9b1bb21ae1e016e25129c64f14300b79",
+  "prepared_at_utc": "2026-11-12T15:07:51.154046+00:00",
+  "scope": "从已取得导出中选取可见用户/助手消息；不含内部推理、工具日志或授权码。不声称完整平台记录；保留来源顺序，文件之间可能重叠。子代理初始指令未必由导出接口返回；不能据助手回复条数推定实现调用次数。",
+  "messages": [
+    {
+      "id": "msg_0ad2238a3cdbccb5016af595afac6087d0a6cc8aa394dd3b03",
+      "role": "assistant",
+      "text": "[\n  {\n    \"location\": \"booking_app/static/schedule.js:86-92\",\n    \"trigger_condition\": \"A keyboard-submitted schedule query completes successfully after an asynchronous network wait.\",\n    \"guard_snippet\": \"if (invalidInput) invalidInput.focus(); else if (succeeded) button.focus();\",\n    \"potential_consequence\": \"Keyboard focus remains on BODY after successful or empty results, losing the query position.\"\n  },\n  {\n    \"location\": \"scripts/verify_auth_browser.py:44-92\",\n    \"trigger_condition\": \"Reusing --output-dir when browser setup, execution, or report parsing fails.\",\n    \"guard_snippet\": \"(args.output_dir / 'browser-results.json').write_text('{\\\"result\\\":\\\"INCOMPLETE\\\"}')  # before setup\",\n    \"potential_consequence\": \"A failed rerun leaves the previous browser PASS report available as apparently current evidence.\"\n  }\n]",
+      "turn_id": "01a1cf4c-a3b0-79f2-8f2a-2b66f4073b0d"
+    }
+  ],
+  "redactions": 0
+}

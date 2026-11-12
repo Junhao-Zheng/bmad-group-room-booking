@@ -1,0 +1,34 @@
+{
+  "export_kind": "selected_visible_messages",
+  "source_export": "review-2-3-blind.json",
+  "source_sha256": "3118923a97884e0f35639705d47a23f2e577694b07855169c27e804f01e265b8",
+  "prepared_at_utc": "2026-11-12T15:07:51.155732+00:00",
+  "scope": "从已取得导出中选取可见用户/助手消息；不含内部推理、工具日志或授权码。不声称完整平台记录；保留来源顺序，文件之间可能重叠。子代理初始指令未必由导出接口返回；不能据助手回复条数推定实现调用次数。",
+  "messages": [
+    {
+      "id": "msg_041406154288768f016af59160df2087d08797c0959c6938cf",
+      "role": "assistant",
+      "text": "I’ll read the diff, calculate the finding floor, and review the changed behavior for omissions and defects.",
+      "turn_id": "01a1cf3f-c7eb-7ab3-a075-6c0d3f4dfc16"
+    },
+    {
+      "id": "msg_041406154288768f016af59190078487d08086f191bcc72da7",
+      "role": "assistant",
+      "text": "The main read paths enforce ownership and fresh session checks. I’m now checking edge cases in the browser state and whether the verification evidence actually proves the claims it makes.",
+      "turn_id": "01a1cf3f-c7eb-7ab3-a075-6c0d3f4dfc16"
+    },
+    {
+      "id": "msg_041406154288768f016af59216db0887d0a90cb4661a1b5361",
+      "role": "assistant",
+      "text": "I reproduced two browser edge cases: successful keyboard filtering leaves focus on the document body, and a detail request that detects an expired session clears the list but leaves its old “query successful” message. I also found several places where the tests report stronger coverage than their assertions establish.",
+      "turn_id": "01a1cf3f-c7eb-7ab3-a075-6c0d3f4dfc16"
+    },
+    {
+      "id": "msg_041406154288768f016af5924344d887d0a9316f44d46373a6",
+      "role": "assistant",
+      "text": "- Finding floor: 349,267 bytes ÷ 1,000 = 349.267 kB; N = min(floor(√349.267 + 1), 10) = min(19, 10) = **10**.\n\n- [history.js:52](/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/booking_app/static/history.js:52): JSON parsing loses precision for supported 64-bit booking IDs above `Number.MAX_SAFE_INTEGER`. For example, `9007199254740993` becomes `9007199254740992`, and clicking its detail button requests the wrong record. Preserve IDs losslessly and add a browser round-trip test with an existing large ID.\n\n- [history.js:125](/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/booking_app/static/history.js:125): A fresh detail response never updates its corresponding list row. Crossing a start/end boundary can therefore display “待开始” in the list and “进行中” or “已结束” in the detail simultaneously. Reconcile the row and active filter, or clearly identify the list as an earlier snapshot and provide refresh feedback.\n\n- [history.js:56](/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/booking_app/static/history.js:56): Session expiry discovered while opening details clears the records but leaves the list’s previous success message intact. I reproduced an empty list still saying “查询成功，共 1 条待开始预约。” Update both panels’ feedback when clearing authenticated data.\n\n- [history.js:105](/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/booking_app/static/history.js:105): Successful keyboard filtering does not restore focus after disabling the submit button. In Chrome, `document.activeElement` becomes `BODY`, leaving no focused control after completion. Restore focus to the initiating control or a meaningful results target, and verify this without programmatic `.focus()` shortcuts.\n\n- [test_personal_history.py:174](/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/tests/test_personal_history.py:174): The route-to-service expiry test advances the clock during the list request and never resets it before the detail request. The second request consequently fails at route authentication, so it does not test the detail service’s recheck. Reset the clock before each request and assert that each request reaches the injected service boundary.\n\n- [test_personal_history.py:212](/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/tests/test_personal_history.py:212): The database snapshot test performs its concurrent update during DTO conversion, after `fetchall()` has already materialized every selected value. It would still pass without transaction snapshot protection. Move the concurrent write between session verification and the reservation SELECT to exercise the claimed transaction guarantee.\n\n- [verify_history_browser.cjs:46](/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/scripts/verify_history_browser.cjs:46): Browser filtering checks only the rendered row count; IDs and statuses are checked through separate `context.request.get()` calls. Swapping the one-row “进行中” and “已结束” UI results could pass. Assert rendered IDs/status text and capture the actual page responses used to render them.\n\n- [test_personal_history.py:85](/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/tests/test_personal_history.py:85): The claimed exact DTO verification largely compares key sets and list/detail equality, although both endpoints share the same serializer. Incorrect timestamps, local-time conversion, attendee counts, or cancellation IDs could agree across endpoints and escape detection. Compare complete representative responses against independently specified expected values.\n\n- [verify_history_browser.py:54](/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/scripts/verify_history_browser.py:54): Timeout cleanup does not guarantee process termination. Killing the Node subprocess on timeout can leave Chromium descendants running, while `server.wait(timeout=10)` has no forced-kill fallback. Track and terminate the process trees, then verify termination before removing temporary resources.\n\n- [verify_history_browser.py:80](/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/scripts/verify_history_browser.py:80): The history-browser evidence records a run ID and timestamps but no source fingerprints for the application, browser driver, or fixtures. Its PASS result cannot independently establish which implementation was exercised. Record those hashes and the relevant runtime versions in each run’s metadata, as the HTTP regression evidence already does.",
+      "turn_id": "01a1cf3f-c7eb-7ab3-a075-6c0d3f4dfc16"
+    }
+  ],
+  "redactions": 0
+}

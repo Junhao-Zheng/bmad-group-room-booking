@@ -1,0 +1,34 @@
+{
+  "export_kind": "selected_visible_messages",
+  "source_export": "review_2_4_verification.json",
+  "source_sha256": "78bd3a9f6555fb7478d5fad59592f76492dd3517e1fc894ad20cf87b6d201ccd",
+  "prepared_at_utc": "2026-11-12T15:07:51.159278+00:00",
+  "scope": "从已取得导出中选取可见用户/助手消息；不含内部推理、工具日志或授权码。不声称完整平台记录；保留来源顺序，文件之间可能重叠。子代理初始指令未必由导出接口返回；不能据助手回复条数推定实现调用次数。",
+  "messages": [
+    {
+      "id": "msg_0844736ff042c203016af5a40b620887d0b2b0e13a24664955",
+      "role": "assistant",
+      "text": "### Post-cancellation refresh is unverified with an active status filter\n\n- **Changed surface:** Cancellation now refreshes the list using the selected status at [history.js:213](/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/booking_app/static/history.js:213).\n- **Impacted consumer or site:** The “待开始” filter on `/my`, defined at [my.html:19](/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/booking_app/templates/my.html:19).\n- **Existing test evidence:** `Regression gap`. The cancellation test at [test_history_js.cjs:190](/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/tests/test_history_js.cjs:190) leaves the filter empty and explicitly expects `/api/bookings/mine`. The browser cancellation scenario at [verify_member_cancel_browser.cjs:36](/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/scripts/verify_member_cancel_browser.cjs:36) also uses the default all-status list. Repository searches for the cancellation symbols, route, and `history.js` found no additional filtered-cancellation scenario.\n- **Missing verification:** Cancel while `status=pending`; assert the refresh requests that status, the cancelled item disappears from the filtered list, and its cancelled detail remains visible.\n- **Demonstration:** I replaced only the post-cancellation `const status = select.value` with `const status = \"\"` in memory. All 34 history-handler tests still passed. The browser scenario would likewise retain its existing default-filter behavior.\n- **Consequence:** A regression could populate a visibly “待开始” list with cancelled and other-status records after cancellation.\n- **Disposition:** `patch` — add a filtered-cancellation case to `tests/test_history_js.cjs`.\n\n### Session expiry during the post-cancellation refresh is unverified\n\n- **Changed surface:** The new follow-up read clears protected content when it returns `AUTH_REQUIRED` at [history.js:217](/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/booking_app/static/history.js:217).\n- **Impacted consumer or site:** `/my` after a successful cancellation, while awaiting its automatic list refresh.\n- **Existing test evidence:** `Regression gap`. The follow-up failure test at [test_history_js.cjs:227](/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/tests/test_history_js.cjs:227) injects a network `TypeError`. The session-loss test at line 234 fails the cancellation POST itself. The browser expiry scenario at [verify_member_cancel_browser.cjs:101](/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/scripts/verify_member_cancel_browser.cjs:101) also logs out before the POST. None of these tests exercises successful POST followed by unauthorized GET.\n- **Missing verification:** Return a valid cancelled DTO from the POST, then `AUTH_REQUIRED` from the refresh; assert protected list/detail content is cleared, cancellation controls are hidden, and login feedback appears.\n- **Demonstration:** I removed only the follow-up catch’s `expired(error, feedback)` call in memory. All 34 history-handler tests still passed because the existing unauthorized cases enter other catches.\n- **Consequence:** This regression would leave personal booking information visible after the refresh establishes that the session is invalid.\n- **Disposition:** `patch` — add a successful-cancellation/unauthorized-refresh case to `tests/test_history_js.cjs`.\n\n## Other findings\n\n- The new completeness check validates formatted strings rather than all original values. At [history.js:139](/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/booking_app/static/history.js:139), missing `attendees` becomes `\"undefined 人\"` before the type check at line 149; `room.capacity` has the same problem. An otherwise valid cancellation response missing `attendees` therefore replaces the preserved detail and announces success. I reproduced this without modifying repository files by changing the existing incomplete-response fixture to omit only `attendees`: its preservation assertion failed, showing `\"undefined 人\"` and the newly cancelled state. Validate these raw fields before formatting or replacing the existing detail.",
+      "turn_id": "01a1cf86-205e-7e83-9284-2230195fa580"
+    }
+  ],
+  "redactions": 0,
+  "turns_metadata": [
+    {
+      "id": "01a1cf86-205e-7e83-9284-2230195fa580",
+      "status": "completed",
+      "error_present": false,
+      "startedAt": 1794483036,
+      "completedAt": 1794483233,
+      "durationMs": 197734
+    }
+  ],
+  "thread_id": "01a1cf86-2053-7102-a868-c65e50b071ff",
+  "agent_path": "/root/review_2_4_verification",
+  "page": {
+    "order": "newest_first",
+    "limit": 10,
+    "nextCursor": null,
+    "hasMore": false
+  }
+}

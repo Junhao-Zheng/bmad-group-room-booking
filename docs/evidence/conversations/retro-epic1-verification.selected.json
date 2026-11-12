@@ -1,0 +1,16 @@
+{
+  "export_kind": "selected_visible_messages",
+  "source_export": "retro-epic1-verification.json",
+  "source_sha256": "d68b27bc9fe58a376e80148a47dd2686864f084066c90ba8223ca21f4a10fca8",
+  "prepared_at_utc": "2026-11-12T15:07:51.155342+00:00",
+  "scope": "从已取得导出中选取可见用户/助手消息；不含内部推理、工具日志或授权码。不声称完整平台记录；保留来源顺序，文件之间可能重叠。子代理初始指令未必由导出接口返回；不能据助手回复条数推定实现调用次数。",
+  "messages": [
+    {
+      "id": "msg_00aa09e61081d24c016af5968872fc87d097b1043bae9b668f",
+      "role": "assistant",
+      "text": "[\n  {\n    \"location\": \"/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/retro-epic1-snapshot/booking_app/dto.py:19\",\n    \"trigger_condition\": \"共享日程返回停用记录时，验证检查 reason 字段存在，却没有检查其值。\",\n    \"guard_snippet\": \"对已知停用夹具断言 record['reason'] == '合成维护 <检查设备>'，并检查对应页面显示该原因。\",\n    \"potential_consequence\": \"把 reason=row['reason'] 误写成 reason=row['title'] 会让全部停用原因变成 null，页面显示“原因：null”，现有检查仍可通过。在快照的临时副本中实施此变异后，66 项 Python 和 13 项 JavaScript 测试全部通过。\",\n    \"gap_shape\": \"regression-gap\",\n    \"consumer\": \"/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/retro-epic1-snapshot/booking_app/static/schedule.js:79 的共享停用原因展示。\",\n    \"evidence\": \"已全仓搜索 schedule_item、dto 导入和 reason 引用。/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/retro-epic1-snapshot/tests/test_room_schedule.py:124 的合同测试检查字段集合、状态、预约标题及时间，但没有停用原因值断言；同文件第 146 行比较的是同一服务的输出。/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/retro-epic1-snapshot/scripts/verify_auth_browser.cjs:87—107 检查数量、标题、预约人、状态、区间及字段集合，也未检查原因值。保存的浏览器 PASS 与截图不能补足这个自动验证缺口。\"\n  },\n  {\n    \"location\": \"/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/retro-epic1-snapshot/booking_app/static/availability.js:70\",\n    \"trigger_condition\": \"可用会议室 API 的地点和容量正确，但结果卡片将它们绑定到错误字段时，现有验证不会失败。\",\n    \"guard_snippet\": \"使用 id 与 capacity 不同的房间夹具，逐张断言结果卡片的地点和容量文本分别等于该房间的 location 与 capacity。\",\n    \"potential_consequence\": \"把地点改为 room.name、容量改为 room.id，会显示错误地点和人数容量。在快照临时副本中实施这两处变异，连同前述 reason 变异运行全量检查，66 项 Python 和 13 项 JavaScript 仍全部通过。正确的后端 DTO 断言无法保护这层页面绑定。\",\n    \"gap_shape\": \"regression-gap\",\n    \"consumer\": \"/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/retro-epic1-snapshot/booking_app/templates/home.html:40 的 #availability-items 查询结果。\",\n    \"evidence\": \"已全仓搜索 availability.js、availability-items、room.location 和 room.capacity。/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/retro-epic1-snapshot/tests/test_availability_js.cjs:124 提供了地点和容量不同于名称和 ID 的夹具，但第 130—134 行只断言条数、房间名、查询条件和提示。/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/retro-epic1-snapshot/scripts/verify_auth_browser.cjs:177—181 同样未断言地点或容量；其房间夹具位于 /Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/retro-epic1-snapshot/tests/schedule_fixtures.py:48—51，三个房间的 ID 恰好分别等于容量，进一步掩盖了容量字段误绑定。\"\n  }\n]",
+      "turn_id": "01a1cf51-30fc-7b93-8d31-ee3bdf44e673"
+    }
+  ],
+  "redactions": 0
+}

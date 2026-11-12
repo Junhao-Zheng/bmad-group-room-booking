@@ -1,0 +1,28 @@
+{
+  "export_kind": "selected_visible_messages",
+  "source_export": "review_3_4_edge.json",
+  "source_sha256": "a55ef0818c01ef0b894c836b8e27ca407b2c9f59a22f900e86102b66d4828931",
+  "prepared_at_utc": "2026-11-12T15:07:51.165505+00:00",
+  "scope": "从已取得导出中选取可见用户/助手消息；不含内部推理、工具日志或授权码。不声称完整平台记录；保留来源顺序，文件之间可能重叠。子代理初始指令未必由导出接口返回；不能据助手回复条数推定实现调用次数。",
+  "messages": [
+    {
+      "id": "msg_01edbf2754823df3016af5d04fb43c87d0a907c4ff1c63b37b",
+      "role": "assistant",
+      "text": "[\n  {\n    \"location\": \"scripts/backup_db.py:35-38\",\n    \"trigger_condition\": \"Destination sidecars already exist, including when a sidecar path is the source database.\",\n    \"guard_snippet\": \"if any(os.path.lexists(str(destination) + suffix) for suffix in ('-wal', '-shm', '-journal')): raise FileExistsError('Destination sidecar exists')\",\n    \"potential_consequence\": \"Failure cleanup deletes pre-existing files and can delete the source database itself.\"\n  },\n  {\n    \"location\": \"booking_app/dto.py:20-22\",\n    \"trigger_condition\": \"An update, cancellation, or revocation audit event has a null before snapshot.\",\n    \"guard_snippet\": \"if (before is None) != row['action'].endswith('.created'): raise ValueError('Invalid before snapshot')\",\n    \"potential_consequence\": \"Corrupted history returns success and displays missing prior evidence as a creation.\"\n  }\n]",
+      "turn_id": "01a1d031-fcce-7921-8a00-a1ecbf722f45"
+    }
+  ],
+  "redactions": 0,
+  "turns_metadata": [
+    {
+      "id": "01a1d031-fcce-7921-8a00-a1ecbf722f45",
+      "status": "completed",
+      "error_present": false,
+      "startedAt": 1794494299,
+      "completedAt": 1794494547,
+      "durationMs": 247952
+    }
+  ],
+  "thread_id": "01a1d031-fc97-7ad2-bfb3-8cb245db4257",
+  "agent_path": "/root/review_3_4_edge"
+}

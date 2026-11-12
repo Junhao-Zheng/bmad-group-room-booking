@@ -1,0 +1,34 @@
+{
+  "export_kind": "selected_visible_messages",
+  "source_export": "review_3_1_edge.json",
+  "source_sha256": "8b70ac36da2de4051fa3e8a84564d4022b397d2832458b293de79a6aa5e1de98",
+  "prepared_at_utc": "2026-11-12T15:07:51.161635+00:00",
+  "scope": "从已取得导出中选取可见用户/助手消息；不含内部推理、工具日志或授权码。不声称完整平台记录；保留来源顺序，文件之间可能重叠。子代理初始指令未必由导出接口返回；不能据助手回复条数推定实现调用次数。",
+  "messages": [
+    {
+      "id": "msg_03ccd944f5c128bd016af5ab6b252887d0a44be096b9d34097",
+      "role": "assistant",
+      "text": "[\n  {\n    \"location\": \"booking_app/static/rooms.js:37-44\",\n    \"trigger_condition\": \"Valid SQLite room IDs exceed JavaScript's safe integer range.\",\n    \"guard_snippet\": \"if (!Number.isSafeInteger(room.id)) throw new Error(\\\"Unsafe room ID\\\");\",\n    \"potential_consequence\": \"Rounding targets a different room or makes the selected room impossible to edit.\"\n  },\n  {\n    \"location\": \"booking_app/static/rooms.js:27-30\",\n    \"trigger_condition\": \"Stored name or location contains internal CR/LF accepted by normalize_room_payload.\",\n    \"guard_snippet\": \"if (room && /[\\\\r\\\\n]/.test(room.name + room.location)) return say(feedback, \\\"Use an editor that preserves line breaks\\\", true);\",\n    \"potential_consequence\": \"Selecting then saving silently strips newlines, changing fields the administrator did not edit.\"\n  },\n  {\n    \"location\": \"booking_app/static/rooms.js:108-110\",\n    \"trigger_condition\": \"An accepted error response contains non-array conflicts or rows missing timestamp strings.\",\n    \"guard_snippet\": \"if (!Array.isArray(body.error.conflicts) || body.error.conflicts.some(r => !r || typeof r.start_local !== \\\"string\\\" || typeof r.end_local !== \\\"string\\\")) throw new Error(\\\"Invalid response\\\");\",\n    \"potential_consequence\": \"The error handler throws, leaving incomplete conflict feedback instead of handling an unknown response.\"\n  }\n]",
+      "turn_id": "01a1cfa0-d1bf-71e0-b2a1-38ea65e88b56"
+    }
+  ],
+  "redactions": 0,
+  "turns_metadata": [
+    {
+      "id": "01a1cfa0-d1bf-71e0-b2a1-38ea65e88b56",
+      "status": "completed",
+      "error_present": false,
+      "startedAt": 1794484785,
+      "completedAt": 1794485104,
+      "durationMs": 319049
+    }
+  ],
+  "thread_id": "01a1cfa0-d1b4-7ed1-b798-27f4eb6e8f36",
+  "agent_path": "/root/review_3_1_edge",
+  "page": {
+    "order": "newest_first",
+    "limit": 10,
+    "nextCursor": null,
+    "hasMore": false
+  }
+}

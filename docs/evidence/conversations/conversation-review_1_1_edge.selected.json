@@ -1,0 +1,18 @@
+{
+  "export_kind": "selected_visible_messages",
+  "source_export": "conversation-review_1_1_edge.json",
+  "source_sha256": "ab78aea9a9825f392bbac1f845b7c54d6fc7bc2940ed45be41c12ce123bf9b80",
+  "prepared_at_utc": "2026-11-12T15:07:51.144937+00:00",
+  "scope": "从已取得导出中选取可见用户/助手消息；不含内部推理、工具日志或授权码。不声称完整平台记录；保留来源顺序，文件之间可能重叠。子代理初始指令未必由导出接口返回；不能据助手回复条数推定实现调用次数。",
+  "messages": [
+    {
+      "id": "msg_0b4e037ab9d11c0d016af5443b774487d09eee56ec5e29b968",
+      "role": "assistant",
+      "text": "[\n  {\n    \"location\": \"booking_app/auth.py:98-110\",\n    \"trigger_condition\": \"JSON username or password contains an unpaired Unicode surrogate.\",\n    \"guard_snippet\": \"if any(0xD800 <= ord(c) <= 0xDFFF for c in username + password): raise DomainError('INVALID_INPUT', 'Invalid Unicode')\",\n    \"potential_consequence\": \"Malformed credentials produce HTTP 500 instead of a validation error.\"\n  },\n  {\n    \"location\": \"scripts/init_demo.py:33-42\",\n    \"trigger_condition\": \"A configured username or password exceeds the application's 16 KiB request limit.\",\n    \"guard_snippet\": \"if len(username.encode('utf-8')) > 256 or len(password.encode('utf-8')) > 1024: raise ValueError('Credentials exceed supported limits')\",\n    \"potential_consequence\": \"Initialization succeeds, but the resulting account cannot log in.\"\n  },\n  {\n    \"location\": \"scripts/init_demo.py:70\",\n    \"trigger_condition\": \"The credentials JSON contains a top-level array, scalar, or null.\",\n    \"guard_snippet\": \"config = json.loads(args.credentials_file.read_text(encoding='utf-8')); if not isinstance(config, dict): raise ValueError('Configuration must be an object')\",\n    \"potential_consequence\": \"An uncaught TypeError prints a traceback instead of the CLI's controlled failure message.\"\n  },\n  {\n    \"location\": \"booking_app/__init__.py:47-54\",\n    \"trigger_condition\": \"APP_ORIGIN explicitly includes the scheme's default port, such as http://127.0.0.1:80.\",\n    \"guard_snippet\": \"if origin.port == {'http': 80, 'https': 443}[origin.scheme]: app.config['APP_ORIGIN'] = f'{origin.scheme}://{origin.hostname}'\",\n    \"potential_consequence\": \"Legitimate browser POSTs fail CSRF validation because browsers omit default ports from Origin.\"\n  },\n  {\n    \"location\": \"booking_app/static/auth.js:24-30\",\n    \"trigger_condition\": \"The authentication request or response body stalls without completing or rejecting.\",\n    \"guard_snippet\": \"signal: AbortSignal.timeout(20000)\",\n    \"potential_consequence\": \"The submit button remains disabled and the waiting message never resolves.\"\n  },\n  {\n    \"location\": \"scripts/verify_auth_http.py:113-115\",\n    \"trigger_condition\": \"The verification server does not exit within ten seconds after terminate().\",\n    \"guard_snippet\": \"try: server.wait(timeout=10)\\nexcept subprocess.TimeoutExpired: server.kill(); server.wait()\",\n    \"potential_consequence\": \"Cleanup raises TimeoutExpired and leaves the server process running.\"\n  }\n]",
+      "turn_id": "01a1ce0f-9ad6-7d31-bc25-bbc5b0c755c5"
+    }
+  ],
+  "redactions": 0,
+  "thread_id": "01a1ce0f-9acc-7f91-9357-102eab6a43de",
+  "agent_path": "/root/review_1_1_edge"
+}

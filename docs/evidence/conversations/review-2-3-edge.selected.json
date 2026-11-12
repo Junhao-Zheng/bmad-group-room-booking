@@ -1,0 +1,16 @@
+{
+  "export_kind": "selected_visible_messages",
+  "source_export": "review-2-3-edge.json",
+  "source_sha256": "99344d8bce9e2d6ad8fe4276f1dcd9b0a3425f0c8608259fef90d2360eac56a5",
+  "prepared_at_utc": "2026-11-12T15:07:51.156125+00:00",
+  "scope": "从已取得导出中选取可见用户/助手消息；不含内部推理、工具日志或授权码。不声称完整平台记录；保留来源顺序，文件之间可能重叠。子代理初始指令未必由导出接口返回；不能据助手回复条数推定实现调用次数。",
+  "messages": [
+    {
+      "id": "msg_017fa1d7b3a5d826016af59204059c87d0904093ddb9698b76",
+      "role": "assistant",
+      "text": "[{\"location\":\"booking_app/static/history.js:50-52\",\"trigger_condition\":\"A valid booking ID exceeds JavaScript's safe-integer range, such as 9007199254740993.\",\"guard_snippet\":\"const body = JSON.parse(await response.text(), (k,v,c) => /(^id$|_id$)/.test(k) && typeof v === 'number' ? c.source : v);\",\"potential_consequence\":\"The displayed ID is rounded; clicking details requests another booking or returns 404.\"}]",
+      "turn_id": "01a1cf3f-e8c1-75a1-8979-f2132afe3822"
+    }
+  ],
+  "redactions": 0
+}

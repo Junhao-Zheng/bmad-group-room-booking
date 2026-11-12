@@ -1,0 +1,34 @@
+{
+  "export_kind": "selected_visible_messages",
+  "source_export": "review_epic1_followup_edge.json",
+  "source_sha256": "2adf529f9768081a09bb00dea8d0b2b1bb7190509667bd1b0245127cfa8dd9df",
+  "prepared_at_utc": "2026-11-12T15:07:51.167111+00:00",
+  "scope": "从已取得导出中选取可见用户/助手消息；不含内部推理、工具日志或授权码。不声称完整平台记录；保留来源顺序，文件之间可能重叠。子代理初始指令未必由导出接口返回；不能据助手回复条数推定实现调用次数。",
+  "messages": [
+    {
+      "id": "msg_0d587f50530d0fae016af59b955e2c87d094ddd4c91486b311",
+      "role": "assistant",
+      "text": "[]",
+      "turn_id": "01a1cf65-b752-73c0-b80d-e4e6d2e811f3"
+    }
+  ],
+  "redactions": 0,
+  "turns_metadata": [
+    {
+      "id": "01a1cf65-b752-73c0-b80d-e4e6d2e811f3",
+      "status": "completed",
+      "error_present": false,
+      "startedAt": 1794480912,
+      "completedAt": 1794481046,
+      "durationMs": 133892
+    }
+  ],
+  "thread_id": "01a1cf65-b748-7731-a998-88d4ddd1b466",
+  "agent_path": "/root/review_epic1_followup_edge",
+  "page": {
+    "order": "newest_first",
+    "limit": 10,
+    "nextCursor": null,
+    "hasMore": false
+  }
+}

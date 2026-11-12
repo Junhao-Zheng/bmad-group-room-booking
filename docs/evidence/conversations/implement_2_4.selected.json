@@ -1,0 +1,35 @@
+{
+  "export_kind": "selected_visible_messages",
+  "source_export": "implement_2_4.json",
+  "source_sha256": "839796236ccb838e1ac058a0d1a2f38c79ebc7f6fb5c6e8adac314c7e8dc47dc",
+  "prepared_at_utc": "2026-11-12T15:07:51.149800+00:00",
+  "scope": "从已取得导出中选取可见用户/助手消息；不含内部推理、工具日志或授权码。不声称完整平台记录；保留来源顺序，文件之间可能重叠。子代理初始指令未必由导出接口返回；不能据助手回复条数推定实现调用次数。",
+  "messages": [],
+  "redactions": 0,
+  "turns_metadata": [
+    {
+      "id": "01a1cf73-ae0c-7c40-a183-160f2a729529",
+      "status": "failed",
+      "error_present": true,
+      "startedAt": 1794481827,
+      "completedAt": 1794481862,
+      "durationMs": 35461
+    },
+    {
+      "id": "01a1cf72-8365-7782-9b34-68fd5ca9fb69",
+      "status": "failed",
+      "error_present": true,
+      "startedAt": 1794481750,
+      "completedAt": 1794481819,
+      "durationMs": 68752
+    }
+  ],
+  "thread_id": "01a1cf72-8358-7480-9840-6a6d350cf20c",
+  "agent_path": "/root/implement_2_4",
+  "page": {
+    "order": "newest_first",
+    "limit": 10,
+    "nextCursor": null,
+    "hasMore": false
+  }
+}

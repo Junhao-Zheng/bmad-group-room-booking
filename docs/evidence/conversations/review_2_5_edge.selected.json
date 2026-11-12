@@ -1,0 +1,28 @@
+{
+  "export_kind": "selected_visible_messages",
+  "source_export": "review_2_5_edge.json",
+  "source_sha256": "da5995f49a07c83b21944d46c412809acc5d61ae8a1cff1e45def97525186061",
+  "prepared_at_utc": "2026-11-12T15:07:51.160281+00:00",
+  "scope": "从已取得导出中选取可见用户/助手消息；不含内部推理、工具日志或授权码。不声称完整平台记录；保留来源顺序，文件之间可能重叠。子代理初始指令未必由导出接口返回；不能据助手回复条数推定实现调用次数。",
+  "messages": [
+    {
+      "id": "msg_02e735d7b0f83eef016af5c294704887d0a7a57386dce427f3",
+      "role": "assistant",
+      "text": "[]",
+      "turn_id": "01a1cffe-01a3-7612-b493-3328ac93d692"
+    }
+  ],
+  "redactions": 0,
+  "turns_metadata": [
+    {
+      "id": "01a1cffe-01a3-7612-b493-3328ac93d692",
+      "status": "completed",
+      "error_present": false,
+      "startedAt": 1794490892,
+      "completedAt": 1794491029,
+      "durationMs": 136556
+    }
+  ],
+  "thread_id": "01a1cffe-019c-79d1-b0d4-356d797b1055",
+  "agent_path": "/root/review_2_5_edge"
+}

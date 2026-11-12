@@ -1,0 +1,34 @@
+{
+  "export_kind": "selected_visible_messages",
+  "source_export": "review_3_1_verification.json",
+  "source_sha256": "85397f434d35d7b2f0d0dc80c938f3c5dff53869fe683569d2cf343d29c49ef3",
+  "prepared_at_utc": "2026-11-12T15:07:51.162129+00:00",
+  "scope": "从已取得导出中选取可见用户/助手消息；不含内部推理、工具日志或授权码。不声称完整平台记录；保留来源顺序，文件之间可能重叠。子代理初始指令未必由导出接口返回；不能据助手回复条数推定实现调用次数。",
+  "messages": [
+    {
+      "id": "msg_0dee06e0178093fc016af5aae840f087d0b1f406761c026810",
+      "role": "assistant",
+      "text": "### Capacity-conflict tests do not verify the displayed time interval\n\n- **Changed surface:** `booking_app/static/rooms.js:110` renders each conflicting reservation’s Beijing start and end times.\n- **Impacted consumer or site:** The administrator’s capacity-conflict list, `booking_app/templates/admin.html:34`.\n- **Existing test evidence:** **Broken-verification gap.** `tests/test_rooms_js.cjs:60–64` supplies different start/end timestamps but only asserts reservation ID, attendance, “北京时间,” and status. `scripts/verify_room_management_browser.cjs:61–63` checks DTO keys and similarly checks attendance/timezone label/status, without checking either displayed timestamp. Repository searches for `rooms.js` and `room-conflicts` identified these as the executable UI checks; I re-read both.\n- **Missing verification:** Assert the rendered start and end values against distinct expected timestamps.\n- **Demonstration:** I substituted `row.start_local` for `row.end_local` in memory while loading the actual handler. All 17 room JavaScript tests still passed. The browser assertion also accepts this incorrect interval because it does not inspect the timestamp values.\n- **Consequence:** Administrators could see a conflicting booking with its start time repeated as its end time while verification remains green.\n- **Disposition:** `patch` — strengthen the existing conflict test with an exact interval assertion and check the displayed interval in the existing browser scenario.\n\n## Other findings\n\n- In `booking_app/static/rooms.js:127–129`, an expired session during manual directory refresh first triggers `sessionError`, which disables refresh and supplies re-login guidance, then overwrites that guidance with “请手动重试.” The equivalent successful-save refresh catch at lines 94–96 also asks the user to refresh after disabling that control. An executable harness probe confirmed the disabled refresh button and contradictory retry message; the re-login link remains visible. Preserve the authentication-specific guidance when handling these errors.",
+      "turn_id": "01a1cfa0-ecc4-7d60-8068-92ffa6f42621"
+    }
+  ],
+  "redactions": 0,
+  "turns_metadata": [
+    {
+      "id": "01a1cfa0-ecc4-7d60-8068-92ffa6f42621",
+      "status": "completed",
+      "error_present": false,
+      "startedAt": 1794484792,
+      "completedAt": 1794484979,
+      "durationMs": 187293
+    }
+  ],
+  "thread_id": "01a1cfa0-ecba-7d61-a7cb-ba82c1a9afd1",
+  "agent_path": "/root/review_3_1_verification",
+  "page": {
+    "order": "newest_first",
+    "limit": 10,
+    "nextCursor": null,
+    "hasMore": false
+  }
+}
