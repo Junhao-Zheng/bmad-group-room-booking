@@ -2,7 +2,7 @@
 title: '撤销尚未结束的停用'
 type: feature
 created: '2026-11-12'
-status: in-progress
+status: in-review
 route: dispatch
 baseline_commit: 39436f328eaf2b85d5bf72629e903db00ccc842b
 story_key: 3-3-revoke-block

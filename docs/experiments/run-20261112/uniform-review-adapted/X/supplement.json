@@ -1,0 +1,83 @@
+{
+  "protocol": "experiment-a-uniform-review-v1",
+  "group": "X",
+  "started_at_utc": "2026-11-12T13:30:55.756000+00:00",
+  "completed_at_utc": "2026-11-12T13:30:58.521162+00:00",
+  "runner_sha256": "a03a339e841878dc985b0e177c8cb693d775f38d966fc0c0fb97cbdd30ca96cf",
+  "tests_run": 17,
+  "result": "PASS",
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "checks": [
+    {
+      "test": "__main__.UniformChecks.test_A1_anonymous",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A1_demoted_and_forged_actor_service",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A1_expired",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A1_logged_out",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A1_member_before_bad_id_reason",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A2_invalid_reasons_initial_and_repeat",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A2_length_one_and_500",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A2_strict_path_and_wrong_kind",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A3_first_exact_end",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A3_one_clock_after_write_lock",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A3_pending_in_progress_and_exact_end",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A4_repeat_other_admin_after_end_preserves_first",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A5_A7_exact_full_dto_history_and_slot_release",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A6_audit_before_after_insert_failures",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A6_commit_failure_rollback",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A6_same_connection_once_and_snapshots",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A7_origin_csrf_and_shape",
+      "result": "PASS"
+    }
+  ],
+  "scope": "A1–A7 executable supplement; does not replace UI, full snapshots/source review, real HTTP races or regression evidence."
+}

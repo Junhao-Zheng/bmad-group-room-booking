@@ -1,0 +1,946 @@
+diff --git a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-Y-baseline-g6n2x3lz/booking_app/domain.py b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/booking_app/domain.py
+index 3efeeb3..abe89c9 100644
+--- a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-Y-baseline-g6n2x3lz/booking_app/domain.py
++++ b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/booking_app/domain.py
+@@ -68,7 +68,7 @@ def resource_id(value, field_name: str = "room_id") -> int:
+     else:
+         valid = False
+     if not valid:
+-        label = "预约" if field_name == "booking_id" else "会议室"
++        label = {"booking_id": "预约", "block_id": "停用"}.get(field_name, "会议室")
+         raise DomainError("INVALID_INPUT", f"请检查{label}编号。",
+                           {field_name: f"请选择有效的{label}。"})
+     return int(value)
+@@ -260,6 +260,15 @@ def validate_block_window(start_at: int, end_at: int, now: int) -> None:
+         raise DomainError("INVALID_INPUT", "请检查停用起止时间。", fields)
+ 
+ 
++def normalize_revoke_payload(payload) -> str:
++    if not isinstance(payload, dict):
++        raise DomainError("INVALID_INPUT", "请求内容必须是一个对象。")
++    try:
++        return normalized_text(payload.get("reason"), "reason", 500)
++    except DomainError as error:
++        raise DomainError("INVALID_INPUT", "请检查撤销原因。", error.fields) from None
++
++
+ def query_attendees(value) -> int:
+     """Canonical URL integer, capped at 1001 (the no-matching-room sentinel).
+ 
+diff --git a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-Y-baseline-g6n2x3lz/booking_app/services.py b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/booking_app/services.py
+index 2afe598..40145b6 100644
+--- a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-Y-baseline-g6n2x3lz/booking_app/services.py
++++ b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/booking_app/services.py
+@@ -8,7 +8,7 @@ from flask import current_app
+ from . import auth, db, dto
+ from .domain import DomainError, auth_required, beijing_day, booking_interval, query_attendees, resource_id
+ from .domain import normalize_booking_payload, normalize_room_payload, validate_booking_window
+-from .domain import normalize_block_payload, validate_block_window
++from .domain import normalize_block_payload, normalize_revoke_payload, validate_block_window
+ 
+ 
+ def _require_actor(conn, actor: auth.Actor, now: int) -> auth.Actor:
+@@ -220,6 +220,38 @@ def _full_booking(row, now: int) -> dict:
+                                  "location": row["room_location"], "capacity": row["room_capacity"]}, now)
+ 
+ 
++def revoke_block(actor: auth.Actor, block_id, payload: dict) -> dict:
++    with db.write_transaction() as conn:
++        # BEGIN IMMEDIATE serializes competing transitions before time and identity checks.
++        now = current_app.config["CLOCK"].now_epoch()
++        actor = require_admin(_require_actor(conn, actor, now))
++        normalized_id = resource_id(block_id, "block_id")
++        reason = normalize_revoke_payload(payload)
++        row = conn.execute(_BOOKING_DETAIL_SELECT + "WHERE r.kind='block' AND r.id=?",
++                           (normalized_id,)).fetchone()
++        if row is None:
++            raise DomainError("NOT_FOUND", "停用记录不存在。")
++        room = {"id": row["room_id"], "name": row["room_name"],
++                "location": row["room_location"], "capacity": row["room_capacity"]}
++        # Valid replays preserve the first result, including after the original end.
++        if row["cancelled_at"] is not None:
++            return dto.block_full(row, room, now)
++        if now >= row["end_at"]:
++            raise DomainError("TRANSITION_CLOSED", "停用已结束，不能撤销。")
++        before = dto.block_snapshot(row)
++        conn.execute("UPDATE reservations SET cancelled_at=?,cancelled_by=?,cancel_reason=? WHERE id=?",
++                     (now, actor.id, reason, normalized_id))
++        conn.execute("DELETE FROM occupancy_slots WHERE reservation_id=?", (normalized_id,))
++        row = conn.execute(_BOOKING_DETAIL_SELECT + "WHERE r.id=?", (normalized_id,)).fetchone()
++        current_app.config["AUDIT_WRITER"](conn, {
++            "actor_id": actor.id, "actor_display_name": actor.display_name,
++            "action": "block.revoked", "target_type": "block", "target_id": normalized_id,
++            "occurred_at": now, "before": before, "after": dto.block_snapshot(row), "reason": reason,
++        })
++        result = dto.block_full(row, room, now)
++    return result
++
++
+ def member_cancel_booking(actor: auth.Actor, booking_id) -> dict:
+     with db.write_transaction() as conn:
+         now = current_app.config["CLOCK"].now_epoch()
+diff --git a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-Y-baseline-g6n2x3lz/booking_app/static/app.css b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/booking_app/static/app.css
+index 0a6ba5e..7065cef 100644
+--- a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-Y-baseline-g6n2x3lz/booking_app/static/app.css
++++ b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/booking_app/static/app.css
+@@ -91,3 +91,6 @@ textarea[aria-invalid="true"]{border:2px solid #a52b37}
+ #block-confirm{width:20px;height:20px;min-height:20px;flex:0 0 20px;margin-top:3px;padding:0;accent-color:#126d65}
+ 
+ #block-fields{border:0;padding:0;margin:0;min-width:0}
++.revoke-panel{margin-top:28px;padding-top:24px;border-top:1px solid #dde6e8}
++#revoke-summary{white-space:pre-wrap;overflow-wrap:anywhere}
++#revoke-confirm{width:20px;height:20px;min-height:20px;flex:0 0 20px;margin-top:3px;padding:0;accent-color:#126d65}
+diff --git a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-Y-baseline-g6n2x3lz/booking_app/static/blocks.js b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/booking_app/static/blocks.js
+index d016e33..dea5362 100644
+--- a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-Y-baseline-g6n2x3lz/booking_app/static/blocks.js
++++ b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/booking_app/static/blocks.js
+@@ -7,7 +7,10 @@
+   const submit = find("block-submit"), confirm = find("block-confirm"), feedback = find("block-feedback");
+   const conflicts = find("block-conflicts"), relogin = find("block-relogin"), refresh = find("block-rooms-refresh");
+   const statuses = {pending:"待开始", in_progress:"进行中", ended:"已结束", cancelled:"已取消", revoked:"已撤销"};
+-  let creating = false, refreshing = false, blocked = false, createdMessage = "";
++  let creating = false, refreshing = false, blocked = false, createdMessage = "", revokedMessage = "", revoking = false, selected = null;
++  const revokeForm = find("revoke-form"), revokeReason = find("revoke-reason"), revokeConfirm = find("revoke-confirm");
++  const revokeSubmit = find("revoke-submit"), revokeFeedback = find("revoke-feedback");
++  let selectButtons = [];
+   const lists = ["bookings", "blocks"].map(kind => ({kind, form:find(`admin-${kind}-form`),
+     items:find(`admin-${kind}-items`), feedback:find(`admin-${kind}-feedback`), busy:false, revision:0}));
+   const fields = list => ["room_id", "date", "status"].map(name => list.form.elements.namedItem(name));
+@@ -56,16 +59,23 @@
+     } finally { window.clearTimeout(timer); }
+   }
+   function controls() {
+-    [...inputs,confirm,submit].forEach(node => { node.disabled = blocked || creating || refreshing || lists.some(list => list.busy); });
+-    refresh.disabled = blocked || creating || refreshing || lists.some(list => list.busy);
++    const busy = creating || refreshing || revoking || lists.some(list => list.busy);
++    [...inputs,confirm,submit].forEach(node => { node.disabled = blocked || busy; });
++    refresh.disabled = blocked || busy;
++    [...selectButtons,revokeReason,revokeConfirm,revokeSubmit].forEach(node => {
++      node.disabled = blocked || busy || ([revokeReason,revokeConfirm,revokeSubmit].includes(node) && (!selected || selected.status === "revoked"));
++    });
++    if (revoking) revokeForm.setAttribute("aria-busy","true"); else revokeForm.removeAttribute("aria-busy");
+     if (creating) form.setAttribute("aria-busy","true"); else form.removeAttribute("aria-busy");
+     for (const list of lists) {
+-      [...fields(list), find(`admin-${list.kind}-submit`)].forEach(node => { node.disabled = blocked || list.busy || refreshing || creating; });
++      [...fields(list), find(`admin-${list.kind}-submit`)].forEach(node => { node.disabled = blocked || list.busy || refreshing || creating || revoking; });
+       if (list.busy) list.form.setAttribute("aria-busy","true"); else list.form.removeAttribute("aria-busy");
+     }
+   }
+   function identityError(error, broadcast = true) {
+-    if (["AUTH_REQUIRED","FORBIDDEN","CSRF_REJECTED"].includes(error.code)) relogin.hidden = false;
++    if (["AUTH_REQUIRED","FORBIDDEN","CSRF_REJECTED"].includes(error.code)) {
++      relogin.hidden = false; find("revoke-relogin").hidden = false;
++    }
+     if (!["AUTH_REQUIRED","FORBIDDEN"].includes(error.code)) return false;
+     const firstLoss = !blocked;
+     blocked = true; conflicts.replaceChildren();
+@@ -73,6 +83,9 @@
+     say(feedback, `${createdMessage}${message} 表单输入已保留，不会自动提交。`, true);
+     say(find("block-rooms-feedback"),message,true);
+     for (const list of lists) { list.items.replaceChildren(); say(list.feedback,message,true); }
++    selected = null; selectButtons = []; revokeConfirm.checked = false;
++    find("revoke-summary").textContent = "身份验证失效，请重新登录后查询停用记录。";
++    say(revokeFeedback,`${revokedMessage}${message} 撤销原因已保留，不会自动提交。`,true);
+     controls();
+     if (broadcast && firstLoss) document.dispatchEvent(new CustomEvent("admin-auth-lost", {detail:{code:error.code}}));
+     return true;
+@@ -90,6 +103,7 @@
+   const focusAllowed = owner => !document.activeElement || document.activeElement === document.body || owner.contains(document.activeElement);
+   function render(list, records) {
+     list.items.replaceChildren();
++    if (list.kind === "blocks") selectButtons = [];
+     for (const row of records) {
+       const booking = list.kind === "bookings", prefix = booking ? "cancelled" : "revoked";
+       const item = document.createElement("li"), title = document.createElement("h3"), detail = document.createElement("dl");
+@@ -104,7 +118,21 @@
+       for (const [label,value] of pairs) {
+         const dt = document.createElement("dt"), dd = document.createElement("dd"); dt.textContent = label; dd.textContent = value; detail.append(dt,dd);
+       }
+-      item.append(title,detail); list.items.append(item);
++      item.append(title,detail);
++      if (!booking && ["pending","in_progress"].includes(row.status) && Number.isSafeInteger(row.id)) {
++        const button = document.createElement("button"); button.type = "button"; button.className = "button-secondary";
++        button.textContent = `选择撤销停用 ${row.id}`;
++        button.addEventListener("click", () => {
++          if (blocked || creating || refreshing || revoking || lists.some(list => list.busy)) return;
++          if (selected?.id !== row.id) revokeReason.value = "";
++          selected = row; revokedMessage = ""; revokeConfirm.checked = false; revokeForm.hidden = false;
++          revokeReason.removeAttribute("aria-invalid"); find("revoke-reason-error").textContent = "";
++          find("revoke-panel").hidden = false; showSelected(); say(revokeFeedback,"");
++          controls(); find("revoke-title").focus();
++        });
++        item.append(button); selectButtons.push(button);
++      }
++      list.items.append(item);
+     }
+   }
+   async function load(list, automatic = false) {
+@@ -124,7 +152,7 @@
+       const lostIdentity = failure.serverError && identityError(failure.serverError);
+       if (!blocked && !lostIdentity && revision === list.revision) {
+         const error = failure.serverError;
+-        say(list.feedback,`${automatic ? "停用已创建，但列表刷新失败。" : "管理记录查询失败。"} ${error ? error.message : "请稍后手动查询。"} 筛选条件已保留。`,true);
++        say(list.feedback,`${automatic ? `${typeof automatic === "string" ? automatic : "停用已创建"}，但列表刷新失败。` : "管理记录查询失败。"} ${error ? error.message : "请稍后手动查询。"} 筛选条件已保留。`,true);
+         for (const input of fields(list)) if (error?.fields[input.name]) {
+           input.setAttribute("aria-invalid","true"); find(`admin-${list.kind}-${input.name}-error`).textContent = error.fields[input.name];
+           if (focusTarget === list.feedback) focusTarget = input;
+@@ -146,10 +174,10 @@
+     say(list.feedback,"筛选条件已更改，请重新查询记录。");
+   });
+   for (const list of lists) list.form.addEventListener("submit",event => {
+-    event.preventDefault(); if (!creating && !refreshing) return load(list);
++    event.preventDefault(); if (!creating && !refreshing && !revoking) return load(list);
+   });
+   form.addEventListener("submit", async event => {
+-    event.preventDefault(); if (creating || refreshing || blocked || lists.some(list => list.busy) || !confirm.checked) return;
++    event.preventDefault(); if (creating || refreshing || revoking || blocked || lists.some(list => list.busy) || !confirm.checked) return;
+     const values = {room_id:Number(inputs[0].value), start:inputs[1].value, end:inputs[2].value, reason:inputs[3].value};
+     const initiatedHere = form.contains(document.activeElement); let focusTarget = feedback;
+     for (const input of inputs) { input.removeAttribute("aria-invalid"); find(`block-${input.name}-error`).textContent = ""; }
+@@ -190,7 +218,7 @@
+     }
+   });
+   refresh.addEventListener("click", async () => {
+-    if (blocked || refreshing || creating || lists.some(list => list.busy)) return;
++    if (blocked || refreshing || creating || revoking || lists.some(list => list.busy)) return;
+     const initiatedHere = document.activeElement === refresh; refreshing = true; controls();
+     const output = find("block-rooms-feedback"); say(output,"正在刷新会议室选项…");
+     try {
+@@ -211,6 +239,45 @@
+       if (initiatedHere && (!document.activeElement || document.activeElement === document.body)) (blocked ? feedback : refresh).focus();
+     }
+   });
++  function showSelected() {
++    const row = selected;
++    find("revoke-summary").textContent = `停用 ${row.id} · ${statuses[row.status]}\n会议室：${row.room.name} · ${row.room.location}\n北京时间：${formatted(row.start_local)} 至 ${formatted(row.end_local)}\n原停用原因：${row.reason}` +
++      (row.status === "revoked" ? `\n首次撤销：${formatted(row.revoked_local)}（北京时间） · ${row.revoked_by_id} · ${row.revoked_by_display_name}\n撤销原因：${row.revoke_reason}` : "");
++  }
++  for (const event of ["input","change"]) revokeReason.addEventListener(event, () => {
++    revokeConfirm.checked = false; revokeReason.removeAttribute("aria-invalid"); find("revoke-reason-error").textContent = "";
++  });
++  revokeForm.addEventListener("submit", async event => {
++    event.preventDefault();
++    if (!selected || selected.status === "revoked" || !revokeConfirm.checked || blocked || creating || refreshing || revoking || lists.some(list => list.busy)) return;
++    const blockId = selected.id, initiatedHere = revokeForm.contains(document.activeElement);
++    let focusTarget = revokeFeedback;
++    revokeReason.removeAttribute("aria-invalid"); find("revoke-reason-error").textContent = "";
++    find("revoke-relogin").hidden = true; revoking = true; controls(); say(revokeFeedback,"正在撤销停用，请稍候…");
++    try {
++      const result = await request(`/api/admin/blocks/${blockId}/revoke`, {reason:revokeReason.value});
++      if (!recordShape(result,"blocks") || result.id !== blockId || result.status !== "revoked") throw new Error("Invalid revoked block");
++      if (blocked) return;
++      selected = result; revokeConfirm.checked = false; revokeForm.hidden = true; showSelected();
++      revokedMessage = `停用 ${result.id} 已撤销，全部占用已释放。`;
++      say(revokeFeedback,`${revokedMessage}首次撤销信息已显示。`);
++      await load(lists[1],"停用已撤销");
++    } catch (failure) {
++      const error = failure.serverError;
++      if (error && identityError(error)) return;
++      if (!blocked) {
++        revokeConfirm.checked = false;
++        say(revokeFeedback,error ? `${error.message} 撤销原因已保留，请核对后重新确认。` :
++          "未能确认撤销结果，撤销原因已保留。请查询记录核对；也可重新确认后重试，已撤销记录会返回首次结果。",true);
++        if (error?.fields.reason) {
++          revokeReason.setAttribute("aria-invalid","true"); find("revoke-reason-error").textContent = error.fields.reason; focusTarget = revokeReason;
++        }
++      }
++    } finally {
++      revoking = false; controls();
++      if (initiatedHere && focusAllowed(revokeForm)) focusTarget.focus();
++    }
++  });
+   controls();
+   find("block-script-unavailable").hidden = true;
+   find("block-fields").disabled = false;
+diff --git a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-Y-baseline-g6n2x3lz/booking_app/templates/admin.html b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/booking_app/templates/admin.html
+index 6193582..d5f0cbf 100644
+--- a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-Y-baseline-g6n2x3lz/booking_app/templates/admin.html
++++ b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/booking_app/templates/admin.html
+@@ -62,7 +62,7 @@
+ {% for kind, label, terminal, terminal_label in [('bookings','预约','cancelled','已取消'),('blocks','停用','revoked','已撤销')] %}
+ <section class="card admin-section" aria-labelledby="admin-{{ kind }}-title">
+   <h2 id="admin-{{ kind }}-title">完整{{ label }}记录</h2>
+-  <p class="muted">仅查看；按开始时间和编号升序。日期按北京时间相交筛选，留空显示全部。</p>
++  <p class="muted">{% if kind == 'blocks' %}待开始和进行中的停用可选择撤销。{% else %}仅查看；{% endif %}按开始时间和编号升序。日期按北京时间相交筛选，留空显示全部。</p>
+   <form id="admin-{{ kind }}-form">
+     <div class="availability-fields">
+       <div class="form-field"><label for="admin-{{ kind }}-room_id">会议室</label><select id="admin-{{ kind }}-room_id" name="room_id" aria-describedby="admin-{{ kind }}-room_id-error"><option value="">全部会议室</option>{% for room in rooms['items'] %}<option value="{{ room.id }}">{{ room.name }} · {{ room.location }}</option>{% endfor %}</select><p id="admin-{{ kind }}-room_id-error" class="field-error"></p></div>
+@@ -73,6 +73,20 @@
+   </form>
+   <p id="admin-{{ kind }}-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1">尚未查询{{ label }}记录，请选择条件后查询。</p>
+   <ul id="admin-{{ kind }}-items" class="history-items"></ul>
++  {% if kind == 'blocks' %}
++  <section id="revoke-panel" class="revoke-panel" aria-labelledby="revoke-title" hidden>
++    <h3 id="revoke-title" tabindex="-1">撤销选中的停用</h3>
++    <p id="revoke-summary" class="notice"></p>
++    <p class="muted">撤销会立即释放此停用的全部占用，保留原记录及历史；不会恢复已取消的预约。首次撤销必须早于停用结束时刻。</p>
++    <form id="revoke-form">
++      <div class="form-field"><label for="revoke-reason">撤销原因（去掉首尾空白后 1—500 字符）</label><textarea id="revoke-reason" name="reason" rows="3" required aria-describedby="revoke-reason-error"></textarea><p id="revoke-reason-error" class="field-error"></p></div>
++      <label class="room-confirm-label" for="revoke-confirm"><input id="revoke-confirm" type="checkbox" required>我已核对停用记录和撤销原因，确认释放全部占用</label>
++      <button id="revoke-submit" class="button-primary" type="submit">确认撤销停用</button>
++    </form>
++    <p id="revoke-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>
++    <a id="revoke-relogin" class="relogin-link" href="{{ url_for('web.login_page') }}" hidden>重新登录（不会自动提交）</a>
++  </section>
++  {% endif %}
+ </section>
+ {% endfor %}
+ {% endblock %}
+diff --git a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-Y-baseline-g6n2x3lz/booking_app/web.py b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/booking_app/web.py
+index 900bc17..18337eb 100644
+--- a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-Y-baseline-g6n2x3lz/booking_app/web.py
++++ b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/booking_app/web.py
+@@ -112,6 +112,14 @@ def admin_bookings_api():
+     return jsonify(ok=True, data=services.admin_bookings(actor, request.args.get("room_id"), request.args.get("date"), request.args.get("status")))
+ 
+ 
++@bp.post("/api/admin/blocks/<block_id>/revoke")
++def revoke_block_api(block_id):
++    actor = services.require_admin(auth.actor_for_token(token()))
++    if request.mimetype != "application/json":
++        raise DomainError("INVALID_INPUT", "请使用 JSON 格式提交撤销原因。")
++    return jsonify(ok=True, data=services.revoke_block(actor, block_id, payload()))
++
++
+ @bp.get("/api/admin/blocks")
+ def admin_blocks_api():
+     actor = services.require_admin(auth.actor_for_token(token()))
+diff --git a/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/scripts/verify_block_revoke_browser.cjs b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/scripts/verify_block_revoke_browser.cjs
+new file mode 100644
+index 0000000..1855732
+--- /dev/null
++++ b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/scripts/verify_block_revoke_browser.cjs
+@@ -0,0 +1,66 @@
++// Real browser interaction on isolated synthetic data; never emit credentials.
++const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
++const {chromium}=require('playwright');
++const [origin,credentialsFile,outputDir,executablePath]=process.argv.slice(2);
++const users=JSON.parse(fs.readFileSync(credentialsFile,'utf8')).users;
++const errorEnvelope=code=>({ok:false,error:{code,message:'合成错误',fields:{},conflicts:[]}});
++async function main(){
++  const browser=await chromium.launch({headless:true,executablePath});const results=[];
++  try{
++    for(const width of [1280,390]){
++      const context=await browser.newContext({viewport:{width,height:900}}),page=await context.newPage(),errors=[],network=[];
++      page.on('pageerror',e=>errors.push(e.name));let posts=0;
++      page.on('request',r=>{if(r.method()==='POST'&&r.url().endsWith('/revoke'))posts++;});
++      await page.goto(origin+'/login');await page.locator('#username').fill(users[2].username);await page.locator('#password').fill(users[2].password);
++      await page.locator('#password').press('Enter');await page.waitForURL(origin+'/');await page.goto(origin+'/admin');
++      async function settled(){await page.waitForFunction(()=>!document.querySelector('#revoke-form').hasAttribute('aria-busy'));}
++      async function query(){await page.locator('#admin-blocks-submit').click();await page.waitForFunction(()=>!document.querySelector('#admin-blocks-form').hasAttribute('aria-busy'));}
++      async function submit(){const wait=page.waitForResponse(r=>r.request().method()==='POST'&&r.url().endsWith('/revoke'));await page.locator('#revoke-submit').click();const response=await wait;const body=await response.json();network.push({path:new URL(response.url()).pathname,status:response.status(),body});await settled();return {status:response.status(),body};}
++      async function shot(name){assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await page.locator('#revoke-panel').screenshot({path:path.join(outputDir,`${name}-${width}.png`)});}
++      await query();assert.equal(await page.getByRole('button',{name:'选择撤销停用 101',exact:true}).count(),0);
++      assert.equal(await page.getByRole('button',{name:'选择撤销停用 110',exact:true}).count(),0);
++      const id=width===1280?113:112,unknownId=width===1280?114:115;
++      await page.getByRole('button',{name:`选择撤销停用 ${id}`,exact:true}).click();
++      assert.equal(await page.locator('#revoke-confirm').isChecked(),false);
++      assert.match(await page.locator('#revoke-summary').textContent(),/原停用原因：合成维护 <检查设备>/);
++      assert.equal(await page.locator('#revoke-summary img,#revoke-summary script').count(),0);
++      await page.locator('#revoke-reason').fill('   ');await page.locator('#revoke-submit').click();assert.equal(posts,0);
++      await page.locator('#revoke-confirm').check();const rejected=await submit();assert.equal(rejected.status,400);
++      assert.equal(await page.locator('#revoke-reason').inputValue(),'   ');assert.equal(await page.evaluate(()=>document.activeElement.id),'revoke-reason');await shot('validation-error');
++      const reason=`  <img src=x onerror="window.revokeXss=1">完成维护 ${width}  `;
++      await page.locator('#revoke-reason').fill(reason);await page.locator('#revoke-confirm').check();
++      await page.locator('#revoke-reason').fill(reason+'!');assert.equal(await page.locator('#revoke-confirm').isChecked(),false);await page.locator('#revoke-reason').fill(reason);
++      await page.route('**/api/admin/blocks/*/revoke',async route=>{const headers=route.request().headers();delete headers['x-csrf-token'];await route.continue({headers});});
++      await page.locator('#revoke-confirm').check();assert.equal((await submit()).status,403);assert.equal(await page.locator('#revoke-reason').inputValue(),reason);
++      assert.equal(await page.locator('#revoke-relogin').isVisible(),true);await page.unroute('**/api/admin/blocks/*/revoke');
++      let release;const gate=new Promise(resolve=>{release=resolve;});
++      await page.route('**/api/admin/blocks/*/revoke',async route=>{await gate;await route.continue();});
++      await page.locator('#revoke-confirm').check();const pending=submit();
++      await page.waitForFunction(()=>document.querySelector('#revoke-form').hasAttribute('aria-busy'));
++      assert.equal(await page.locator('#revoke-reason').isDisabled(),true);assert.equal(await page.locator('#block-submit').isDisabled(),true);
++      assert.equal(await page.locator('#admin-blocks-submit').isDisabled(),true);assert.match(await page.locator('#revoke-feedback').textContent(),/正在撤销/);await shot('waiting');
++      release();const success=await pending;assert.equal(success.status,200);assert.equal(success.body.data.status,'revoked');assert.equal(success.body.data.revoke_reason,reason.trim());
++      assert.equal(await page.locator('#revoke-form').isVisible(),false);assert.match(await page.locator('#revoke-summary').textContent(),/首次撤销：.*演示管理员/);
++      assert.equal(await page.locator('#revoke-summary img,#revoke-summary script').count(),0);assert.equal(await page.evaluate(()=>window.revokeXss),undefined);await shot('success');
++      await page.unroute('**/api/admin/blocks/*/revoke');
++      await page.getByRole('button',{name:`选择撤销停用 ${unknownId}`,exact:true}).click();await page.locator('#revoke-reason').fill('首次撤销原因');await page.locator('#revoke-confirm').check();
++      let committed;
++      await page.route('**/api/admin/blocks/*/revoke',async route=>{const response=await route.fetch();assert.equal(response.status(),200);committed=(await response.json()).data;await route.abort();});
++      const previousPosts=posts;await page.locator('#revoke-submit').click();
++      await page.waitForFunction(()=>document.querySelector('#revoke-feedback').textContent.includes('未能确认'));await settled();
++      assert.equal(await page.locator('#revoke-reason').inputValue(),'首次撤销原因');assert.equal(await page.locator('#revoke-confirm').isChecked(),false);assert.equal(posts,previousPosts+1);await shot('unknown-outcome');
++      await page.unroute('**/api/admin/blocks/*/revoke');await page.locator('#revoke-reason').fill('后续不同撤销原因');await page.locator('#revoke-confirm').check();
++      const repeated=await submit();assert.equal(repeated.status,200);assert.deepEqual(repeated.body.data,committed);assert.match(await page.locator('#revoke-summary').textContent(),/撤销原因：首次撤销原因/);
++      await page.getByRole('button',{name:'选择撤销停用 108',exact:true}).click();await page.locator('#revoke-reason').fill('失效身份仍保留草稿');await page.locator('#revoke-confirm').check();
++      const identity=(await (await context.request.get(origin+'/api/me')).json()).data;
++      assert.equal((await context.request.post(origin+'/api/logout',{data:{},headers:{Origin:origin,'X-CSRF-Token':identity.csrf_token}})).status(),200);
++      assert.equal((await submit()).status,401);assert.equal(await page.locator('#revoke-reason').inputValue(),'失效身份仍保留草稿');assert.equal(await page.locator('#revoke-submit').isDisabled(),true);
++      assert.equal(await page.locator('#admin-blocks-items > li').count(),0);await shot('expired-session');
++      assert.deepEqual(errors,[]);fs.writeFileSync(path.join(outputDir,`network-${width}.json`),JSON.stringify(network,null,2));
++      results.push({width,validation:true,confirmation:true,csrf:true,waiting:true,success:true,unknown_then_idempotent_retry:true,expired_session:true,safe_text:true,no_horizontal_overflow:true,page_errors:errors});
++      await context.close();
++    }
++  }finally{await browser.close();}
++  process.stdout.write(JSON.stringify({result:'PASS',viewports:results}));
++}
++main().catch(error=>{process.stderr.write(error.stack+'\n');process.exitCode=1;});
+diff --git a/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/scripts/verify_block_revoke_browser.py b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/scripts/verify_block_revoke_browser.py
+new file mode 100644
+index 0000000..bec1796
+--- /dev/null
++++ b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/scripts/verify_block_revoke_browser.py
+@@ -0,0 +1,57 @@
++"""Run desktop and mobile revocation interactions against a real local server."""
++import argparse
++import json
++import os
++from pathlib import Path
++import secrets
++import subprocess
++import tempfile
++
++from booking_app import ROOT, db
++from scripts.init_demo import DEMO_IDENTITIES, seed_users
++from scripts.verify_block_revoke_http import snapshot, source_hashes
++from scripts.verify_create_booking_http import BookingServer, FixedClock
++from scripts.verify_room_management_http import facts
++from tests.schedule_fixtures import insert_record, seed_schedule_fixture
++
++
++def main():
++    parser=argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--browser-executable',type=Path,default=Path('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'))
++    parser.add_argument('--output-dir',type=Path,default=ROOT/'work/block-revoke-browser')
++    args=parser.parse_args();args.output_dir.mkdir(parents=True,exist_ok=True)
++    target=args.output_dir/'browser-result.json'
++    target.write_text(json.dumps(dict(result='INCOMPLETE',completed=False)))
++    with tempfile.TemporaryDirectory(prefix='revoke-browser-',dir=ROOT/'work') as directory:
++        temporary=Path(directory);database=temporary/'test.sqlite3'
++        users=[dict(username=u,display_name=d,role=r,password=secrets.token_urlsafe(24)) for u,d,r in DEMO_IDENTITIES]
++        credentials=temporary/'credentials.json';credentials.touch(mode=0o600);credentials.write_text(json.dumps(dict(users=users)))
++        seed_users(database,users,FixedClock());seed_schedule_fixture(database)
++        with db.write_transaction(database) as conn:
++            for record,room,start,end in [(112,30,'09:00','11:00'),(113,20,'12:00','14:00'),(114,30,'12:00','13:00'),(115,20,'14:00','15:00')]:
++                insert_record(conn,record,room,'2026-11-12T'+start,'2026-11-12T'+end,kind='block')
++        before=facts(database);server=BookingServer(database)
++        try:
++            server.start()
++            process=subprocess.run(['node',str(ROOT/'scripts/verify_block_revoke_browser.cjs'),server.origin,str(credentials),str(args.output_dir),str(args.browser_executable)],
++                cwd=ROOT,env=dict(os.environ,NODE_PATH=str(ROOT/'work/browser-tools/node_modules')),capture_output=True,text=True,timeout=180)
++            if process.returncode:
++                print(process.stderr);raise RuntimeError('Browser verification failed')
++            result=json.loads(process.stdout);after=facts(database)
++            changed={112,113,114,115}
++            assert [r for r in before['reservations'] if r['id'] not in changed]==[r for r in after['reservations'] if r['id'] not in changed]
++            assert after['occupancy_slots']==[r for r in before['occupancy_slots'] if r['reservation_id'] not in changed]
++            assert len(after['audit_events'])==4
++            for row in after['reservations']:
++                if row['id'] not in changed: continue
++                assert row['cancelled_by']==3 and row['cancelled_at'] is not None
++                assert len([event for event in after['audit_events'] if event['target_id']==row['id'] and event['action']=='block.revoked'])==1
++            (args.output_dir/'database-facts.json').write_text(json.dumps(dict(before=before,after=after),ensure_ascii=False,indent=2))
++            report=result|dict(completed=True,storage_verified=True,revocations=4,revoke_audits=4,other_records_preserved=True,source_sha256=source_hashes())
++            target.write_text(json.dumps(report,ensure_ascii=False,indent=2));print(json.dumps(result|dict(storage_verified=True),ensure_ascii=False,indent=2))
++        finally:
++            server.stop()
++
++
++if __name__=='__main__':
++    main()
+diff --git a/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/scripts/verify_block_revoke_http.py b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/scripts/verify_block_revoke_http.py
+new file mode 100644
+index 0000000..842d883
+--- /dev/null
++++ b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/scripts/verify_block_revoke_http.py
+@@ -0,0 +1,171 @@
++"""Twenty real HTTP races between two independent administrator sessions."""
++import argparse
++from concurrent.futures import ThreadPoolExecutor, as_completed
++from datetime import datetime, timezone
++import hashlib
++import json
++import multiprocessing
++from pathlib import Path
++import secrets
++import tempfile
++import threading
++
++from booking_app import ROOT, create_app, db
++from booking_app.audit import audit_writer
++from scripts.init_demo import seed_users
++from scripts.verify_availability_performance import Client, Server, write_json
++from scripts.verify_create_booking_http import FixedClock
++from scripts.verify_room_management_http import facts
++from tests.maintenance_contract import BLOCK_KEYS, BLOCK_SNAPSHOT_KEYS
++from tests.schedule_fixtures import NOW
++
++
++def server_main(database, port, fault):
++    from waitress import serve
++    def writer(conn, event):
++        if fault == 'after': audit_writer(conn, event)
++        if fault: raise RuntimeError('injected audit failure')
++        audit_writer(conn, event)
++    app = create_app(dict(TESTING=True, DATABASE=database, CLOCK=FixedClock(), AUDIT_WRITER=writer,
++                          APP_ORIGIN=f'http://127.0.0.1:{port}', TRUSTED_HOSTS=['127.0.0.1']))
++    serve(app, host='127.0.0.1', port=port, threads=8)
++
++
++class RevokeServer(Server):
++    def __init__(self, database, fault=None):
++        super().__init__(database)
++        self.process = multiprocessing.get_context('spawn').Process(target=server_main, args=(str(database), self.port, fault))
++
++
++def snapshot(database):
++    value = facts(database)
++    with db.read_transaction(database) as conn:
++        value['observed_transitions'] = [dict(row) for row in conn.execute('SELECT * FROM observed_transitions ORDER BY id')]
++    for record in value['reservations']:
++        slots = sorted(row['slot_start'] for row in value['occupancy_slots'] if row['reservation_id'] == record['id'])
++        assert slots == ([] if record['cancelled_at'] is not None else list(range(record['start_at'], record['end_at'], 1800)))
++    return value
++
++
++def source_hashes():
++    paths = [path for path in (ROOT/'booking_app').rglob('*') if path.suffix in {'.py','.sql','.js','.css','.html'}]
++    paths += [ROOT/'scripts'/name for name in ('verify_block_revoke_http.py','verify_create_booking_http.py',
++              'verify_availability_performance.py','verify_room_management_http.py','init_demo.py')]
++    return {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sorted(paths)}
++
++
++def run(output):
++    steps = []
++    def request(client, phase, url, body):
++        status, result, duration = client.request(url, body)
++        steps.append(dict(phase=phase, path=url, http_status=status, response=result, duration_ms=duration))
++        write_json(output/'http-steps.json', steps)
++        return status, result
++    with tempfile.TemporaryDirectory(prefix='revoke-http-', dir=ROOT/'work') as directory:
++        database = Path(directory)/'test.sqlite3'
++        users = [dict(username=f'revoke_admin_{i}',display_name=f'合成撤销管理员 {i}',role='admin',password=secrets.token_urlsafe(24)) for i in (1,2)]
++        members = [dict(username=f'revoke_member_{i}',display_name=f'合成成员 {i}',role='member',password=secrets.token_urlsafe(24)) for i in (1,2)]
++        seed_users(database, users + members, FixedClock())
++        with db.write_transaction(database) as conn:
++            conn.execute("INSERT INTO rooms VALUES(1,'合成并发会议室','测试楼',20,?,?)", (NOW, NOW))
++            # Test-only observer detects actual null -> revoked transitions independently of audit counts.
++            conn.execute('CREATE TABLE observed_transitions(id INTEGER PRIMARY KEY,block_id INTEGER,actor_id INTEGER,at INTEGER,reason TEXT)')
++            conn.execute('CREATE TRIGGER observe_revoke AFTER UPDATE OF cancelled_at ON reservations '
++                         "WHEN OLD.kind='block' AND OLD.cancelled_at IS NULL AND NEW.cancelled_at IS NOT NULL "
++                         'BEGIN INSERT INTO observed_transitions(block_id,actor_id,at,reason) '
++                         'VALUES(NEW.id,NEW.cancelled_by,NEW.cancelled_at,NEW.cancel_reason); END')
++        server = RevokeServer(database); race_results = []
++        payload = dict(room_id=1,start='2026-11-13T12:00',end='2026-11-14T14:00',reason='原始停用原因 <维护>')
++        try:
++            server.start(); clients = [Client(server.origin), Client(server.origin)]
++            for client, user in zip(clients, users): client.login(user)
++            assert clients[0].jar is not clients[1].jar
++            assert {c.value for c in clients[0].jar}.isdisjoint({c.value for c in clients[1].jar})
++            identities = [client.request('/api/me')[1]['data']['id'] for client in clients]
++            assert identities == [1,2]
++            for index in range(20):
++                status, created = request(clients[0], 'create', '/api/admin/blocks', payload)
++                assert status == 201
++                block = created['data']; block_id = block['id']; url = f'/api/admin/blocks/{block_id}/revoke'
++                before = snapshot(database); barrier = threading.Barrier(2)
++                reasons = [f'第 {index+1} 轮 · 管理员 {i+1} 完成维护' for i in range(2)]
++                def compete(i):
++                    barrier.wait(timeout=30)
++                    status, response, duration = clients[i].request(url, {'reason': f' {reasons[i]} '})
++                    return dict(round=index+1, requester_id=identities[i], submitted_reason=reasons[i],
++                                http_status=status, response=response, duration_ms=duration)
++                with ThreadPoolExecutor(max_workers=2) as pool:
++                    futures = [pool.submit(compete, i) for i in range(2)]
++                    rows = [future.result() for future in as_completed(futures)]
++                final = snapshot(database)
++                write_json(output/f'round-{index+1:02}.json', dict(responses_in_completion_order=rows,before=before,after=final))
++                assert all(row['http_status']==200 for row in rows)
++                result = rows[0]['response']['data']
++                assert all(row['response']==dict(ok=True,data=result) for row in rows)
++                assert set(result)==BLOCK_KEYS and result['status']=='revoked'
++                winner = next(row for row in rows if row['requester_id']==result['revoked_by_id'])
++                assert result['revoke_reason']==winner['submitted_reason'] and result['revoked_at']==NOW
++                assert result['revoked_by_display_name']==users[result['revoked_by_id']-1]['display_name']
++                expected_record = next(row for row in before['reservations'] if row['id']==block_id) | dict(
++                    cancelled_at=result['revoked_at'],cancelled_by=result['revoked_by_id'],cancel_reason=result['revoke_reason'])
++                assert final['reservations']==[expected_record if row['id']==block_id else row for row in before['reservations']]
++                assert final['occupancy_slots']==[row for row in before['occupancy_slots'] if row['reservation_id']!=block_id]
++                changes = [row for row in final['observed_transitions'] if row['block_id']==block_id]
++                assert len(changes)==1 and changes[0]==dict(id=index+1,block_id=block_id,actor_id=result['revoked_by_id'],at=result['revoked_at'],reason=result['revoke_reason'])
++                events = [row for row in final['audit_events'] if row['target_type']=='block' and row['target_id']==block_id]
++                assert [row['action'] for row in events]==['block.created','block.revoked']
++                event = events[-1]; previous = json.loads(event['before_json']); after = json.loads(event['after_json'])
++                assert set(previous)==set(after)==BLOCK_SNAPSHOT_KEYS
++                assert previous==json.loads(events[0]['after_json'])
++                assert after==previous|dict(revoked_at=result['revoked_at'],revoked_by_id=result['revoked_by_id'],revoke_reason=result['revoke_reason'])
++                assert (event['actor_id'],event['occurred_at'],event['reason'])==(result['revoked_by_id'],result['revoked_at'],result['revoke_reason'])
++                assert len(final['audit_events'])==len(before['audit_events'])+1
++                assert request(clients[1], 'repeat', url, {'reason':'后续不同原因'})[1]['data']==result
++                assert snapshot(database)==final
++                race_results.append(dict(round=index+1,block_id=block_id,first_actor_id=result['revoked_by_id'],
++                    first_at=result['revoked_at'],first_reason=result['revoke_reason'],transitions=1,revoke_audits=1,http_200=2))
++            status, created = request(clients[0], 'fault_setup', '/api/admin/blocks', payload)
++            assert status==201; fault_url=f"/api/admin/blocks/{created['data']['id']}/revoke"
++            saved = snapshot(database)
++        finally:
++            server.stop()
++        for mode in ('before','after'):
++            server=RevokeServer(database, fault=mode)
++            try:
++                server.start(); client=Client(server.origin);client.login(users[1])
++                status, response=request(client, f'audit_fault_{mode}', fault_url, {'reason':'测试原子回滚'})
++                assert status==500 and response['error']['code']=='INTERNAL_ERROR'
++                assert snapshot(database)==saved
++                write_json(output/f'rollback-{mode}.json', snapshot(database))
++            finally:
++                server.stop()
++        server=RevokeServer(database)
++        try:
++            server.start();client=Client(server.origin);client.login(users[1])
++            assert snapshot(database)==saved
++            status,response=request(client,'retry_after_restart',fault_url,{'reason':'故障解除后成功'})
++            assert status==200 and response['data']['revoked_by_id']==2
++            final=snapshot(database);write_json(output/'final-database-facts.json',final)
++            assert len(final['observed_transitions'])==21
++        finally:
++            server.stop()
++    return dict(result='PASS',completed=True,rounds=20,independent_admin_sessions=2,concurrent_http_200=40,
++                actual_race_transitions=20,race_revoke_audits=20,first_metadata_verified=True,
++                rollback_before_and_after_audit_insert=True,restart_and_retry=True,round_results=race_results)
++
++
++def main():
++    parser=argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--output-dir',type=Path,default=ROOT/'work/block-revoke-http')
++    args=parser.parse_args();args.output_dir.mkdir(parents=True,exist_ok=True)
++    result_path=args.output_dir/'http-result.json'
++    meta=dict(started_at_utc=datetime.now(timezone.utc).isoformat(),source_sha256=source_hashes())
++    write_json(result_path,meta|dict(result='INCOMPLETE',completed=False))
++    report=run(args.output_dir)
++    assert source_hashes()==meta['source_sha256']
++    write_json(result_path,meta|report|dict(finished_at_utc=datetime.now(timezone.utc).isoformat()))
++    print(json.dumps({k:v for k,v in report.items() if k!='round_results'},ensure_ascii=False,indent=2))
++
++
++if __name__=='__main__':
++    main()
+diff --git a/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/tests/test_block_revoke.py b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/tests/test_block_revoke.py
+new file mode 100644
+index 0000000..61a2e06
+--- /dev/null
++++ b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/tests/test_block_revoke.py
+@@ -0,0 +1,239 @@
++"""Administrator block revocation: state, boundaries, authorization and atomicity."""
++from contextlib import contextmanager
++from dataclasses import replace
++import json
++from pathlib import Path
++import re
++import secrets
++import sqlite3
++import tempfile
++import unittest
++from unittest.mock import patch
++
++from booking_app import auth, create_app, db, services
++from booking_app.audit import audit_writer
++from booking_app.domain import DomainError, local_time
++from scripts.init_demo import DEMO_IDENTITIES, seed_users
++from tests.history_fixtures import FixedClock
++from tests.maintenance_contract import BLOCK_KEYS, BLOCK_SNAPSHOT_KEYS
++from tests.schedule_fixtures import NOW, assert_slot_integrity, insert_record, seed_schedule_fixture
++
++ORIGIN = 'http://127.0.0.1:8000'
++
++
++class BlockRevokeTests(unittest.TestCase):
++    @classmethod
++    def setUpClass(cls):
++        cls.directory = tempfile.TemporaryDirectory()
++        cls.fixture = Path(cls.directory.name) / 'fixture.sqlite3'
++        cls.password = secrets.token_urlsafe(24)
++        seed_users(cls.fixture, [dict(username=u, display_name=d, role=r, password=cls.password)
++                                for u, d, r in (*DEMO_IDENTITIES, ('second_admin', '第二管理员', 'admin'))], FixedClock())
++        seed_schedule_fixture(cls.fixture)
++        with db.write_transaction(cls.fixture) as conn:
++            insert_record(conn, 112, 30, '2026-11-12T09:00', '2026-11-12T11:00', kind='block')
++            insert_record(conn, 113, 20, '2026-11-12T12:00', '2026-11-13T12:00', kind='block')
++            insert_record(conn, 114, 20, '2026-11-12T12:00', '2026-11-12T13:00', cancelled=True)
++
++    @classmethod
++    def tearDownClass(cls):
++        cls.directory.cleanup()
++
++    def setUp(self):
++        temp = tempfile.TemporaryDirectory(); self.addCleanup(temp.cleanup)
++        self.database = Path(temp.name) / 'test.sqlite3'
++        source, target = db.connect(self.fixture), db.connect(self.database)
++        source.backup(target); source.close(); target.close()
++        self.clock = FixedClock()
++        self.app = create_app({'TESTING': True, 'DATABASE': str(self.database), 'CLOCK': self.clock})
++        self.client, self.identity = self.login('demo_admin')
++        self.addCleanup(assert_slot_integrity, self, self.database)
++
++    def login(self, username):
++        client = self.app.test_client()
++        page = client.get('/login', base_url=ORIGIN)
++        csrf = re.search(r'name="csrf_token" value="([^"]+)"', page.text).group(1)
++        response = client.post('/api/login', base_url=ORIGIN, headers={'Origin': ORIGIN, 'X-CSRF-Token': csrf},
++                               json=dict(username=username, password=self.password))
++        self.assertEqual(response.status_code, 200)
++        return client, response.json['data']
++
++    def revoke(self, block_id=113, values=None, client=None, identity=None):
++        return (client or self.client).post(f'/api/admin/blocks/{block_id}/revoke', base_url=ORIGIN,
++            headers={'Origin': ORIGIN, 'X-CSRF-Token': (identity or self.identity)['csrf_token']},
++            json={'reason': ' 维护完成 '} if values is None else values)
++
++    def facts(self):
++        with db.read_transaction(self.database) as conn:
++            return {table: [dict(row) for row in conn.execute(f'SELECT * FROM {table} ORDER BY 1')]
++                    for table in ('rooms', 'reservations', 'occupancy_slots', 'audit_events')}
++
++    def error(self, response, status, code):
++        self.assertEqual(response.status_code, status, response.text)
++        self.assertEqual(set(response.json), {'ok', 'error'})
++        self.assertFalse(response.json['ok'])
++        self.assertEqual(set(response.json['error']), {'code', 'message', 'fields', 'conflicts'})
++        self.assertEqual(response.json['error']['code'], code)
++        self.assertEqual(response.json['error']['conflicts'], [])
++
++    def test_pending_revoke_exact_details_first_metadata_and_atomic_audit(self):
++        before = self.facts(); connections = []; events = []; original = db.write_transaction
++        @contextmanager
++        def tracked(database=None):
++            with original(database) as conn:
++                connections.append(conn)
++                yield conn
++        def writer(conn, event):
++            self.assertIs(conn, connections[-1]); self.assertTrue(conn.in_transaction)
++            self.assertEqual(conn.execute('SELECT count(*) FROM occupancy_slots WHERE reservation_id=113').fetchone()[0], 0)
++            events.append(event); audit_writer(conn, event)
++        self.app.config['AUDIT_WRITER'] = writer
++        with patch.object(db, 'write_transaction', tracked):
++            response = self.revoke(values={'reason': ' \u0085<img src=x>🧪\u0085 ', 'cancelled_by': 1, 'revoked_at': 0})
++        self.assertEqual(response.status_code, 200); value = response.json['data']
++        self.assertEqual(set(response.json), {'ok', 'data'}); self.assertEqual(set(value), BLOCK_KEYS)
++        self.assertEqual((value['status'], value['revoked_by_id'], value['revoked_at'], value['revoke_reason']),
++                         ('revoked', 3, NOW, '<img src=x>🧪'))
++        self.assertEqual(value['revoked_local'], local_time(NOW))
++        self.assertEqual(value['revoked_by_display_name'], '演示管理员')
++        after = self.facts(); old = next(r for r in before['reservations'] if r['id'] == 113)
++        self.assertEqual(after['reservations'], [row | dict(cancelled_at=NOW, cancelled_by=3, cancel_reason='<img src=x>🧪')
++                                               if row['id'] == 113 else row for row in before['reservations']])
++        self.assertEqual(after['occupancy_slots'], [row for row in before['occupancy_slots'] if row['reservation_id'] != 113])
++        self.assertEqual(value['reason'], old['reason']); self.assertEqual(len(events), 1)
++        event = events[0]
++        self.assertEqual((event['action'], event['target_type'], event['target_id']), ('block.revoked', 'block', 113))
++        self.assertEqual(set(event['before']), BLOCK_SNAPSHOT_KEYS)
++        self.assertEqual(event['after'], event['before'] | dict(revoked_at=NOW, revoked_by_id=3, revoke_reason='<img src=x>🧪'))
++        self.assertEqual((event['actor_id'], event['occurred_at'], event['reason']), (3, NOW, '<img src=x>🧪'))
++        self.assertEqual(json.loads(after['audit_events'][0]['before_json']), event['before'])
++        self.assertEqual(json.loads(after['audit_events'][0]['after_json']), event['after'])
++
++    def test_ongoing_including_last_second_and_exact_end_rejected(self):
++        self.clock.now = NOW + 3599
++        self.assertEqual(self.revoke(112).status_code, 200)
++        before = self.facts()
++        for at in (NOW + 3600, NOW + 3601):
++            self.clock.now = at
++            self.error(self.revoke(101), 409, 'TRANSITION_CLOSED')
++            self.assertEqual(self.facts(), before)
++        # A separate still-active record ends at 11:30.
++        with db.write_transaction(self.database) as conn:
++            insert_record(conn, 115, 30, '2026-11-12T11:00', '2026-11-12T11:30', kind='block')
++        before = self.facts(); self.clock.now = NOW + 5400
++        self.error(self.revoke(115), 409, 'TRANSITION_CLOSED'); self.assertEqual(self.facts(), before)
++
++    def test_repeat_after_end_other_admin_preserves_first_result_and_requires_valid_reason(self):
++        first = self.revoke(112).json['data']; second, identity = self.login('second_admin')
++        before = self.facts()
++        self.app.config['AUDIT_WRITER'] = lambda *_: self.fail('Replay must not audit')
++        for now in (first['end_at'], first['end_at'] + 1):
++            self.clock.now = now
++            response = self.revoke(112, {'reason': '不同原因'}, second, identity)
++            self.assertEqual(response.status_code, 200); self.assertEqual(response.json['data'], first)
++            self.error(self.revoke(112, {'reason': '   '}, second, identity), 400, 'INVALID_INPUT')
++        self.assertEqual(self.facts(), before)
++        with db.write_transaction(self.database) as conn:
++            conn.execute("UPDATE rooms SET name='当前名称' WHERE id=30")
++        current = self.revoke(112).json['data']
++        self.assertEqual(current['room']['name'], '当前名称')
++        self.assertEqual({k:v for k,v in current.items() if k!='room'}, {k:v for k,v in first.items() if k!='room'})
++
++    def test_reason_types_unicode_bounds_and_whitespace(self):
++        before = self.facts()
++        for body in ({}, [], False, 'text', *[{'reason': v} for v in ('', ' \u0085 ', 'x'*501, 'x\x00y', '\ud800', None, 1, True, [])]):
++            with self.subTest(body=repr(body)):
++                self.error(self.revoke(values=body), 400, 'INVALID_INPUT'); self.assertEqual(self.facts(), before)
++        self.assertEqual(self.revoke(112, {'reason': ' \n🧪\t '}).json['data']['revoke_reason'], '🧪')
++        self.assertEqual(self.revoke(113, {'reason': ' \n'+'🧪'*500+'\t '}).json['data']['revoke_reason'], '🧪'*500)
++
++    def test_booking_wrong_kind_missing_and_invalid_id_never_change_facts(self):
++        before = self.facts()
++        for value in (103, 104, 107, 114, 999, 2**63-1):
++            self.error(self.revoke(value), 404, 'NOT_FOUND')
++        for value in ('0', '01', '-1', '1.0', 'true', str(2**63), '9'*5000):
++            self.error(self.revoke(value), 400, 'INVALID_INPUT')
++        self.assertEqual(self.facts(), before)
++
++    def test_auth_role_csrf_mime_and_stale_sessions_rejected_even_on_replay(self):
++        self.revoke(112); before = self.facts()
++        member, identity = self.login('demo_member_a')
++        for record in (112, 113):
++            self.error(self.revoke(record, {}, member, identity), 403, 'FORBIDDEN')
++            anonymous = self.app.test_client()
++            self.error(anonymous.post(f'/api/admin/blocks/{record}/revoke', base_url=ORIGIN,
++                                     headers={'Origin': ORIGIN}, json={}), 401, 'AUTH_REQUIRED')
++        for headers in ({}, {'Origin': 'http://evil.invalid'}, {'Origin': ORIGIN}, {'Origin': ORIGIN, 'X-CSRF-Token': 'invalid'}):
++            self.error(self.client.post('/api/admin/blocks/113/revoke', base_url=ORIGIN, headers=headers, json={'reason':'x'}), 403, 'CSRF_REJECTED')
++        headers = {'Origin': ORIGIN, 'X-CSRF-Token': self.identity['csrf_token']}
++        self.error(self.client.post('/api/admin/blocks/113/revoke', base_url=ORIGIN, headers=headers, data={}), 400, 'INVALID_INPUT')
++        cookie = self.client.get_cookie(auth.COOKIE_NAME, domain='127.0.0.1').value
++        self.client.post('/api/logout', base_url=ORIGIN, headers=headers, json={})
++        self.client.set_cookie(auth.COOKIE_NAME, cookie, domain='127.0.0.1')
++        self.error(self.revoke(112), 401, 'AUTH_REQUIRED')
++        self.client, self.identity = self.login('demo_admin'); self.clock.now = NOW + auth.SESSION_SECONDS
++        self.error(self.revoke(112), 401, 'AUTH_REQUIRED'); self.assertEqual(self.facts(), before)
++
++    def test_transaction_rechecks_actor_clock_role_and_deadline_after_lock(self):
++        original = db.write_transaction; before = self.facts()
++        for now, status, code in ((NOW+auth.SESSION_SECONDS, 401, 'AUTH_REQUIRED'), (NOW+3600, 409, 'TRANSITION_CLOSED')):
++            self.clock.now = NOW
++            @contextmanager
++            def advance(database=None):
++                with original(database) as conn:
++                    self.clock.now = now; yield conn
++            with patch.object(db, 'write_transaction', advance): self.error(self.revoke(112), status, code)
++            self.assertEqual(self.facts(), before)
++        self.clock.now = NOW
++        with self.app.app_context():
++            actor = auth.actor_for_token(self.client.get_cookie(auth.COOKIE_NAME, domain='127.0.0.1').value)
++            for bad in (None, replace(actor, id=1), replace(actor, session_token_hash='0'*64)):
++                with self.assertRaises(DomainError) as caught: services.revoke_block(bad, 113, {})
++                self.assertEqual(caught.exception.code, 'AUTH_REQUIRED')
++            self.clock.calls = 0
++            services.revoke_block(replace(actor, display_name='伪造姓名'), 112, {'reason': '完成'})
++            self.assertEqual(self.clock.calls, 1)
++            with db.write_transaction(self.database) as conn: conn.execute("UPDATE users SET role='member' WHERE id=3")
++            for record in (112, 113):
++                with self.assertRaises(DomainError) as caught: services.revoke_block(actor, record, {})
++                self.assertEqual(caught.exception.code, 'FORBIDDEN')
++            with db.write_transaction(self.database) as conn: conn.execute('DELETE FROM sessions')
++            with self.assertRaises(DomainError) as caught: services.revoke_block(actor, 112, {'reason':'x'})
++            self.assertEqual(caught.exception.code, 'AUTH_REQUIRED')
++
++    def test_audit_and_commit_failures_roll_back_state_slots_and_audit(self):
++        before = self.facts()
++        for after in (False, True):
++            def fail(conn, event):
++                if after: audit_writer(conn, event)
++                raise RuntimeError('private injected fault')
++            self.app.config['AUDIT_WRITER'] = fail
++            with self.assertLogs(self.app.logger, level='ERROR') as logs: self.error(self.revoke(), 500, 'INTERNAL_ERROR')
++            self.assertNotIn('private', str(logs.output)); self.assertEqual(self.facts(), before)
++        self.app.config['AUDIT_WRITER'] = audit_writer; original = db.connect
++        class FailCommit:
++            def __init__(self, conn): self.conn = conn
++            def __getattr__(self, name): return getattr(self.conn, name)
++            def execute(self, sql, *args):
++                if sql == 'COMMIT': raise sqlite3.OperationalError('injected commit failure')
++                return self.conn.execute(sql, *args)
++        with patch.object(db, 'connect', lambda *a, **kw: FailCommit(original(*a, **kw))), self.assertLogs(self.app.logger, level='ERROR'):
++            self.error(self.revoke(), 500, 'INTERNAL_ERROR')
++        self.assertEqual(self.facts(), before); self.assertEqual(self.revoke().status_code, 200)
++
++    def test_release_all_occupancy_schedule_availability_without_restoring_cancelled_booking(self):
++        before = self.facts(); self.assertEqual(self.revoke().status_code, 200)
++        rows = self.client.get('/api/schedule?room_id=20&date=2026-11-12', base_url=ORIGIN).json['data']['items']
++        self.assertFalse(any(row['kind']=='block' and row['record']['id']==113 for row in rows))
++        available = self.client.get('/api/availability?start=2026-11-12T12:00&end=2026-11-12T13:00&attendees=5', base_url=ORIGIN).json['data']['items']
++        self.assertIn(20, [room['id'] for room in available])
++        member, identity = self.login('demo_member_a')
++        result = member.post('/api/bookings', base_url=ORIGIN, headers={'Origin': ORIGIN, 'X-CSRF-Token': identity['csrf_token']},
++            json=dict(room_id=20, start='2026-11-12T12:00', end='2026-11-12T13:00', title='替代预约', purpose='测试', attendees=5, intent_key='revoke-slot-reuse-0001'))
++        self.assertEqual(result.status_code, 201)
++        cancelled = next(r for r in before['reservations'] if r['id']==114)
++        self.assertEqual(next(r for r in self.facts()['reservations'] if r['id']==114), cancelled)
++
++
++if __name__ == '__main__':
++    unittest.main()
+diff --git a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-Y-baseline-g6n2x3lz/tests/test_blocks_js.cjs b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/tests/test_blocks_js.cjs
+index 510a77d..cf5378f 100644
+--- a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-Y-baseline-g6n2x3lz/tests/test_blocks_js.cjs
++++ b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/Y/tests/test_blocks_js.cjs
+@@ -19,6 +19,8 @@ function harness({combined=false,transform=source=>source}={}){
+       addEventListener(k,f){handlers[k]=f;},querySelectorAll(tag){return this.children.flatMap(c=>[...(c.tag===tag?[c]:[]),...c.querySelectorAll(tag)]);},contains(target){return this===target||this.children.some(c=>c.contains(target));},focus(){if(!disabled)active=this;}};
+   }
+   for(const id of ['block-fields','block-script-unavailable','block-form','block-submit','block-confirm','block-feedback','block-conflicts','block-relogin','block-summary','block-rooms-refresh','block-rooms-feedback','logout-form','room-name'])n[id]=node(id);
++  for(const name of ['form','panel','title','reason','reason-error','confirm','submit','feedback','summary','relogin'])n['revoke-'+name]=node('revoke-'+name);
++  n['revoke-form'].append(n['revoke-reason'],n['revoke-confirm'],n['revoke-submit']);
+   const inputs=['room_id','start','end','reason'].map((name,i)=>{const item=n['block-'+name]=node('block-'+name);item.name=name;item.value=['30','2026-11-13T10:00','2026-11-14T16:00',block.reason][i];n['block-'+name+'-error']=node();return item;});
+   n['block-form'].append(...inputs,n['block-submit'],n['block-confirm']);n['block-form'].elements={namedItem:name=>n['block-'+name]};
+   for(const kind of ['bookings','blocks']){
+@@ -195,3 +197,68 @@ for(const mutant of ['empty-booking','missing-purpose'])test(`render oracle reje
+   const rows=fixtures('bookings'),ui=harness({transform:source=>mutant==='empty-booking'?source.replace('for (const row of records) {','for (const row of (list.kind === "bookings" ? [] : records)) {'):source.replace('["用途",row.purpose],','')});
+   ui.setFetch(async()=>ok({items:rows,total:rows.length}));await ui.load('bookings');assert.throws(()=>assertRendered(visibleRows(ui,'bookings'),rows,'bookings'),assert.AssertionError);
+ });
++
++const revoked={...block,status:'revoked',revoked_at:1794448800,revoked_local:'2026-11-12T10:00:00+08:00',revoked_by_id:4,revoked_by_display_name:'首次管理员 <svg>',revoke_reason:'首次撤销 <script>纯文本</script>'};
++async function selectRevoke(ui){await ui.load();ui.n['admin-blocks-items'].querySelectorAll('button')[0].handlers.click();ui.n['revoke-reason'].value=' 修复完成 <img> ';}
++function submitRevoke(ui,confirm=true){ui.n['revoke-confirm'].checked=confirm;ui.n['revoke-submit'].focus();return ui.n['revoke-form'].handlers.submit({preventDefault(){}});}
++function revokeRestored(ui){restored(ui);assert.equal(ui.n['revoke-form'].getAttribute('aria-busy'),undefined);assert.equal(ui.n['revoke-reason'].value,' 修复完成 <img> ');}
++test('revocation is offered only for pending/ongoing safe block IDs, never bookings',async()=>{
++  const ui=harness();ui.setFetch(async()=>ok({items:fixtures('blocks'),total:4}));await ui.load();
++  assert.deepEqual(ui.n['admin-blocks-items'].querySelectorAll('button').map(n=>n.textContent),['选择撤销停用 200','选择撤销停用 201']);
++  ui.setFetch(async()=>ok({items:fixtures('bookings'),total:4}));await ui.load('bookings');assert.equal(ui.n['admin-bookings-items'].querySelectorAll('button').length,0);
++  ui.setFetch(async()=>ok({items:[{...block,id:Number('9007199254740993')}],total:1}));await ui.load();assert.equal(ui.n['admin-blocks-items'].querySelectorAll('button').length,0);
++});
++test('selected original facts and successful first revocation metadata render as text',async()=>{
++  const ui=harness();await selectRevoke(ui);assert.match(ui.n['revoke-summary'].textContent,/<script>纯文本/);assert.equal(ui.active,ui.n['revoke-title']);
++  await submitRevoke(ui,false);assert.equal(ui.fetches.length,1);
++  ui.setFetch(async(_url,options)=>ok(options.method?revoked:{items:[revoked],total:1}));await submitRevoke(ui);revokeRestored(ui);
++  const post=ui.fetches.find(r=>r.options.method);assert.equal(post.url,'/api/admin/blocks/120/revoke');assert.deepEqual(JSON.parse(post.options.body),{reason:' 修复完成 <img> '});
++  assert.equal(post.options.headers['X-CSRF-Token'],'synthetic');assert.match(ui.n['revoke-feedback'].textContent,/已撤销.*全部占用已释放/);
++  assert.match(ui.n['revoke-summary'].textContent,/首次管理员 <svg>.*\n撤销原因：首次撤销 <script>/);
++  assert.equal(ui.n['revoke-form'].hidden,true);assert.equal(ui.n['admin-blocks-items'].querySelectorAll('button').length,0);
++  await submitRevoke(ui);assert.equal(ui.fetches.length,3);
++});
++for(const event of ['input','change'])test(`revoke reason ${event} requires fresh confirmation`,async()=>{
++  const ui=harness();await selectRevoke(ui);ui.n['revoke-confirm'].checked=true;ui.n['revoke-reason'].handlers[event]();
++  assert.equal(ui.n['revoke-confirm'].checked,false);await ui.n['revoke-form'].handlers.submit({preventDefault(){}});assert.equal(ui.fetches.length,1);
++});
++test('waiting revocation disables competing controls and blocks double submission',async()=>{
++  const ui=harness();await selectRevoke(ui);let release;ui.setFetch(()=>new Promise(r=>{release=r;}));const pending=submitRevoke(ui);
++  assert.equal(ui.n['revoke-form'].getAttribute('aria-busy'),'true');assert.match(ui.n['revoke-feedback'].textContent,/正在撤销/);
++  for(const id of ['revoke-reason','revoke-submit','block-submit','admin-blocks-submit'])assert.equal(ui.n[id].disabled,true);
++  await submitRevoke(ui);await ui.submit();await ui.load();await ui.refresh();assert.equal(ui.fetches.length,2);
++  ui.n['room-name'].focus();release(fail('STORE_BUSY'));await pending;revokeRestored(ui);assert.equal(ui.active,ui.n['room-name']);
++});
++for(const code of ['INVALID_INPUT','TRANSITION_CLOSED','NOT_FOUND','STORE_BUSY','INTERNAL_ERROR','CSRF_REJECTED'])test(`revoke ${code} preserves reason and requires reconfirmation`,async()=>{
++  const ui=harness();await selectRevoke(ui);ui.setFetch(async()=>fail(code,code==='INVALID_INPUT'?{reason:'原因无效'}:{}));await submitRevoke(ui);revokeRestored(ui);
++  assert.match(ui.n['revoke-feedback'].textContent,/撤销原因已保留/);assert.equal(ui.n['revoke-confirm'].checked,false);assert.equal(ui.n['revoke-submit'].disabled,false);
++  if(code==='INVALID_INPUT'){assert.equal(ui.active,ui.n['revoke-reason']);assert.equal(ui.n['revoke-reason'].getAttribute('aria-invalid'),'true');}
++  if(code==='CSRF_REJECTED')assert.equal(ui.n['revoke-relogin'].hidden,false);
++});
++for(const failure of ['network','bad-json','wrong-id','not-revoked','missing-field'])test(`uncertain revoke ${failure} preserves input without auto retry`,async()=>{
++  const ui=harness();await selectRevoke(ui);ui.setFetch(async()=>{
++    if(failure==='network')throw Error();if(failure==='bad-json')return {ok:true,json:async()=>{throw Error();}};
++    if(failure==='wrong-id')return ok({...revoked,id:121});if(failure==='not-revoked')return ok(block);
++    const row={...revoked};delete row.revoke_reason;return ok(row);
++  });await submitRevoke(ui);revokeRestored(ui);assert.match(ui.n['revoke-feedback'].textContent,/未能确认.*重新确认后重试/);assert.equal(ui.fetches.length,2);
++  await ui.n['revoke-form'].handlers.submit({preventDefault(){}});assert.equal(ui.fetches.length,2);
++});
++for(const phase of ['headers','body'])test(`revoke timeout during ${phase} preserves reason and restores controls`,async()=>{
++  const ui=harness();await selectRevoke(ui);ui.setFetch(async(_url,{signal})=>{const stall=()=>new Promise((_r,reject)=>signal.addEventListener('abort',()=>reject(Error())));return phase==='headers'?stall():{ok:true,json:stall};});
++  const pending=submitRevoke(ui);await tick();[...ui.timers.values()][0].fn();await pending;revokeRestored(ui);assert.match(ui.n['revoke-feedback'].textContent,/未能确认/);
++});
++for(const code of ['AUTH_REQUIRED','FORBIDDEN'])test(`revoke ${code} blocks all admin controls and preserves reason`,async()=>{
++  const ui=harness({combined:true});await selectRevoke(ui);ui.setFetch(async()=>fail(code));await submitRevoke(ui);
++  assert.equal(ui.n['revoke-reason'].value,' 修复完成 <img> ');assert.equal(ui.n['revoke-submit'].disabled,true);assert.equal(ui.n['room-submit'].disabled,true);
++  assert.equal(ui.n['revoke-relogin'].hidden,false);assert.equal(ui.n['admin-blocks-items'].children.length,0);await submitRevoke(ui);assert.equal(ui.fetches.length,2);
++});
++for(const code of ['STORE_BUSY','AUTH_REQUIRED'])test(`successful revoke stays explicit when automatic refresh gets ${code}`,async()=>{
++  const ui=harness();await selectRevoke(ui);ui.setFetch(async(_url,options)=>options.method?ok(revoked):fail(code));await submitRevoke(ui);
++  assert.match(ui.n['revoke-feedback'].textContent,/停用 120 已撤销/);assert.equal(ui.n['revoke-reason'].value,' 修复完成 <img> ');
++  if(code==='STORE_BUSY')assert.match(ui.n['admin-blocks-feedback'].textContent,/停用已撤销.*列表刷新失败/);
++});
++test('late revoke success cannot restore protected facts after room panel detects identity loss',async()=>{
++  const ui=harness({combined:true});await selectRevoke(ui);let release;ui.setFetch(async url=>url.endsWith('/revoke')?new Promise(r=>{release=r;}):fail('AUTH_REQUIRED'));
++  const pending=submitRevoke(ui);await ui.roomSubmit();release(ok(revoked));await pending;
++  assert.equal(ui.n['revoke-submit'].disabled,true);assert.equal(ui.n['admin-blocks-items'].children.length,0);assert.doesNotMatch(ui.n['revoke-summary'].textContent,/首次管理员/);
++});

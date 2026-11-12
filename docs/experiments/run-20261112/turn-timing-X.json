@@ -1,0 +1,15 @@
+{
+  "source": "Codex read_thread visible turn metadata",
+  "thread_id": "01a1cfdd-6fc0-74f0-a079-dd9c135d9e26",
+  "turns_metadata": [
+    {
+      "id": "01a1cfdd-700e-7dc1-83cf-e96351ecd2bd",
+      "status": "completed",
+      "error_present": false,
+      "startedAt": 1794488758,
+      "completedAt": 1794489469,
+      "durationMs": 711163
+    }
+  ],
+  "note": "Actual agent duration separated from parent dispatch-to-snapshot wall time. Does not expose model reasoning or imply exact model identity."
+}

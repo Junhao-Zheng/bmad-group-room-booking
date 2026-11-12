@@ -1,0 +1,13 @@
+{
+  "status": "MEASUREMENT_NOTES_NOT_RESULTS",
+  "operator": "Same parent AI agent, user authorization; not a student manually running each trial",
+  "same_configuration": "Fresh agents fork none, inherit parent model capability, no model override; exact model identifier unavailable",
+  "execution_order": "X then Y; independent copies of the same common runtime baseline",
+  "X_isolation_exception": "Implementer reported first filename-only inventory from outer cwd exposed some Y paths, with no Y contents read; subsequent work stayed in X. Not OS isolation.",
+  "timing": "Report both dispatch-to-original-snapshot wall duration and Codex completed turn duration; X snapshot helper needed correction for pre-existing internal symlinks, no implementation change.",
+  "load": "Parent concurrently prepared documentation and recording tools while each implementation ran. Background activity was not load-controlled, so wall-time differences are observational, not a performance benchmark.",
+  "uniform_review": "Frozen A1-A9, same A1-A7 supplement; both originals sealed before any uniform scoring or repair. Independent source/UI/real-HTTP evidence still required.",
+  "quality_review": "Later three-lens quality review and product integration are separate from the experiment's uniform first-round result. Missing coverage is not automatically an implementation rule/ADR violation.",
+  "planning": "3418 seconds observed between Git initialization and epics-plan commit, not active effort or total planning cost; pre-initialization/user costs unavailable. Twelve-story extrapolation only a scenario.",
+  "human_input": "User deferred all genuine human judgments to one final checklist; no technical vetoes fabricated."
+}

@@ -1,0 +1,6 @@
+{
+  "group": "X",
+  "issue": "Initial snapshot helper rejected pre-existing relative documentation symlinks",
+  "correction": "Allow only symlinks resolving inside the group directory and record their targets; no project source or frozen review criterion changed.",
+  "initial_failed_before_archive_creation": true
+}

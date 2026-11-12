@@ -1,0 +1,23 @@
+{
+  "group": "X",
+  "stage": "initial",
+  "common_git_baseline": "b0ce58a9b66144db5a4b15f61376132fa3f210e4",
+  "input_manifest_sha256": "00518886f4efa8b87cb13ae0da955a7b2c8ac1608666f91c29fda944363b2731",
+  "diff_file": "/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-X-initial-s63rlzqs.diff",
+  "diff_sha256": "a2fe660ee5cf5a34f07754ca71afe047ee28bfef7080f4849f217e56da733e95",
+  "bytes": 85075,
+  "changed_files": [
+    "_bmad-output/implementation-artifacts/2-5-admin-cancel.md",
+    "booking_app/services.py",
+    "booking_app/static/app.css",
+    "booking_app/static/blocks.js",
+    "booking_app/templates/admin.html",
+    "booking_app/web.py",
+    "scripts/verify_admin_cancel_browser.cjs",
+    "scripts/verify_admin_cancel_browser.py",
+    "scripts/verify_admin_cancel_http.py",
+    "tests/test_admin_cancel.py",
+    "tests/test_blocks_js.cjs"
+  ],
+  "scope": "All changed/new/deleted files in this implementation workspace against frozen inputs; work/.venv/tools/cache excluded as runtime/evidence. Main-repository document-only work is outside this isolated implementation. Original output archives preserved separately."
+}

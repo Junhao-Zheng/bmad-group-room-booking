@@ -1,0 +1,42 @@
+{
+  "status": "SEALED_BEFORE_QUALITY_REPAIR",
+  "groups": [
+    {
+      "group": "X",
+      "initial_calls": 1,
+      "uniform_first_pass": true,
+      "context_violations": 0,
+      "ADR_conflicts": 0,
+      "post_done_rework_at_initial_review": 0,
+      "wall_seconds": 763.215554,
+      "agent_seconds": 711.163
+    },
+    {
+      "group": "Y",
+      "initial_calls": 1,
+      "uniform_first_pass": true,
+      "context_violations": 0,
+      "ADR_conflicts": 0,
+      "post_done_rework_at_initial_review": 0,
+      "wall_seconds": 652.434692,
+      "agent_seconds": 630.15
+    }
+  ],
+  "Y_minus_X_wall_seconds": -110.780862,
+  "Y_minus_X_agent_seconds": -81.013,
+  "conclusion": "两组均通过本次统一首轮评审；未观察到上下文违规或 ADR 冲突。X 本轮耗时较长，不能宣称 BMAD 带来实测节省。单样本、顺序执行、任务不同及既有基线携带约束，不能推断普遍因果效果。",
+  "limitations": {
+    "status": "MEASUREMENT_NOTES_NOT_RESULTS",
+    "operator": "Same parent AI agent, user authorization; not a student manually running each trial",
+    "same_configuration": "Fresh agents fork none, inherit parent model capability, no model override; exact model identifier unavailable",
+    "execution_order": "X then Y; independent copies of the same common runtime baseline",
+    "X_isolation_exception": "Implementer reported first filename-only inventory from outer cwd exposed some Y paths, with no Y contents read; subsequent work stayed in X. Not OS isolation.",
+    "timing": "Report both dispatch-to-original-snapshot wall duration and Codex completed turn duration; X snapshot helper needed correction for pre-existing internal symlinks, no implementation change.",
+    "load": "Parent concurrently prepared documentation and recording tools while each implementation ran. Background activity was not load-controlled, so wall-time differences are observational, not a performance benchmark.",
+    "uniform_review": "Frozen A1-A9, same A1-A7 supplement; both originals sealed before any uniform scoring or repair. Independent source/UI/real-HTTP evidence still required.",
+    "quality_review": "Later three-lens quality review and product integration are separate from the experiment's uniform first-round result. Missing coverage is not automatically an implementation rule/ADR violation.",
+    "planning": "3418 seconds observed between Git initialization and epics-plan commit, not active effort or total planning cost; pre-initialization/user costs unavailable. Twelve-story extrapolation only a scenario.",
+    "human_input": "User deferred all genuine human judgments to one final checklist; no technical vetoes fabricated."
+  },
+  "later_quality_review": "独立记录，不倒改本表；同一缺陷若后续实际证伪本次评定，应追加勘误而不覆盖原始结果。"
+}

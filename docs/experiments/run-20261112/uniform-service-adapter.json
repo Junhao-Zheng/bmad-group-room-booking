@@ -1,0 +1,9 @@
+{
+  "recorded_at_utc": "2026-11-12T13:30:55.654309+00:00",
+  "original_sha256": "ade8edde20b71dfd27c84ab7a5b6eb4ea43a8251f14a944817c67fa859b37ae2",
+  "adapted_sha256": "a03a339e841878dc985b0e177c8cb693d775f38d966fc0c0fb97cbdd30ca96cf",
+  "reason": "Y direct service accepts payload dict; original probe supplied raw reason string and therefore received INVALID_INPUT before the time check. The public HTTP contract and all acceptance assertions are unchanged. X and Y are both rerun with the same adapted probe.",
+  "initial_probe_result": "X 17/17; Y 16/17 with one harness invocation mismatch, not an implementation time-boundary defect.",
+  "implementation_changed": false,
+  "criteria_changed": false
+}

@@ -1,0 +1,218 @@
+{
+  "group": "X",
+  "status": "SEALED_UNIFORM_INITIAL_REVIEW",
+  "scored_at_utc": "2026-11-12T13:41:06.319478+00:00",
+  "source_archive_sha256": "d57679f77b157d5da80215ffd767fd0ae66b88b4252c411ec4ab24aa954b19fa",
+  "source_unchanged_since_initial_seal": true,
+  "initial_implementation_calls": 1,
+  "implementation_transport_failures": 0,
+  "requested_implementation_changes_during_uniform_review": 0,
+  "first_uniform_review_pass": true,
+  "criteria": [
+    {
+      "id": "A1",
+      "name": "身份",
+      "result": "PASS",
+      "cases": [
+        "anonymous",
+        "member",
+        "expired",
+        "logged_out",
+        "database_role_demoted",
+        "forged_actor"
+      ],
+      "evidence": [
+        "uniform-review-adapted/X/supplement.json"
+      ],
+      "assessment": "父流程按冻结标准检查源代码、测试断言和实际输出；A8 另亲自重跑真实浏览器并目视检查手机成功面板。"
+    },
+    {
+      "id": "A2",
+      "name": "输入",
+      "result": "PASS",
+      "cases": [
+        "strip_1_and_500",
+        "empty_and_501",
+        "non_string",
+        "NUL_and_invalid_UTF8",
+        "invalid_reason_even_repeated",
+        "wrong_kind",
+        "strict_64_bit_id"
+      ],
+      "evidence": [
+        "uniform-review-adapted/X/supplement.json"
+      ],
+      "assessment": "父流程按冻结标准检查源代码、测试断言和实际输出；A8 另亲自重跑真实浏览器并目视检查手机成功面板。"
+    },
+    {
+      "id": "A3",
+      "name": "时间",
+      "result": "PASS",
+      "cases": [
+        "pending",
+        "in_progress",
+        "first_exact_end_rejected",
+        "repeat_past_end_returns_original",
+        "single_clock_after_write_lock"
+      ],
+      "evidence": [
+        "uniform-review-adapted/X/supplement.json"
+      ],
+      "assessment": "父流程按冻结标准检查源代码、测试断言和实际输出；A8 另亲自重跑真实浏览器并目视检查手机成功面板。"
+    },
+    {
+      "id": "A4",
+      "name": "幂等",
+      "result": "PASS",
+      "cases": [
+        "repeat_same_full_shape",
+        "first_actor_time_reason_preserved",
+        "repeat_zero_audit"
+      ],
+      "evidence": [
+        "uniform-review-adapted/X/supplement.json"
+      ],
+      "assessment": "父流程按冻结标准检查源代码、测试断言和实际输出；A8 另亲自重跑真实浏览器并目视检查手机成功面板。"
+    },
+    {
+      "id": "A5",
+      "name": "占用与历史",
+      "result": "PASS",
+      "cases": [
+        "all_target_slots_removed",
+        "other_slots_unchanged",
+        "history_kept",
+        "no_automatic_restoration"
+      ],
+      "evidence": [
+        "uniform-review-adapted/X/supplement.json"
+      ],
+      "assessment": "父流程按冻结标准检查源代码、测试断言和实际输出；A8 另亲自重跑真实浏览器并目视检查手机成功面板。"
+    },
+    {
+      "id": "A6",
+      "name": "原子性",
+      "result": "PASS",
+      "cases": [
+        "BEGIN_IMMEDIATE",
+        "one_connection",
+        "one_audit",
+        "writer_before_failure",
+        "writer_after_insert_failure",
+        "commit_failure",
+        "real_HTTP_twenty_pair_races_final_storage"
+      ],
+      "evidence": [
+        "uniform-review-adapted/X/supplement.json",
+        "originals/X/initial-evidence.tar.gz: work/admin-cancel-http/"
+      ],
+      "assessment": "父流程按冻结标准检查源代码、测试断言和实际输出；A8 另亲自重跑真实浏览器并目视检查手机成功面板。"
+    },
+    {
+      "id": "A7",
+      "name": "HTTP与DTO",
+      "result": "PASS",
+      "cases": [
+        "contract_endpoint",
+        "ok_data_once",
+        "exact_full_keys_and_nulls",
+        "Origin_and_CSRF",
+        "authorization_before_object_validation",
+        "safe_error_codes"
+      ],
+      "evidence": [
+        "uniform-review-adapted/X/supplement.json"
+      ],
+      "assessment": "父流程按冻结标准检查源代码、测试断言和实际输出；A8 另亲自重跑真实浏览器并目视检查手机成功面板。"
+    },
+    {
+      "id": "A8",
+      "name": "UI",
+      "result": "PASS",
+      "cases": [
+        "reason_and_confirmation",
+        "waiting_disabled",
+        "success_refresh",
+        "failure_input_preserved",
+        "safe_text",
+        "desktop_and_mobile"
+      ],
+      "evidence": [
+        "uniform-parent-browser/X/",
+        "originals/X/initial.tar.gz: booking_app/static/blocks.js, templates/admin.html, tests/js/"
+      ],
+      "assessment": "父流程按冻结标准检查源代码、测试断言和实际输出；A8 另亲自重跑真实浏览器并目视检查手机成功面板。"
+    },
+    {
+      "id": "A9",
+      "name": "验证",
+      "result": "PASS",
+      "cases": [
+        "regression_no_skips",
+        "normal_and_refusal",
+        "boundary_and_repeat",
+        "concurrent_final_DB",
+        "rollback",
+        "actual_browser"
+      ],
+      "evidence": [
+        "originals/X/initial-evidence.tar.gz: Python/JS complete regression logs and real HTTP/browser evidence"
+      ],
+      "assessment": "父流程按冻结标准检查源代码、测试断言和实际输出；A8 另亲自重跑真实浏览器并目视检查手机成功面板。"
+    }
+  ],
+  "distinct_proven_context_rule_violations": [],
+  "distinct_proven_ADR_conflicts": [],
+  "post_done_rework": {
+    "count": 0,
+    "qualification": "尚未正式 done，仅初始提交；不是最终生命周期指标。"
+  },
+  "regression": {
+    "python_unique_tests": 167,
+    "javascript_tests": 228,
+    "skipped": 0
+  },
+  "real_HTTP_race_pairs": 20,
+  "uniform_executable_checks_passed": 17,
+  "parent_verified_report_source_hashes": [
+    "booking_app/__init__.py",
+    "booking_app/audit.py",
+    "booking_app/auth.py",
+    "booking_app/db.py",
+    "booking_app/domain.py",
+    "booking_app/dto.py",
+    "booking_app/schema.sql",
+    "booking_app/services.py",
+    "booking_app/static/app.css",
+    "booking_app/static/auth.js",
+    "booking_app/static/availability.js",
+    "booking_app/static/blocks.js",
+    "booking_app/static/booking.js",
+    "booking_app/static/history.js",
+    "booking_app/static/rooms.js",
+    "booking_app/static/schedule.js",
+    "booking_app/templates/admin.html",
+    "booking_app/templates/base.html",
+    "booking_app/templates/home.html",
+    "booking_app/templates/login.html",
+    "booking_app/templates/my.html",
+    "booking_app/web.py",
+    "scripts/init_demo.py",
+    "scripts/verify_admin_cancel_browser.cjs",
+    "scripts/verify_admin_cancel_browser.py",
+    "scripts/verify_admin_cancel_http.py",
+    "scripts/verify_auth_browser.py",
+    "scripts/verify_availability_performance.py",
+    "scripts/verify_history_browser.py",
+    "tests/history_fixtures.py",
+    "tests/schedule_fixtures.py"
+  ],
+  "observed_dispatch_to_seal_seconds": 763.215554,
+  "agent_turn_duration_ms": 711163,
+  "parent_visual_qa": "手机长文本、原因、首次取消/撤销信息可读，恶意样式文本按纯文本显示，无横向裁切；具体截图保留。",
+  "limitations": [
+    "A1–A9 是预先冻结的有限检查，不等于后续所有质量审查无缺陷。",
+    "检查器直接服务调用为适配 Y 的 payload 参数作等价调用修正，接受断言未更改、应用未更改；原失败及补丁均保留。",
+    "Y 的 390×900 / 1280×900 满足冻结的桌面/移动检查，但后续完整 Story 集成还需按项目规定尺寸验证；Y 浏览器报告未包含自身脚本哈希，父流程另验证整个封存源树未变。"
+  ]
+}

@@ -1,0 +1,36 @@
+diff --git a/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/frozen-uniform-checks.py b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/uniform-checks-service-adapter.py
+index 14aa1c8..87eb025 100644
+--- a/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/frozen-uniform-checks.py
++++ b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/uniform-checks-service-adapter.py
+@@ -17,6 +17,8 @@ from tests.history_fixtures import FixedClock
+ from tests.schedule_fixtures import NOW,insert_record
+ KIND='booking' if args.group=='X' else 'block'
+ COMMAND='admin_cancel_booking' if KIND=='booking' else 'revoke_block'
++# Invocation adapter only: X takes reason; Y takes a payload. Acceptance assertions unchanged.
++def service_input(reason):return reason if args.group=='X' else {'reason':reason}
+ PREFIX='/api/admin/bookings/' if KIND=='booking' else '/api/admin/blocks/'
+ SUFFIX='/cancel' if KIND=='booking' else '/revoke'
+ FULL_COMMON={'id','room','start_at','start_local','end_at','end_local','status','created_at','created_local'}
+@@ -73,11 +75,11 @@ class UniformChecks(unittest.TestCase):
+    for invalid in (None,replace(actor,id=1),replace(actor,session_token_hash='0'*64)):
+     with self.subTest(case='forged_actor'):
+      before=self.facts()
+-     with self.assertRaises(DomainError) as caught:command(invalid,9001,'合成原因')
++     with self.assertRaises(DomainError) as caught:command(invalid,9001,service_input('合成原因'))
+      self.assertEqual(caught.exception.code,'AUTH_REQUIRED');self.assertEqual(self.facts(),before)
+    with db.write_transaction(self.database) as conn:conn.execute("UPDATE users SET role='member' WHERE id=?",(actor.id,))
+    before=self.facts()
+-   with self.assertRaises(DomainError) as caught:command(actor,9001,'合成原因')
++   with self.assertRaises(DomainError) as caught:command(actor,9001,service_input('合成原因'))
+    self.assertEqual(caught.exception.code,'FORBIDDEN');self.assertEqual(self.facts(),before)
+   self.error(self.call('bad',''),403,'FORBIDDEN')
+  def test_A2_invalid_reasons_initial_and_repeat(self):
+@@ -108,7 +110,7 @@ class UniformChecks(unittest.TestCase):
+    def advance(database=None):
+     with original(database) as conn:self.clock.now=NOW+10800;yield conn
+    before=self.facts()
+-   with patch.object(db,'write_transaction',advance),self.assertRaises(DomainError) as caught:getattr(services,COMMAND)(actor,9001,'合成原因')
++   with patch.object(db,'write_transaction',advance),self.assertRaises(DomainError) as caught:getattr(services,COMMAND)(actor,9001,service_input('合成原因'))
+    self.assertEqual(caught.exception.code,'TRANSITION_CLOSED');self.assertEqual(self.clock.calls,1);self.assertEqual(self.facts(),before)
+  def test_A4_repeat_other_admin_after_end_preserves_first(self):
+   first=self.call(reason='首次原因');self.assertEqual(first.status_code,200);before=self.facts();self.clock.now=NOW+10801

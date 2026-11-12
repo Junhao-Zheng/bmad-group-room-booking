@@ -1,0 +1,1084 @@
+diff --git a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-X-baseline-f46d2ltx/_bmad-output/implementation-artifacts/2-5-admin-cancel.md b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/_bmad-output/implementation-artifacts/2-5-admin-cancel.md
+index 9419451..7275ecf 100644
+--- a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-X-baseline-f46d2ltx/_bmad-output/implementation-artifacts/2-5-admin-cancel.md
++++ b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/_bmad-output/implementation-artifacts/2-5-admin-cancel.md
+@@ -51,8 +51,8 @@ context:
+ 
+ ## Tasks & Acceptance
+ 
+-- [ ] 交付独立命令、API、界面和矩阵测试。
+-- [ ] 实际验证并保留原始输出；报告遗漏或风险，不写未跑成绩。
++- [x] 交付独立命令、API、界面和矩阵测试。
++- [x] 实际验证并保留原始输出；报告遗漏或风险，不写未跑成绩。
+ 
+ ## Implementation Notes
+ 
+@@ -67,3 +67,16 @@ context:
+ - 全量Python及JS回归，无skip；API精确DTO和安全错误。
+ - 20轮真实独立HTTP成员/管理员取消竞争，最终DB完整槽、元数据、恰一次转换审计；真实文件库故障回滚。
+ - 桌面/手机真实浏览器操作管理取消、原因/确认/等待/拒绝/结果和成员详情；保留证据。
++
++
++### 初次实现验证记录（2026-11-12）
++
++独立 `admin_cancel_booking`、管理取消 API、管理预约列表原因/确认界面已实现。取得写锁后一次取时，重验会话及数据库角色；原因校验先于幂等；首次取消、槽释放、完整审计快照在同一事务提交。成员入口保持原规则。未实施停用撤销，未自行发起独立代理评审。
++
++- Python 全量：167 tests，PASS，无 skip。原始输出：`work/admin-cancel-python-final.log`。
++- JavaScript 全量：228 tests，PASS，无 skip。原始输出：`work/admin-cancel-js-final.log`。新增 11 个独立 Python 测试方法与 20 个 JS 用例，无测试类继承重复计数。
++- 20 轮真实 HTTP 成员/管理员取消竞争：40 个独立会话请求全部 200、每轮两个结果一致且仅一次转换审计。最终一轮验收成员先成功 13 轮、管理员 7 轮；不是固定胜者要求。审计写入前、写入后、SQLite 实际拒绝 COMMIT 均完整回滚；重启和原意图重放通过。`work/admin-cancel-http/http-result.json` 指向全部响应及各轮存储事实。
++- Chrome / Playwright 1.58.2：1280×800、390×844 真实浏览器操作通过；原因/确认、等待禁用、实际拒绝、丢响应后人工重试、成员详情原因、可用性释放、会话退出、纯文本展示与无横向溢出均验证。`work/admin-cancel-browser/browser-results.json` 指向响应、存储和截图；最终桌面/手机取消面板截图已目视检查。
++- 初次两个测试夹具错误（表单 CSRF 传法、种子少一个成员）的失败日志保留，修正后通过。完整交付清单、命令、源文件哈希、限制与隔离说明见 `work/admin-cancel-implementation-report.json`。
++
++初次实现供父流程先封存再统一评审；本记录不代表独立评审或人类批准。UI 对超出 JS 安全整数范围的编号拒绝提交以防取整误取消；API/服务支持合同规定的正 64 位编号。首次从父工作目录执行的文件名清单检索曾列出 X/Y browser-tools 文件名与 spec 路径，但未打开 Y 或原始仓库文件内容；其后项目读写均限本 X 目录，未运行 Git/远端操作。
+diff --git a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-X-baseline-f46d2ltx/booking_app/services.py b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/booking_app/services.py
+index 2afe598..cdafdbc 100644
+--- a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-X-baseline-f46d2ltx/booking_app/services.py
++++ b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/booking_app/services.py
+@@ -8,7 +8,7 @@ from flask import current_app
+ from . import auth, db, dto
+ from .domain import DomainError, auth_required, beijing_day, booking_interval, query_attendees, resource_id
+ from .domain import normalize_booking_payload, normalize_room_payload, validate_booking_window
+-from .domain import normalize_block_payload, validate_block_window
++from .domain import normalize_block_payload, normalized_text, validate_block_window
+ 
+ 
+ def _require_actor(conn, actor: auth.Actor, now: int) -> auth.Actor:
+@@ -250,6 +250,37 @@ def member_cancel_booking(actor: auth.Actor, booking_id) -> dict:
+     return result
+ 
+ 
++def admin_cancel_booking(actor: auth.Actor, booking_id, reason) -> dict:
++    """Admin intervention is independent from the owner's cancellation deadline."""
++    with db.write_transaction() as conn:
++        now = current_app.config["CLOCK"].now_epoch()
++        actor = require_admin(_require_actor(conn, actor, now))
++        normalized_id = resource_id(booking_id, "booking_id")
++        reason = normalized_text(reason, "reason", 500)
++        row = conn.execute(
++            _BOOKING_DETAIL_SELECT + "WHERE r.kind='booking' AND r.id=?", (normalized_id,),
++        ).fetchone()
++        if row is None:
++            raise DomainError("NOT_FOUND", "预约不存在或无权访问。")
++        # Valid authorization and reason are required even for an idempotent retry.
++        if row["cancelled_at"] is not None:
++            return _full_booking(row, now)
++        if now >= row["end_at"]:
++            raise DomainError("TRANSITION_CLOSED", "预约已结束，不能取消。")
++        before = dto.booking_snapshot(row)
++        conn.execute("UPDATE reservations SET cancelled_at=?,cancelled_by=?,cancel_reason=? WHERE id=?",
++                     (now, actor.id, reason, normalized_id))
++        conn.execute("DELETE FROM occupancy_slots WHERE reservation_id=?", (normalized_id,))
++        row = conn.execute(_BOOKING_DETAIL_SELECT + "WHERE r.id=?", (normalized_id,)).fetchone()
++        current_app.config["AUDIT_WRITER"](conn, {
++            "actor_id": actor.id, "actor_display_name": actor.display_name,
++            "action": "booking.cancelled_by_admin", "target_type": "booking", "target_id": normalized_id,
++            "occurred_at": now, "before": before, "after": dto.booking_snapshot(row), "reason": reason,
++        })
++        result = _full_booking(row, now)
++    return result
++
++
+ def my_bookings(actor: auth.Actor, status=None) -> dict:
+     with db.read_transaction() as conn:
+         now = current_app.config["CLOCK"].now_epoch()
+diff --git a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-X-baseline-f46d2ltx/booking_app/static/app.css b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/booking_app/static/app.css
+index 0a6ba5e..78bfb6c 100644
+--- a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-X-baseline-f46d2ltx/booking_app/static/app.css
++++ b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/booking_app/static/app.css
+@@ -91,3 +91,7 @@ textarea[aria-invalid="true"]{border:2px solid #a52b37}
+ #block-confirm{width:20px;height:20px;min-height:20px;flex:0 0 20px;margin-top:3px;padding:0;accent-color:#126d65}
+ 
+ #block-fields{border:0;padding:0;margin:0;min-width:0}
++#admin-cancel-fields{border:0;padding:0;margin:0;min-width:0}
++#admin-cancel-panel{margin-top:28px;padding-top:20px;border-top:1px solid #dde6e8}
++#admin-cancel-summary{white-space:pre-wrap}
++#admin-cancel-confirm{width:20px;height:20px;min-height:20px;flex:0 0 20px;margin-top:3px;padding:0;accent-color:#126d65}
+diff --git a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-X-baseline-f46d2ltx/booking_app/static/blocks.js b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/booking_app/static/blocks.js
+index d016e33..f096ce6 100644
+--- a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-X-baseline-f46d2ltx/booking_app/static/blocks.js
++++ b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/booking_app/static/blocks.js
+@@ -8,6 +8,9 @@
+   const conflicts = find("block-conflicts"), relogin = find("block-relogin"), refresh = find("block-rooms-refresh");
+   const statuses = {pending:"待开始", in_progress:"进行中", ended:"已结束", cancelled:"已取消", revoked:"已撤销"};
+   let creating = false, refreshing = false, blocked = false, createdMessage = "";
++  const cancelForm = find("admin-cancel-form"), cancelReason = find("admin-cancel-reason"), cancelConfirm = find("admin-cancel-confirm");
++  const cancelFeedback = find("admin-cancel-feedback");
++  let cancelling = false, selectedBooking = null, cancelledMessage = "";
+   const lists = ["bookings", "blocks"].map(kind => ({kind, form:find(`admin-${kind}-form`),
+     items:find(`admin-${kind}-items`), feedback:find(`admin-${kind}-feedback`), busy:false, revision:0}));
+   const fields = list => ["room_id", "date", "status"].map(name => list.form.elements.namedItem(name));
+@@ -56,11 +59,15 @@
+     } finally { window.clearTimeout(timer); }
+   }
+   function controls() {
+-    [...inputs,confirm,submit].forEach(node => { node.disabled = blocked || creating || refreshing || lists.some(list => list.busy); });
+-    refresh.disabled = blocked || creating || refreshing || lists.some(list => list.busy);
++    [...inputs,confirm,submit].forEach(node => { node.disabled = blocked || creating || cancelling || refreshing || lists.some(list => list.busy); });
++    refresh.disabled = blocked || creating || cancelling || refreshing || lists.some(list => list.busy);
++    if (cancelForm) {
++      find("admin-cancel-fields").disabled = blocked || cancelling || creating || refreshing || lists.some(list => list.busy);
++      if (cancelling) cancelForm.setAttribute("aria-busy","true"); else cancelForm.removeAttribute("aria-busy");
++    }
+     if (creating) form.setAttribute("aria-busy","true"); else form.removeAttribute("aria-busy");
+     for (const list of lists) {
+-      [...fields(list), find(`admin-${list.kind}-submit`)].forEach(node => { node.disabled = blocked || list.busy || refreshing || creating; });
++      [...fields(list), find(`admin-${list.kind}-submit`), ...list.items.querySelectorAll("button")].forEach(node => { node.disabled = blocked || list.busy || refreshing || creating || cancelling; });
+       if (list.busy) list.form.setAttribute("aria-busy","true"); else list.form.removeAttribute("aria-busy");
+     }
+   }
+@@ -72,6 +79,11 @@
+     const message = error.code === "AUTH_REQUIRED" ? "登录已失效，请重新登录后打开管理页。" : "当前无管理权限，请以管理员身份重新登录。";
+     say(feedback, `${createdMessage}${message} 表单输入已保留，不会自动提交。`, true);
+     say(find("block-rooms-feedback"),message,true);
++    if (cancelForm) {
++      find("admin-cancel-summary").textContent = "";
++      find("admin-cancel-relogin").hidden = false;
++      say(cancelFeedback,`${cancelledMessage}${message} 原因已保留，不会自动提交。`,true);
++    }
+     for (const list of lists) { list.items.replaceChildren(); say(list.feedback,message,true); }
+     controls();
+     if (broadcast && firstLoss) document.dispatchEvent(new CustomEvent("admin-auth-lost", {detail:{code:error.code}}));
+@@ -104,7 +116,24 @@
+       for (const [label,value] of pairs) {
+         const dt = document.createElement("dt"), dd = document.createElement("dd"); dt.textContent = label; dd.textContent = value; detail.append(dt,dd);
+       }
+-      item.append(title,detail); list.items.append(item);
++      item.append(title,detail);
++      if (booking && cancelForm && row.status !== "ended") {
++        const button = document.createElement("button"); button.type = "button"; button.className = "button-secondary";
++        button.textContent = `${row.status === "cancelled" ? "确认取消状态" : "管理员取消"} · 预约 ${row.id}`;
++        button.addEventListener("click", () => {
++          if (blocked || cancelling || creating || refreshing || list.busy) return;
++          if (!Number.isSafeInteger(row.id)) { say(list.feedback,"当前浏览器无法安全提交此预约编号。",true); return; }
++          selectedBooking = row;
++          cancelReason.value = ""; cancelConfirm.checked = false; cancelledMessage = "";
++          cancelReason.removeAttribute("aria-invalid"); find("admin-cancel-reason-error").textContent = "";
++          find("admin-cancel-panel").hidden = false; find("admin-cancel-relogin").hidden = true;
++          find("admin-cancel-summary").textContent = `预约 ${row.id} · ${row.title}\n${row.room.name} · 北京时间 ${formatted(row.start_local)} 至 ${formatted(row.end_local)} · ${statuses[row.status]}`;
++          say(cancelFeedback,row.status === "cancelled" ? "此预约已取消。仍须填写合规原因；确认只返回原取消信息，不会覆盖。" : "请填写原因并核对后确认。");
++          controls(); cancelReason.focus();
++        });
++        item.append(button);
++      }
++      list.items.append(item);
+     }
+   }
+   async function load(list, automatic = false) {
+@@ -124,7 +153,7 @@
+       const lostIdentity = failure.serverError && identityError(failure.serverError);
+       if (!blocked && !lostIdentity && revision === list.revision) {
+         const error = failure.serverError;
+-        say(list.feedback,`${automatic ? "停用已创建，但列表刷新失败。" : "管理记录查询失败。"} ${error ? error.message : "请稍后手动查询。"} 筛选条件已保留。`,true);
++        say(list.feedback,`${automatic ? (list.kind === "bookings" ? "取消已成功，但列表刷新失败。" : "停用已创建，但列表刷新失败。") : "管理记录查询失败。"} ${error ? error.message : "请稍后手动查询。"} 筛选条件已保留。`,true);
+         for (const input of fields(list)) if (error?.fields[input.name]) {
+           input.setAttribute("aria-invalid","true"); find(`admin-${list.kind}-${input.name}-error`).textContent = error.fields[input.name];
+           if (focusTarget === list.feedback) focusTarget = input;
+@@ -146,10 +175,10 @@
+     say(list.feedback,"筛选条件已更改，请重新查询记录。");
+   });
+   for (const list of lists) list.form.addEventListener("submit",event => {
+-    event.preventDefault(); if (!creating && !refreshing) return load(list);
++    event.preventDefault(); if (!creating && !cancelling && !refreshing) return load(list);
+   });
+   form.addEventListener("submit", async event => {
+-    event.preventDefault(); if (creating || refreshing || blocked || lists.some(list => list.busy) || !confirm.checked) return;
++    event.preventDefault(); if (creating || cancelling || refreshing || blocked || lists.some(list => list.busy) || !confirm.checked) return;
+     const values = {room_id:Number(inputs[0].value), start:inputs[1].value, end:inputs[2].value, reason:inputs[3].value};
+     const initiatedHere = form.contains(document.activeElement); let focusTarget = feedback;
+     for (const input of inputs) { input.removeAttribute("aria-invalid"); find(`block-${input.name}-error`).textContent = ""; }
+@@ -190,7 +219,7 @@
+     }
+   });
+   refresh.addEventListener("click", async () => {
+-    if (blocked || refreshing || creating || lists.some(list => list.busy)) return;
++    if (blocked || refreshing || creating || cancelling || lists.some(list => list.busy)) return;
+     const initiatedHere = document.activeElement === refresh; refreshing = true; controls();
+     const output = find("block-rooms-feedback"); say(output,"正在刷新会议室选项…");
+     try {
+@@ -211,6 +240,46 @@
+       if (initiatedHere && (!document.activeElement || document.activeElement === document.body)) (blocked ? feedback : refresh).focus();
+     }
+   });
++  if (cancelForm) {
++    for (const event of ["input","change"]) cancelReason.addEventListener(event, () => { cancelConfirm.checked = false; });
++    cancelForm.addEventListener("submit", async event => {
++      event.preventDefault();
++      if (blocked || cancelling || creating || refreshing || lists.some(list => list.busy) || !selectedBooking || !cancelConfirm.checked) return;
++      const bookingId = selectedBooking.id, initiatedHere = cancelForm.contains(document.activeElement);
++      let focusTarget = cancelFeedback;
++      cancelledMessage = ""; cancelling = true; controls();
++      find("admin-cancel-relogin").hidden = true;
++      cancelReason.removeAttribute("aria-invalid"); find("admin-cancel-reason-error").textContent = "";
++      say(cancelFeedback,`正在确认取消预约 ${bookingId}，请稍候…`);
++      try {
++        const record = await request(`/api/admin/bookings/${bookingId}/cancel`,{reason:cancelReason.value});
++        if (!recordShape(record,"bookings") || record.id !== bookingId || record.status !== "cancelled") throw new Error("Unconfirmed cancellation");
++        cancelledMessage = `预约 ${bookingId} 已取消，时段已释放。`;
++        if (blocked) { say(cancelFeedback,`${cancelledMessage} 请重新登录后查看详情。`,true); return; }
++        selectedBooking = record; cancelConfirm.checked = false;
++        find("admin-cancel-summary").textContent = `预约 ${record.id} · ${record.title} · 已取消\n取消时间（北京时间）：${formatted(record.cancelled_local)}\n操作者：${record.cancelled_by_display_name}\n原取消原因：${record.cancel_reason ?? "本人取消，无原因"}`;
++        say(cancelFeedback,`${cancelledMessage} 原取消信息和历史已保留。日程与可用性将在预约页查询时更新。`);
++        await load(lists[0],true);
++      } catch (failure) {
++        const error = failure.serverError;
++        if (error) {
++          if (!( ["AUTH_REQUIRED","FORBIDDEN"].includes(error.code) && identityError(error)) && !blocked) {
++            say(cancelFeedback,`${error.message} 原因已保留，可核对后重试。`,true);
++            if (error.code === "CSRF_REJECTED") find("admin-cancel-relogin").hidden = false;
++            if (error.fields.reason) {
++              cancelReason.setAttribute("aria-invalid","true"); find("admin-cancel-reason-error").textContent = error.fields.reason; focusTarget = cancelReason;
++            }
++          }
++        } else if (!blocked) {
++          cancelConfirm.checked = false;
++          say(cancelFeedback,"未能确认取消结果。原因已保留，请重新勾选确认后重试原预约；不会自动重试。",true);
++        }
++      } finally {
++        cancelling = false; controls();
++        if (initiatedHere && focusAllowed(cancelForm)) focusTarget.focus();
++      }
++    });
++  }
+   controls();
+   find("block-script-unavailable").hidden = true;
+   find("block-fields").disabled = false;
+diff --git a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-X-baseline-f46d2ltx/booking_app/templates/admin.html b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/booking_app/templates/admin.html
+index 6193582..ccd0c9c 100644
+--- a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-X-baseline-f46d2ltx/booking_app/templates/admin.html
++++ b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/booking_app/templates/admin.html
+@@ -62,7 +62,7 @@
+ {% for kind, label, terminal, terminal_label in [('bookings','预约','cancelled','已取消'),('blocks','停用','revoked','已撤销')] %}
+ <section class="card admin-section" aria-labelledby="admin-{{ kind }}-title">
+   <h2 id="admin-{{ kind }}-title">完整{{ label }}记录</h2>
+-  <p class="muted">仅查看；按开始时间和编号升序。日期按北京时间相交筛选，留空显示全部。</p>
++  <p class="muted">按开始时间和编号升序。日期按北京时间相交筛选，留空显示全部。{% if kind == 'bookings' %}可说明原因取消未结束预约；原因将对预约人可见。{% endif %}</p>
+   <form id="admin-{{ kind }}-form">
+     <div class="availability-fields">
+       <div class="form-field"><label for="admin-{{ kind }}-room_id">会议室</label><select id="admin-{{ kind }}-room_id" name="room_id" aria-describedby="admin-{{ kind }}-room_id-error"><option value="">全部会议室</option>{% for room in rooms['items'] %}<option value="{{ room.id }}">{{ room.name }} · {{ room.location }}</option>{% endfor %}</select><p id="admin-{{ kind }}-room_id-error" class="field-error"></p></div>
+@@ -73,6 +73,21 @@
+   </form>
+   <p id="admin-{{ kind }}-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1">尚未查询{{ label }}记录，请选择条件后查询。</p>
+   <ul id="admin-{{ kind }}-items" class="history-items"></ul>
++  {% if kind == 'bookings' %}
++  <section id="admin-cancel-panel" hidden aria-labelledby="admin-cancel-title">
++    <h3 id="admin-cancel-title" tabindex="-1">管理员取消预约</h3>
++    <p id="admin-cancel-summary" class="notice"></p>
++    <form id="admin-cancel-form">
++      <fieldset id="admin-cancel-fields" disabled>
++        <div class="form-field"><label for="admin-cancel-reason">取消原因（1—500 字，对预约人可见）</label><textarea id="admin-cancel-reason" name="reason" rows="3" required aria-describedby="admin-cancel-reason-error"></textarea><p id="admin-cancel-reason-error" class="field-error"></p></div>
++        <label class="room-confirm-label" for="admin-cancel-confirm"><input id="admin-cancel-confirm" type="checkbox" required>我已核对预约及原因，确认取消</label>
++        <button id="admin-cancel-submit" class="button-primary" type="submit">确认管理员取消</button>
++      </fieldset>
++    </form>
++    <p id="admin-cancel-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>
++    <a id="admin-cancel-relogin" class="relogin-link" href="{{ url_for('web.login_page') }}" hidden>重新登录（不会自动提交）</a>
++  </section>
++  {% endif %}
+ </section>
+ {% endfor %}
+ {% endblock %}
+diff --git a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-X-baseline-f46d2ltx/booking_app/web.py b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/booking_app/web.py
+index 900bc17..3e9e384 100644
+--- a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-X-baseline-f46d2ltx/booking_app/web.py
++++ b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/booking_app/web.py
+@@ -112,6 +112,17 @@ def admin_bookings_api():
+     return jsonify(ok=True, data=services.admin_bookings(actor, request.args.get("room_id"), request.args.get("date"), request.args.get("status")))
+ 
+ 
++@bp.post("/api/admin/bookings/<booking_id>/cancel")
++def admin_cancel_booking_api(booking_id):
++    actor = services.require_admin(auth.actor_for_token(token()))
++    if request.mimetype != "application/json":
++        raise DomainError("INVALID_INPUT", "请使用 JSON 格式提交取消原因。")
++    values = payload()
++    if set(values) != {"reason"}:
++        raise DomainError("INVALID_INPUT", "请仅提交取消原因。", {"reason": "请填写取消原因。"})
++    return jsonify(ok=True, data=services.admin_cancel_booking(actor, booking_id, values["reason"]))
++
++
+ @bp.get("/api/admin/blocks")
+ def admin_blocks_api():
+     actor = services.require_admin(auth.actor_for_token(token()))
+diff --git a/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/scripts/verify_admin_cancel_browser.cjs b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/scripts/verify_admin_cancel_browser.cjs
+new file mode 100644
+index 0000000..7ce835a
+--- /dev/null
++++ b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/scripts/verify_admin_cancel_browser.cjs
+@@ -0,0 +1,89 @@
++// Real browser operations; evidence excludes synthetic passwords and session credentials.
++const {chromium}=require('playwright');
++const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
++const [origin,credentialsFile,outputDir,executablePath]=process.argv.slice(2);
++const users=JSON.parse(fs.readFileSync(credentialsFile,'utf8')).users;
++const fullKeys=['id','room','title','purpose','attendees','owner_id','owner_display_name','start_at','start_local','end_at','end_local','status','created_at','created_local','cancelled_at','cancelled_local','cancelled_by_id','cancelled_by_display_name','cancel_reason'].sort();
++async function login(context,user){const page=await context.newPage();await page.goto(origin+'/login');await page.locator('#username').fill(user.username);await page.locator('#password').fill(user.password);await page.locator('#password').press('Enter');await page.waitForURL(origin+'/');return page;}
++async function settled(page){await page.waitForFunction(()=>!document.querySelector('#admin-cancel-form').hasAttribute('aria-busy'));}
++async function width(page){const sizes=await page.evaluate(()=>({document:document.documentElement.scrollWidth,viewport:innerWidth}));assert.ok(sizes.document<=sizes.viewport);return sizes;}
++(async()=>{
++  assert.equal(require('playwright/package.json').version,'1.58.2');
++  const browser=await chromium.launch({headless:true,executablePath});const results=[];
++  try{
++    for(const viewport of [{width:1280,height:800},{width:390,height:844}]){
++      const context=await browser.newContext({viewport}),page=await login(context,users[2]);
++      const target=viewport.width===1280?103:104,ongoing=viewport.width===1280?102:201,network=[],errors=[];
++      page.on('pageerror',error=>errors.push(error.name));let posts=0;
++      page.on('request',request=>{if(request.method()==='POST'&&request.url().endsWith('/cancel'))posts++;});
++      const saveNetwork=()=>fs.writeFileSync(path.join(outputDir,`admin-cancel-network-${viewport.width}.json`),JSON.stringify(network,null,2));
++      async function capture(response,phase){const url=new URL(response.url());const result={phase,path:url.pathname+url.search,status:response.status(),body:await response.json()};network.push(result);saveNetwork();return result;}
++      async function screenshot(name,locator='#admin-cancel-panel'){await page.locator(locator).scrollIntoViewIfNeeded();await width(page);await page.screenshot({path:path.join(outputDir,`${name}-${viewport.width}.png`),fullPage:true});await page.locator(locator).screenshot({path:path.join(outputDir,`${name}-panel-${viewport.width}.png`)});}
++      async function choose(id){await page.locator('#admin-bookings-items button').filter({hasText:new RegExp(`预约 ${id}$`)}).click();await page.locator('#admin-cancel-reason').waitFor({state:'visible'});}
++      await page.goto(origin+'/admin');await page.locator('#admin-bookings-submit').click();await page.waitForSelector('#admin-bookings-items li');
++      assert.equal(await page.locator('#admin-bookings-items li').filter({has:page.locator('h3').filter({hasText:'预约 101 ·'})}).locator('button').count(),0);
++      await choose(target);assert.equal(await page.locator('#admin-cancel-reason').isEnabled(),true);
++      await page.locator('#admin-cancel-reason').fill('   ');await page.locator('#admin-cancel-confirm').check();
++      let response=page.waitForResponse(r=>r.url().endsWith(`/${target}/cancel`));await page.locator('#admin-cancel-submit').click();
++      const invalid=await capture(await response,'blank-reason-rejected');assert.equal(invalid.status,400);await settled(page);
++      assert.equal(await page.locator('#admin-cancel-reason').inputValue(),'   ');assert.equal(await page.evaluate(()=>document.activeElement.id),'admin-cancel-reason');
++      const reason='<svg onload="window.adminCancelXss=1">维护说明</svg> '+ '长文本' .repeat(50);
++      await page.locator('#admin-cancel-reason').fill(reason);assert.equal(await page.locator('#admin-cancel-confirm').isChecked(),false);
++      const beforeNoConfirm=posts;await page.locator('#admin-cancel-submit').click();assert.equal(posts,beforeNoConfirm);
++      await page.locator('#admin-cancel-confirm').check();
++      await page.route(`**/api/admin/bookings/${target}/cancel`,async route=>{const headers=route.request().headers();delete headers['x-csrf-token'];await route.continue({headers});});
++      response=page.waitForResponse(r=>r.url().endsWith(`/${target}/cancel`));await page.locator('#admin-cancel-submit').click();
++      const rejected=await capture(await response,'real-csrf-rejection');assert.equal(rejected.status,403);await settled(page);
++      assert.equal(await page.locator('#admin-cancel-reason').inputValue(),reason);assert.equal(await page.locator('#admin-cancel-reason').isEnabled(),true);
++      await screenshot('admin-cancel-rejected');await page.unroute(`**/api/admin/bookings/${target}/cancel`);
++      let release;const gate=new Promise(resolve=>{release=resolve;});
++      await page.route(`**/api/admin/bookings/${target}/cancel`,async route=>{await gate;await route.continue();});
++      response=page.waitForResponse(r=>r.url().endsWith(`/${target}/cancel`));await page.locator('#admin-cancel-submit').click();
++      assert.equal(await page.locator('#admin-cancel-submit').isDisabled(),true);assert.equal(await page.locator('#admin-cancel-reason').isDisabled(),true);
++      assert.equal(await page.locator('#admin-bookings-submit').isDisabled(),true);await screenshot('admin-cancel-waiting');
++      await page.locator('#room-name').focus();release();const success=await capture(await response,'pending-cancel-success');assert.equal(success.status,200);await settled(page);
++      assert.equal(await page.evaluate(()=>document.activeElement.id),'room-name');assert.deepEqual(Object.keys(success.body.data).sort(),fullKeys);
++      assert.equal(success.body.data.cancel_reason,reason);assert.equal(success.body.data.cancelled_by_id,3);
++      assert.match(await page.locator('#admin-cancel-summary').textContent(),/已取消/);assert.ok((await page.locator('#admin-cancel-summary').textContent()).includes(reason));
++      assert.equal(await page.locator('#admin-cancel-summary svg,#admin-bookings-items svg').count(),0);assert.equal(await page.evaluate(()=>window.adminCancelXss),undefined);
++      const row=page.locator('#admin-bookings-items li').filter({has:page.locator('h3').filter({hasText:`预约 ${target} ·`})});assert.match(await row.textContent(),/已取消/);
++      await screenshot('admin-cancel-success');await page.unroute(`**/api/admin/bookings/${target}/cancel`);
++      await page.locator('#admin-cancel-reason').fill('重新确认的合规原因');await page.locator('#admin-cancel-confirm').check();
++      response=page.waitForResponse(r=>r.url().endsWith(`/${target}/cancel`));await page.locator('#admin-cancel-submit').focus();await page.keyboard.press('Enter');
++      const repeated=await capture(await response,'repeat-keeps-first-facts');await settled(page);assert.deepEqual(repeated.body,success.body);
++      assert.equal(await page.evaluate(()=>document.activeElement.id),'admin-cancel-feedback');
++      await choose(ongoing);await page.locator('#admin-cancel-reason').fill('进行中预约的合成管理原因');await page.locator('#admin-cancel-confirm').check();
++      await page.route(`**/api/admin/bookings/${ongoing}/cancel`,async route=>{await capture(await route.fetch(),'committed-response-dropped');await route.abort();});
++      const beforeUnknown=posts;await page.locator('#admin-cancel-submit').click();await page.waitForFunction(()=>document.querySelector('#admin-cancel-feedback').textContent.includes('未能确认'));await settled(page);
++      assert.equal(posts,beforeUnknown+1);assert.equal(await page.locator('#admin-cancel-confirm').isChecked(),false);
++      assert.equal(await page.locator('#admin-cancel-reason').inputValue(),'进行中预约的合成管理原因');await screenshot('admin-cancel-unknown');
++      await page.unroute(`**/api/admin/bookings/${ongoing}/cancel`);await page.locator('#admin-cancel-confirm').check();
++      response=page.waitForResponse(r=>r.url().endsWith(`/${ongoing}/cancel`));await page.locator('#admin-cancel-submit').click();
++      const ongoingResult=await capture(await response,'in-progress-manual-retry');assert.equal(ongoingResult.status,200);await settled(page);
++      assert.deepEqual(ongoingResult.body,network.find(item=>item.phase==='committed-response-dropped').body);
++      const memberContext=await browser.newContext({viewport}),member=await login(memberContext,users[0]);
++      await member.goto(origin+'/my');await member.locator('#history-items button').filter({hasText:`编号 ${target}`}).click();await member.waitForFunction(()=>!document.querySelector('#detail-fields').hidden);
++      const detail=await member.locator('#detail-fields').evaluate(node=>{const result={};for(let i=0;i<node.children.length;i+=2)result[node.children[i].textContent]=node.children[i+1].textContent;return result;});
++      assert.equal(detail['取消原因'],reason);assert.equal(detail['取消操作者'],'演示管理员');assert.equal(detail['状态'],'已取消');
++      assert.equal(await member.locator('#detail-fields svg,#detail-fields script,#detail-fields img').count(),0);assert.equal(await member.evaluate(()=>window.adminCancelXss),undefined);
++      await width(member);await member.locator('#history-detail').scrollIntoViewIfNeeded();await member.screenshot({path:path.join(outputDir,`member-visible-reason-${viewport.width}.png`),fullPage:true});
++      const csrf=(await(await memberContext.request.get(origin+'/api/me')).json()).data.csrf_token;
++      const denied=await capture(await memberContext.request.post(`${origin}/api/admin/bookings/0/cancel`,{headers:{Origin:origin,'X-CSRF-Token':csrf},data:{reason:null}}),'member-admin-denied');assert.equal(denied.status,403);
++      const original=success.body.data;
++      await member.goto(origin+'/');await member.locator('#start').fill(original.start_local.slice(0,16));await member.locator('#end').fill(original.end_local.slice(0,16));await member.locator('#attendees').fill('5');
++      await member.locator('#availability-form button[type=submit]').click();await member.waitForFunction(()=>!document.querySelector('#availability-form').hasAttribute('aria-busy'));
++      assert.ok((await member.locator('#availability-results').textContent()).includes(original.room.name));
++      const availability=await capture(await memberContext.request.get(`${origin}/api/availability?start=${original.start_local.slice(0,16)}&end=${original.end_local.slice(0,16)}&attendees=5`),'released-availability');
++      assert.ok(availability.body.data.items.some(room=>room.id===original.room.id));
++      await memberContext.close();
++      const logoutPage=await context.newPage();await logoutPage.goto(origin+'/admin');await logoutPage.locator('#logout-form button').click();await logoutPage.waitForURL(origin+'/login?logged_out=1');
++      await page.locator('#admin-cancel-confirm').check();await page.locator('#admin-cancel-submit').click();await page.waitForFunction(()=>!document.querySelector('#admin-cancel-relogin').hidden&&document.querySelector('#admin-cancel-fields').disabled);await settled(page);
++      assert.equal(await page.locator('#admin-bookings-items li').count(),0);assert.equal(await page.locator('#admin-cancel-summary').textContent(),'');
++      assert.equal(await page.locator('#admin-cancel-reason').inputValue(),'进行中预约的合成管理原因');await screenshot('admin-cancel-session-lost');
++      assert.deepEqual(errors,[]);results.push({viewport,width:await width(page),pending_and_in_progress:true,confirmation_required:true,reason_failure_retained:true,
++        csrf_rejection:true,waiting_disabled:true,first_result_preserved:true,unknown_manual_retry:true,member_sees_reason:true,member_management_denied:true,
++        released_availability:true,session_loss_blocks:true,plain_text_xss:true,keyboard_and_focus:true,page_errors:errors});await context.close();
++    }
++    console.log(JSON.stringify({result:'PASS',browser:await browser.version(),runner:'Playwright 1.58.2',node_version:process.version,results},null,2));
++  }finally{await browser.close();}
++})().catch(error=>{const source=String(error.stack).match(/verify_admin_cancel_browser\.cjs:[0-9]+:[0-9]+/);fs.writeFileSync(path.join(outputDir,'browser-failure.json'),JSON.stringify({error_type:error.name,source:source?source[0]:null},null,2));console.error(error.name);process.exitCode=1;});
+diff --git a/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/scripts/verify_admin_cancel_browser.py b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/scripts/verify_admin_cancel_browser.py
+new file mode 100644
+index 0000000..4ea99d1
+--- /dev/null
++++ b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/scripts/verify_admin_cancel_browser.py
+@@ -0,0 +1,134 @@
++"""Story 2.5 isolated administrator cancellation browser validation with shared verified process lifecycle."""
++import argparse
++from datetime import datetime, timezone
++import hashlib
++import json
++import os
++from pathlib import Path
++import secrets
++import socket
++import subprocess
++import sys
++import tempfile
++import time
++
++from booking_app import ROOT, db
++from scripts.init_demo import DEMO_IDENTITIES, seed_users
++from scripts.verify_auth_browser import write_report
++from tests.history_fixtures import FixedClock, seed_history_fixture
++
++
++
++from scripts.verify_history_browser import (require_process_groups, stop_process_group,
++    browser_wrapper, run_driver, environment_metadata, facts)
++
++
++def source_fingerprints():
++    app_files = sorted(path for path in (ROOT / 'booking_app').rglob('*')
++                       if path.is_file() and path.suffix in {'.py','.sql','.js','.css','.html'})
++    helpers = [ROOT / path for path in (
++        'scripts/verify_admin_cancel_browser.py', 'scripts/verify_admin_cancel_browser.cjs',
++        'scripts/verify_history_browser.py',
++        'scripts/verify_auth_browser.py', 'scripts/init_demo.py',
++        'tests/history_fixtures.py', 'tests/schedule_fixtures.py')]
++    def hashes(paths):
++        return {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
++    return {'app_source_files_sha256': hashes(app_files), 'verification_source_files_sha256': hashes(helpers)}
++
++
++def run(args):
++    require_process_groups()
++    origin = f'http://127.0.0.1:{args.port}'
++    with socket.socket() as probe: probe.bind(('127.0.0.1', args.port))
++    with tempfile.TemporaryDirectory(prefix='grb-admin-cancel-browser-') as directory:
++        temporary = Path(directory)
++        users = [dict(username=u, display_name=d, role=r, password=secrets.token_urlsafe(24)) for u,d,r in (*DEMO_IDENTITIES, ('demo_empty', '合成空记录成员', 'member'))]
++        credentials = temporary / 'demo.credentials.json'
++        credentials.touch(mode=0o600)
++        credentials.write_text(json.dumps({'users': users}), encoding='utf-8')
++        database = temporary / 'history.sqlite3'
++        seed_users(database, users, FixedClock())
++        seed_history_fixture(database)
++        before = facts(database)
++        env = dict(os.environ, BOOKING_DB_PATH=str(database), APP_ORIGIN=origin, COOKIE_SECURE='false',
++                   TRUSTED_HOSTS='127.0.0.1', NODE_PATH=str(args.playwright_root.resolve()))
++        executable = args.browser_executable
++        if executable is None:
++            resolved = subprocess.run(['node', '-e', 'process.stdout.write(require("playwright").chromium.executablePath())'],
++                env=env, cwd=ROOT, capture_output=True, text=True, check=True, timeout=10, start_new_session=True)
++            executable = Path(resolved.stdout)
++        wrapper, registry = browser_wrapper(temporary, executable.resolve())
++        command = [sys.executable, '-m', 'waitress', f'--listen=127.0.0.1:{args.port}', '--threads=8',
++                   '--call', 'scripts.verify_auth_browser:create_schedule_verification_app']
++        with (temporary / 'waitress.log').open('w') as log:
++            server = subprocess.Popen(command, cwd=ROOT, env=env, stdout=log, stderr=log, start_new_session=True)
++            try:
++                for _ in range(100):
++                    if server.poll() is not None: raise RuntimeError('Waitress startup failed')
++                    try:
++                        with socket.create_connection(('127.0.0.1', args.port), timeout=.1): break
++                    except OSError: time.sleep(.05)
++                else: raise RuntimeError('Waitress startup timeout')
++                result = run_driver(['node', str(ROOT / 'scripts/verify_admin_cancel_browser.cjs'), origin,
++                    str(credentials), str(args.output_dir), str(wrapper)], env, registry)
++                if result.returncode: raise RuntimeError('Browser verification failed; private diagnostics omitted')
++                report = json.loads(result.stdout)
++                after = facts(database)
++                originals = {r['id']: r for r in before['reservations']}
++                changed = {102, 103, 104, 201}
++                for row in after['reservations']:
++                    slots = sorted(s['slot_start'] for s in after['occupancy_slots'] if s['reservation_id'] == row['id'])
++                    assert slots == ([] if row['cancelled_at'] is not None else list(range(row['start_at'], row['end_at'], 1800)))
++                    if row['id'] in changed:
++                        assert row['cancelled_at'] == FixedClock().now_epoch() and row['cancelled_by'] == 3
++                        assert row['cancel_reason']
++                        assert row == originals[row['id']] | dict(cancelled_at=row['cancelled_at'], cancelled_by=3, cancel_reason=row['cancel_reason'])
++                        events = [a for a in after['audit_events'] if a['target_id'] == row['id']]
++                        assert len(events) == 1 and events[0]['action'] == 'booking.cancelled_by_admin'
++                        assert events[0]['reason'] == row['cancel_reason']
++                        assert json.loads(events[0]['before_json'])['cancelled_at'] is None
++                        assert json.loads(events[0]['after_json'])['cancelled_at'] == row['cancelled_at']
++                    else: assert row == originals[row['id']]
++                assert len(after['reservations']) == len(before['reservations'])
++                assert len(after['audit_events']) == 4
++                write_report(args.output_dir / 'storage.json', {'before': before, 'after': after, 'cancellation_invariants_verified': True})
++                report['storage'] = {'cancellation_invariants_verified': True, 'reservations': len(after['reservations']),
++                                     'slots': len(after['occupancy_slots']), 'audits': len(after['audit_events'])}
++                report['server'] = {'command': command, 'threads': 8, 'processes': 1}
++                return report
++            finally:
++                stop_process_group(server.pid, server)
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--port', type=int, default=8015)
++    parser.add_argument('--playwright-root', type=Path, default=ROOT / 'work/browser-tools/node_modules')
++    parser.add_argument('--browser-executable', type=Path)
++    parser.add_argument('--output-dir', type=Path, default=ROOT / 'work/admin-cancel-browser')
++    args = parser.parse_args()
++    args.output_dir = args.output_dir.resolve()
++    args.output_dir.mkdir(parents=True, exist_ok=True)
++    meta = {'run_id': secrets.token_hex(16), 'started_at_utc': datetime.now(timezone.utc).isoformat()}
++    target = args.output_dir / 'browser-results.json'
++    write_report(target, meta | {'result': 'INCOMPLETE', 'completed': False})
++    run_args = argparse.Namespace(**(vars(args) | {'output_dir': args.output_dir / 'runs' / meta['run_id']}))
++    run_args.output_dir.mkdir(parents=True)
++    meta['artifact_directory'] = f"runs/{meta['run_id']}"
++    try:
++        meta.update(environment=environment_metadata(args), **source_fingerprints())
++        observed = run(run_args)
++        if any(meta[key] != value for key, value in source_fingerprints().items()):
++            raise RuntimeError('Verification sources changed during this run')
++        report = observed | meta | {'result': 'PASS', 'completed': True,
++                                       'finished_at_utc': datetime.now(timezone.utc).isoformat()}
++    except BaseException as error:
++        report = meta | {'result': 'INCOMPLETE', 'completed': False, 'error_type': type(error).__name__}
++        write_report(target, report)
++        print(json.dumps(report, ensure_ascii=False, indent=2))
++        return 1
++    write_report(target, report)
++    print(json.dumps(report, ensure_ascii=False, indent=2))
++    return 0
++
++if __name__ == '__main__': raise SystemExit(main())
+diff --git a/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/scripts/verify_admin_cancel_http.py b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/scripts/verify_admin_cancel_http.py
+new file mode 100644
+index 0000000..6cd58a8
+--- /dev/null
++++ b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/scripts/verify_admin_cancel_http.py
+@@ -0,0 +1,184 @@
++"""Story 2.5: twenty independent HTTP member/admin races, storage and fault oracles."""
++import argparse
++from concurrent.futures import ThreadPoolExecutor
++from datetime import datetime, timezone
++import hashlib
++import json
++import multiprocessing
++from pathlib import Path
++import secrets
++import sqlite3
++import tempfile
++import threading
++
++from booking_app import ROOT, create_app, db
++from booking_app.audit import audit_writer
++from scripts.init_demo import seed_users
++from scripts.verify_availability_performance import Client, Server, environment, write_json
++from scripts.verify_create_booking_http import FixedClock
++from scripts.verify_history_browser import facts
++from tests.history_fixtures import FULL_KEYS
++from tests.schedule_fixtures import NOW
++
++
++def server_main(database, port, fault):
++    from waitress import serve
++    def writer(conn, event):
++        if fault == 'before': raise RuntimeError('synthetic private audit fault')
++        audit_writer(conn, event)
++        if fault == 'after': raise RuntimeError('synthetic private audit fault')
++        if fault == 'commit':
++            conn.set_authorizer(lambda action, first, *_: sqlite3.SQLITE_DENY
++                if action == sqlite3.SQLITE_TRANSACTION and first == 'COMMIT' else sqlite3.SQLITE_OK)
++    config = {'TESTING': True, 'DATABASE': database, 'CLOCK': FixedClock(),
++              'APP_ORIGIN': f'http://127.0.0.1:{port}', 'TRUSTED_HOSTS': ['127.0.0.1']}
++    if fault: config['AUDIT_WRITER'] = writer
++    serve(create_app(config), host='127.0.0.1', port=port, threads=8)
++
++
++class CancelServer(Server):
++    def __init__(self, database, fault=None):
++        super().__init__(database)
++        self.process = multiprocessing.get_context('spawn').Process(target=server_main, args=(str(database), self.port, fault))
++
++
++def checked_storage(database):
++    value = facts(database)
++    with db.read_transaction(database) as conn:
++        assert conn.execute('PRAGMA integrity_check').fetchone()[0] == 'ok'
++        assert conn.execute('PRAGMA foreign_key_check').fetchall() == []
++    for record in value['reservations']:
++        slots = sorted(s['slot_start'] for s in value['occupancy_slots'] if s['reservation_id'] == record['id'])
++        assert slots == ([] if record['cancelled_at'] is not None else list(range(record['start_at'], record['end_at'], 1800)))
++        events = [a for a in value['audit_events'] if a['target_type'] == 'booking' and a['target_id'] == record['id']]
++        assert sum(a['action'] == 'booking.created' for a in events) == 1
++        cancelled = [a for a in events if a['action'] in ('booking.cancelled_by_member', 'booking.cancelled_by_admin')]
++        assert len(cancelled) == int(record['cancelled_at'] is not None)
++        if cancelled:
++            event = cancelled[0]
++            assert event['actor_id'] == record['cancelled_by'] and event['occurred_at'] == record['cancelled_at'] == NOW
++            before = dict(id=record['id'], room_id=record['room_id'], owner_id=record['user_id'], title=record['title'],
++                purpose=record['purpose'], attendees=record['attendees'], start_at=record['start_at'], end_at=record['end_at'],
++                created_at=record['created_at'], cancelled_at=None, cancelled_by_id=None, cancel_reason=None)
++            assert json.loads(event['before_json']) == before
++            assert json.loads(event['after_json']) == before | dict(cancelled_at=NOW, cancelled_by_id=record['cancelled_by'], cancel_reason=record['cancel_reason'])
++            assert event['reason'] == record['cancel_reason']
++            if event['action'] == 'booking.cancelled_by_member': assert record['cancelled_by'] == record['user_id'] and record['cancel_reason'] is None
++            else: assert record['cancelled_by'] == 2 and record['cancel_reason'] == 'HTTP 合成管理原因'
++    return value
++
++
++def fingerprints():
++    files = list((ROOT / 'booking_app').rglob('*')) + [Path(__file__), ROOT / 'scripts/verify_availability_performance.py', ROOT / 'scripts/verify_history_browser.py']
++    return {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(files)
++            if p.is_file() and p.suffix in {'.py', '.sql', '.js', '.html', '.css'}}
++
++
++def run(output, meta):
++    steps = []; rounds = []
++    def capture(client, phase, path, payload):
++        status, body, elapsed = client.request(path, payload)
++        steps.append(dict(phase=phase, path=path, http_status=status, response=body, duration_ms=elapsed))
++        write_json(output / 'http-steps.json', steps)
++        return status, body
++    with tempfile.TemporaryDirectory(prefix='grb-admin-cancel-http-') as directory:
++        database = Path(directory) / 'test.sqlite3'
++        users = [dict(username='race_member', display_name='合成成员', role='member', password=secrets.token_urlsafe(24)),
++                 dict(username='race_admin', display_name='合成管理员', role='admin', password=secrets.token_urlsafe(24))]
++        seed_users(database, users + [dict(username='other_member', display_name='合成成员乙', role='member',
++                                         password=secrets.token_urlsafe(24))], FixedClock())
++        with db.write_transaction(database) as conn:
++            conn.execute("INSERT INTO rooms VALUES(1,'合成会议室','合成测试楼',20,?,?)", (NOW, NOW))
++        payload = dict(room_id=1, title='合成竞争预约', purpose='合成用途', attendees=5,
++                       start='2026-11-12T12:00', end='2026-11-12T14:00')
++        server = CancelServer(database)
++        try:
++            server.start()
++            write_json(output / 'environment.json', environment(server, meta) | dict(fixed_now=NOW, threads=8,
++                server_start='spawn scripts.verify_admin_cancel_http.server_main; Waitress 8 threads',
++                invocation=['.venv/bin/python', '-m', 'scripts.verify_admin_cancel_http', '--output-dir', str(output)]))
++            for index in range(20):
++                clients = [Client(server.origin), Client(server.origin)]
++                for client, user in zip(clients, users): client.login(user)
++                status, body = capture(clients[0], f'create-{index}', '/api/bookings', payload | dict(intent_key=f'admin-cancel-race-{index:03}'))
++                assert status == 201
++                booking_id = body['data']['booking']['id']; before = checked_storage(database)
++                write_json(output / f'round-{index:02}-before.json', before)
++                barrier = threading.Barrier(2)
++                def cancel(which):
++                    path = f'/api/{"admin/" if which else ""}bookings/{booking_id}/cancel'
++                    try:
++                        barrier.wait(timeout=30)
++                        status, body, elapsed = clients[which].request(path, {'reason': ' HTTP 合成管理原因 '} if which else {})
++                        return dict(actor='admin' if which else 'member', http_status=status, response=body, duration_ms=elapsed)
++                    except Exception as error:
++                        return dict(actor='admin' if which else 'member', http_status=None, error_type=type(error).__name__)
++                with ThreadPoolExecutor(max_workers=2) as pool:
++                    responses = list(pool.map(cancel, [0, 1]))
++                after = facts(database)
++                row = dict(round=index, booking_id=booking_id, responses=responses, storage=after)
++                rounds.append(row); write_json(output / 'race-rounds.json', rounds)
++                assert [r['http_status'] for r in responses] == [200, 200]
++                winner = responses[0]['response']['data']
++                assert responses[1]['response']['data'] == winner and set(winner) == FULL_KEYS
++                assert winner['status'] == 'cancelled'
++                assert (winner['cancelled_by_id'], winner['cancel_reason']) in [(1, None), (2, 'HTTP 合成管理原因')]
++                checked_storage(database)
++                record = next(r for r in after['reservations'] if r['id'] == booking_id)
++                original = next(r for r in before['reservations'] if r['id'] == booking_id)
++                assert record == original | dict(cancelled_at=NOW, cancelled_by=winner['cancelled_by_id'], cancel_reason=winner['cancel_reason'])
++                assert after['occupancy_slots'] == [s for s in before['occupancy_slots'] if s['reservation_id'] != booking_id]
++            status, body = capture(clients[0], 'fault-target', '/api/bookings', payload | dict(intent_key='admin-cancel-fault-target'))
++            assert status == 201
++            fault_id = body['data']['booking']['id']; saved = checked_storage(database)
++            write_json(output / 'before-fault.json', saved)
++        finally: server.stop()
++        for phase in ['before', 'after', 'commit']:
++            server = CancelServer(database, phase)
++            try:
++                server.start(); client = Client(server.origin); client.login(users[1])
++                assert checked_storage(database) == saved
++                status, body = capture(client, f'fault-{phase}', f'/api/admin/bookings/{fault_id}/cancel', {'reason': 'HTTP 合成管理原因'})
++                assert status == 500 and body['error']['code'] == 'INTERNAL_ERROR'
++                observed = facts(database); write_json(output / f'after-fault-{phase}.json', observed)
++                assert observed == saved; checked_storage(database)
++                status, repeated = capture(client, f'repeat-with-{phase}-writer', f'/api/admin/bookings/{rounds[0]["booking_id"]}/cancel', {'reason': '重复合法原因'})
++                assert status == 200 and repeated['data'] == rounds[0]['responses'][0]['response']['data']
++            finally: server.stop()
++        server = CancelServer(database)
++        try:
++            server.start(); client = Client(server.origin); client.login(users[1])
++            assert checked_storage(database) == saved
++            status, result = capture(client, 'cancel-after-restart', f'/api/admin/bookings/{fault_id}/cancel', {'reason': 'HTTP 合成管理原因'})
++            assert status == 200
++            member = Client(server.origin); member.login(users[0])
++            status, result = capture(member, 'replay-old-cancelled-intent', '/api/bookings', payload | dict(intent_key='admin-cancel-fault-target'))
++            assert status == 200 and result['data']['replayed'] and result['data']['booking']['status'] == 'cancelled'
++            final = checked_storage(database); write_json(output / 'final-storage.json', final)
++            assert len(final['reservations']) == 21 and len(final['occupancy_slots']) == 0 and len(final['audit_events']) == 42
++        finally: server.stop()
++    return dict(result='PASS', completed=True, rounds=20, independent_race_sessions=40, http_200=40,
++                transitions_per_round=1, response_facts_agree=True, full_storage_oracle=True,
++                writer_before_after_and_commit_rollback=True, restart_persistence=True, repeat_writer_calls=0,
++                race_winners={role: sum(r['responses'][0]['response']['data']['cancelled_by_id'] == actor for r in rounds)
++                              for role, actor in [('member', 1), ('admin', 2)]})
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--output-dir', type=Path, default=ROOT / 'work/admin-cancel-http')
++    args = parser.parse_args(); args.output_dir.mkdir(parents=True, exist_ok=True)
++    meta = dict(run_id=secrets.token_hex(16), started_at_utc=datetime.now(timezone.utc).isoformat())
++    target = args.output_dir / 'http-result.json'; output = args.output_dir / 'runs' / meta['run_id']; output.mkdir(parents=True)
++    meta['artifact_directory'] = 'runs/' + meta['run_id']; meta['source_sha256'] = fingerprints()
++    write_json(target, meta | dict(result='INCOMPLETE', completed=False))
++    try:
++        report = run(output, meta)
++        assert fingerprints() == meta['source_sha256'], 'Sources changed during run'
++        write_json(target, meta | report | dict(finished_at_utc=datetime.now(timezone.utc).isoformat()))
++    except BaseException as error:
++        write_json(target, meta | dict(result='INCOMPLETE', completed=False, error_type=type(error).__name__)); raise
++    print(json.dumps(report, ensure_ascii=False, indent=2))
++
++
++if __name__ == '__main__': main()
+diff --git a/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/tests/test_admin_cancel.py b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/tests/test_admin_cancel.py
+new file mode 100644
+index 0000000..5fe92c7
+--- /dev/null
++++ b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/tests/test_admin_cancel.py
+@@ -0,0 +1,269 @@
++"""Story 2.5 acceptance matrix; independent cases, file database, no inherited tests."""
++from contextlib import contextmanager
++from dataclasses import replace
++import json
++from pathlib import Path
++import re
++import secrets
++import sqlite3
++import tempfile
++import unittest
++from unittest.mock import patch
++
++from booking_app import auth, create_app, db, dto, services
++from booking_app.audit import audit_writer
++from booking_app.domain import DomainError
++from scripts.init_demo import DEMO_IDENTITIES, seed_users
++from tests.history_fixtures import FULL_KEYS, FixedClock, seed_history_fixture
++from tests.schedule_fixtures import NOW, assert_slot_integrity
++
++ORIGIN = 'http://127.0.0.1:8000'
++
++
++class AdminCancelTests(unittest.TestCase):
++    @classmethod
++    def setUpClass(cls):
++        cls.fixture = tempfile.TemporaryDirectory()
++        cls.fixture_db = Path(cls.fixture.name) / 'fixture.sqlite3'
++        cls.password = secrets.token_urlsafe(24)
++        seed_users(cls.fixture_db, [dict(username=u, display_name=d, role=r, password=cls.password)
++                                  for u, d, r in DEMO_IDENTITIES], FixedClock())
++        seed_history_fixture(cls.fixture_db)
++
++    @classmethod
++    def tearDownClass(cls): cls.fixture.cleanup()
++
++    def setUp(self):
++        directory = tempfile.TemporaryDirectory(); self.addCleanup(directory.cleanup)
++        self.database = Path(directory.name) / 'test.sqlite3'
++        source, dest = db.connect(self.fixture_db), db.connect(self.database)
++        source.backup(dest); source.close(); dest.close()
++        self.clock = FixedClock()
++        self.app = create_app({'TESTING': True, 'DATABASE': str(self.database), 'CLOCK': self.clock})
++        self.client, self.identity = self.login('demo_admin')
++        self.addCleanup(assert_slot_integrity, self, self.database)
++
++    def login(self, username):
++        client = self.app.test_client()
++        page = client.get('/login', base_url=ORIGIN)
++        csrf = re.search(r'name="csrf_token" value="([^"]+)"', page.text).group(1)
++        result = client.post('/api/login', base_url=ORIGIN, headers={'Origin': ORIGIN, 'X-CSRF-Token': csrf},
++                             json=dict(username=username, password=self.password))
++        self.assertEqual(result.status_code, 200)
++        return client, result.json['data']
++
++    def cancel(self, booking_id=103, reason='  维护需要取消  ', client=None, identity=None):
++        return (client or self.client).post(f'/api/admin/bookings/{booking_id}/cancel', base_url=ORIGIN,
++            headers={'Origin': ORIGIN, 'X-CSRF-Token': (identity or self.identity)['csrf_token']}, json={'reason': reason})
++
++    def error(self, response, status, code):
++        self.assertEqual(response.status_code, status, response.text)
++        self.assertEqual(set(response.json), {'ok', 'error'})
++        self.assertFalse(response.json['ok'])
++        self.assertEqual(set(response.json['error']), {'code', 'message', 'fields', 'conflicts'})
++        self.assertEqual(response.json['error']['code'], code)
++        self.assertEqual(response.json['error']['conflicts'], [])
++
++    def facts(self):
++        with db.read_transaction(self.database) as conn:
++            return {table: [dict(row) for row in conn.execute(f'SELECT * FROM {table} ORDER BY 1')]
++                    for table in ('reservations', 'occupancy_slots', 'audit_events')}
++
++    def actor(self):
++        return auth.actor_for_token(self.client.get_cookie(auth.COOKIE_NAME, domain='127.0.0.1').value)
++
++    def test_success_complete_dto_snapshot_same_transaction_once_and_preserved_other_slots(self):
++        before = self.facts(); calls = []; connections = []
++        original = db.write_transaction
++        @contextmanager
++        def tracked(database=None):
++            with original(database) as conn: connections.append(conn); yield conn
++        def writer(conn, event):
++            self.assertIs(conn, connections[0]); self.assertTrue(conn.in_transaction)
++            self.assertEqual(conn.execute('SELECT count(*) FROM occupancy_slots WHERE reservation_id=103').fetchone()[0], 0)
++            self.assertEqual(conn.execute('SELECT cancelled_by FROM reservations WHERE id=103').fetchone()[0], 3)
++            calls.append(event); audit_writer(conn, event)
++        self.app.config['AUDIT_WRITER'] = writer
++        with patch.object(db, 'write_transaction', tracked): result = self.cancel()
++        self.assertEqual(result.status_code, 200); self.assertEqual(set(result.json), {'ok', 'data'})
++        value = result.json['data']; self.assertEqual(set(value), FULL_KEYS)
++        self.assertEqual(set(value['room']), {'id', 'name', 'location', 'capacity'})
++        self.assertEqual((value['status'], value['cancelled_at'], value['cancelled_by_id'], value['cancel_reason']),
++                         ('cancelled', NOW, 3, '维护需要取消'))
++        self.assertEqual(value['cancelled_local'], '2026-11-12T10:00:00+08:00')
++        self.assertEqual(value['cancelled_by_display_name'], '演示管理员')
++        after = self.facts(); old = next(r for r in before['reservations'] if r['id'] == 103)
++        new = next(r for r in after['reservations'] if r['id'] == 103)
++        self.assertEqual(new, old | dict(cancelled_at=NOW, cancelled_by=3, cancel_reason='维护需要取消'))
++        self.assertEqual(after['occupancy_slots'], [s for s in before['occupancy_slots'] if s['reservation_id'] != 103])
++        self.assertEqual(len(calls), 1)
++        snapshot = dict(id=103, room_id=1, owner_id=1, title=old['title'], purpose=old['purpose'], attendees=5,
++            start_at=old['start_at'], end_at=old['end_at'], created_at=old['created_at'],
++            cancelled_at=None, cancelled_by_id=None, cancel_reason=None)
++        self.assertEqual(calls[0], dict(actor_id=3, actor_display_name='演示管理员', action='booking.cancelled_by_admin',
++            target_type='booking', target_id=103, occurred_at=NOW, before=snapshot,
++            after=snapshot | dict(cancelled_at=NOW, cancelled_by_id=3, cancel_reason='维护需要取消'), reason='维护需要取消'))
++        self.assertEqual(json.loads(after['audit_events'][0]['before_json']), snapshot)
++        self.assertEqual(json.loads(after['audit_events'][0]['after_json']), calls[0]['after'])
++        member, _ = self.login('demo_member_a')
++        self.assertEqual(member.get('/api/bookings/103', base_url=ORIGIN).json['data'], value)
++
++    def test_exact_time_boundaries_start_equal_and_end_minus_one_allowed_end_equal_closed(self):
++        for booking_id, now in [(102, NOW), (103, NOW + 3 * 3600 - 1)]:
++            self.clock.now = now
++            self.assertEqual(self.cancel(booking_id).status_code, 200)
++        before = self.facts()
++        for now in [NOW + 3 * 3600, NOW + 3 * 3600 + 1]:
++            self.clock.now = now
++            self.error(self.cancel(104), 409, 'TRANSITION_CLOSED'); self.assertEqual(self.facts(), before)
++        self.error(self.cancel(101), 409, 'TRANSITION_CLOSED')
++
++    def test_repeats_after_end_preserve_admin_or_member_metadata_and_never_call_writer(self):
++        original = self.cancel().json['data']
++        prior = {i: self.client.get(f'/api/bookings/{i}', base_url=ORIGIN).json['data'] for i in [105, 106]}
++        before = self.facts()
++        self.app.config['AUDIT_WRITER'] = lambda *_: self.fail('idempotent cancellation invoked writer')
++        self.clock.now = NOW + 7 * 3600
++        for booking_id, expected in {103: original, **prior}.items():
++            response = self.cancel(booking_id, '不同但合法的原因')
++            self.assertEqual(response.status_code, 200); self.assertEqual(response.json['data'], expected)
++        self.assertEqual(self.facts(), before)
++
++    def test_reason_validation_before_repeats_unicode_boundaries_nul_and_surrogates(self):
++        invalid = [None, False, 1, 1.2, [], {}, '', ' \t\n', '字' * 501, 'ok\x00bad', '\ud800', '\udfff']
++        before = self.facts()
++        for booking_id in [103, 105, 106]:
++            for reason in invalid:
++                with self.subTest(booking=booking_id, reason=repr(reason)):
++                    result = self.cancel(booking_id, reason)
++                    self.error(result, 400, 'INVALID_INPUT'); self.assertIn('reason', result.json['error']['fields'])
++        self.assertEqual(self.facts(), before)
++        for booking_id, reason in [(103, '\u2003😀\t'), (104, '\n' + '😀' * 500 + ' \t')]:
++            result = self.cancel(booking_id, reason)
++            self.assertEqual(result.status_code, 200); self.assertEqual(result.json['data']['cancel_reason'], reason.strip())
++
++    def test_ids_kind_missing_and_permissions_precede_invalid_parameters(self):
++        before = self.facts()
++        for username in ['demo_member_a', 'demo_member_b']:
++            client, identity = self.login(username)
++            for booking_id in [103, 106, 401, '0', '9' * 5000]:
++                self.error(self.cancel(booking_id, None, client, identity), 403, 'FORBIDDEN')
++        for booking_id in ['0', '01', '-1', '1.0', 'true', '１２', '9223372036854775808', '9' * 5000]:
++            self.error(self.cancel(booking_id), 400, 'INVALID_INPUT')
++        responses = [self.cancel(i) for i in [401, 999, 2**63 - 1]]
++        for response in responses: self.error(response, 404, 'NOT_FOUND')
++        self.assertEqual(responses[0].json, responses[1].json)
++        with self.app.app_context():
++            actor = self.actor()
++            for value in [None, True, False, 1.0, [], {}, 2**63]:
++                with self.assertRaises(DomainError) as caught: services.admin_cancel_booking(actor, value, '原因')
++                self.assertEqual(caught.exception.code, 'INVALID_INPUT')
++            for actor in [None, replace(actor, id=1), replace(actor, session_token_hash='0' * 64)]:
++                with self.assertRaises(DomainError) as caught: services.admin_cancel_booking(actor, False, None)
++                self.assertEqual(caught.exception.code, 'AUTH_REQUIRED')
++        self.assertEqual(self.facts(), before)
++
++    def test_json_shape_origin_csrf_malformed_utf8_and_anonymous_leave_storage_unchanged(self):
++        before = self.facts(); path = '/api/admin/bookings/103/cancel'
++        headers = {'Origin': ORIGIN, 'X-CSRF-Token': self.identity['csrf_token']}
++        for value in [{}, [], False, None, 'reason', {'reason': '取消', 'user_id': 1}]:
++            self.error(self.client.post(path, base_url=ORIGIN, headers=headers, data=json.dumps(value),
++                content_type='application/json'), 400, 'INVALID_INPUT')
++        self.error(self.client.post(path, base_url=ORIGIN, headers=headers, data=b'{"reason":"\xff"}',
++            content_type='application/json'), 400, 'INVALID_INPUT')
++        self.error(self.client.post(path, base_url=ORIGIN, headers=headers,
++            data={'reason': '取消', 'csrf_token': self.identity['csrf_token']}), 400, 'INVALID_INPUT')
++        for bad in [{}, {'Origin': 'http://evil.example'}, {'Origin': ORIGIN}, {'Origin': ORIGIN, 'X-CSRF-Token': 'bad'}]:
++            self.error(self.client.post(path, base_url=ORIGIN, headers=bad, json={'reason': '取消'}), 403, 'CSRF_REJECTED')
++        self.error(self.app.test_client().post('/api/admin/bookings/0/cancel', base_url=ORIGIN,
++            headers={'Origin': ORIGIN}, json={'reason': None}), 401, 'AUTH_REQUIRED')
++        self.assertEqual(self.facts(), before)
++
++    def test_expired_logged_out_and_demoted_sessions_are_rejected(self):
++        before = self.facts(); self.clock.now = NOW + auth.SESSION_SECONDS
++        self.error(self.cancel('0', None), 401, 'AUTH_REQUIRED')
++        self.clock.now = NOW
++        stale = self.client.get_cookie(auth.COOKIE_NAME, domain='127.0.0.1').value
++        with self.app.app_context(): actor = self.actor()
++        self.assertEqual(self.client.post('/api/logout', base_url=ORIGIN,
++            headers={'Origin': ORIGIN, 'X-CSRF-Token': self.identity['csrf_token']}, json={}).status_code, 200)
++        self.client.set_cookie(auth.COOKIE_NAME, stale, domain='127.0.0.1')
++        self.error(self.cancel(), 401, 'AUTH_REQUIRED')
++        with self.app.app_context():
++            with self.assertRaises(DomainError) as caught: services.admin_cancel_booking(actor, 103, '原因')
++            self.assertEqual(caught.exception.code, 'AUTH_REQUIRED')
++        self.client, self.identity = self.login('demo_admin')
++        with self.app.app_context(): actor = self.actor()
++        with db.write_transaction(self.database) as conn: conn.execute("UPDATE users SET role='member' WHERE id=3")
++        self.error(self.cancel('0', None), 403, 'FORBIDDEN')
++        with self.app.app_context():
++            with self.assertRaises(DomainError) as caught: services.admin_cancel_booking(actor, False, None)
++            self.assertEqual(caught.exception.code, 'FORBIDDEN')
++        self.assertEqual(self.facts(), before)
++
++    def test_lock_time_expiry_logout_demotion_and_deadline_are_rechecked(self):
++        original = db.write_transaction; before = self.facts()
++        for mutation, now, status, code in [
++            (None, NOW + auth.SESSION_SECONDS, 401, 'AUTH_REQUIRED'),
++            ('DELETE FROM sessions', NOW, 401, 'AUTH_REQUIRED'),
++            ("UPDATE users SET role='member' WHERE id=3", NOW, 403, 'FORBIDDEN'),
++            (None, NOW + 3 * 3600, 409, 'TRANSITION_CLOSED')]:
++            self.clock.now = NOW
++            @contextmanager
++            def changed(database=None):
++                with original(database) as conn:
++                    if mutation: conn.execute(mutation)
++                    self.clock.now = now
++                    yield conn
++            with patch.object(db, 'write_transaction', changed): self.error(self.cancel(), status, code)
++            self.assertEqual(self.facts(), before)
++
++    def test_fresh_actor_name_role_one_locked_clock_and_current_dto_audit_snapshot(self):
++        with self.app.app_context(): actor = self.actor()
++        with db.write_transaction(self.database) as conn:
++            conn.execute("UPDATE users SET display_name='事件时名字' WHERE id=3")
++        with self.app.app_context():
++            self.clock.calls = 0
++            result = services.admin_cancel_booking(replace(actor, role='member', display_name='陈旧名字'), 103, '原因')
++            self.assertEqual(self.clock.calls, 1)
++        self.assertEqual(result['cancelled_by_display_name'], '事件时名字')
++        with db.write_transaction(self.database) as conn:
++            conn.execute("UPDATE users SET display_name='当前名字' WHERE id=3")
++            conn.execute("UPDATE users SET display_name='当前预约人' WHERE id=1")
++            conn.execute("UPDATE rooms SET name='当前会议室' WHERE id=1")
++        repeated = self.cancel().json['data']
++        self.assertEqual(repeated['cancelled_by_display_name'], '当前名字')
++        self.assertEqual(repeated['owner_display_name'], '当前预约人'); self.assertEqual(repeated['room']['name'], '当前会议室')
++        self.assertEqual(self.facts()['audit_events'][0]['actor_display_name'], '事件时名字')
++
++    def test_writer_before_after_insert_and_actual_sqlite_commit_denial_all_rollback(self):
++        before = self.facts()
++        for phase in ['before', 'after', 'commit']:
++            calls = []
++            def fail(conn, event):
++                calls.append(event)
++                if phase != 'before': audit_writer(conn, event)
++                if phase == 'commit':
++                    conn.set_authorizer(lambda action, first, *_: sqlite3.SQLITE_DENY
++                        if action == sqlite3.SQLITE_TRANSACTION and first == 'COMMIT' else sqlite3.SQLITE_OK)
++                else: raise RuntimeError('sensitive SQL fault')
++            self.app.config['AUDIT_WRITER'] = fail
++            with self.assertLogs(self.app.logger, level='ERROR') as logs: response = self.cancel()
++            self.error(response, 500, 'INTERNAL_ERROR'); self.assertEqual(len(calls), 1)
++            self.assertNotIn('sensitive', response.text + str(logs.output)); self.assertNotIn('SQL', response.text)
++            self.assertEqual(self.facts(), before)
++        self.app.config['AUDIT_WRITER'] = audit_writer
++        self.assertEqual(self.cancel().status_code, 200)
++
++    def test_member_route_keeps_start_deadline_and_repeat_admin_reason_with_same_result(self):
++        self.error(self.client.post('/api/bookings/301/cancel', base_url=ORIGIN,
++            headers={'Origin': ORIGIN, 'X-CSRF-Token': self.identity['csrf_token']}, json={}), 409, 'TRANSITION_CLOSED')
++        self.assertEqual(self.cancel(301).status_code, 200)
++        result = self.cancel().json['data']; member, identity = self.login('demo_member_a')
++        repeated = member.post('/api/bookings/103/cancel', base_url=ORIGIN,
++            headers={'Origin': ORIGIN, 'X-CSRF-Token': identity['csrf_token']}, json={})
++        self.assertEqual(repeated.json['data'], result)
++        self.assertEqual(len(self.facts()['audit_events']), 2)
++
++
++if __name__ == '__main__': unittest.main()
+diff --git a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-X-baseline-f46d2ltx/tests/test_blocks_js.cjs b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/tests/test_blocks_js.cjs
+index 510a77d..3e202eb 100644
+--- a/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-X-baseline-f46d2ltx/tests/test_blocks_js.cjs
++++ b/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/work/experiment-a-run-20261112/X/tests/test_blocks_js.cjs
+@@ -27,6 +27,9 @@ function harness({combined=false,transform=source=>source}={}){
+     n[`admin-${kind}-form`].append(...controls,n[`admin-${kind}-submit`]);n[`admin-${kind}-form`].elements={namedItem:name=>n[`admin-${kind}-${name}`]};
+   }
+   n['logout-form'].elements={csrf_token:{value:'synthetic'}};const body=node('body'),events=new Map();
++  for (const suffix of ['form','panel','title','summary','fields','reason','reason-error','confirm','submit','feedback','relogin']) n['admin-cancel-'+suffix]=node('admin-cancel-'+suffix);
++  n['admin-cancel-form'].append(n['admin-cancel-fields']);
++  n['admin-cancel-fields'].append(n['admin-cancel-reason'],n['admin-cancel-confirm'],n['admin-cancel-submit']);
+   const document={getElementById:id=>n[id],querySelector:s=>n[s.slice(1)],createElement:tag=>node('',tag),body,get activeElement(){return active;},
+     addEventListener(name,handler){if(!events.has(name))events.set(name,[]);events.get(name).push(handler);},
+     dispatchEvent(event){for(const handler of events.get(event.type)||[])handler(event);}};
+@@ -46,6 +49,8 @@ function harness({combined=false,transform=source=>source}={}){
+     submit(){n['block-confirm'].checked=true;n['block-submit'].focus();return n['block-form'].handlers.submit({preventDefault(){}});},
+     refresh(){n['block-rooms-refresh'].focus();return n['block-rooms-refresh'].handlers.click();},
+     roomSubmit(){n['room-confirm'].checked=true;n['room-submit'].focus();return n['room-form'].handlers.submit({preventDefault(){}});},
++    choose(index=0){return n['admin-bookings-items'].children[index].querySelectorAll('button')[0].handlers.click();},
++    cancel(){n['admin-cancel-confirm'].checked=true;n['admin-cancel-submit'].focus();return n['admin-cancel-form'].handlers.submit({preventDefault(){}});},
+     load(kind='blocks'){n[`admin-${kind}-submit`].focus();return n[`admin-${kind}-form`].handlers.submit({preventDefault(){}});}};
+ }
+ function restored(ui){assert.equal(ui.n['block-submit'].disabled,false);assert.equal(ui.n['block-form'].getAttribute('aria-busy'),undefined);assert.equal(ui.timers.size,0);}
+@@ -195,3 +200,59 @@ for(const mutant of ['empty-booking','missing-purpose'])test(`render oracle reje
+   const rows=fixtures('bookings'),ui=harness({transform:source=>mutant==='empty-booking'?source.replace('for (const row of records) {','for (const row of (list.kind === "bookings" ? [] : records)) {'):source.replace('["用途",row.purpose],','')});
+   ui.setFetch(async()=>ok({items:rows,total:rows.length}));await ui.load('bookings');assert.throws(()=>assertRendered(visibleRows(ui,'bookings'),rows,'bookings'),assert.AssertionError);
+ });
++
++function adminBooking(status='pending') {
++  const row=fixtures('bookings')[0];row.status=status;
++  if(status==='cancelled')Object.assign(row,{cancelled_at:1794448800,cancelled_local:'2026-11-12T10:00:00+08:00',cancelled_by_id:3,cancelled_by_display_name:'管理员 <svg>',cancel_reason:'原原因 <script>'});
++  return row;
++}
++async function cancellationUI(){
++  const ui=harness();ui.setFetch(async()=>ok({items:[adminBooking()],total:1}));await ui.load('bookings');ui.choose();ui.n['admin-cancel-reason'].value='维护 <script>';return ui;
++}
++function cancelRestored(ui){assert.equal(ui.n['admin-cancel-fields'].disabled,false);assert.equal(ui.n['admin-cancel-form'].getAttribute('aria-busy'),undefined);assert.equal(ui.timers.size,0);}
++test('admin cancellation requires confirmation, reason edits reset it and eligible states expose controls',async()=>{
++  const ui=harness();ui.setFetch(async()=>ok({items:['pending','in_progress','ended','cancelled'].map(adminBooking),total:4}));await ui.load('bookings');
++  assert.deepEqual(ui.n['admin-bookings-items'].children.map(row=>row.querySelectorAll('button').length),[1,1,0,1]);ui.choose();
++  await ui.n['admin-cancel-form'].handlers.submit({preventDefault(){}});assert.equal(ui.fetches.length,1);
++  for(const name of ['input','change']){ui.n['admin-cancel-confirm'].checked=true;ui.n['admin-cancel-reason'].handlers[name]();assert.equal(ui.n['admin-cancel-confirm'].checked,false);}
++});
++test('admin cancellation sends only reason to selected ID, prevents repeat pending requests, refreshes and renders saved facts as text',async()=>{
++  const ui=await cancellationUI();let release;ui.setFetch(async(_url,options)=>options.method?new Promise(resolve=>{release=resolve;}):ok({items:[adminBooking('cancelled')],total:1}));
++  const pending=ui.cancel();assert.equal(ui.n['admin-cancel-fields'].disabled,true);assert.equal(ui.n['admin-bookings-submit'].disabled,true);
++  await ui.cancel();assert.equal(ui.fetches.length,2);assert.equal(ui.fetches[1].url,'/api/admin/bookings/200/cancel');
++  assert.deepEqual(JSON.parse(ui.fetches[1].options.body),{reason:'维护 <script>'});assert.equal(ui.fetches[1].options.headers['X-CSRF-Token'],'synthetic');
++  ui.n['room-name'].focus();release(ok(adminBooking('cancelled')));await pending;cancelRestored(ui);
++  assert.equal(ui.active,ui.n['room-name']);assert.match(ui.n['admin-cancel-summary'].textContent,/原取消原因：原原因 <script>/);
++  assert.match(ui.n['admin-bookings-items'].textContent,/已取消/);assert.equal(ui.fetches.length,3);assert.equal(ui.n['admin-cancel-confirm'].checked,false);
++});
++for(const code of ['INVALID_INPUT','TRANSITION_CLOSED','INTERNAL_ERROR','STORE_BUSY','NOT_FOUND','CSRF_REJECTED'])test(`admin cancel ${code} preserves reason and allows deliberate retry`,async()=>{
++  const ui=await cancellationUI();ui.setFetch(async()=>fail(code,code==='INVALID_INPUT'?{reason:'原因错误'}:{}));await ui.cancel();cancelRestored(ui);
++  assert.equal(ui.n['admin-cancel-reason'].value,'维护 <script>');assert.equal(ui.fetches.length,2);assert.match(ui.n['admin-cancel-feedback'].textContent,/原因已保留/);
++  if(code==='INVALID_INPUT'){assert.equal(ui.active,ui.n['admin-cancel-reason']);assert.equal(ui.n['admin-cancel-reason'].getAttribute('aria-invalid'),'true');}
++});
++for(const failure of ['network','malformed','mismatched-id','incomplete','timeout-headers','timeout-body'])test(`admin cancel ${failure} is unconfirmed without automatic retry`,async()=>{
++  const ui=await cancellationUI();ui.setFetch(async(_url,{signal})=>{
++    if(failure==='network')throw Error();
++    if(failure.startsWith('timeout')){const stall=()=>new Promise((_r,reject)=>signal.addEventListener('abort',()=>reject(Error())));return failure==='timeout-headers'?stall():{ok:true,json:stall};}
++    if(failure==='malformed')return {ok:true,json:async()=>{throw Error();}};
++    const row=adminBooking('cancelled');if(failure==='mismatched-id')row.id=201;else delete row.cancel_reason;return ok(row);
++  });const pending=ui.cancel();await tick();if(failure.startsWith('timeout'))[...ui.timers.values()][0].fn();await pending;cancelRestored(ui);
++  assert.match(ui.n['admin-cancel-feedback'].textContent,/未能确认.*不会自动重试/);assert.equal(ui.n['admin-cancel-confirm'].checked,false);
++  assert.equal(ui.n['admin-cancel-reason'].value,'维护 <script>');await ui.n['admin-cancel-form'].handlers.submit({preventDefault(){}});assert.equal(ui.fetches.length,2);
++});
++for(const code of ['AUTH_REQUIRED','FORBIDDEN'])test(`admin cancel ${code} clears protected data and blocks writes retaining reason`,async()=>{
++  const ui=await cancellationUI();ui.setFetch(async()=>fail(code));await ui.cancel();assert.equal(ui.n['admin-cancel-fields'].disabled,true);
++  assert.equal(ui.n['admin-bookings-items'].children.length,0);assert.equal(ui.n['admin-cancel-summary'].textContent,'');assert.equal(ui.n['admin-cancel-reason'].value,'维护 <script>');
++  assert.equal(ui.n['admin-cancel-relogin'].hidden,false);await ui.cancel();assert.equal(ui.fetches.length,2);
++});
++for(const code of ['STORE_BUSY','AUTH_REQUIRED','FORBIDDEN'])test(`admin cancel successful result remains successful when refresh gets ${code}`,async()=>{
++  const ui=await cancellationUI();ui.setFetch(async(_url,options)=>options.method?ok(adminBooking('cancelled')):fail(code));await ui.cancel();
++  assert.match(ui.n['admin-cancel-feedback'].textContent,/预约 200 已取消/);assert.equal(ui.fetches.length,3);
++  if(code==='STORE_BUSY'){cancelRestored(ui);assert.match(ui.n['admin-bookings-feedback'].textContent,/取消已成功.*刷新失败/);}
++});
++test('admin cancel repeated member cancellation accepts original null reason and unsafe ID never posts',async()=>{
++  const ui=await cancellationUI();const row=adminBooking('cancelled');row.cancel_reason=null;row.cancelled_by_id=row.owner_id;
++  ui.setFetch(async(_url,options)=>ok(options.method?row:{items:[row],total:1}));await ui.cancel();cancelRestored(ui);assert.match(ui.n['admin-cancel-summary'].textContent,/本人取消，无原因/);
++  ui.setFetch(async()=>ok({items:[{...row,id:Number('9223372036854775807')}],total:1}));await ui.load('bookings');ui.choose();
++  assert.match(ui.n['admin-bookings-feedback'].textContent,/无法安全提交/);
++});

@@ -1,0 +1,23 @@
+{
+  "group": "Y",
+  "stage": "initial",
+  "common_git_baseline": "b0ce58a9b66144db5a4b15f61376132fa3f210e4",
+  "input_manifest_sha256": "00518886f4efa8b87cb13ae0da955a7b2c8ac1608666f91c29fda944363b2731",
+  "diff_file": "/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-experiment-Y-initial-47lhzw2l.diff",
+  "diff_sha256": "ff85ef86db1fc91d75c23f105fe598c1d3449db8e091153efdfde9f03d435e97",
+  "bytes": 72257,
+  "changed_files": [
+    "booking_app/domain.py",
+    "booking_app/services.py",
+    "booking_app/static/app.css",
+    "booking_app/static/blocks.js",
+    "booking_app/templates/admin.html",
+    "booking_app/web.py",
+    "scripts/verify_block_revoke_browser.cjs",
+    "scripts/verify_block_revoke_browser.py",
+    "scripts/verify_block_revoke_http.py",
+    "tests/test_block_revoke.py",
+    "tests/test_blocks_js.cjs"
+  ],
+  "scope": "All changed/new/deleted files in this implementation workspace against frozen inputs; work/.venv/tools/cache excluded as runtime/evidence. Main-repository document-only work is outside this isolated implementation. Original output archives preserved separately."
+}

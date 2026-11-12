@@ -1,0 +1,11 @@
+{
+  "group": "Y",
+  "started_at_utc": "2026-11-12T13:29:39.706410+00:00",
+  "finished_at_utc": "2026-11-12T13:29:42.568699+00:00",
+  "wall_seconds": 2.862289,
+  "exit_code": 1,
+  "original_source_hashes_unchanged": true,
+  "supplement_exists": true,
+  "stderr_present": false,
+  "note": "A1–A7 supplement only. A8/A9 and source/HTTP evidence require the same separate assessment for both groups."
+}

@@ -1,0 +1,32 @@
+{
+  "result": "PASS",
+  "viewports": [
+    {
+      "width": 1280,
+      "validation": true,
+      "confirmation": true,
+      "csrf": true,
+      "waiting": true,
+      "success": true,
+      "unknown_then_idempotent_retry": true,
+      "expired_session": true,
+      "safe_text": true,
+      "no_horizontal_overflow": true,
+      "page_errors": []
+    },
+    {
+      "width": 390,
+      "validation": true,
+      "confirmation": true,
+      "csrf": true,
+      "waiting": true,
+      "success": true,
+      "unknown_then_idempotent_retry": true,
+      "expired_session": true,
+      "safe_text": true,
+      "no_horizontal_overflow": true,
+      "page_errors": []
+    }
+  ],
+  "storage_verified": true
+}

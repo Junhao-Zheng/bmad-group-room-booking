@@ -1,0 +1,90 @@
+{
+  "protocol": "experiment-a-uniform-review-v1",
+  "group": "Y",
+  "started_at_utc": "2026-11-12T13:29:39.803638+00:00",
+  "completed_at_utc": "2026-11-12T13:29:42.547526+00:00",
+  "runner_sha256": "ade8edde20b71dfd27c84ab7a5b6eb4ea43a8251f14a944817c67fa859b37ae2",
+  "tests_run": 17,
+  "result": "FAIL",
+  "failures": 1,
+  "errors": 0,
+  "skipped": 0,
+  "checks": [
+    {
+      "test": "__main__.UniformChecks.test_A1_anonymous",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A1_demoted_and_forged_actor_service",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A1_expired",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A1_logged_out",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A1_member_before_bad_id_reason",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A2_invalid_reasons_initial_and_repeat",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A2_length_one_and_500",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A2_strict_path_and_wrong_kind",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A3_first_exact_end",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A3_one_clock_after_write_lock",
+      "result": "FAIL",
+      "error_type": "AssertionError",
+      "locations": [
+        {
+          "file": "frozen-uniform-checks.py",
+          "line": 112
+        }
+      ]
+    },
+    {
+      "test": "__main__.UniformChecks.test_A3_pending_in_progress_and_exact_end",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A4_repeat_other_admin_after_end_preserves_first",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A5_A7_exact_full_dto_history_and_slot_release",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A6_audit_before_after_insert_failures",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A6_commit_failure_rollback",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A6_same_connection_once_and_snapshots",
+      "result": "PASS"
+    },
+    {
+      "test": "__main__.UniformChecks.test_A7_origin_csrf_and_shape",
+      "result": "PASS"
+    }
+  ],
+  "scope": "A1–A7 executable supplement; does not replace UI, full snapshots/source review, real HTTP races or regression evidence."
+}
