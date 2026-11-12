@@ -44,7 +44,7 @@ development_status:
   epic-2: in-progress
   2-1-create-booking: done
   2-2-replay-intent: done
-  2-3-personal-history: ready-for-dev
+  2-3-personal-history: in-progress
   2-4-member-cancel: backlog
   2-5-admin-cancel: backlog
   epic-2-retrospective: optional

@@ -20,3 +20,4 @@
 {"timestamp": "2026-11-12T09:37:50.140768+00:00", "story": "2-2-replay-intent", "from": "in-progress", "to": "review", "actor": "AI root", "head": "b91fb1b3dd62fd2aef0dce02c392c81b2e3bca66", "post_done_rework": false}
 {"timestamp": "2026-11-12T09:56:22.824394+00:00", "story": "2-2-replay-intent", "from": "review", "to": "done", "actor": "AI root", "head": "b91fb1b3dd62fd2aef0dce02c392c81b2e3bca66", "post_done_rework": false}
 {"timestamp": "2026-11-12T09:56:54.102497+00:00", "story": "2-3-personal-history", "from": "backlog", "to": "ready-for-dev", "actor": "AI root", "head": "e4b5afddd7ce53960de8e67c340d92ca7a59af27", "post_done_rework": false}
+{"timestamp": "2026-11-12T09:56:54.180033+00:00", "story": "2-3-personal-history", "from": "ready-for-dev", "to": "in-progress", "actor": "AI root", "head": "2ded2623c555d1fad3db93341e1c17c58d9ee087", "post_done_rework": false}

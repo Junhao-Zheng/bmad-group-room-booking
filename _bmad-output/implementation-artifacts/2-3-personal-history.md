@@ -2,8 +2,9 @@
 title: '查看自己的预约及状态'
 type: feature
 created: '2026-11-12'
-status: ready-for-dev
+status: in-progress
 route: dispatch
+baseline_commit: 2ded2623c555d1fad3db93341e1c17c58d9ee087
 story_key: 2-3-personal-history
 review_loop_iteration: 0
 context:
