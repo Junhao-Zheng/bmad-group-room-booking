@@ -2,8 +2,9 @@
 title: '取消本人尚未开始的预约'
 type: feature
 created: '2026-11-12'
-status: ready-for-dev
+status: in-progress
 route: dispatch
+baseline_commit: 791b208ec8075e2c13979eea466d2eda1fbc7faa
 story_key: 2-4-member-cancel
 review_loop_iteration: 0
 context:
