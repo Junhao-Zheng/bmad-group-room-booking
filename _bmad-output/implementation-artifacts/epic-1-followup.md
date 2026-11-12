@@ -2,8 +2,9 @@
 title: '修补第一个史诗的跨故事反馈和验证遗漏'
 type: bugfix
 created: '2026-11-12'
-status: ready-for-dev
+status: in-progress
 route: dispatch
+baseline_commit: d545ca5ab8d339ecb037d802193ed310e0969fee
 story_key: ''
 review_loop_iteration: 0
 context:

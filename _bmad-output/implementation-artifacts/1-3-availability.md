@@ -2,7 +2,7 @@
 title: '按时段和人数找到可用房间'
 type: feature
 created: '2026-11-12'
-status: done
+status: in-progress
 route: dispatch
 baseline_commit: ea3fba136e8b6c3cbd5bc373c167a8527376981f
 story_key: 1-3-availability
@@ -93,3 +93,7 @@ context:
 
 
 主代理最终验收：全量66项Python、13项JavaScript通过（0 skip），详见story-1.3-final-python.txt和story-1.3-final-javascript.txt；reviewed浏览器通过。独立复算220样本、run_id、类型严格响应、样本SHA及实际源文件hash一致，P95=20.824042ms。全部保留修补项关闭，无high/medium延期。
+
+## 完成后返工 R1
+
+2026-11-12跨故事复盘发现后重新进入in-progress；保留初始baseline和原验收证据。统一修补见[工作项](epic-1-followup.md)，不把本次AI评审写成人类否决。

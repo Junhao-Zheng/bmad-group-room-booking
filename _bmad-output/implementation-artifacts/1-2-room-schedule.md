@@ -2,7 +2,7 @@
 title: '查看会议室和共享日程'
 type: feature
 created: '2026-11-12'
-status: done
+status: in-progress
 route: dispatch
 baseline_commit: 3f0349edf4cb0dedd85e269fdb1530cd67aa95d5
 story_key: 1-2-room-schedule
@@ -100,3 +100,7 @@ context:
 
 
 主代理最终核对：49项Python、7项JS全量通过（0 skip）；修订后桌面/手机浏览器通过，固定Clock三态、准确区间、无脚本说明与键盘提交均有证据；已查看修订截图。14条发现逐条裁决，所有保留修补项关闭，无high/medium延期。
+
+## 完成后返工 R1
+
+2026-11-12跨故事复盘发现后重新进入in-progress；保留初始baseline和原验收证据。统一修补见[工作项](epic-1-followup.md)，不把本次AI评审写成人类否决。

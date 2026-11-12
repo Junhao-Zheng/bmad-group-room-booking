@@ -2,7 +2,7 @@
 title: '使用预置账号安全登录和退出'
 type: feature
 created: '2026-11-12'
-status: done
+status: in-progress
 route: dispatch
 baseline_commit: 837f30b48199ede90c4bfbb970080361db051070
 story_key: 1-1-account-access
@@ -104,3 +104,7 @@ context:
 - 本机 Chrome 在 1280×800、390×844 通过键盘登录/退出、错误聚焦及无横向溢出验证；原始结果和截图见上述验证记录。所有验证均为 AI 自动化技术证据，不记作人工/教师验收。
 
 主代理最终验收：33项全量Python、2项JS、真实HTTP与隔离环境安装/HTTP全通过；有效评审patch已关闭，详见`../../docs/evidence/reviews/story-1.1-review.md`。
+
+## 完成后返工 R1
+
+2026-11-12跨故事复盘发现后重新进入in-progress；保留初始baseline和原验收证据。统一修补见[工作项](epic-1-followup.md)，不把本次AI评审写成人类否决。
