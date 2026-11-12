@@ -103,3 +103,7 @@ npm install --prefix work/browser-tools --no-save playwright@1.58.2
 最新全量208唯一Python、376 JS、0skip；[父流程核验](evidence/epic-3-followup/parent-final-qa.json)。真实管理联动/禁JS/脚本失败与审计双视口报告各61项源码哈希已复算。后端未改，历史138权限/重启/并发/性能按原报告保留。最后独立3镜头429无结果，父流程检查不能替代独立性，复盘保留open item。
 
 新增管理复跑：`.venv/bin/python -m scripts.verify_epic3_followup_browser --browser-executable '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --output-dir work/rerun/admin-followup`。
+
+## 全新副本交付检查
+
+[实际安装及全量检查](evidence/delivery/README.md)通过：Python3.12.14/SQLite3.53.1，新虚拟环境从uv.lock安装，208唯一Python、376 JS，0skip，真实Waitress初始化/登录/退出验证；原目录虚拟环境和数据库未复制。之后文档/会话归档不改变产品与锁文件。

@@ -1,0 +1,27 @@
+{
+  "export_kind": "selected_visible_messages",
+  "source_export": "followup3_verification.json",
+  "source_sha256": "43f5f8224509bc62364fa1f5d3716c39f1062c024b9b48183534cba0d8beeac7",
+  "prepared_at_utc": "2026-11-12T15:57:48.025139+00:00",
+  "scope": "从已取得导出中选取可见用户/助手消息；不含内部推理、工具日志或授权码。不声称完整平台记录；保留来源顺序，文件之间可能重叠。子代理初始指令未必由导出接口返回；不能据助手回复条数推定实现调用次数。",
+  "messages": [],
+  "redactions": 0,
+  "turns_metadata": [
+    {
+      "id": "01a1d06e-5b83-75f3-a085-214ea42cae81",
+      "status": "failed",
+      "error_present": true,
+      "startedAt": 1794498255,
+      "completedAt": 1794498280,
+      "durationMs": 24442
+    }
+  ],
+  "thread_id": "01a1d06e-5b7b-7cc2-98c3-a24798125321",
+  "agent_path": "/root/followup3_verification",
+  "page": {
+    "order": "newest_first",
+    "limit": 3,
+    "nextCursor": null,
+    "hasMore": false
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "export_kind": "selected_visible_messages",
+  "source_export": "followup3_blind.json",
+  "source_sha256": "7cd0af2e8e9fcbfb825de5bd0c5e0722fb107584750c66ce67eebdb90afe9993",
+  "prepared_at_utc": "2026-11-12T15:57:48.024456+00:00",
+  "scope": "从已取得导出中选取可见用户/助手消息；不含内部推理、工具日志或授权码。不声称完整平台记录；保留来源顺序，文件之间可能重叠。子代理初始指令未必由导出接口返回；不能据助手回复条数推定实现调用次数。",
+  "messages": [
+    {
+      "id": "msg_0dca92e6a27d663f016af5de69ab6487d295a4a7e72c9787d5",
+      "role": "assistant",
+      "text": "I’ll read the diff and check for missing behavior and edge cases, then return concrete findings.\n",
+      "turn_id": "01a1d06c-99b4-7432-8df7-63b610bec49a"
+    }
+  ],
+  "redactions": 0,
+  "turns_metadata": [
+    {
+      "id": "01a1d06c-99b4-7432-8df7-63b610bec49a",
+      "status": "failed",
+      "error_present": true,
+      "startedAt": 1794498140,
+      "completedAt": 1794498168,
+      "durationMs": 27435
+    }
+  ],
+  "thread_id": "01a1d06c-99ab-7321-b723-e14665b84c0d",
+  "agent_path": "/root/followup3_blind",
+  "page": {
+    "order": "newest_first",
+    "limit": 3,
+    "nextCursor": null,
+    "hasMore": false
+  }
+}

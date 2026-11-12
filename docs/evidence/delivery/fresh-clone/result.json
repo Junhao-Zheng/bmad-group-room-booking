@@ -1,0 +1,106 @@
+{
+  "result": "PASS",
+  "started_at_utc": "2026-11-12T15:56:46.018032+00:00",
+  "checks": [
+    {
+      "name": "clone",
+      "command": [
+        "git",
+        "clone",
+        "--no-hardlinks",
+        "/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking",
+        "/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-delivery-clone-1mn0r2qi/repo"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.3052460418548435
+    },
+    {
+      "name": "uv-sync",
+      "command": [
+        "/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/.tools/bin/uv",
+        "sync",
+        "--frozen",
+        "--python",
+        "3.12.14"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.06912662507966161
+    },
+    {
+      "name": "runtime",
+      "command": [
+        "/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-delivery-clone-1mn0r2qi/repo/.venv/bin/python",
+        "-c",
+        "import platform,sqlite3,json; print(json.dumps({\"python\":platform.python_version(),\"sqlite\":sqlite3.sqlite_version}))"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.06263349996879697
+    },
+    {
+      "name": "python-tests",
+      "command": [
+        "/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-delivery-clone-1mn0r2qi/repo/.venv/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 49.1301690840628
+    },
+    {
+      "name": "javascript-tests",
+      "command": [
+        "node",
+        "--test",
+        "tests/test_audit_js.cjs",
+        "tests/test_auth_js.cjs",
+        "tests/test_availability_js.cjs",
+        "tests/test_block_revoke_browser_runner_js.cjs",
+        "tests/test_blocks_js.cjs",
+        "tests/test_booking_js.cjs",
+        "tests/test_history_js.cjs",
+        "tests/test_room_browser_runner_js.cjs",
+        "tests/test_rooms_js.cjs",
+        "tests/test_schedule_js.cjs"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.49726166599430144
+    },
+    {
+      "name": "real-waitress-smoke",
+      "command": [
+        "/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-delivery-clone-1mn0r2qi/repo/.venv/bin/python",
+        "-m",
+        "scripts.verify_auth_http",
+        "--port",
+        "61340"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.2207095420453697
+    }
+  ],
+  "source_commit": "581e3878b4a92942be919deb22f73160a728ae7e",
+  "runtime": {
+    "python": "3.12.14",
+    "sqlite": "3.53.1"
+  },
+  "python_tests": 208,
+  "python_skips": 0,
+  "unique_python_ids_verified": true,
+  "javascript_tests": 376,
+  "real_waitress_smoke": "PASS",
+  "initialization_added_counts": [
+    3,
+    0
+  ],
+  "clone_tracked_state_unchanged": true,
+  "limitations": [
+    "Fresh clone creates a new virtualenv from uv.lock but may reuse the host uv package and Python cache.",
+    "Real Waitress smoke validates initialization/login/logout/session replay; broader product browser and concurrency evidence is separately indexed.",
+    "Node and uv are host tools; browser packages are intentionally not needed for unit tests."
+  ],
+  "completed_at_utc": "2026-11-12T15:57:39.079691+00:00"
+}

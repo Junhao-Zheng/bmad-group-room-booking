@@ -1,0 +1,12 @@
+Cloning into '/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/grb-delivery-clone-1mn0r2qi/repo'...
+done.
+Updating files:  92% (2841/3059)
+Updating files:  93% (2845/3059)
+Updating files:  94% (2876/3059)
+Updating files:  95% (2907/3059)
+Updating files:  96% (2937/3059)
+Updating files:  97% (2968/3059)
+Updating files:  98% (2998/3059)
+Updating files:  99% (3029/3059)
+Updating files: 100% (3059/3059)
+Updating files: 100% (3059/3059), done.
