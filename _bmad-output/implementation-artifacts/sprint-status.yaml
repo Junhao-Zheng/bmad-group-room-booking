@@ -53,7 +53,7 @@ development_status:
   3-1-room-management: done
   3-2-maintenance-block: done
   3-3-revoke-block: done
-  3-4-audit-and-restart: ready-for-dev
+  3-4-audit-and-restart: in-progress
   epic-3-retrospective: optional
 action_items:
   - id: "epic-1-retro-item-1-后续页面验证同时覆盖等待与跨表单焦点-实际值绑定-失败报告先失效"

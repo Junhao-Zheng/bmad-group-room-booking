@@ -2,8 +2,9 @@
 title: '查询操作证据并在重启后继续使用'
 type: feature
 created: '2026-11-12'
-status: ready-for-dev
+status: in-progress
 route: dispatch
+baseline_commit: 795c65285aabb99d86d74a1b240deaa57ba9b1f8
 story_key: 3-4-audit-and-restart
 review_loop_iteration: 0
 context:
