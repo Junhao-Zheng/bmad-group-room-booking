@@ -1,0 +1,114 @@
+[
+  {
+    "id": "B1",
+    "verdict": "medium",
+    "route": "patch",
+    "title": "重新查询不刷新选中停用",
+    "evidence": "render只重建列表，selected仍旧快照。已有对象变为ended/revoked时确认表单可继续操作。主动查询清旧目标与确认，或按新结果更新并禁用终态；成功自动刷新保留已知撤销结果。"
+  },
+  {
+    "id": "B2",
+    "verdict": "high",
+    "route": "patch",
+    "title": "改变筛选保留旧目标和已确认状态",
+    "evidence": "input/change只清列表，撤销form仍有selected。新筛选上下文可误操作旧对象；清既有选择/确认、清受保护摘要，保留原因草稿。"
+  },
+  {
+    "id": "B3",
+    "verdict": "low",
+    "route": "patch",
+    "title": "不安全大ID无可操作提示",
+    "evidence": "Number.isSafeInteger失败不生成按钮也不解释；直接显示无法安全提交编号的文字，不引入无损数字协议，不接受对旧对象操作。极大ID限制继续披露。"
+  },
+  {
+    "id": "B4",
+    "verdict": "medium",
+    "route": "patch",
+    "title": "Node超时未回收浏览器后代",
+    "evidence": "subprocess.run timeout仅处理直接进程，CJS finally被终止时Chromium可残留。复用已有browser_wrapper/run_driver与受管组清理，故障验证只操作本次所有PID。"
+  },
+  {
+    "id": "B5",
+    "verdict": "medium",
+    "route": "patch",
+    "title": "失败输出原始Playwright堆栈",
+    "evidence": "CJS error.stack且Python print(stderr)，fill失败可能记录密码值。改为已存在的stage/type/source等安全白名单；不得归档原始私密stderr，测试故障输出不含哨兵。尚未观察到初稿凭据实际泄露，不伪称已泄露。"
+  },
+  {
+    "id": "B6",
+    "verdict": "medium",
+    "route": "patch",
+    "title": "浏览器/依赖源哈希不完整且仅事后采集",
+    "evidence": "source_hashes缺browser.py/cjs和fixture等；浏览器仅末尾调用。覆盖实际依赖、环境、运行前后指纹一致；每次独立run_id。"
+  },
+  {
+    "id": "B7",
+    "verdict": "false",
+    "route": "reject",
+    "title": "客户端屏障不足以宣称服务器必然锁争用",
+    "evidence": "实际报告声明独立HTTP双请求同步发出和最终一次转换，未声明两事务都已进锁等待；SQL写事务按设计串行。20轮barrier+两个HTTP客户端+trigger最终状态是预登记标准。强制服务端gate是额外实验条件，不是当前声称被证伪；保留“未强制观测服务器锁等待”的限制，不冒称确定重叠。"
+  },
+  {
+    "id": "B8",
+    "verdict": "medium",
+    "route": "patch",
+    "title": "浏览器目标完整行及rooms未核对",
+    "evidence": "四个目标被排除完整前后比对，循环只检查幸存目标，删目标/改原reason或room元数据可漏检。完整ID集合、rooms/旧audit/未变记录及目标仅三取消字段变化、精确审计快照/原原因/槽均断言；先写事实再断言并加负面oracle。"
+  },
+  {
+    "id": "B9",
+    "verdict": "medium",
+    "route": "patch",
+    "title": "自定义输出与干净检出缺work父目录",
+    "evidence": "两个TemporaryDirectory指定ROOT/work但仅mkdir output，自定义外部输出确实不存在父目录。改系统临时目录，不依赖仓库work存在。"
+  },
+  {
+    "id": "E1",
+    "verdict": "medium",
+    "route": "patch",
+    "title": "刷新后selected终态未同步",
+    "evidence": "与B1相同真实路径。edge给出的guard_snippet是建议补丁而非当前源码；当前render不存在该重对齐代码。按B1修正。"
+  },
+  {
+    "id": "V1",
+    "verdict": "medium",
+    "route": "patch",
+    "title": "确认摘要区间绑定缺回归",
+    "evidence": "验证层预验证：end_local改成start_local的内存突变仍过全部90个该JS文件测试。加两个不同区间的精确DOM值，真实浏览器也核对完整区间。"
+  },
+  {
+    "id": "P1",
+    "verdict": "medium",
+    "route": "patch",
+    "title": "PASS早于server清理且缺失败诊断隔离",
+    "evidence": "main在try写PASS然后finally stop，stop失败仍留PASS；无run_id可覆盖旧图。复用现有INCOMPLETE→每次run→实际清理成功后PASS机制，异常保留阶段/类型与可得无凭据事实。"
+  },
+  {
+    "id": "P2",
+    "verdict": "low",
+    "route": "patch",
+    "title": "浏览器尺寸未按完整故事对齐",
+    "evidence": "初稿脚本height=900，冻结实验仅桌面/手机故通过，但正式3.3规定1280×800/390×844。直接改两尺寸并真实跑，不倒改初稿实验分数。"
+  },
+  {
+    "id": "P3",
+    "verdict": "medium",
+    "route": "patch",
+    "title": "测试断言预约永远无按钮妨碍合法集成",
+    "evidence": "新增只对block生成revoke的用例同时断言bookings完全无button；正确2.5集成将失败。改为预约无“撤销停用”动作，允许独立管理员取消预约。"
+  },
+  {
+    "id": "P4",
+    "verdict": "medium",
+    "route": "patch",
+    "title": "身份失效后迟到成功丢失已知结果",
+    "evidence": "成功验证后if(blocked)return在revokedMessage赋值前，使已提交撤销仍只有失效提示。保留已确认撤销且要求重新登录，受保护摘要保持清空；覆盖AUTH_REQUIRED/FORBIDDEN先到再成功的两顺序。"
+  },
+  {
+    "id": "P5",
+    "verdict": "medium",
+    "route": "patch",
+    "title": "终态拒绝仍保留过期目标供反复确认",
+    "evidence": "TRANSITION_CLOSED/NOT_FOUND只清confirm，selected/status不变，提示重新确认但目标不可操作。清已有目标并提示重新查询，保留原因；可恢复错误仍可人工重试。"
+  }
+]

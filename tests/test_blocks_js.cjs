@@ -27,6 +27,9 @@ function harness({combined=false,transform=source=>source}={}){
     n[`admin-${kind}-form`].append(...controls,n[`admin-${kind}-submit`]);n[`admin-${kind}-form`].elements={namedItem:name=>n[`admin-${kind}-${name}`]};
   }
   n['logout-form'].elements={csrf_token:{value:'synthetic'}};const body=node('body'),events=new Map();
+  for (const suffix of ['form','panel','title','summary','fields','reason','reason-error','confirm','submit','feedback','relogin']) n['admin-cancel-'+suffix]=node('admin-cancel-'+suffix);
+  n['admin-cancel-form'].append(n['admin-cancel-fields']);
+  n['admin-cancel-fields'].append(n['admin-cancel-reason'],n['admin-cancel-confirm'],n['admin-cancel-submit']);
   const document={getElementById:id=>n[id],querySelector:s=>n[s.slice(1)],createElement:tag=>node('',tag),body,get activeElement(){return active;},
     addEventListener(name,handler){if(!events.has(name))events.set(name,[]);events.get(name).push(handler);},
     dispatchEvent(event){for(const handler of events.get(event.type)||[])handler(event);}};
@@ -46,6 +49,8 @@ function harness({combined=false,transform=source=>source}={}){
     submit(){n['block-confirm'].checked=true;n['block-submit'].focus();return n['block-form'].handlers.submit({preventDefault(){}});},
     refresh(){n['block-rooms-refresh'].focus();return n['block-rooms-refresh'].handlers.click();},
     roomSubmit(){n['room-confirm'].checked=true;n['room-submit'].focus();return n['room-form'].handlers.submit({preventDefault(){}});},
+    choose(index=0){return n['admin-bookings-items'].children[index].querySelectorAll('button')[0].handlers.click();},
+    cancel(){n['admin-cancel-confirm'].checked=true;n['admin-cancel-submit'].focus();return n['admin-cancel-form'].handlers.submit({preventDefault(){}});},
     load(kind='blocks'){n[`admin-${kind}-submit`].focus();return n[`admin-${kind}-form`].handlers.submit({preventDefault(){}});}};
 }
 function restored(ui){assert.equal(ui.n['block-submit'].disabled,false);assert.equal(ui.n['block-form'].getAttribute('aria-busy'),undefined);assert.equal(ui.timers.size,0);}
@@ -195,3 +200,113 @@ for(const mutant of ['empty-booking','missing-purpose'])test(`render oracle reje
   const rows=fixtures('bookings'),ui=harness({transform:source=>mutant==='empty-booking'?source.replace('for (const row of records) {','for (const row of (list.kind === "bookings" ? [] : records)) {'):source.replace('["用途",row.purpose],','')});
   ui.setFetch(async()=>ok({items:rows,total:rows.length}));await ui.load('bookings');assert.throws(()=>assertRendered(visibleRows(ui,'bookings'),rows,'bookings'),assert.AssertionError);
 });
+
+function adminBooking(status='pending') {
+  const row=fixtures('bookings')[0];row.status=status;
+  if(status==='cancelled')Object.assign(row,{cancelled_at:1794448800,cancelled_local:'2026-11-12T10:00:00+08:00',cancelled_by_id:3,cancelled_by_display_name:'管理员 <svg>',cancel_reason:'原原因 <script>'});
+  return row;
+}
+async function cancellationUI(options){
+  const ui=harness(options);ui.setFetch(async()=>ok({items:[adminBooking()],total:1}));await ui.load('bookings');ui.choose();ui.n['admin-cancel-reason'].value='维护 <script>';return ui;
+}
+function cancelRestored(ui){assert.equal(ui.n['admin-cancel-fields'].disabled,false);assert.equal(ui.n['admin-cancel-form'].getAttribute('aria-busy'),undefined);assert.equal(ui.timers.size,0);}
+test('admin cancellation requires confirmation, reason edits reset it and eligible states expose controls',async()=>{
+  const ui=harness();ui.setFetch(async()=>ok({items:['pending','in_progress','ended','cancelled'].map(adminBooking),total:4}));await ui.load('bookings');
+  assert.deepEqual(ui.n['admin-bookings-items'].children.map(row=>row.querySelectorAll('button').length),[1,1,0,1]);ui.choose();
+  await ui.n['admin-cancel-form'].handlers.submit({preventDefault(){}});assert.equal(ui.fetches.length,1);
+  for(const name of ['input','change']){ui.n['admin-cancel-confirm'].checked=true;ui.n['admin-cancel-reason'].handlers[name]();assert.equal(ui.n['admin-cancel-confirm'].checked,false);}
+});
+test('admin cancellation sends only reason to selected ID, prevents repeat pending requests, refreshes and renders saved facts as text',async()=>{
+  const ui=await cancellationUI();let release;ui.setFetch(async(_url,options)=>options.method?new Promise(resolve=>{release=resolve;}):ok({items:[adminBooking('cancelled')],total:1}));
+  const pending=ui.cancel();assert.equal(ui.n['admin-cancel-fields'].disabled,true);assert.equal(ui.n['admin-bookings-submit'].disabled,true);
+  await ui.cancel();assert.equal(ui.fetches.length,2);assert.equal(ui.fetches[1].url,'/api/admin/bookings/200/cancel');
+  assert.deepEqual(JSON.parse(ui.fetches[1].options.body),{reason:'维护 <script>'});assert.equal(ui.fetches[1].options.headers['X-CSRF-Token'],'synthetic');
+  ui.n['room-name'].focus();release(ok(adminBooking('cancelled')));await pending;cancelRestored(ui);
+  assert.equal(ui.active,ui.n['room-name']);assert.match(ui.n['admin-cancel-summary'].textContent,/原取消原因：原原因 <script>/);
+  assert.match(ui.n['admin-bookings-items'].textContent,/已取消/);assert.equal(ui.fetches.length,3);assert.equal(ui.n['admin-cancel-confirm'].checked,false);
+});
+for(const code of ['INVALID_INPUT','INTERNAL_ERROR','STORE_BUSY','CSRF_REJECTED'])test(`admin cancel ${code} preserves reason and allows deliberate retry`,async()=>{
+  const ui=await cancellationUI();ui.setFetch(async()=>fail(code,code==='INVALID_INPUT'?{reason:'原因错误'}:{}));await ui.cancel();cancelRestored(ui);
+  assert.equal(ui.n['admin-cancel-reason'].value,'维护 <script>');assert.equal(ui.fetches.length,2);assert.match(ui.n['admin-cancel-feedback'].textContent,/原因已保留/);
+  if(code==='INVALID_INPUT'){assert.equal(ui.active,ui.n['admin-cancel-reason']);assert.equal(ui.n['admin-cancel-reason'].getAttribute('aria-invalid'),'true');}
+});
+for(const failure of ['network','malformed','mismatched-id','incomplete','timeout-headers','timeout-body'])test(`admin cancel ${failure} is unconfirmed without automatic retry`,async()=>{
+  const ui=await cancellationUI();ui.setFetch(async(_url,{signal})=>{
+    if(failure==='network')throw Error();
+    if(failure.startsWith('timeout')){const stall=()=>new Promise((_r,reject)=>signal.addEventListener('abort',()=>reject(Error())));return failure==='timeout-headers'?stall():{ok:true,json:stall};}
+    if(failure==='malformed')return {ok:true,json:async()=>{throw Error();}};
+    const row=adminBooking('cancelled');if(failure==='mismatched-id')row.id=201;else delete row.cancel_reason;return ok(row);
+  });const pending=ui.cancel();await tick();if(failure.startsWith('timeout'))[...ui.timers.values()][0].fn();await pending;cancelRestored(ui);
+  assert.match(ui.n['admin-cancel-feedback'].textContent,/未能确认.*不会自动重试/);assert.equal(ui.n['admin-cancel-confirm'].checked,false);
+  assert.equal(ui.n['admin-cancel-reason'].value,'维护 <script>');await ui.n['admin-cancel-form'].handlers.submit({preventDefault(){}});assert.equal(ui.fetches.length,2);
+});
+for(const code of ['AUTH_REQUIRED','FORBIDDEN'])test(`admin cancel ${code} clears protected data and blocks writes retaining reason`,async()=>{
+  const ui=await cancellationUI();ui.setFetch(async()=>fail(code));await ui.cancel();assert.equal(ui.n['admin-cancel-fields'].disabled,true);
+  assert.equal(ui.n['admin-bookings-items'].children.length,0);assert.equal(ui.n['admin-cancel-summary'].textContent,'');assert.equal(ui.n['admin-cancel-reason'].value,'维护 <script>');
+  assert.equal(ui.n['admin-cancel-relogin'].hidden,false);await ui.cancel();assert.equal(ui.fetches.length,2);
+});
+for(const code of ['STORE_BUSY','AUTH_REQUIRED','FORBIDDEN'])test(`admin cancel successful result remains successful when refresh gets ${code}`,async()=>{
+  const ui=await cancellationUI();ui.setFetch(async(_url,options)=>options.method?ok(adminBooking('cancelled')):fail(code));await ui.cancel();
+  assert.match(ui.n['admin-cancel-feedback'].textContent,/预约 200 已取消/);assert.equal(ui.fetches.length,3);
+  if(code==='STORE_BUSY'){cancelRestored(ui);assert.match(ui.n['admin-bookings-feedback'].textContent,/取消已成功.*刷新失败/);}
+});
+test('admin cancel repeated member cancellation accepts original null reason and unsafe ID never posts',async()=>{
+  const ui=await cancellationUI();const row=adminBooking('cancelled');row.cancel_reason=null;row.cancelled_by_id=row.owner_id;
+  ui.setFetch(async(_url,options)=>ok(options.method?row:{items:[row],total:1}));await ui.cancel();cancelRestored(ui);assert.match(ui.n['admin-cancel-summary'].textContent,/本人取消，无原因/);
+  ui.setFetch(async()=>ok({items:[{...row,id:Number('9223372036854775807')}],total:1}));await ui.load('bookings');ui.choose();
+  assert.match(ui.n['admin-bookings-feedback'].textContent,/无法安全提交/);
+});
+
+function assertDisarmed(ui){
+  assert.equal(ui.n['admin-cancel-confirm'].checked,false);
+  assert.equal(ui.n['admin-cancel-summary'].textContent,'');
+  assert.equal(ui.n['admin-cancel-reason'].value,'维护 <script>');
+  assert.equal(ui.n['admin-cancel-fields'].disabled,true);
+}
+for(const field of ['room_id','date','status'])for(const event of ['input','change'])test(`booking ${field} ${event} disarms old cancellation while preserving draft`,async()=>{
+  const ui=await cancellationUI();ui.n['admin-cancel-confirm'].checked=true;
+  ui.n[`admin-bookings-${field}`].handlers[event]();assertDisarmed(ui);
+  await ui.cancel();assert.equal(ui.fetches.length,1);assert.match(ui.n['admin-cancel-feedback'].textContent,/重新查询/);
+});
+test('manual booking requery disarms selected target before response, even for empty results',async()=>{
+  const ui=await cancellationUI();ui.n['admin-cancel-confirm'].checked=true;let release;ui.setFetch(()=>new Promise(r=>{release=r;}));
+  const pending=ui.load('bookings');assertDisarmed(ui);release(ok({items:[],total:0}));await pending;
+  assertDisarmed(ui);await ui.cancel();assert.equal(ui.fetches.length,2);
+});
+test('unsafe booking click clears previously armed safe booking and retains draft',async()=>{
+  const ui=harness();ui.setFetch(async()=>ok({items:[adminBooking(),{...adminBooking(),id:Number('9223372036854775807')}],total:2}));
+  await ui.load('bookings');ui.choose(0);ui.n['admin-cancel-reason'].value='维护 <script>';ui.n['admin-cancel-confirm'].checked=true;
+  ui.choose(1);assertDisarmed(ui);await ui.cancel();assert.equal(ui.fetches.length,1);
+});
+for(const code of ['TRANSITION_CLOSED','NOT_FOUND'])test(`admin cancellation ${code} clears target and requires query instead of retry`,async()=>{
+  const ui=await cancellationUI();ui.setFetch(async()=>fail(code));await ui.cancel();assertDisarmed(ui);
+  assert.match(ui.n['admin-cancel-feedback'].textContent,/重新查询并选择预约/);assert.doesNotMatch(ui.n['admin-cancel-feedback'].textContent,/重试/);
+  await ui.cancel();assert.equal(ui.fetches.length,2);
+});
+test('successful cancellation with empty pending refresh preserves complete target summary and known result',async()=>{
+  const ui=await cancellationUI(),row=adminBooking('cancelled');ui.n['admin-bookings-status'].value='pending';
+  ui.setFetch(async(_url,options)=>ok(options.method?row:{items:[],total:0}));await ui.cancel();cancelRestored(ui);
+  assert.equal(ui.n['admin-bookings-items'].children.length,0);assert.equal(ui.fetches[2].url,'/api/admin/bookings?status=pending');
+  assert.equal(ui.n['admin-cancel-summary'].textContent,'预约 200 · 标题0 · 已取消\n会议室：30 · 房间0<img> · 地点0\n预约时段（北京时间）：2026-11-13 10:00:00 至 2026-11-14 16:00:00\n取消时间（北京时间）：2026-11-12 10:00:00\n操作者：管理员 <svg>\n原取消原因：原原因 <script>');
+  assert.match(ui.n['admin-cancel-feedback'].textContent,/预约 200 已取消/);
+  await ui.cancel();assert.equal(ui.fetches.filter(call=>call.options.method==='POST').length,2);
+});
+async function lateCancellationOracle(code,transform){
+  const ui=await cancellationUI({combined:true,transform});let release;
+  ui.setFetch(async url=>url.endsWith('/cancel')?new Promise(r=>{release=r;}):fail(code));
+  const pending=ui.cancel();await ui.roomSubmit();
+  assert.equal(ui.n['admin-cancel-summary'].textContent,'');
+  release(ok(adminBooking('cancelled')));await pending;
+  assert.equal(ui.n['admin-cancel-summary'].textContent,'');
+  assert.equal(ui.n['admin-cancel-fields'].disabled,true);assert.equal(ui.n['room-submit'].disabled,true);
+  assert.equal(ui.n['admin-cancel-reason'].value,'维护 <script>');assert.equal(ui.n['admin-cancel-relogin'].hidden,false);
+  assert.match(ui.n['admin-cancel-feedback'].textContent,/预约 200 已取消.*重新登录/);
+  assert.equal(ui.n['admin-bookings-items'].children.length,0);assert.equal(ui.fetches.length,3);
+}
+for(const code of ['AUTH_REQUIRED','FORBIDDEN']){
+  test(`rooms ${code} followed by late admin cancellation keeps protected summary empty and known success`,async()=>lateCancellationOracle(code));
+  test(`late admin cancellation oracle detects removed blocked guard after rooms ${code}`,async()=>{
+    const guard='if (blocked) { say(cancelFeedback,`${cancelledMessage} 请重新登录后查看详情。`,true); return; }';
+    await assert.rejects(lateCancellationOracle(code,source=>{assert.ok(source.includes(guard));return source.replace(guard,'');}),assert.AssertionError);
+  });
+}

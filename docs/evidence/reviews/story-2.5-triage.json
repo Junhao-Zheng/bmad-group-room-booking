@@ -1,0 +1,79 @@
+[
+  {
+    "id": "B1",
+    "verdict": "high",
+    "route": "patch",
+    "title": "筛选/重查询后原取消目标仍 armed",
+    "evidence": "blocks.js 的 input/change 仅清 list，load 也未清 selectedBooking；改变房间至空列表仍可取消旧对象，用户可能误操作。清已有选择/确认及受保护摘要，保留原因草稿；自动成功刷新保留已知结果。"
+  },
+  {
+    "id": "B2",
+    "verdict": "medium",
+    "route": "patch",
+    "title": "无法安全选择新 ID 时仍保留旧目标",
+    "evidence": "安全整数检查在 selectedBooking 赋值前 return，不撤销旧选择与确认。拒绝新目标时清旧目标/确认，避免对旧对象发送请求。"
+  },
+  {
+    "id": "B3",
+    "verdict": "low",
+    "route": "reject",
+    "title": "浏览器无法操作超出安全整数的合法 64 位 ID",
+    "evidence": "限制属实，API 服务支持正64位且UI主动拒绝避免取整误取消；既有多页面使用数值JSON，统一无损解析需新增跨页面协议/解析复杂度。日常课程种子和递增规模不可能触及2^53，按低概率且非直接修正规则拒绝扩大本轮范围，README保留边界；不把安全拒绝计为权限/ADR冲突。"
+  },
+  {
+    "id": "B4",
+    "verdict": "low",
+    "route": "patch",
+    "title": "取消控制未关联目标摘要",
+    "evidence": "模板 reason 仅关联字段错误，checkbox 不引用摘要。直接添加 aria-describedby 保留原错误引用，并用实际DOM属性检查。"
+  },
+  {
+    "id": "B5",
+    "verdict": "medium",
+    "route": "patch",
+    "title": "成功结果丢失房间和时段",
+    "evidence": "成功摘要仅ID/title/取消元数据，pending筛选自动移除记录。保留房间与完整北京时间区间。"
+  },
+  {
+    "id": "B6",
+    "verdict": "medium",
+    "route": "patch",
+    "title": "终态错误仍提示重试且保留确认",
+    "evidence": "TRANSITION_CLOSED/NOT_FOUND 走通用可重试文案，selectedBooking/confirm不清。仅对此两码清目标/确认、保留原因并明确重新查询；非终态错误维持恢复。"
+  },
+  {
+    "id": "B7",
+    "verdict": "medium",
+    "route": "patch",
+    "title": "真实写锁等待的期限与busy验证缺失",
+    "evidence": "现有该方法替换write_transaction，真实20轮竞争不改变时钟；没有该命令等待真实另一连接至截止再取得锁、或超时503且数据不变的测试。复用真实文件库/连接加入定向断言，禁止以sleep推测已进入锁等待，使用可观测同步。"
+  },
+  {
+    "id": "B8",
+    "verdict": "medium",
+    "route": "patch",
+    "title": "两个管理员不同原因竞争缺少覆盖",
+    "evidence": "HTTP仅member/admin；重复admin的顺序用例不覆盖两个有效不同原因同时首提交。追加独立admin/admin竞争与双方相同首actor/time/reason、恰1审计、目标槽释放及其他数据不变断言。"
+  },
+  {
+    "id": "B9",
+    "verdict": "medium",
+    "route": "patch",
+    "title": "HTTP源指纹未包括执行依赖",
+    "evidence": "fingerprints仅app、当前脚本、performance/historybrowser，实际seed和FULL_KEYS来源未入。加init_demo、verify_create_booking_http、history/schedule_fixtures等直接/间接可执行依赖并前后比较。"
+  },
+  {
+    "id": "B10",
+    "verdict": "medium",
+    "route": "patch",
+    "title": "浏览器失败丢失数据库事实和安全诊断",
+    "evidence": "run_driver失败立即raise，after事实和storage文件仅在断言后写出；TemporaryDirectory退出销毁库。使用现有安全结果机制，失败仍保存无凭据 before/after事实，先保存再断言，只保留诊断类型/阶段等白名单，不输出原始driver日志。"
+  },
+  {
+    "id": "V1",
+    "verdict": "medium",
+    "route": "patch",
+    "title": "跨面板身份失效后的迟到取消成功无断言",
+    "evidence": "验证层预验证：移除blocked成功guard所有228JS仍过；真实combined harness证明摘要重现。补AUTH_REQUIRED/FORBIDDEN两种时序，摘要空/控件禁用/原因保留/已知成功和重新登录反馈；不要更改正确guard。"
+  }
+]

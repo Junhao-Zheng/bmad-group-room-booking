@@ -55,3 +55,9 @@
 |V1 跨面板身份失效后的迟到取消成功无断言|medium|patch|验证层预验证：移除blocked成功guard所有228JS仍过；真实combined harness证明摘要重现。补AUTH_REQUIRED/FORBIDDEN两种时序，摘要空/控件禁用/原因保留/已知成功和重新登录反馈；不要更改正确guard。|
 
 逐条裁决后归并：B1/B2同为旧选择未失效，合并一次修补；其余不同根因不合并。10条patch发现→9项修补，1条low reject，0defer；没有变更产品需求或编造人工决定。
+
+## 修补后的父流程发现 P1
+
+medium / patch：新增 test_admin_cancel_browser_runner 调用 main 的真实 environment_metadata，后者读取仓库 work/browser-tools/node_modules/playwright/package.json；driver 已被测试替身替换，故这三项应是Python/真实本地服务测试，却在按README只装应用依赖的干净检出中因缺Playwright元数据而提早失败。测试内提供明确的受控环境元数据，并用sys.executable作为不会真正启动的wrapper目标，不能改弱生产runner的真实环境核验。保留真实SQLite/Waitress、故障留证和秘密哨兵断言。此为首轮修补引入的测试可移植性问题，另一次修补调用，非done后返工。
+
+本次父流程在现有安装环境完整运行172项Python、241项JS通过，无skip；该成绩不宣称干净检出已过。最后统一集成后还要重新完整验证。

@@ -112,6 +112,17 @@ def admin_bookings_api():
     return jsonify(ok=True, data=services.admin_bookings(actor, request.args.get("room_id"), request.args.get("date"), request.args.get("status")))
 
 
+@bp.post("/api/admin/bookings/<booking_id>/cancel")
+def admin_cancel_booking_api(booking_id):
+    actor = services.require_admin(auth.actor_for_token(token()))
+    if request.mimetype != "application/json":
+        raise DomainError("INVALID_INPUT", "请使用 JSON 格式提交取消原因。")
+    values = payload()
+    if set(values) != {"reason"}:
+        raise DomainError("INVALID_INPUT", "请仅提交取消原因。", {"reason": "请填写取消原因。"})
+    return jsonify(ok=True, data=services.admin_cancel_booking(actor, booking_id, values["reason"]))
+
+
 @bp.get("/api/admin/blocks")
 def admin_blocks_api():
     actor = services.require_admin(auth.actor_for_token(token()))

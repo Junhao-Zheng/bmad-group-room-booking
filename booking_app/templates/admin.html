@@ -62,7 +62,7 @@
 {% for kind, label, terminal, terminal_label in [('bookings','预约','cancelled','已取消'),('blocks','停用','revoked','已撤销')] %}
 <section class="card admin-section" aria-labelledby="admin-{{ kind }}-title">
   <h2 id="admin-{{ kind }}-title">完整{{ label }}记录</h2>
-  <p class="muted">仅查看；按开始时间和编号升序。日期按北京时间相交筛选，留空显示全部。</p>
+  <p class="muted">按开始时间和编号升序。日期按北京时间相交筛选，留空显示全部。{% if kind == 'bookings' %}可说明原因取消未结束预约；原因将对预约人可见。{% endif %}</p>
   <form id="admin-{{ kind }}-form">
     <div class="availability-fields">
       <div class="form-field"><label for="admin-{{ kind }}-room_id">会议室</label><select id="admin-{{ kind }}-room_id" name="room_id" aria-describedby="admin-{{ kind }}-room_id-error"><option value="">全部会议室</option>{% for room in rooms['items'] %}<option value="{{ room.id }}">{{ room.name }} · {{ room.location }}</option>{% endfor %}</select><p id="admin-{{ kind }}-room_id-error" class="field-error"></p></div>
@@ -73,6 +73,21 @@
   </form>
   <p id="admin-{{ kind }}-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1">尚未查询{{ label }}记录，请选择条件后查询。</p>
   <ul id="admin-{{ kind }}-items" class="history-items"></ul>
+  {% if kind == 'bookings' %}
+  <section id="admin-cancel-panel" hidden aria-labelledby="admin-cancel-title">
+    <h3 id="admin-cancel-title" tabindex="-1">管理员取消预约</h3>
+    <p id="admin-cancel-summary" class="notice"></p>
+    <form id="admin-cancel-form">
+      <fieldset id="admin-cancel-fields" disabled>
+        <div class="form-field"><label for="admin-cancel-reason">取消原因（1—500 字，对预约人可见）</label><textarea id="admin-cancel-reason" name="reason" rows="3" required aria-describedby="admin-cancel-summary admin-cancel-reason-error"></textarea><p id="admin-cancel-reason-error" class="field-error"></p></div>
+        <label class="room-confirm-label" for="admin-cancel-confirm"><input id="admin-cancel-confirm" type="checkbox" required aria-describedby="admin-cancel-summary">我已核对预约及原因，确认取消</label>
+        <button id="admin-cancel-submit" class="button-primary" type="submit">确认管理员取消</button>
+      </fieldset>
+    </form>
+    <p id="admin-cancel-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>
+    <a id="admin-cancel-relogin" class="relogin-link" href="{{ url_for('web.login_page') }}" hidden>重新登录（不会自动提交）</a>
+  </section>
+  {% endif %}
 </section>
 {% endfor %}
 {% endblock %}

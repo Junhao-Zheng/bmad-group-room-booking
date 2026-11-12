@@ -8,7 +8,7 @@ from flask import current_app
 from . import auth, db, dto
 from .domain import DomainError, auth_required, beijing_day, booking_interval, query_attendees, resource_id
 from .domain import normalize_booking_payload, normalize_room_payload, validate_booking_window
-from .domain import normalize_block_payload, validate_block_window
+from .domain import normalize_block_payload, normalized_text, validate_block_window
 
 
 def _require_actor(conn, actor: auth.Actor, now: int) -> auth.Actor:
@@ -245,6 +245,37 @@ def member_cancel_booking(actor: auth.Actor, booking_id) -> dict:
             "actor_id": actor.id, "actor_display_name": actor.display_name,
             "action": "booking.cancelled_by_member", "target_type": "booking", "target_id": normalized_id,
             "occurred_at": now, "before": before, "after": dto.booking_snapshot(row), "reason": None,
+        })
+        result = _full_booking(row, now)
+    return result
+
+
+def admin_cancel_booking(actor: auth.Actor, booking_id, reason) -> dict:
+    """Admin intervention is independent from the owner's cancellation deadline."""
+    with db.write_transaction() as conn:
+        now = current_app.config["CLOCK"].now_epoch()
+        actor = require_admin(_require_actor(conn, actor, now))
+        normalized_id = resource_id(booking_id, "booking_id")
+        reason = normalized_text(reason, "reason", 500)
+        row = conn.execute(
+            _BOOKING_DETAIL_SELECT + "WHERE r.kind='booking' AND r.id=?", (normalized_id,),
+        ).fetchone()
+        if row is None:
+            raise DomainError("NOT_FOUND", "预约不存在或无权访问。")
+        # Valid authorization and reason are required even for an idempotent retry.
+        if row["cancelled_at"] is not None:
+            return _full_booking(row, now)
+        if now >= row["end_at"]:
+            raise DomainError("TRANSITION_CLOSED", "预约已结束，不能取消。")
+        before = dto.booking_snapshot(row)
+        conn.execute("UPDATE reservations SET cancelled_at=?,cancelled_by=?,cancel_reason=? WHERE id=?",
+                     (now, actor.id, reason, normalized_id))
+        conn.execute("DELETE FROM occupancy_slots WHERE reservation_id=?", (normalized_id,))
+        row = conn.execute(_BOOKING_DETAIL_SELECT + "WHERE r.id=?", (normalized_id,)).fetchone()
+        current_app.config["AUDIT_WRITER"](conn, {
+            "actor_id": actor.id, "actor_display_name": actor.display_name,
+            "action": "booking.cancelled_by_admin", "target_type": "booking", "target_id": normalized_id,
+            "occurred_at": now, "before": before, "after": dto.booking_snapshot(row), "reason": reason,
         })
         result = _full_booking(row, now)
     return result
