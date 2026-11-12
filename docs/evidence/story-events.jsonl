@@ -43,3 +43,4 @@
 {"timestamp": "2026-11-12T11:44:30.211155+00:00", "story": "3-1-room-management", "from": "ready-for-dev", "to": "in-progress", "actor": "AI root", "head": "6644902c9e3880482d1edef75c42a1ee303ba6dd", "post_done_rework": false}
 {"timestamp": "2026-11-12T11:59:28.195066+00:00", "story": "3-1-room-management", "from": "in-progress", "to": "review", "actor": "AI root", "head": "8c5d731f2ed27f8c5fd59c4d0651c1d41bbe35f3", "post_done_rework": false}
 {"timestamp": "2026-11-12T12:17:27.366500+00:00", "story": "3-1-room-management", "from": "review", "to": "done", "actor": "AI root", "head": "8c5d731f2ed27f8c5fd59c4d0651c1d41bbe35f3", "post_done_rework": false}
+{"timestamp": "2026-11-12T12:17:43.187788+00:00", "story": "3-2-maintenance-block", "from": "backlog", "to": "ready-for-dev", "actor": "AI root", "head": "8edf9fd61ef1ea8fb111e0eea6f41022f8064b1a", "post_done_rework": false}
