@@ -1,0 +1,18 @@
+{
+  "checked_at_utc": "2026-11-12T13:28:17.828224+00:00",
+  "scope": "PREPARATION_ONLY_NOT_FINAL_COURSE_VIDEO",
+  "files_sha256": {
+    "current-actions-runner.json": "495c1f315e8392153184fff04bba1406a79b84d992c6335c64b6de661db6c39c",
+    "current-actions-steps.json": "95e4c07c28a36260bf40a763ce391f216293ed2244f7021448ca9341a17c2396",
+    "encoder-smoke.json": "feb8e6b8e46ad9d7d853b07dee16a927e0c4efa6f7ec63ddd81fb20b7dae5765",
+    "encoder-decode.txt": "75a4902634e5cd6cdb9e5e0687598fad4dd31c8dedf064bb8e315d8f44e6b086",
+    "fitted-viewport-frame.png": "a262da8141496accec1bb38ab292fef583f2cd22d2f276e077313bd9ad2223ad",
+    "initial-clipped-frame.png": "55a95388baf1632aea34e93943a1534321c76bf50db201ba02be7d831417e6ed",
+    "current-actions-scenes.json": "a34e021df71a31f61bd15ab83968c0c38e1d2dde19842b71598d6b12d411c54a"
+  },
+  "visual_checked": [
+    "initial-clipped-frame.png",
+    "fitted-viewport-frame.png"
+  ],
+  "result": "PREFLIGHT_PASS"
+}

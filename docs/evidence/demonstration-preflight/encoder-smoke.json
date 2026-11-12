@@ -1,0 +1,8 @@
+{
+  "result": "PASS",
+  "exit": 0,
+  "stdout": "{\"result\":\"PASS\",\"bytes\":19098,\"browser\":\"157.0.8103.51\"}\n",
+  "stderr": "",
+  "ffmpeg_sha256": "591260c945d0eef150e3bf82b0ef988bd36a9cecc18ff05d6679617159f0a95e",
+  "note": "Separate 2.2 second encoder smoke, never a ten-minute course video; initial Playwright download did not finish and its executable exited 137."
+}

@@ -1,0 +1,398 @@
+{
+  "status": "FINAL_AUDITED",
+  "scenes": [
+    {
+      "title": "现有页面动作预检 1",
+      "lead": "只检查已有控件能否按脚本操作，不代表最终课程演示完成。",
+      "facts": [
+        "合成数据；预检模式，不录制十分钟视频"
+      ],
+      "sources": [],
+      "narration": "此文件仅供动作预检。"
+    },
+    {
+      "title": "现有页面动作预检 2",
+      "lead": "只检查已有控件能否按脚本操作，不代表最终课程演示完成。",
+      "facts": [
+        "合成数据；预检模式，不录制十分钟视频"
+      ],
+      "sources": [],
+      "narration": "此文件仅供动作预检。"
+    },
+    {
+      "title": "现有页面动作预检 3",
+      "lead": "只检查已有控件能否按脚本操作，不代表最终课程演示完成。",
+      "facts": [
+        "合成数据；预检模式，不录制十分钟视频"
+      ],
+      "sources": [],
+      "narration": "此文件仅供动作预检。"
+    },
+    {
+      "title": "现有页面动作预检 4",
+      "lead": "只检查已有控件能否按脚本操作，不代表最终课程演示完成。",
+      "facts": [
+        "合成数据；预检模式，不录制十分钟视频"
+      ],
+      "sources": [],
+      "narration": "此文件仅供动作预检。"
+    },
+    {
+      "title": "现有页面动作预检 5",
+      "lead": "只检查已有控件能否按脚本操作，不代表最终课程演示完成。",
+      "facts": [
+        "合成数据；预检模式，不录制十分钟视频"
+      ],
+      "sources": [],
+      "narration": "此文件仅供动作预检。",
+      "app_path": "/",
+      "username": "demo_member_a",
+      "actions": [
+        {
+          "kind": "pause",
+          "milliseconds": 2000
+        },
+        {
+          "kind": "fill",
+          "selector": "#start",
+          "value": "2026-11-15T10:00"
+        },
+        {
+          "kind": "fill",
+          "selector": "#end",
+          "value": "2026-11-15T11:00"
+        },
+        {
+          "kind": "fill",
+          "selector": "#attendees",
+          "value": "6"
+        },
+        {
+          "kind": "pause",
+          "milliseconds": 2000
+        },
+        {
+          "kind": "click",
+          "selector": "#availability-form button[type=submit]"
+        },
+        {
+          "kind": "wait_text",
+          "selector": "#availability-feedback",
+          "value": "查询"
+        },
+        {
+          "kind": "pause",
+          "milliseconds": 2000
+        },
+        {
+          "kind": "click",
+          "selector": "#availability-items li:has-text(\"讨论室 B\") button"
+        },
+        {
+          "kind": "fill",
+          "selector": "#booking-name",
+          "value": "课程过程复盘"
+        },
+        {
+          "kind": "fill",
+          "selector": "#booking-purpose",
+          "value": "对照需求、架构和验证证据讨论改进"
+        },
+        {
+          "kind": "pause",
+          "milliseconds": 3000
+        },
+        {
+          "kind": "click",
+          "selector": "#booking-form button[type=submit]"
+        },
+        {
+          "kind": "wait_text",
+          "selector": "#booking-feedback",
+          "value": "成功"
+        },
+        {
+          "kind": "scroll",
+          "selector": "#booking-panel"
+        },
+        {
+          "kind": "pause",
+          "milliseconds": 3000
+        }
+      ]
+    },
+    {
+      "title": "现有页面动作预检 6",
+      "lead": "只检查已有控件能否按脚本操作，不代表最终课程演示完成。",
+      "facts": [
+        "合成数据；预检模式，不录制十分钟视频"
+      ],
+      "sources": [],
+      "narration": "此文件仅供动作预检。",
+      "app_path": "/my",
+      "actions": [
+        {
+          "kind": "pause",
+          "milliseconds": 2000
+        },
+        {
+          "kind": "click",
+          "selector": "#history-items button[aria-label*=\"课程过程复盘\"]"
+        },
+        {
+          "kind": "wait_text",
+          "selector": "#detail-fields",
+          "value": "课程过程复盘"
+        },
+        {
+          "kind": "scroll",
+          "selector": "#history-detail"
+        },
+        {
+          "kind": "pause",
+          "milliseconds": 4000
+        },
+        {
+          "kind": "click",
+          "selector": "#cancel-confirm"
+        },
+        {
+          "kind": "pause",
+          "milliseconds": 2000
+        },
+        {
+          "kind": "click",
+          "selector": "#cancel-submit"
+        },
+        {
+          "kind": "wait_text",
+          "selector": "#cancel-feedback",
+          "value": "已取消，时段已释放"
+        },
+        {
+          "kind": "pause",
+          "milliseconds": 4000
+        }
+      ]
+    },
+    {
+      "title": "现有页面动作预检 7",
+      "lead": "只检查已有控件能否按脚本操作，不代表最终课程演示完成。",
+      "facts": [
+        "合成数据；预检模式，不录制十分钟视频"
+      ],
+      "sources": [],
+      "narration": "此文件仅供动作预检。",
+      "app_path": "/admin",
+      "username": "demo_admin",
+      "actions": [
+        {
+          "kind": "pause",
+          "milliseconds": 2000
+        },
+        {
+          "kind": "click",
+          "selector": "#admin-rooms button:has-text(\"编辑会议室 2\")"
+        },
+        {
+          "kind": "fill",
+          "selector": "#room-capacity",
+          "value": "4"
+        },
+        {
+          "kind": "click",
+          "selector": "#room-confirm"
+        },
+        {
+          "kind": "pause",
+          "milliseconds": 2000
+        },
+        {
+          "kind": "click",
+          "selector": "#room-submit"
+        },
+        {
+          "kind": "wait_text",
+          "selector": "#room-feedback",
+          "value": "新容量不足"
+        },
+        {
+          "kind": "scroll",
+          "selector": "#room-conflicts"
+        },
+        {
+          "kind": "pause",
+          "milliseconds": 4000
+        },
+        {
+          "kind": "fill",
+          "selector": "#room-capacity",
+          "value": "10"
+        },
+        {
+          "kind": "click",
+          "selector": "#room-confirm"
+        },
+        {
+          "kind": "pause",
+          "milliseconds": 2000
+        },
+        {
+          "kind": "click",
+          "selector": "#room-submit"
+        },
+        {
+          "kind": "wait_text",
+          "selector": "#room-feedback",
+          "value": "已保存"
+        },
+        {
+          "kind": "scroll",
+          "selector": "#room-form"
+        },
+        {
+          "kind": "pause",
+          "milliseconds": 3000
+        }
+      ]
+    },
+    {
+      "title": "现有页面动作预检 8",
+      "lead": "只检查已有控件能否按脚本操作，不代表最终课程演示完成。",
+      "facts": [
+        "合成数据；预检模式，不录制十分钟视频"
+      ],
+      "sources": [],
+      "narration": "此文件仅供动作预检。",
+      "app_path": "/admin",
+      "actions": [
+        {
+          "kind": "scroll",
+          "selector": "#block-form-title"
+        },
+        {
+          "kind": "pause",
+          "milliseconds": 2000
+        },
+        {
+          "kind": "select",
+          "selector": "#block-room_id",
+          "value": "2"
+        },
+        {
+          "kind": "fill",
+          "selector": "#block-start",
+          "value": "2026-11-13T14:00"
+        },
+        {
+          "kind": "fill",
+          "selector": "#block-end",
+          "value": "2026-11-13T15:00"
+        },
+        {
+          "kind": "fill",
+          "selector": "#block-reason",
+          "value": "网络设备维护，冲突时保留原有活动"
+        },
+        {
+          "kind": "click",
+          "selector": "#block-confirm"
+        },
+        {
+          "kind": "pause",
+          "milliseconds": 2000
+        },
+        {
+          "kind": "click",
+          "selector": "#block-submit"
+        },
+        {
+          "kind": "wait_text",
+          "selector": "#block-feedback",
+          "value": "已有预约或停用"
+        },
+        {
+          "kind": "scroll",
+          "selector": "#block-conflicts"
+        },
+        {
+          "kind": "pause",
+          "milliseconds": 4000
+        },
+        {
+          "kind": "fill",
+          "selector": "#block-start",
+          "value": "2026-11-15T10:00"
+        },
+        {
+          "kind": "fill",
+          "selector": "#block-end",
+          "value": "2026-11-15T11:00"
+        },
+        {
+          "kind": "click",
+          "selector": "#block-confirm"
+        },
+        {
+          "kind": "pause",
+          "milliseconds": 2000
+        },
+        {
+          "kind": "click",
+          "selector": "#block-submit"
+        },
+        {
+          "kind": "wait_text",
+          "selector": "#block-feedback",
+          "value": "已创建"
+        },
+        {
+          "kind": "scroll",
+          "selector": "#block-feedback"
+        },
+        {
+          "kind": "pause",
+          "milliseconds": 3000
+        }
+      ]
+    },
+    {
+      "title": "现有页面动作预检 9",
+      "lead": "只检查已有控件能否按脚本操作，不代表最终课程演示完成。",
+      "facts": [
+        "合成数据；预检模式，不录制十分钟视频"
+      ],
+      "sources": [],
+      "narration": "此文件仅供动作预检。"
+    },
+    {
+      "title": "现有页面动作预检 10",
+      "lead": "只检查已有控件能否按脚本操作，不代表最终课程演示完成。",
+      "facts": [
+        "合成数据；预检模式，不录制十分钟视频"
+      ],
+      "sources": [],
+      "narration": "此文件仅供动作预检。"
+    },
+    {
+      "title": "现有页面动作预检 11",
+      "lead": "只检查已有控件能否按脚本操作，不代表最终课程演示完成。",
+      "facts": [
+        "合成数据；预检模式，不录制十分钟视频"
+      ],
+      "sources": [],
+      "narration": "此文件仅供动作预检。"
+    },
+    {
+      "title": "现有页面动作预检 12",
+      "lead": "只检查已有控件能否按脚本操作，不代表最终课程演示完成。",
+      "facts": [
+        "合成数据；预检模式，不录制十分钟视频"
+      ],
+      "sources": [],
+      "narration": "此文件仅供动作预检。"
+    }
+  ],
+  "source_commit": "c653c52a8754997941a817b1d1aeee2a063f57a8",
+  "scope": "Only already-implemented actions; preflight, not final course presentation"
+}

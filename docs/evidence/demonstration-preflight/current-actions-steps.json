@@ -1,0 +1,118 @@
+{
+  "result": "PASS",
+  "started_at_utc": "2026-11-12T13:24:45.758Z",
+  "scenes": [
+    {
+      "index": 1,
+      "title": "现有页面动作预检 1",
+      "actual_started_seconds": 0.0000024170000001504376,
+      "actions_complete_seconds": 0.555904125,
+      "route": "process#0",
+      "actual_ended_seconds": 0.5573777500000001
+    },
+    {
+      "index": 2,
+      "title": "现有页面动作预检 2",
+      "actual_started_seconds": 0.5574650000000001,
+      "actions_complete_seconds": 0.5999761250000002,
+      "route": "process#1",
+      "actual_ended_seconds": 0.6002007090000002
+    },
+    {
+      "index": 3,
+      "title": "现有页面动作预检 3",
+      "actual_started_seconds": 0.6002840000000002,
+      "actions_complete_seconds": 0.6500408340000003,
+      "route": "process#2",
+      "actual_ended_seconds": 0.651450292
+    },
+    {
+      "index": 4,
+      "title": "现有页面动作预检 4",
+      "actual_started_seconds": 0.6515669170000001,
+      "actions_complete_seconds": 0.6991950840000004,
+      "route": "process#3",
+      "actual_ended_seconds": 0.7005909590000001
+    },
+    {
+      "index": 5,
+      "title": "现有页面动作预检 5",
+      "actual_started_seconds": 0.7733407500000002,
+      "actions_complete_seconds": 2.0422636670000007,
+      "route": "/",
+      "actual_ended_seconds": 2.043686209
+    },
+    {
+      "index": 6,
+      "title": "现有页面动作预检 6",
+      "actual_started_seconds": 2.0438645840000005,
+      "actions_complete_seconds": 3.223369209,
+      "route": "/my",
+      "actual_ended_seconds": 3.224717792
+    },
+    {
+      "index": 7,
+      "title": "现有页面动作预检 7",
+      "actual_started_seconds": 3.303429917,
+      "actions_complete_seconds": 4.711014334,
+      "route": "/admin",
+      "actual_ended_seconds": 4.711204834
+    },
+    {
+      "index": 8,
+      "title": "现有页面动作预检 8",
+      "actual_started_seconds": 4.711280875000001,
+      "actions_complete_seconds": 6.110664584,
+      "route": "/admin",
+      "actual_ended_seconds": 6.1120364590000005
+    },
+    {
+      "index": 9,
+      "title": "现有页面动作预检 9",
+      "actual_started_seconds": 6.112152250000001,
+      "actions_complete_seconds": 6.658195834,
+      "route": "process#8",
+      "actual_ended_seconds": 6.659555
+    },
+    {
+      "index": 10,
+      "title": "现有页面动作预检 10",
+      "actual_started_seconds": 6.659650083999999,
+      "actions_complete_seconds": 6.698087542,
+      "route": "process#9",
+      "actual_ended_seconds": 6.699423875000001
+    },
+    {
+      "index": 11,
+      "title": "现有页面动作预检 11",
+      "actual_started_seconds": 6.699507625,
+      "actions_complete_seconds": 6.7480716670000005,
+      "route": "process#10",
+      "actual_ended_seconds": 6.749465542
+    },
+    {
+      "index": 12,
+      "title": "现有页面动作预检 12",
+      "actual_started_seconds": 6.7496642090000005,
+      "actions_complete_seconds": 6.800305709,
+      "route": "process#11",
+      "actual_ended_seconds": 6.801643334
+    }
+  ],
+  "mode": "preflight",
+  "synthetic_narration": true,
+  "operator": "AI automation",
+  "source_commit": "c653c52a8754997941a817b1d1aeee2a063f57a8",
+  "viewport": {
+    "width": 1280,
+    "height": 800,
+    "outerWidth": 1280,
+    "outerHeight": 887,
+    "devicePixelRatio": 1
+  },
+  "actual_recording_seconds": 6.802913584,
+  "browser": "157.0.8103.51",
+  "node": "v26.8.1",
+  "playwright": "1.58.2",
+  "completed_at_utc": "2026-11-12T13:24:54.463Z"
+}
