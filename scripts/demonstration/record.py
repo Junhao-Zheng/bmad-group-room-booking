@@ -43,7 +43,7 @@ def seed_demonstration(database,users):
   services.create_block(admin,dict(room_id=rooms[1]['id'],start='2026-11-14T09:00',end='2026-11-14T12:00',reason='投影设备维护'))
  with db.write_transaction(database) as conn:conn.execute('DELETE FROM sessions')
 def main():
- parser=argparse.ArgumentParser();parser.add_argument('--scenes',type=Path,required=True);parser.add_argument('--viewer',type=Path,required=True);parser.add_argument('--output',type=Path,required=True);parser.add_argument('--browser-executable',type=Path,required=True);parser.add_argument('--preflight',action='store_true',help='Run actions quickly without recording or claiming a ten-minute video');a=parser.parse_args()
+ parser=argparse.ArgumentParser();parser.add_argument('--scenes',type=Path,required=True);parser.add_argument('--viewer',type=Path,required=True);parser.add_argument('--output',type=Path,required=True);parser.add_argument('--browser-executable',type=Path,required=True);parser.add_argument('--ffmpeg-executable',type=Path,help='Optional tested FFmpeg supplied in a private Playwright recorder cache');parser.add_argument('--preflight',action='store_true',help='Run actions quickly without recording or claiming a ten-minute video');a=parser.parse_args()
  scenes=json.loads(a.scenes.read_text());assert scenes['status']=='FINAL_AUDITED'
  head=subprocess.check_output(['git','rev-parse','HEAD'],cwd=REPO,text=True).strip();assert head==scenes['source_commit']
  output=a.output.resolve();assert not output.exists(),'Preserve earlier recordings';output.mkdir(parents=True)
@@ -58,6 +58,16 @@ def main():
   database=tmp/'demo.sqlite3';seed_demonstration(database,users)
   app_port=free_port();origin=f'http://127.0.0.1:{app_port}'
   env=dict(os.environ,BOOKING_DB_PATH=str(database),APP_ORIGIN=origin,COOKIE_SECURE='false',TRUSTED_HOSTS='127.0.0.1',NODE_PATH=str(REPO/'work/browser-tools/node_modules'))
+  if a.ffmpeg_executable:
+   binary=a.ffmpeg_executable.resolve(strict=True)
+   browsers=json.loads((REPO/'work/browser-tools/node_modules/playwright-core/browsers.json').read_text())['browsers']
+   revision=next(item['revision'] for item in browsers if item['name']=='ffmpeg')
+   cache=tmp/'recorder-cache';directory=cache/f'ffmpeg-{revision}';directory.mkdir(parents=True)
+   filename='ffmpeg-mac' if sys.platform=='darwin' else 'ffmpeg-win64.exe' if sys.platform=='win32' else 'ffmpeg-linux'
+   (directory/filename).symlink_to(binary)
+   env['PLAYWRIGHT_BROWSERS_PATH']=str(cache)
+   facts['recorder_ffmpeg']={'sha256':hashlib.sha256(binary.read_bytes()).hexdigest(),'version':subprocess.check_output([str(binary),'-version'],text=True).splitlines()[0],'selection':'explicit executable in isolated temporary cache; not the Playwright-distributed build','playwright_registry_revision':revision}
+   target.write_text(json.dumps(facts,ensure_ascii=False,indent=2)+'\n')
   handler=functools.partial(QuietHandler,directory=str(viewer));httpd=http.server.ThreadingHTTPServer(('127.0.0.1',0),handler)
   thread=threading.Thread(target=httpd.serve_forever,daemon=True);thread.start()
   with (tmp/'server.log').open('w') as log:
