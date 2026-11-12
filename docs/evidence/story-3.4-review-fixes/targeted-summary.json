@@ -1,0 +1,111 @@
+{
+  "result": "PASS",
+  "generated_at_utc": "2026-11-12T15:01:38.218784+00:00",
+  "scope": "Targeted review fixes only; parent owns full verification",
+  "findings_addressed": [
+    "B1",
+    "E1",
+    "B4",
+    "B5",
+    "E2",
+    "B6",
+    "B8",
+    "B9",
+    "B10",
+    "V1",
+    "V2"
+  ],
+  "boundary_documented": [
+    "B2",
+    "B3"
+  ],
+  "rejected_extensions_not_added": [
+    "atomic publication",
+    "backup deadline",
+    "audit query index"
+  ],
+  "python_tests": 16,
+  "javascript_tests": 31,
+  "baseline_targeted_skips": 0,
+  "browser_run_id": "71823ba97c94d182c1dd43e515c42c76",
+  "viewports": [
+    {
+      "width": 1280,
+      "height": 800,
+      "exact_dto": true,
+      "complete_display_bindings": true,
+      "distinct_update_cancel_revoke": true,
+      "per_action_reasons": true,
+      "safe_text": true,
+      "filters": true,
+      "filter_edits_invalidate": true,
+      "empty": true,
+      "loading": true,
+      "error_recovery": true,
+      "logged_out_session_rejected": true,
+      "member_403": true,
+      "login_logout": true,
+      "no_page_overflow": true,
+      "page_errors": []
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "exact_dto": true,
+      "complete_display_bindings": true,
+      "distinct_update_cancel_revoke": true,
+      "per_action_reasons": true,
+      "safe_text": true,
+      "filters": true,
+      "filter_edits_invalidate": true,
+      "empty": true,
+      "loading": true,
+      "error_recovery": true,
+      "logged_out_session_rejected": true,
+      "member_403": true,
+      "login_logout": true,
+      "no_page_overflow": true,
+      "page_errors": []
+    }
+  ],
+  "mutations": [
+    {
+      "mutation": "every AuditEvent.reason returned as null",
+      "application_source_changed": false,
+      "targeted_test": "AuditTests.test_all_seven_actions_exact_snapshots_and_repeats",
+      "tests_run": 1,
+      "failures": 1,
+      "errors": 0,
+      "mutation_rejected": true,
+      "independent_expected_reason": "finished"
+    },
+    {
+      "mutation": "before-cell-reads-after",
+      "application_source_changed": false,
+      "mutation_rejected": true,
+      "exit_code": 1,
+      "expected_failed_test": "audit distinct update cancellation revocation bind every full field to its own cell"
+    },
+    {
+      "mutation": "reason-cell-null",
+      "application_source_changed": false,
+      "mutation_rejected": true,
+      "exit_code": 1,
+      "expected_failed_test": "audit distinct update cancellation revocation bind every full field to its own cell"
+    }
+  ],
+  "source_sha256": {
+    "scripts/backup_db.py": "b23d383e3ab9f9d1a691f8aafa0f1dc72cd528abbad78d403100e5dbad0346cf",
+    "tests/test_backup.py": "58213ae46b83fecd902b67f73fc0789dccf48557453b6f75c721f2f08e5ba171",
+    "README.md": "efc0f92e418d8f0a1fc896a376a63e49ae17104a62c60ff8df230e4a912bc67e",
+    "booking_app/dto.py": "6601b5a1170749590050e426a5d3445d69d0047b5e233583ccf31eb6104a0414",
+    "tests/test_audit.py": "9cebd499dbfd8fa090665596c20c0ceb3d9dd56b188e8c9ee0bbb380850183d0",
+    "booking_app/static/audit.js": "a2551e28f44a1adf005dd8573d94488fc1966f8e232ee172fd66a4f7c946729b",
+    "tests/test_audit_js.cjs": "6a6976c8662d5a061915ce89f4d57f0e06ba480a372525087f1b885783150aad",
+    "scripts/verify_audit_browser.py": "c9b9f03ef56c4f5d1f34ab3db2d872db02f821ec3a73e8ce2c3d0e0413fd33e2",
+    "scripts/verify_audit_browser.cjs": "706440ae3a66518bf88b84ca425ac2e9d0c3e3934e0fe46bd5020e57de4bda90",
+    "tests/test_audit_browser_runner.py": "59f170f29eb9bc47fe1d16a32743a0876bde07ecfe237d3750cfc9ac207cbe27"
+  },
+  "initial_reports_preserved": true,
+  "interruption": "Intentional conversation interruption; not a network failure"
+}

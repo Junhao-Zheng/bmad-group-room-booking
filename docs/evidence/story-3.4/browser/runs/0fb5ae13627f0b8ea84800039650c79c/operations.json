@@ -1,0 +1,749 @@
+[
+  {
+    "path": "/api/admin/rooms",
+    "status": 201,
+    "response": {
+      "data": {
+        "capacity": 20,
+        "id": 1,
+        "location": "L",
+        "name": "<img src=x onerror=\"window.auditXss=1\">合成房间"
+      },
+      "ok": true
+    },
+    "duration_ms": 5.666832905262709
+  },
+  {
+    "path": "/api/admin/rooms/1",
+    "status": 200,
+    "response": {
+      "data": {
+        "capacity": 18,
+        "id": 1,
+        "location": "已修改 <script>text</script>",
+        "name": "<img src=x onerror=\"window.auditXss=1\">合成房间"
+      },
+      "ok": true
+    },
+    "duration_ms": 3.4568749833852053
+  },
+  {
+    "path": "/api/bookings",
+    "status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 4,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794493820,
+          "created_local": "2026-11-12T22:30:20+08:00",
+          "end_at": 1794546000,
+          "end_local": "2026-11-13T13:00:00+08:00",
+          "id": 1,
+          "owner_display_name": "演示成员甲",
+          "owner_id": 1,
+          "purpose": "<svg onload=\"window.auditXss=2\">证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据",
+          "room": {
+            "capacity": 18,
+            "id": 1,
+            "location": "已修改 <script>text</script>",
+            "name": "<img src=x onerror=\"window.auditXss=1\">合成房间"
+          },
+          "start_at": 1794542400,
+          "start_local": "2026-11-13T12:00:00+08:00",
+          "status": "pending",
+          "title": "合成审计活动"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 5.31541695818305
+  },
+  {
+    "path": "/api/bookings/1/cancel",
+    "status": 200,
+    "response": {
+      "data": {
+        "attendees": 4,
+        "cancel_reason": null,
+        "cancelled_at": 1794493820,
+        "cancelled_by_display_name": "演示成员甲",
+        "cancelled_by_id": 1,
+        "cancelled_local": "2026-11-12T22:30:20+08:00",
+        "created_at": 1794493820,
+        "created_local": "2026-11-12T22:30:20+08:00",
+        "end_at": 1794546000,
+        "end_local": "2026-11-13T13:00:00+08:00",
+        "id": 1,
+        "owner_display_name": "演示成员甲",
+        "owner_id": 1,
+        "purpose": "<svg onload=\"window.auditXss=2\">证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据",
+        "room": {
+          "capacity": 18,
+          "id": 1,
+          "location": "已修改 <script>text</script>",
+          "name": "<img src=x onerror=\"window.auditXss=1\">合成房间"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "cancelled",
+        "title": "合成审计活动"
+      },
+      "ok": true
+    },
+    "duration_ms": 6.6012919414788485
+  },
+  {
+    "path": "/api/bookings",
+    "status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 4,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794493820,
+          "created_local": "2026-11-12T22:30:20+08:00",
+          "end_at": 1794546000,
+          "end_local": "2026-11-13T13:00:00+08:00",
+          "id": 2,
+          "owner_display_name": "演示成员甲",
+          "owner_id": 1,
+          "purpose": "<svg onload=\"window.auditXss=2\">证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据",
+          "room": {
+            "capacity": 18,
+            "id": 1,
+            "location": "已修改 <script>text</script>",
+            "name": "<img src=x onerror=\"window.auditXss=1\">合成房间"
+          },
+          "start_at": 1794542400,
+          "start_local": "2026-11-13T12:00:00+08:00",
+          "status": "pending",
+          "title": "合成审计活动"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 6.4287499990314245
+  },
+  {
+    "path": "/api/admin/bookings/2/cancel",
+    "status": 200,
+    "response": {
+      "data": {
+        "attendees": 4,
+        "cancel_reason": "管理员取消 <img src=x>长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长",
+        "cancelled_at": 1794493820,
+        "cancelled_by_display_name": "演示管理员",
+        "cancelled_by_id": 3,
+        "cancelled_local": "2026-11-12T22:30:20+08:00",
+        "created_at": 1794493820,
+        "created_local": "2026-11-12T22:30:20+08:00",
+        "end_at": 1794546000,
+        "end_local": "2026-11-13T13:00:00+08:00",
+        "id": 2,
+        "owner_display_name": "演示成员甲",
+        "owner_id": 1,
+        "purpose": "<svg onload=\"window.auditXss=2\">证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据",
+        "room": {
+          "capacity": 18,
+          "id": 1,
+          "location": "已修改 <script>text</script>",
+          "name": "<img src=x onerror=\"window.auditXss=1\">合成房间"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "cancelled",
+        "title": "合成审计活动"
+      },
+      "ok": true
+    },
+    "duration_ms": 5.16887498088181
+  },
+  {
+    "path": "/api/admin/blocks",
+    "status": 201,
+    "response": {
+      "data": {
+        "created_at": 1794493820,
+        "created_local": "2026-11-12T22:30:20+08:00",
+        "creator_display_name": "演示管理员",
+        "creator_id": 3,
+        "end_at": 1794546000,
+        "end_local": "2026-11-13T13:00:00+08:00",
+        "id": 3,
+        "reason": "合成维护",
+        "revoke_reason": null,
+        "revoked_at": null,
+        "revoked_by_display_name": null,
+        "revoked_by_id": null,
+        "revoked_local": null,
+        "room": {
+          "capacity": 18,
+          "id": 1,
+          "location": "已修改 <script>text</script>",
+          "name": "<img src=x onerror=\"window.auditXss=1\">合成房间"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "pending"
+      },
+      "ok": true
+    },
+    "duration_ms": 5.202458007261157
+  },
+  {
+    "path": "/api/admin/blocks/3/revoke",
+    "status": 200,
+    "response": {
+      "data": {
+        "created_at": 1794493820,
+        "created_local": "2026-11-12T22:30:20+08:00",
+        "creator_display_name": "演示管理员",
+        "creator_id": 3,
+        "end_at": 1794546000,
+        "end_local": "2026-11-13T13:00:00+08:00",
+        "id": 3,
+        "reason": "合成维护",
+        "revoke_reason": "完成维护",
+        "revoked_at": 1794493820,
+        "revoked_by_display_name": "演示管理员",
+        "revoked_by_id": 3,
+        "revoked_local": "2026-11-12T22:30:20+08:00",
+        "room": {
+          "capacity": 18,
+          "id": 1,
+          "location": "已修改 <script>text</script>",
+          "name": "<img src=x onerror=\"window.auditXss=1\">合成房间"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "revoked"
+      },
+      "ok": true
+    },
+    "duration_ms": 4.293540958315134
+  },
+  {
+    "path": "/api/bookings",
+    "status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 4,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794493820,
+          "created_local": "2026-11-12T22:30:20+08:00",
+          "end_at": 1794546000,
+          "end_local": "2026-11-13T13:00:00+08:00",
+          "id": 4,
+          "owner_display_name": "演示成员甲",
+          "owner_id": 1,
+          "purpose": "<svg onload=\"window.auditXss=2\">证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据",
+          "room": {
+            "capacity": 18,
+            "id": 1,
+            "location": "已修改 <script>text</script>",
+            "name": "<img src=x onerror=\"window.auditXss=1\">合成房间"
+          },
+          "start_at": 1794542400,
+          "start_local": "2026-11-13T12:00:00+08:00",
+          "status": "pending",
+          "title": "合成审计活动"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 5.250666057690978
+  },
+  {
+    "path": "/api/admin/blocks",
+    "status": 201,
+    "response": {
+      "data": {
+        "created_at": 1794493820,
+        "created_local": "2026-11-12T22:30:20+08:00",
+        "creator_display_name": "演示管理员",
+        "creator_id": 3,
+        "end_at": 1794636000,
+        "end_local": "2026-11-14T14:00:00+08:00",
+        "id": 5,
+        "reason": "合成维护",
+        "revoke_reason": null,
+        "revoked_at": null,
+        "revoked_by_display_name": null,
+        "revoked_by_id": null,
+        "revoked_local": null,
+        "room": {
+          "capacity": 18,
+          "id": 1,
+          "location": "已修改 <script>text</script>",
+          "name": "<img src=x onerror=\"window.auditXss=1\">合成房间"
+        },
+        "start_at": 1794628800,
+        "start_local": "2026-11-14T12:00:00+08:00",
+        "status": "pending"
+      },
+      "ok": true
+    },
+    "duration_ms": 4.540208028629422
+  },
+  {
+    "path": "/api/bookings",
+    "status": 200,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 4,
+          "cancel_reason": null,
+          "cancelled_at": 1794493820,
+          "cancelled_by_display_name": "演示成员甲",
+          "cancelled_by_id": 1,
+          "cancelled_local": "2026-11-12T22:30:20+08:00",
+          "created_at": 1794493820,
+          "created_local": "2026-11-12T22:30:20+08:00",
+          "end_at": 1794546000,
+          "end_local": "2026-11-13T13:00:00+08:00",
+          "id": 1,
+          "owner_display_name": "演示成员甲",
+          "owner_id": 1,
+          "purpose": "<svg onload=\"window.auditXss=2\">证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据",
+          "room": {
+            "capacity": 18,
+            "id": 1,
+            "location": "已修改 <script>text</script>",
+            "name": "<img src=x onerror=\"window.auditXss=1\">合成房间"
+          },
+          "start_at": 1794542400,
+          "start_local": "2026-11-13T12:00:00+08:00",
+          "status": "cancelled",
+          "title": "合成审计活动"
+        },
+        "replayed": true
+      },
+      "ok": true
+    },
+    "duration_ms": 7.2543330024927855
+  },
+  {
+    "path": "/api/bookings/1/cancel",
+    "status": 200,
+    "response": {
+      "data": {
+        "attendees": 4,
+        "cancel_reason": null,
+        "cancelled_at": 1794493820,
+        "cancelled_by_display_name": "演示成员甲",
+        "cancelled_by_id": 1,
+        "cancelled_local": "2026-11-12T22:30:20+08:00",
+        "created_at": 1794493820,
+        "created_local": "2026-11-12T22:30:20+08:00",
+        "end_at": 1794546000,
+        "end_local": "2026-11-13T13:00:00+08:00",
+        "id": 1,
+        "owner_display_name": "演示成员甲",
+        "owner_id": 1,
+        "purpose": "<svg onload=\"window.auditXss=2\">证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据",
+        "room": {
+          "capacity": 18,
+          "id": 1,
+          "location": "已修改 <script>text</script>",
+          "name": "<img src=x onerror=\"window.auditXss=1\">合成房间"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "cancelled",
+        "title": "合成审计活动"
+      },
+      "ok": true
+    },
+    "duration_ms": 5.996416788548231
+  },
+  {
+    "path": "/api/admin/bookings/2/cancel",
+    "status": 200,
+    "response": {
+      "data": {
+        "attendees": 4,
+        "cancel_reason": "管理员取消 <img src=x>长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长",
+        "cancelled_at": 1794493820,
+        "cancelled_by_display_name": "演示管理员",
+        "cancelled_by_id": 3,
+        "cancelled_local": "2026-11-12T22:30:20+08:00",
+        "created_at": 1794493820,
+        "created_local": "2026-11-12T22:30:20+08:00",
+        "end_at": 1794546000,
+        "end_local": "2026-11-13T13:00:00+08:00",
+        "id": 2,
+        "owner_display_name": "演示成员甲",
+        "owner_id": 1,
+        "purpose": "<svg onload=\"window.auditXss=2\">证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据",
+        "room": {
+          "capacity": 18,
+          "id": 1,
+          "location": "已修改 <script>text</script>",
+          "name": "<img src=x onerror=\"window.auditXss=1\">合成房间"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "cancelled",
+        "title": "合成审计活动"
+      },
+      "ok": true
+    },
+    "duration_ms": 12.25970801897347
+  },
+  {
+    "path": "/api/admin/blocks/3/revoke",
+    "status": 200,
+    "response": {
+      "data": {
+        "created_at": 1794493820,
+        "created_local": "2026-11-12T22:30:20+08:00",
+        "creator_display_name": "演示管理员",
+        "creator_id": 3,
+        "end_at": 1794546000,
+        "end_local": "2026-11-13T13:00:00+08:00",
+        "id": 3,
+        "reason": "合成维护",
+        "revoke_reason": "完成维护",
+        "revoked_at": 1794493820,
+        "revoked_by_display_name": "演示管理员",
+        "revoked_by_id": 3,
+        "revoked_local": "2026-11-12T22:30:20+08:00",
+        "room": {
+          "capacity": 18,
+          "id": 1,
+          "location": "已修改 <script>text</script>",
+          "name": "<img src=x onerror=\"window.auditXss=1\">合成房间"
+        },
+        "start_at": 1794542400,
+        "start_local": "2026-11-13T12:00:00+08:00",
+        "status": "revoked"
+      },
+      "ok": true
+    },
+    "duration_ms": 4.796083085238934
+  },
+  {
+    "path": "/api/admin/rooms/1",
+    "status": 200,
+    "response": {
+      "data": {
+        "capacity": 18,
+        "id": 1,
+        "location": "已修改 <script>text</script>",
+        "name": "<img src=x onerror=\"window.auditXss=1\">合成房间"
+      },
+      "ok": true
+    },
+    "duration_ms": 6.197416922077537
+  },
+  {
+    "path": "/api/admin/audit",
+    "status": 200,
+    "response": {
+      "data": {
+        "items": [
+          {
+            "action": "block.created",
+            "actor_display_name": "演示管理员",
+            "actor_id": 3,
+            "after": {
+              "created_at": 1794493820,
+              "creator_id": 3,
+              "end_at": 1794636000,
+              "id": 5,
+              "reason": "合成维护",
+              "revoke_reason": null,
+              "revoked_at": null,
+              "revoked_by_id": null,
+              "room_id": 1,
+              "start_at": 1794628800
+            },
+            "before": null,
+            "id": 10,
+            "occurred_at": 1794493820,
+            "occurred_local": "2026-11-12T22:30:20+08:00",
+            "reason": "合成维护",
+            "target_id": 5,
+            "target_type": "block"
+          },
+          {
+            "action": "booking.created",
+            "actor_display_name": "演示成员甲",
+            "actor_id": 1,
+            "after": {
+              "attendees": 4,
+              "cancel_reason": null,
+              "cancelled_at": null,
+              "cancelled_by_id": null,
+              "created_at": 1794493820,
+              "end_at": 1794546000,
+              "id": 4,
+              "owner_id": 1,
+              "purpose": "<svg onload=\"window.auditXss=2\">证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据",
+              "room_id": 1,
+              "start_at": 1794542400,
+              "title": "合成审计活动"
+            },
+            "before": null,
+            "id": 9,
+            "occurred_at": 1794493820,
+            "occurred_local": "2026-11-12T22:30:20+08:00",
+            "reason": null,
+            "target_id": 4,
+            "target_type": "booking"
+          },
+          {
+            "action": "block.revoked",
+            "actor_display_name": "演示管理员",
+            "actor_id": 3,
+            "after": {
+              "created_at": 1794493820,
+              "creator_id": 3,
+              "end_at": 1794546000,
+              "id": 3,
+              "reason": "合成维护",
+              "revoke_reason": "完成维护",
+              "revoked_at": 1794493820,
+              "revoked_by_id": 3,
+              "room_id": 1,
+              "start_at": 1794542400
+            },
+            "before": {
+              "created_at": 1794493820,
+              "creator_id": 3,
+              "end_at": 1794546000,
+              "id": 3,
+              "reason": "合成维护",
+              "revoke_reason": null,
+              "revoked_at": null,
+              "revoked_by_id": null,
+              "room_id": 1,
+              "start_at": 1794542400
+            },
+            "id": 8,
+            "occurred_at": 1794493820,
+            "occurred_local": "2026-11-12T22:30:20+08:00",
+            "reason": "完成维护",
+            "target_id": 3,
+            "target_type": "block"
+          },
+          {
+            "action": "block.created",
+            "actor_display_name": "演示管理员",
+            "actor_id": 3,
+            "after": {
+              "created_at": 1794493820,
+              "creator_id": 3,
+              "end_at": 1794546000,
+              "id": 3,
+              "reason": "合成维护",
+              "revoke_reason": null,
+              "revoked_at": null,
+              "revoked_by_id": null,
+              "room_id": 1,
+              "start_at": 1794542400
+            },
+            "before": null,
+            "id": 7,
+            "occurred_at": 1794493820,
+            "occurred_local": "2026-11-12T22:30:20+08:00",
+            "reason": "合成维护",
+            "target_id": 3,
+            "target_type": "block"
+          },
+          {
+            "action": "booking.cancelled_by_admin",
+            "actor_display_name": "演示管理员",
+            "actor_id": 3,
+            "after": {
+              "attendees": 4,
+              "cancel_reason": "管理员取消 <img src=x>长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长",
+              "cancelled_at": 1794493820,
+              "cancelled_by_id": 3,
+              "created_at": 1794493820,
+              "end_at": 1794546000,
+              "id": 2,
+              "owner_id": 1,
+              "purpose": "<svg onload=\"window.auditXss=2\">证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据",
+              "room_id": 1,
+              "start_at": 1794542400,
+              "title": "合成审计活动"
+            },
+            "before": {
+              "attendees": 4,
+              "cancel_reason": null,
+              "cancelled_at": null,
+              "cancelled_by_id": null,
+              "created_at": 1794493820,
+              "end_at": 1794546000,
+              "id": 2,
+              "owner_id": 1,
+              "purpose": "<svg onload=\"window.auditXss=2\">证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据",
+              "room_id": 1,
+              "start_at": 1794542400,
+              "title": "合成审计活动"
+            },
+            "id": 6,
+            "occurred_at": 1794493820,
+            "occurred_local": "2026-11-12T22:30:20+08:00",
+            "reason": "管理员取消 <img src=x>长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长",
+            "target_id": 2,
+            "target_type": "booking"
+          },
+          {
+            "action": "booking.created",
+            "actor_display_name": "演示成员甲",
+            "actor_id": 1,
+            "after": {
+              "attendees": 4,
+              "cancel_reason": null,
+              "cancelled_at": null,
+              "cancelled_by_id": null,
+              "created_at": 1794493820,
+              "end_at": 1794546000,
+              "id": 2,
+              "owner_id": 1,
+              "purpose": "<svg onload=\"window.auditXss=2\">证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据",
+              "room_id": 1,
+              "start_at": 1794542400,
+              "title": "合成审计活动"
+            },
+            "before": null,
+            "id": 5,
+            "occurred_at": 1794493820,
+            "occurred_local": "2026-11-12T22:30:20+08:00",
+            "reason": null,
+            "target_id": 2,
+            "target_type": "booking"
+          },
+          {
+            "action": "booking.cancelled_by_member",
+            "actor_display_name": "演示成员甲",
+            "actor_id": 1,
+            "after": {
+              "attendees": 4,
+              "cancel_reason": null,
+              "cancelled_at": 1794493820,
+              "cancelled_by_id": 1,
+              "created_at": 1794493820,
+              "end_at": 1794546000,
+              "id": 1,
+              "owner_id": 1,
+              "purpose": "<svg onload=\"window.auditXss=2\">证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据",
+              "room_id": 1,
+              "start_at": 1794542400,
+              "title": "合成审计活动"
+            },
+            "before": {
+              "attendees": 4,
+              "cancel_reason": null,
+              "cancelled_at": null,
+              "cancelled_by_id": null,
+              "created_at": 1794493820,
+              "end_at": 1794546000,
+              "id": 1,
+              "owner_id": 1,
+              "purpose": "<svg onload=\"window.auditXss=2\">证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据",
+              "room_id": 1,
+              "start_at": 1794542400,
+              "title": "合成审计活动"
+            },
+            "id": 4,
+            "occurred_at": 1794493820,
+            "occurred_local": "2026-11-12T22:30:20+08:00",
+            "reason": null,
+            "target_id": 1,
+            "target_type": "booking"
+          },
+          {
+            "action": "booking.created",
+            "actor_display_name": "演示成员甲",
+            "actor_id": 1,
+            "after": {
+              "attendees": 4,
+              "cancel_reason": null,
+              "cancelled_at": null,
+              "cancelled_by_id": null,
+              "created_at": 1794493820,
+              "end_at": 1794546000,
+              "id": 1,
+              "owner_id": 1,
+              "purpose": "<svg onload=\"window.auditXss=2\">证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据证据",
+              "room_id": 1,
+              "start_at": 1794542400,
+              "title": "合成审计活动"
+            },
+            "before": null,
+            "id": 3,
+            "occurred_at": 1794493820,
+            "occurred_local": "2026-11-12T22:30:20+08:00",
+            "reason": null,
+            "target_id": 1,
+            "target_type": "booking"
+          },
+          {
+            "action": "room.updated",
+            "actor_display_name": "演示管理员",
+            "actor_id": 3,
+            "after": {
+              "capacity": 18,
+              "id": 1,
+              "location": "已修改 <script>text</script>",
+              "name": "<img src=x onerror=\"window.auditXss=1\">合成房间"
+            },
+            "before": {
+              "capacity": 20,
+              "id": 1,
+              "location": "L",
+              "name": "<img src=x onerror=\"window.auditXss=1\">合成房间"
+            },
+            "id": 2,
+            "occurred_at": 1794493820,
+            "occurred_local": "2026-11-12T22:30:20+08:00",
+            "reason": null,
+            "target_id": 1,
+            "target_type": "room"
+          },
+          {
+            "action": "room.created",
+            "actor_display_name": "演示管理员",
+            "actor_id": 3,
+            "after": {
+              "capacity": 20,
+              "id": 1,
+              "location": "L",
+              "name": "<img src=x onerror=\"window.auditXss=1\">合成房间"
+            },
+            "before": null,
+            "id": 1,
+            "occurred_at": 1794493820,
+            "occurred_local": "2026-11-12T22:30:20+08:00",
+            "reason": null,
+            "target_id": 1,
+            "target_type": "room"
+          }
+        ],
+        "total": 10
+      },
+      "ok": true
+    },
+    "duration_ms": 5.544000072404742
+  }
+]

@@ -1,0 +1,39 @@
+✔ audit actual handler sends optional filters, renders exact facts as plain text and empty state (3.215833ms)
+✔ audit headers timeout unlocks retained filters without auto retry (3.747125ms)
+✔ audit body timeout unlocks retained filters without auto retry (1.145375ms)
+✔ audit INTERNAL_ERROR safely recovers (0.699834ms)
+✔ audit INVALID_INPUT safely recovers (0.508166ms)
+✔ audit STORE_BUSY safely recovers (0.477541ms)
+✔ audit AUTH_REQUIRED clears loaded facts and disables stale requests (0.52125ms)
+✔ audit FORBIDDEN clears loaded facts and disables stale requests (0.409042ms)
+✔ audit malformed DTO never renders partial facts (0.417833ms)
+✔ audit malformed DTO never renders partial facts (0.393333ms)
+✔ audit malformed DTO never renders partial facts (0.528458ms)
+✔ audit malformed DTO never renders partial facts (0.430417ms)
+✔ audit malformed DTO never renders partial facts (0.409375ms)
+✔ external auth-loss event invalidates late successful response (0.427792ms)
+✔ audit distinct update cancellation revocation bind every full field to its own cell (1.022791ms)
+✔ display oracle rejects mutation: before cell incorrectly bound to after (2.090917ms)
+✔ display oracle rejects mutation: non-null reason discarded (1.11075ms)
+✔ audit malformed snapshot nested name cannot render evidence (0.436791ms)
+✔ audit malformed snapshot string capacity cannot render evidence (0.295042ms)
+✔ audit malformed snapshot boolean capacity cannot render evidence (0.304375ms)
+✔ audit malformed snapshot null required text cannot render evidence (0.31575ms)
+✔ audit malformed snapshot object previous name cannot render evidence (0.279208ms)
+✔ audit malformed snapshot string cancelled time cannot render evidence (0.288459ms)
+✔ audit malformed snapshot object nullable reason cannot render evidence (0.277667ms)
+✔ audit malformed snapshot boolean revoked actor cannot render evidence (0.287416ms)
+✔ audit malformed snapshot numeric revoke reason cannot render evidence (0.840667ms)
+✔ target_type input invalidates results and requests deliberate query (0.491833ms)
+✔ target_type change invalidates results and requests deliberate query (0.385125ms)
+✔ date input invalidates results and requests deliberate query (0.324833ms)
+✔ date change invalidates results and requests deliberate query (0.332625ms)
+✔ filter invalidation prevents a late old response restoring rows (0.340125ms)
+ℹ tests 31
+ℹ suites 0
+ℹ pass 31
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 85.029208

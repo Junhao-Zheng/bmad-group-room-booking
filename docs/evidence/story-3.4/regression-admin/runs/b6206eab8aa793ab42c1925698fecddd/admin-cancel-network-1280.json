@@ -1,0 +1,207 @@
+[
+  {
+    "phase": "blank-reason-rejected",
+    "path": "/api/admin/bookings/103/cancel",
+    "status": 400,
+    "body": {
+      "error": {
+        "code": "INVALID_INPUT",
+        "conflicts": [],
+        "fields": {
+          "reason": "请输入 1—500 个有效字符，不含空字符。"
+        },
+        "message": "请检查活动内容。"
+      },
+      "ok": false
+    }
+  },
+  {
+    "phase": "real-csrf-rejection",
+    "path": "/api/admin/bookings/103/cancel",
+    "status": 403,
+    "body": {
+      "error": {
+        "code": "CSRF_REJECTED",
+        "conflicts": [],
+        "fields": {},
+        "message": "请求验证失败，请重新打开页面后重试。"
+      },
+      "ok": false
+    }
+  },
+  {
+    "phase": "pending-cancel-success",
+    "path": "/api/admin/bookings/103/cancel",
+    "status": 200,
+    "body": {
+      "data": {
+        "attendees": 5,
+        "cancel_reason": "<svg onload=\"window.adminCancelXss=1\">维护说明</svg> 长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本",
+        "cancelled_at": 1794448800,
+        "cancelled_by_display_name": "演示管理员",
+        "cancelled_by_id": 3,
+        "cancelled_local": "2026-11-12T10:00:00+08:00",
+        "created_at": 1794362400,
+        "created_local": "2026-11-11T10:00:00+08:00",
+        "end_at": 1794459600,
+        "end_local": "2026-11-12T13:00:00+08:00",
+        "id": 103,
+        "owner_display_name": "演示成员甲",
+        "owner_id": 1,
+        "purpose": "本人私密用途 103",
+        "room": {
+          "capacity": 10,
+          "id": 1,
+          "location": "合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置",
+          "name": "合成历史甲 <会议室>"
+        },
+        "start_at": 1794456000,
+        "start_local": "2026-11-12T12:00:00+08:00",
+        "status": "cancelled",
+        "title": "合成历史活动 103"
+      },
+      "ok": true
+    }
+  },
+  {
+    "phase": "repeat-keeps-first-facts",
+    "path": "/api/admin/bookings/103/cancel",
+    "status": 200,
+    "body": {
+      "data": {
+        "attendees": 5,
+        "cancel_reason": "<svg onload=\"window.adminCancelXss=1\">维护说明</svg> 长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本",
+        "cancelled_at": 1794448800,
+        "cancelled_by_display_name": "演示管理员",
+        "cancelled_by_id": 3,
+        "cancelled_local": "2026-11-12T10:00:00+08:00",
+        "created_at": 1794362400,
+        "created_local": "2026-11-11T10:00:00+08:00",
+        "end_at": 1794459600,
+        "end_local": "2026-11-12T13:00:00+08:00",
+        "id": 103,
+        "owner_display_name": "演示成员甲",
+        "owner_id": 1,
+        "purpose": "本人私密用途 103",
+        "room": {
+          "capacity": 10,
+          "id": 1,
+          "location": "合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置",
+          "name": "合成历史甲 <会议室>"
+        },
+        "start_at": 1794456000,
+        "start_local": "2026-11-12T12:00:00+08:00",
+        "status": "cancelled",
+        "title": "合成历史活动 103"
+      },
+      "ok": true
+    }
+  },
+  {
+    "phase": "committed-response-dropped",
+    "path": "/api/admin/bookings/102/cancel",
+    "status": 200,
+    "body": {
+      "data": {
+        "attendees": 5,
+        "cancel_reason": "进行中预约的合成管理原因",
+        "cancelled_at": 1794448800,
+        "cancelled_by_display_name": "演示管理员",
+        "cancelled_by_id": 3,
+        "cancelled_local": "2026-11-12T10:00:00+08:00",
+        "created_at": 1794362400,
+        "created_local": "2026-11-11T10:00:00+08:00",
+        "end_at": 1794452400,
+        "end_local": "2026-11-12T11:00:00+08:00",
+        "id": 102,
+        "owner_display_name": "演示成员甲",
+        "owner_id": 1,
+        "purpose": "本人私密用途 102",
+        "room": {
+          "capacity": 10,
+          "id": 1,
+          "location": "合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置",
+          "name": "合成历史甲 <会议室>"
+        },
+        "start_at": 1794448800,
+        "start_local": "2026-11-12T10:00:00+08:00",
+        "status": "cancelled",
+        "title": "合成历史活动 102"
+      },
+      "ok": true
+    }
+  },
+  {
+    "phase": "in-progress-manual-retry",
+    "path": "/api/admin/bookings/102/cancel",
+    "status": 200,
+    "body": {
+      "data": {
+        "attendees": 5,
+        "cancel_reason": "进行中预约的合成管理原因",
+        "cancelled_at": 1794448800,
+        "cancelled_by_display_name": "演示管理员",
+        "cancelled_by_id": 3,
+        "cancelled_local": "2026-11-12T10:00:00+08:00",
+        "created_at": 1794362400,
+        "created_local": "2026-11-11T10:00:00+08:00",
+        "end_at": 1794452400,
+        "end_local": "2026-11-12T11:00:00+08:00",
+        "id": 102,
+        "owner_display_name": "演示成员甲",
+        "owner_id": 1,
+        "purpose": "本人私密用途 102",
+        "room": {
+          "capacity": 10,
+          "id": 1,
+          "location": "合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置",
+          "name": "合成历史甲 <会议室>"
+        },
+        "start_at": 1794448800,
+        "start_local": "2026-11-12T10:00:00+08:00",
+        "status": "cancelled",
+        "title": "合成历史活动 102"
+      },
+      "ok": true
+    }
+  },
+  {
+    "phase": "member-admin-denied",
+    "path": "/api/admin/bookings/0/cancel",
+    "status": 403,
+    "body": {
+      "error": {
+        "code": "FORBIDDEN",
+        "conflicts": [],
+        "fields": {},
+        "message": "仅管理员可管理会议室。"
+      },
+      "ok": false
+    }
+  },
+  {
+    "phase": "released-availability",
+    "path": "/api/availability?start=2026-11-12T12:00&end=2026-11-12T13:00&attendees=5",
+    "status": 200,
+    "body": {
+      "data": {
+        "items": [
+          {
+            "capacity": 30,
+            "id": 3,
+            "location": "演示楼 303",
+            "name": "合成历史丙"
+          },
+          {
+            "capacity": 10,
+            "id": 1,
+            "location": "合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置合成位置",
+            "name": "合成历史甲 <会议室>"
+          }
+        ],
+        "total": 2
+      },
+      "ok": true
+    }
+  }
+]

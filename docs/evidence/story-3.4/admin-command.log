@@ -1,0 +1,24 @@
+ERROR:booking_app:request_id=daf0062d91ed441fbd0c15b3f69da2ed action=web.admin_cancel_booking_api error_type=RuntimeError
+ERROR:booking_app:request_id=2dfe5a9b5d734939a4c3f37696fdfe3f action=web.admin_cancel_booking_api error_type=RuntimeError
+ERROR:booking_app:request_id=4f71a17124f84216a28bc79d7edff77f action=web.admin_cancel_booking_api error_type=DatabaseError
+{
+  "result": "PASS",
+  "completed": true,
+  "rounds": 20,
+  "independent_race_sessions": 40,
+  "http_200": 40,
+  "transitions_per_round": 1,
+  "response_facts_agree": true,
+  "full_storage_oracle": true,
+  "writer_before_after_and_commit_rollback": true,
+  "restart_persistence": true,
+  "repeat_writer_calls": 0,
+  "admin_admin_races": 1,
+  "admin_admin_http_200": 2,
+  "admin_admin_first_facts_agree": true,
+  "admin_admin_unrelated_storage_unchanged": true,
+  "race_winners": {
+    "member": 5,
+    "admin": 15
+  }
+}

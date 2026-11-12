@@ -1,0 +1,21 @@
+test_cli_reports_checks_and_failure_nonzero (tests.test_backup.BackupTests.test_cli_reports_checks_and_failure_nonzero) ... ok
+test_consistent_wal_backup_private_and_independent (tests.test_backup.BackupTests.test_consistent_wal_backup_private_and_independent) ... ok
+test_foreign_key_failure_removes_partial_output (tests.test_backup.BackupTests.test_foreign_key_failure_removes_partial_output) ... ok
+test_same_existing_symlink_hardlink_and_missing_source_rejected (tests.test_backup.BackupTests.test_same_existing_symlink_hardlink_and_missing_source_rejected) ... ok
+test_sidecar_files_and_dangling_symlinks_rejected_before_any_sqlite_open (tests.test_backup.BackupTests.test_sidecar_files_and_dangling_symlinks_rejected_before_any_sqlite_open) ... ok
+test_source_at_each_destination_sidecar_is_never_deleted (tests.test_backup.BackupTests.test_source_at_each_destination_sidecar_is_never_deleted) ... ok
+test_all_seven_actions_exact_snapshots_and_repeats (tests.test_audit.AuditTests.test_all_seven_actions_exact_snapshots_and_repeats) ... ok
+test_anonymous_member_expired_logged_out_and_role_recheck (tests.test_audit.AuditTests.test_anonymous_member_expired_logged_out_and_role_recheck) ... ok
+test_corrupt_json_fails_without_partial_events_or_private_logs (tests.test_audit.AuditTests.test_corrupt_json_fails_without_partial_events_or_private_logs) ... ok
+test_date_half_open_filters_sort_and_empty (tests.test_audit.AuditTests.test_date_half_open_filters_sort_and_empty) ... ok
+test_historical_snapshots_stay_readable_but_invalid_ids_or_attendees_fail (tests.test_audit.AuditTests.test_historical_snapshots_stay_readable_but_invalid_ids_or_attendees_fail) ... ok
+test_parseable_static_contradictions_fail_safely_without_rewriting_history (tests.test_audit.AuditTests.test_parseable_static_contradictions_fail_safely_without_rewriting_history) ... ok
+test_service_uses_one_clock_and_read_only_snapshot (tests.test_audit.AuditTests.test_service_uses_one_clock_and_read_only_snapshot) ... ok
+test_cli_omission_passes_none_to_runner (tests.test_audit_browser_runner.AuditBrowserRunnerTests.test_cli_omission_passes_none_to_runner) ... ok
+test_default_browser_uses_playwright_executable_path (tests.test_audit_browser_runner.AuditBrowserRunnerTests.test_default_browser_uses_playwright_executable_path) ... ok
+test_explicit_browser_wins_without_playwright_lookup (tests.test_audit_browser_runner.AuditBrowserRunnerTests.test_explicit_browser_wins_without_playwright_lookup) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 1.624s
+
+OK

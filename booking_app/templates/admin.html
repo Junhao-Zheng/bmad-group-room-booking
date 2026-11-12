@@ -3,6 +3,7 @@
 {% block content %}
 <script src="{{ url_for('static', filename='rooms.js') }}" defer></script>
 <script src="{{ url_for('static', filename='blocks.js') }}" defer></script>
+<script src="{{ url_for('static', filename='audit.js') }}" defer></script>
 <section class="page-intro">
   <p class="eyebrow">管理员</p><h1>会议室管理</h1>
   <p class="muted">维护名称、地点及容量。降低容量须满足所有未结束有效预约的人数，包含进行中预约。</p>
@@ -104,4 +105,21 @@
   {% endif %}
 </section>
 {% endfor %}
+<section class="card admin-section" aria-labelledby="audit-title">
+  <h2 id="audit-title">操作记录</h2>
+  <p class="muted">仅记录成功的实际变更，按发生时间和编号倒序。日期按北京时间筛选；操作者名称为操作时快照。</p>
+  <form id="audit-form">
+    <div class="availability-fields">
+      <div class="form-field"><label for="audit-target_type">操作对象</label><select id="audit-target_type" name="target_type"><option value="">全部对象</option><option value="room">会议室</option><option value="booking">预约</option><option value="block">停用</option></select></div>
+      <div class="form-field"><label for="audit-date">发生日期（北京时间）</label><input id="audit-date" name="date" type="date" max="9999-12-30"></div>
+    </div>
+    <button id="audit-submit" type="submit" class="button-primary">查询操作记录</button>
+  </form>
+  <p id="audit-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1">尚未查询操作记录，请选择条件后查询。</p>
+  <a id="audit-relogin" class="relogin-link" href="{{ url_for('web.login_page') }}" hidden>重新登录</a>
+  <div id="audit-results" class="audit-scroll" role="region" aria-label="操作记录表格，可横向滚动" tabindex="0" hidden>
+    <table class="audit-table"><caption>操作证据（北京时间）</caption><thead><tr><th scope="col">编号 / 时间</th><th scope="col">操作者</th><th scope="col">动作 / 对象</th><th scope="col">变更前</th><th scope="col">变更后</th><th scope="col">原因</th></tr></thead><tbody id="audit-items"></tbody></table>
+  </div>
+  <noscript><p>请启用 JavaScript 以查询操作记录。</p></noscript>
+</section>
 {% endblock %}

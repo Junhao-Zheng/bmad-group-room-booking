@@ -1,0 +1,9 @@
+{
+  "stage": "startup",
+  "error_type": "Error",
+  "source": {
+    "file": "scripts/verify_room_management_browser.cjs",
+    "line": 36,
+    "column": 32
+  }
+}

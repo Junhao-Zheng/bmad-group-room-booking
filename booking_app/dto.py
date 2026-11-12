@@ -1,6 +1,53 @@
 """Explicit public allowlists; storage rows are never serialized wholesale."""
 
+import json
+
 from .domain import active_status, local_time
+
+
+_SNAPSHOT_KEYS = {
+    "room": {"id", "name", "location", "capacity"},
+    "booking": {"id", "room_id", "owner_id", "title", "purpose", "attendees", "start_at", "end_at", "created_at", "cancelled_at", "cancelled_by_id", "cancel_reason"},
+    "block": {"id", "room_id", "creator_id", "reason", "start_at", "end_at", "created_at", "revoked_at", "revoked_by_id", "revoke_reason"},
+}
+_AUDIT_ACTION_TYPES = {
+    "room.created": "room", "room.updated": "room", "booking.created": "booking",
+    "booking.cancelled_by_member": "booking", "booking.cancelled_by_admin": "booking",
+    "block.created": "block", "block.revoked": "block",
+}
+
+
+def audit_event(row) -> dict:
+    before = json.loads(row["before_json"]) if row["before_json"] is not None else None
+    after = json.loads(row["after_json"])
+    # Malformed stored facts fail the whole read; never omit an event or leak raw JSON.
+    if (_AUDIT_ACTION_TYPES.get(row["action"]) != row["target_type"]
+            or row["action"].endswith(".created") != (before is None)):
+        raise ValueError("Inconsistent audit action or previous snapshot")
+    expected = _SNAPSHOT_KEYS[row["target_type"]]
+    for index, snapshot in enumerate((before, after)):
+        if snapshot is None and index == 0:
+            continue
+        if not isinstance(snapshot, dict) or set(snapshot) != expected:
+            raise ValueError("Invalid audit snapshot")
+        if snapshot["id"] != row["target_id"]:
+            raise ValueError("Inconsistent audit target")
+        for key, value in snapshot.items():
+            nullable = key in {"cancelled_at", "cancelled_by_id", "cancel_reason", "revoked_at", "revoked_by_id", "revoke_reason"}
+            if value is None and nullable:
+                continue
+            kind = str if key in {"name", "location", "title", "purpose", "reason", "cancel_reason", "revoke_reason"} else int
+            if type(value) is not kind:
+                raise ValueError("Invalid audit snapshot field")
+            if ((key == "id" or key.endswith("_id")) and not 1 <= value <= 2**63 - 1
+                    or key in {"capacity", "attendees"} and not 1 <= value <= 1000):
+                raise ValueError("Invalid audit positive domain value")
+    return {
+        "id": row["id"], "actor_id": row["actor_id"], "actor_display_name": row["actor_display_name"],
+        "action": row["action"], "target_type": row["target_type"], "target_id": row["target_id"],
+        "occurred_at": row["occurred_at"], "occurred_local": local_time(row["occurred_at"]),
+        "before": before, "after": after, "reason": row["reason"],
+    }
 
 
 def room(row) -> dict:

@@ -1,0 +1,14 @@
+test_all_seven_actions_exact_snapshots_and_repeats (tests.test_audit.AuditTests.test_all_seven_actions_exact_snapshots_and_repeats) ... FAIL
+
+======================================================================
+FAIL: test_all_seven_actions_exact_snapshots_and_repeats (tests.test_audit.AuditTests.test_all_seven_actions_exact_snapshots_and_repeats)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/tests/test_audit.py", line 74, in test_all_seven_actions_exact_snapshots_and_repeats
+    self.assertEqual(event['reason'],saved['reason'])
+AssertionError: None != 'finished'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.444s
+
+FAILED (failures=1)

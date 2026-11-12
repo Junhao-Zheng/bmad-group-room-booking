@@ -1,0 +1,10 @@
+{
+  "mutation": "every AuditEvent.reason returned as null",
+  "application_source_changed": false,
+  "targeted_test": "AuditTests.test_all_seven_actions_exact_snapshots_and_repeats",
+  "tests_run": 1,
+  "failures": 1,
+  "errors": 0,
+  "mutation_rejected": true,
+  "independent_expected_reason": "finished"
+}

@@ -137,6 +137,12 @@ def admin_blocks_api():
     return jsonify(ok=True, data=services.admin_blocks(actor, request.args.get("room_id"), request.args.get("date"), request.args.get("status")))
 
 
+@bp.get("/api/admin/audit")
+def audit_events_api():
+    actor = services.require_admin(auth.actor_for_token(token()))
+    return jsonify(ok=True, data=services.audit_events(actor, request.args.get("target_type"), request.args.get("date")))
+
+
 @bp.get("/api/bookings/<booking_id>")
 def booking_detail_api(booking_id):
     return jsonify(ok=True, data=services.booking_detail(auth.actor_for_token(token()), booking_id))

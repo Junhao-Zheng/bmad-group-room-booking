@@ -1,0 +1,14 @@
+{
+  "preexisting_sidecar_deleted": true,
+  "empty_source_reports_schema": 0,
+  "contradictory_snapshot_accepted": {
+    "before": null,
+    "target_id": 1,
+    "after": {
+      "id": 999,
+      "name": "R",
+      "location": "L",
+      "capacity": -1
+    }
+  }
+}

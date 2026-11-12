@@ -1,0 +1,49 @@
+TAP version 13
+# Subtest: audit distinct update cancellation revocation bind every full field to its own cell
+not ok 1 - audit distinct update cancellation revocation bind every full field to its own cell
+  ---
+  duration_ms: 3.0605
+  type: 'test'
+  location: '/private/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/audit-review-mutation-p8jxk63n/tests/test_audit_js.cjs:73:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+    +   capacity: 20,
+    -   capacity: 10,
+        id: 1,
+        location: 'L',
+    +   name: 'new room'
+    -   name: 'old room'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    id: 1
+    name: 'old room'
+    location: 'L'
+    capacity: 10
+  actual:
+    id: 1
+    name: 'new room'
+    location: 'L'
+    capacity: 20
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDisplayed (/private/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/audit-review-mutation-p8jxk63n/tests/test_audit_js.cjs:68:12)
+    TestContext.<anonymous> (/private/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/audit-review-mutation-p8jxk63n/tests/test_audit_js.cjs:74:97)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 59.443

@@ -1,0 +1,18 @@
+ERROR:booking_app:request_id=3bb24c5b03fb4d5bacf299286ffd9252 action=web.create_room_api error_type=RuntimeError
+ERROR:booking_app:request_id=470b91d7ccdc4a11aed1b8370324066d action=web.update_room_api error_type=RuntimeError
+{
+  "result": "PASS",
+  "completed": true,
+  "rounds": 20,
+  "concurrent_responses": 40,
+  "wins": {
+    "booking": 5,
+    "capacity": 15
+  },
+  "no_unfinished_overcapacity": true,
+  "exact_room_audit_chain": true,
+  "full_fault_rollback": true,
+  "restart_preserves_business_slots_audits": true,
+  "old_intent_replay_after_lowering": true,
+  "no_change_writer_calls": 0
+}

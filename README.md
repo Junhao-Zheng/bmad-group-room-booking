@@ -1,6 +1,6 @@
 # 课题组活动与会议室预约
 
-软件工程管理课程项目。选题及使用对象已由用户确认。Story 1.1—1.3、2.1—2.4 与 3.1—3.2 已实现预置账号登录、身份显示、退出、会议室目录、共享日程、可用会议室查询、创建预约、原提交意图可靠确认、个人预约四态查询/完整详情、确认取消本人未开始预约，以及管理员新增/修改会议室、容量保护、创建维护停用与完整管理查询。管理员取消预约和撤销停用属于后续故事。
+软件工程管理课程项目。选题及使用对象已由用户确认。Story 1.1—1.3、2.1—2.5 与 3.1—3.4 已实现预置账号登录、身份显示、退出、会议室目录、共享日程、可用会议室查询、创建预约、原提交意图可靠确认、个人预约四态查询/完整详情、确认取消本人未开始预约，以及管理员新增/修改会议室、容量保护、创建维护停用与完整管理查询。现已包含管理员取消预约、撤销停用、操作记录筛选、SQLite 一致备份及真实服务重启验证。
 
 本仓库按实际发生的工作保存 BMAD 产物和过程证据。实验 B 按用户转述的教师要求免做，实验 A 保留。人数和截止日期不作为当前阶段的阻塞条件。
 
@@ -71,7 +71,7 @@ uv run --frozen waitress-serve --listen=127.0.0.1:8000 --threads=8 --call bookin
 
 打开 [本机登录页](http://127.0.0.1:8000/login)，登录后在首页查看房间名称、地点和容量，选择会议室及北京时间日期，点击「查看日程」。结果区保留查询条件，明确显示查询中、成功、空结果或错误；共享预约仅显示活动名、预约人显示名、房间、时间与状态，停用显示时间及原因。历史日期和跨日停用同样可查询，结束恰为午夜的记录不进入下一天。使用顶栏按钮退出；刷新不会延长 8 小时绝对有效期，退出只撤销当前会话。界面可用键盘操作，并适配手机宽度。
 
-`seed_demo_rooms` 只补充三间名称含「合成演示」的房间，按名称/地点识别已有房间，可重复运行且不覆盖容量或业务数据。它与账号初始化一样使用 `BOOKING_DB_PATH`；在旧 Story 1.1 数据库上运行也会非破坏性补齐查询表，保持 `user_version=1`。不需要演示房间时可省略该命令，首页显示空目录。默认演示库没有预约或停用，因此查询显示空日程；下方 `--schedule` 浏览器验证会在独立临时库建立有完整占用槽的合成预约与跨日停用，以复现有日程、历史、取消排除和隐私场景。Story 2.1 提供预约创建接口；停用写接口尚未交付。验证器不把测试夹具写入演示库。
+`seed_demo_rooms` 只补充三间名称含「合成演示」的房间，按名称/地点识别已有房间，可重复运行且不覆盖容量或业务数据。它与账号初始化一样使用 `BOOKING_DB_PATH`；在旧 Story 1.1 数据库上运行也会非破坏性补齐查询表，保持 `user_version=1`。不需要演示房间时可省略该命令，首页显示空目录。默认演示库没有预约或停用，因此查询显示空日程；下方 `--schedule` 浏览器验证会在独立临时库建立有完整占用槽的合成预约与跨日停用，以复现有日程、历史、取消排除和隐私场景。Story 2.1 提供预约创建接口；停用写接口已由 Story 3.2 交付。验证器不把测试夹具写入演示库。
 
 初始化和启动命令可重复执行。重复初始化仍会提示输入合规口令，但只补缺失账号，**不会重置已有密码、显示名或角色，也不会清除已有数据**。停止后重启服务保留未到期会话。不要删除数据库来升级应用；schema 版本不兼容时启动会明确停止。
 
@@ -134,7 +134,7 @@ node --test tests/test_*js.cjs
 
 成功 key 与规范化六字段 JSON 持久保存在数据库，按成员隔离。同成员相同 key、相同规范化内容返回 **200**，`data={booking:BookingFull,replayed:true}`；原预约已开始、已结束、已取消或房间容量降低也能确认原 ID 与查询时当前状态、房间及显示名。相同 key 变更实质字段返回 409 `IDEMPOTENCY_MISMATCH`；明确失败不会占用 key，重放不会新增预约、占用槽或审计。
 
-本页表单使用 32 字节安全随机提交键，相同规范化六字段保留原键。网络断开、20 秒超时（含正文）或响应格式异常会显示「未能确认」，保留内容；点击「重试确认原预约」即可用原键确认。成功后仍可点击「再次确认原预约」，不会自动清空表单。活动名称/用途的实质编辑、选择不同房间或不同查询条件会生成新意图；仅 Python `str.strip()` 等价的首尾空白不算修改，包括 U+0085 和 U+001C—1F，但不去除 U+FEFF。点击「开始新预约」明确结束当前表单，再查询选房。提交期间锁定相关输入、查询、房间选择及新预约按钮；不会自动重提。本人取消现已由 Story 2.4 交付；管理员取消和停用撤销仍属于后续故事；创建停用和完整管理查询见 Story 3.2。
+本页表单使用 32 字节安全随机提交键，相同规范化六字段保留原键。网络断开、20 秒超时（含正文）或响应格式异常会显示「未能确认」，保留内容；点击「重试确认原预约」即可用原键确认。成功后仍可点击「再次确认原预约」，不会自动清空表单。活动名称/用途的实质编辑、选择不同房间或不同查询条件会生成新意图；仅 Python `str.strip()` 等价的首尾空白不算修改，包括 U+0085 和 U+001C—1F，但不去除 U+FEFF。点击「开始新预约」明确结束当前表单，再查询选房。提交期间锁定相关输入、查询、房间选择及新预约按钮；不会自动重提。本人取消现已由 Story 2.4 交付；管理员取消和停用撤销已集成；创建停用和完整管理查询见 Story 3.2。
 
 复跑本故事（均使用隔离临时文件库，自动停止服务和清理测试凭证）：
 
@@ -220,7 +220,7 @@ node --test tests/test_*js.cjs
 
 `POST /api/admin/blocks` 接受 `room_id,start,end,reason`，`room_id` 必须是 JSON 正整数；返回 201 与精确 `BlockFull`。未撤销的五个 `revoked_*`/`revoke_reason` 字段均为 null，外部没有 cancelled 字段。服务取得写锁后重新认证管理员并取一次 Clock；停用、完整半小时槽和一次 `block.created` 审计同事务提交。预约与停用共用槽约束，重叠返回 409 `OCCUPANCY_CONFLICT`，原安排不变；相邻允许。审计失败全量回滚。
 
-`GET /api/admin/bookings` 与 `GET /api/admin/blocks` 均支持可选 `room_id,date,status`，返回全部匹配记录及 total，按开始时间、编号升序。日期以北京时间半开区间相交判断，跨日停用在各覆盖日出现。预约四态为 pending/in_progress/ended/cancelled；停用为 pending/in_progress/ended/revoked，终态优先且四态互斥。非法过滤条件 400、合法不存在房间 404。完整字段仅管理员可读，成员直接调用 403，匿名及失效会话 401。两个管理列表当前仅查看，不提供管理员取消或撤销按钮。
+`GET /api/admin/bookings` 与 `GET /api/admin/blocks` 均支持可选 `room_id,date,status`，返回全部匹配记录及 total，按开始时间、编号升序。日期以北京时间半开区间相交判断，跨日停用在各覆盖日出现。预约四态为 pending/in_progress/ended/cancelled；停用为 pending/in_progress/ended/revoked，终态优先且四态互斥。非法过滤条件 400、合法不存在房间 404。完整字段仅管理员可读，成员直接调用 403，匿名及失效会话 401。管理员预约列表可说明原因取消，停用列表可选择撤销；两者均保留首次转换信息。
 
 页面区分尚未查询、加载、空结果、成功、冲突、服务失败和权限失效。提交中锁定相关输入；20 秒请求期限包含响应正文。失败保留输入；未知结果须先查询停用记录核对，不自动重提。已创建但列表刷新失败仍保留创建成功事实；返回提示不抢走移到其他表单的焦点。原因及其他用户文本均按纯文本展示。重新登录需要重新打开管理页，当前页草稿不跨导航自动恢复。
 
@@ -251,3 +251,74 @@ AI 自主提出的业务规则按假设标注，不作为已完成访谈或用�
 Story2.4评审后主流程全量复验121项Python/86项JS，16项发现全部闭环，0defer；[最终证据](docs/evidence/story-2.4-review-fixes/parent-final-qa.json)。
 
 Story3.1评审后全量139项Python、141项JS通过；[最终验收证据](docs/evidence/story-3.1-review-fixes/parent-final-qa.json)。
+
+
+## 操作记录、重启与备份（Story 3.4）
+
+管理员在 `/admin` 的「操作记录」选择对象类型与发生日期后查询。日期使用北京时间事件时刻的 `[当日零点, 次日零点)`，结果按 `occurred_at,id` 均降序，返回全部匹配记录。创建前值为 null；其余前后值为 JSON 对象，展开可查看完整字段。操作者名称保留操作时快照，原因和全部文本按纯文本显示；表格在自身区域横向滚动。加载、空结果、失败和身份失效分别反馈。20 秒期限包含响应正文；失败保留筛选条件，手动重新查询。失效会广播 `admin-auth-lost`、清空受保护结果并要求重新登录。
+
+`GET /api/admin/audit?target_type=room|booking|block&date=YYYY-MM-DD` 两个过滤项均可省略。成员 403、未登录/失效 401、非法过滤 400；存储快照损坏返回安全 500，不忽略记录或返回 JSON 字符串。七种实际业务动作对应完整快照，重复意图、重复取消/撤销和同值房间更新均不新增审计。审计不保存密码、会话、CSRF、token 摘要、请求头或提交意图 key。
+
+启动沿用本地文件库、单进程 Waitress 8 线程及 loopback 命令。最终 schema 为 `PRAGMA user_version=1`，缺表或版本不匹配时停止，不自动迁移。以下只读检查同时报告最终解析的数据库绝对路径、schema 与运行时：
+
+```bash
+.venv/bin/python - <<'CHECK_DB'
+from booking_app import default_database, check_runtime, db
+check_runtime()
+path = default_database()
+db.check_database(path)
+with db.read_transaction(path) as conn:
+    print({"database": path, "schema_version": conn.execute("PRAGMA user_version").fetchone()[0],
+           "journal_mode": conn.execute("PRAGMA journal_mode").fetchone()[0]})
+CHECK_DB
+```
+
+备份可以在服务运行中执行。指定一个**尚不存在的独立目标文件**，使用 SQLite `Connection.backup` 读取一致快照，包括已提交 WAL；不复制运行中的主文件。CLI 在完成后检查 `integrity_check` 与 `foreign_key_check`，报告时间/路径/schema，目标权限为 600；源路径、已有文件和符号链接目标不会被覆盖。目标目录请使用本地部署者私有目录：
+
+```bash
+mkdir -m 700 -p backups
+.venv/bin/python -m scripts.backup_db backups/booking-2026-11-12.sqlite3
+# 或显式指定源（初始化、服务与备份须指向同一个实际文件）
+.venv/bin/python -m scripts.backup_db --source /absolute/local/booking.sqlite3 backups/booking-manual.sqlite3
+```
+
+CLI 的完整性/外键检查只证明 SQLite 结构有效；`schema_version=0` 或仅结构有效的副本不构成本应用兼容的恢复备份。应用恢复必须通过 `schema=1` 和 `db.check_database` 检查。目标同名 `-wal`、`-shm`、`-journal`（含悬空符号链接）已存在时，CLI 会拒绝复制。
+
+被终止或中断、未成功完成 CLI 的副本不是已完成备份；请使用新的目标重试，不以文件存在判断成功。外部独占锁可能使复制持续等待，直到锁释放或操作被中断；CLI 不提供完成时限保证。
+
+恢复仅在停止 Waitress 并确认没有其他读写进程后进行：
+
+1. 用上述 backup CLI 备份当前库至新的回退文件，再校验准备恢复的副本。保留当前文件及停服后的同名 `-wal`、`-shm` 于同一个私有回退目录；不可把旧 sidecar 留在新库旁。不要在运行时删除 WAL。
+2. 将已检查副本通过 backup CLI 写至已腾空的原数据库路径。副本来自本 CLI 时是自包含文件，无需携带 sidecar。确认路径、权限 600 和目录权限 700；不要覆盖唯一回退副本。
+3. 使用下列命令核验 schema/完整性，重新启用 WAL 并清空会话。所有用户须重新登录，预约/停用/审计/成功意图历史不改写。
+4. 按原 Waitress 命令启动，核对房间、预约、停用、槽和审计数量/关键字段、槽关联与新登录。失败则再停服，将失败的新库及其 sidecar 单独保存，再按步骤 2—3 用回退备份恢复，重新验证后启动。
+
+```bash
+# 仅停服且已将已检查副本恢复至 BOOKING_DB_PATH 后执行
+.venv/bin/python - <<'RESTORED_DB'
+from booking_app import default_database, db
+path = default_database()
+conn = db.connect(path)
+try:
+    assert conn.execute("PRAGMA user_version").fetchone()[0] == 1
+    assert conn.execute("PRAGMA integrity_check").fetchall()[0][0] == "ok"
+    assert conn.execute("PRAGMA foreign_key_check").fetchall() == []
+    assert conn.execute("PRAGMA journal_mode=WAL").fetchone()[0] == "wal"
+finally:
+    conn.close()
+db.check_database(path)
+with db.write_transaction(path) as conn:
+    conn.execute("DELETE FROM sessions")
+RESTORED_DB
+```
+
+`instance/`、`backups/`、`work/`、SQLite 主库/sidecar、`.env`、私有凭证文件均不应进入版本库。测试使用独立临时库和随机临时密码，不触及演示或真实运行库。以下命令保留每次独立运行、进程 PID、环境和源码指纹；只有全部检查及清理完成才写 PASS：
+
+```bash
+.venv/bin/python -m unittest discover -s tests -v
+node --test tests/test_*js.cjs
+.venv/bin/python -m scripts.verify_audit_http --output-dir docs/evidence/story-3.4/http
+.venv/bin/python -m scripts.verify_audit_browser --output-dir docs/evidence/story-3.4/browser
+```
+
+浏览器依赖与 `--browser-executable` 参数沿用上文；视口为 1280×800 与 390×844。HTTP 验证执行房间修改、预约创建/取消、停用创建/撤销后实际终止 Waitress，再使用同一数据库和新 PID 启动；完整业务字段、槽、审计和关联哈希不变，原有效会话及已取消预约的旧成功意图仍可使用。备份 API 与副本完整性已实测；这里的停服恢复/回退是运维说明，**没有宣称完成灾难恢复演练或提供 SLA**。四项 NFR 联合复核与实际输出见 [Story 3.4 验证](docs/evidence/story-3.4/verification.md)。

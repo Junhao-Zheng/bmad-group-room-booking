@@ -1,0 +1,122 @@
+{
+  "result": "PASS",
+  "generated_at_utc": "2026-11-12T14:35:22.484212+00:00",
+  "python_tests": 201,
+  "javascript_tests": 296,
+  "no_skips": true,
+  "permission_cases": 138,
+  "restart": {
+    "old_pid": 74169,
+    "new_pid": 74181,
+    "old_process_stopped_before_start": true,
+    "old_sessions_valid": true,
+    "identical_business_and_relationships": true,
+    "audit_count_unchanged": true,
+    "original_intent_cancelled_record_id": 1
+  },
+  "storage_counts": {
+    "rooms": 1,
+    "reservations": 5,
+    "occupancy_slots": 6,
+    "audit_events": 10
+  },
+  "relationship_sha256": "36a12fe65ddbe135ad55a9fc50e9ebc00fe3c79c0be87edcdfa18068e2bd07ef",
+  "performance": {
+    "measured_requests": 200,
+    "warmup_requests": 20,
+    "errors": 0,
+    "wrong_results": 0,
+    "p95_ms": 21.500958129763603
+  },
+  "reports": [
+    {
+      "path": "http/result.json",
+      "result": "PASS",
+      "run_id": "9341bc2356e9503b58ad28ab7f754333",
+      "sha256": "78620db4254f3086a01aa5f62dfe6e3b0790a67462334d020230910577f0dc31"
+    },
+    {
+      "path": "browser/result.json",
+      "result": "PASS",
+      "run_id": "7aac8c8959bed463c284919268f814fe",
+      "sha256": "6fc5bb925cf790ac02d027a8b6e2fa6685b509d8cde47055c135ebac1511b70e"
+    },
+    {
+      "path": "nfr-room/http-result.json",
+      "result": "PASS",
+      "run_id": "f7b71d8b7461b67f3bf365f703b6f537",
+      "sha256": "bf2df9c5f2940b11011296d9d2da9382f25d1534e5a01579db186a884f94a28e"
+    },
+    {
+      "path": "nfr-block/http-result.json",
+      "result": "PASS",
+      "run_id": "31055149ae5133a5d32b66a02cdc3ae1",
+      "sha256": "f1f5756a417af75f4d1f011a18467b7ac392740dd534cc27aa1f5ca44ffa4c1d"
+    },
+    {
+      "path": "nfr-admin-cancel/http-result.json",
+      "result": "PASS",
+      "run_id": "a8f7e71a720245989433dffc33194477",
+      "sha256": "d94f5bc0d30e6fa6fb12b735f73c7d94f320fc6bc28252aba778d09950c5d9bb"
+    },
+    {
+      "path": "nfr-create/create-http-result.json",
+      "result": "PASS",
+      "run_id": "929e25506363d10f20f2a7c4ad3312f1",
+      "sha256": "79f09aae9276ea78d68b81aa736ada73282d14df8e9af46cc8f7c9ea930dfdb5"
+    },
+    {
+      "path": "nfr-replay/replay-http-result.json",
+      "result": "PASS",
+      "run_id": "ca4ad60f45561522b6da2857f3d3c885",
+      "sha256": "1ce55eee175ccc85949adad079adfd5e351f38a78e6147423657284e55fed1fd"
+    },
+    {
+      "path": "nfr-performance/performance-result.json",
+      "result": "PASS",
+      "run_id": "85b778e021f4757c6b395bd23c93d27d",
+      "sha256": "2bdb94066d3ef6632f7588d1edbf8cea234f871c8ed1a9131ef67d5c4f3e3576"
+    },
+    {
+      "path": "regression-room/browser-results.json",
+      "result": "PASS",
+      "run_id": "fa55be24d256ff3d80f6b81b76e0bdbc",
+      "sha256": "c01fd828b5b3f2a615708d6c2fb9362f070887b4f9c5d673660636dfec500675"
+    },
+    {
+      "path": "regression-block/browser-results.json",
+      "result": "PASS",
+      "run_id": "7c84fc2a25a5db37632e63b8dcce498c",
+      "sha256": "e3c0cf4d0b1ffca7ddc4c247e06fc0317e2b4180c657e0825ba91f3d0cc8d5b4"
+    },
+    {
+      "path": "regression-revoke/browser-result.json",
+      "result": "PASS",
+      "run_id": "96357fbd802c78046ef8d718eeaa6ba9",
+      "sha256": "eb349756ad3ea5164a1f5bc8a2d7c42bee6d4476f41c1ab8928e456f6b23ca3e"
+    },
+    {
+      "path": "regression-member/browser-results.json",
+      "result": "PASS",
+      "run_id": "2c2f5cbaaac22299c0d446e946d88af5",
+      "sha256": "8923deea2b7b19930b78742b67d5c34551ff326b386eeb6af4cf38681f22328f"
+    },
+    {
+      "path": "regression-admin/browser-results.json",
+      "result": "PASS",
+      "run_id": "b6206eab8aa793ab42c1925698fecddd",
+      "sha256": "6cb8a11270516ae527c104c15c7c0075d66508134ef987f76aa360ddc5fe93a0"
+    },
+    {
+      "path": "regression-booking/browser-results.json",
+      "result": "PASS",
+      "run_id": "84a550fcc34b0ba8be29ad1796a30cfc",
+      "sha256": "a08af6c5dac041b9cddb31e3b83c64774cb6736e5da7a66c2f5ac7f35c7f24aa"
+    }
+  ],
+  "limits": [
+    "Synthetic local test data; no human/teacher acceptance claimed",
+    "Backup API checked; disaster restoration procedure documented but no disaster drill claimed",
+    "Earlier INCOMPLETE runs retained; final reports point to successful runs"
+  ]
+}

@@ -1,0 +1,1099 @@
+[
+  {
+    "phase": "create-0",
+    "path": "/api/bookings",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794463200,
+          "end_local": "2026-11-12T14:00:00+08:00",
+          "id": 1,
+          "owner_display_name": "合成成员",
+          "owner_id": 1,
+          "purpose": "合成用途",
+          "room": {
+            "capacity": 20,
+            "id": 1,
+            "location": "合成测试楼",
+            "name": "合成会议室"
+          },
+          "start_at": 1794456000,
+          "start_local": "2026-11-12T12:00:00+08:00",
+          "status": "pending",
+          "title": "合成竞争预约"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 8.513083914294839
+  },
+  {
+    "phase": "create-1",
+    "path": "/api/bookings",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794463200,
+          "end_local": "2026-11-12T14:00:00+08:00",
+          "id": 2,
+          "owner_display_name": "合成成员",
+          "owner_id": 1,
+          "purpose": "合成用途",
+          "room": {
+            "capacity": 20,
+            "id": 1,
+            "location": "合成测试楼",
+            "name": "合成会议室"
+          },
+          "start_at": 1794456000,
+          "start_local": "2026-11-12T12:00:00+08:00",
+          "status": "pending",
+          "title": "合成竞争预约"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 7.300541969016194
+  },
+  {
+    "phase": "create-2",
+    "path": "/api/bookings",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794463200,
+          "end_local": "2026-11-12T14:00:00+08:00",
+          "id": 3,
+          "owner_display_name": "合成成员",
+          "owner_id": 1,
+          "purpose": "合成用途",
+          "room": {
+            "capacity": 20,
+            "id": 1,
+            "location": "合成测试楼",
+            "name": "合成会议室"
+          },
+          "start_at": 1794456000,
+          "start_local": "2026-11-12T12:00:00+08:00",
+          "status": "pending",
+          "title": "合成竞争预约"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 10.202167090028524
+  },
+  {
+    "phase": "create-3",
+    "path": "/api/bookings",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794463200,
+          "end_local": "2026-11-12T14:00:00+08:00",
+          "id": 4,
+          "owner_display_name": "合成成员",
+          "owner_id": 1,
+          "purpose": "合成用途",
+          "room": {
+            "capacity": 20,
+            "id": 1,
+            "location": "合成测试楼",
+            "name": "合成会议室"
+          },
+          "start_at": 1794456000,
+          "start_local": "2026-11-12T12:00:00+08:00",
+          "status": "pending",
+          "title": "合成竞争预约"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 6.1809171456843615
+  },
+  {
+    "phase": "create-4",
+    "path": "/api/bookings",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794463200,
+          "end_local": "2026-11-12T14:00:00+08:00",
+          "id": 5,
+          "owner_display_name": "合成成员",
+          "owner_id": 1,
+          "purpose": "合成用途",
+          "room": {
+            "capacity": 20,
+            "id": 1,
+            "location": "合成测试楼",
+            "name": "合成会议室"
+          },
+          "start_at": 1794456000,
+          "start_local": "2026-11-12T12:00:00+08:00",
+          "status": "pending",
+          "title": "合成竞争预约"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 5.1023331470787525
+  },
+  {
+    "phase": "create-5",
+    "path": "/api/bookings",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794463200,
+          "end_local": "2026-11-12T14:00:00+08:00",
+          "id": 6,
+          "owner_display_name": "合成成员",
+          "owner_id": 1,
+          "purpose": "合成用途",
+          "room": {
+            "capacity": 20,
+            "id": 1,
+            "location": "合成测试楼",
+            "name": "合成会议室"
+          },
+          "start_at": 1794456000,
+          "start_local": "2026-11-12T12:00:00+08:00",
+          "status": "pending",
+          "title": "合成竞争预约"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 5.728834075853229
+  },
+  {
+    "phase": "create-6",
+    "path": "/api/bookings",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794463200,
+          "end_local": "2026-11-12T14:00:00+08:00",
+          "id": 7,
+          "owner_display_name": "合成成员",
+          "owner_id": 1,
+          "purpose": "合成用途",
+          "room": {
+            "capacity": 20,
+            "id": 1,
+            "location": "合成测试楼",
+            "name": "合成会议室"
+          },
+          "start_at": 1794456000,
+          "start_local": "2026-11-12T12:00:00+08:00",
+          "status": "pending",
+          "title": "合成竞争预约"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 3.827915992587805
+  },
+  {
+    "phase": "create-7",
+    "path": "/api/bookings",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794463200,
+          "end_local": "2026-11-12T14:00:00+08:00",
+          "id": 8,
+          "owner_display_name": "合成成员",
+          "owner_id": 1,
+          "purpose": "合成用途",
+          "room": {
+            "capacity": 20,
+            "id": 1,
+            "location": "合成测试楼",
+            "name": "合成会议室"
+          },
+          "start_at": 1794456000,
+          "start_local": "2026-11-12T12:00:00+08:00",
+          "status": "pending",
+          "title": "合成竞争预约"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 8.49820813164115
+  },
+  {
+    "phase": "create-8",
+    "path": "/api/bookings",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794463200,
+          "end_local": "2026-11-12T14:00:00+08:00",
+          "id": 9,
+          "owner_display_name": "合成成员",
+          "owner_id": 1,
+          "purpose": "合成用途",
+          "room": {
+            "capacity": 20,
+            "id": 1,
+            "location": "合成测试楼",
+            "name": "合成会议室"
+          },
+          "start_at": 1794456000,
+          "start_local": "2026-11-12T12:00:00+08:00",
+          "status": "pending",
+          "title": "合成竞争预约"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 4.892207914963365
+  },
+  {
+    "phase": "create-9",
+    "path": "/api/bookings",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794463200,
+          "end_local": "2026-11-12T14:00:00+08:00",
+          "id": 10,
+          "owner_display_name": "合成成员",
+          "owner_id": 1,
+          "purpose": "合成用途",
+          "room": {
+            "capacity": 20,
+            "id": 1,
+            "location": "合成测试楼",
+            "name": "合成会议室"
+          },
+          "start_at": 1794456000,
+          "start_local": "2026-11-12T12:00:00+08:00",
+          "status": "pending",
+          "title": "合成竞争预约"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 11.70429214835167
+  },
+  {
+    "phase": "create-10",
+    "path": "/api/bookings",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794463200,
+          "end_local": "2026-11-12T14:00:00+08:00",
+          "id": 11,
+          "owner_display_name": "合成成员",
+          "owner_id": 1,
+          "purpose": "合成用途",
+          "room": {
+            "capacity": 20,
+            "id": 1,
+            "location": "合成测试楼",
+            "name": "合成会议室"
+          },
+          "start_at": 1794456000,
+          "start_local": "2026-11-12T12:00:00+08:00",
+          "status": "pending",
+          "title": "合成竞争预约"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 3.8854170124977827
+  },
+  {
+    "phase": "create-11",
+    "path": "/api/bookings",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794463200,
+          "end_local": "2026-11-12T14:00:00+08:00",
+          "id": 12,
+          "owner_display_name": "合成成员",
+          "owner_id": 1,
+          "purpose": "合成用途",
+          "room": {
+            "capacity": 20,
+            "id": 1,
+            "location": "合成测试楼",
+            "name": "合成会议室"
+          },
+          "start_at": 1794456000,
+          "start_local": "2026-11-12T12:00:00+08:00",
+          "status": "pending",
+          "title": "合成竞争预约"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 5.687459139153361
+  },
+  {
+    "phase": "create-12",
+    "path": "/api/bookings",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794463200,
+          "end_local": "2026-11-12T14:00:00+08:00",
+          "id": 13,
+          "owner_display_name": "合成成员",
+          "owner_id": 1,
+          "purpose": "合成用途",
+          "room": {
+            "capacity": 20,
+            "id": 1,
+            "location": "合成测试楼",
+            "name": "合成会议室"
+          },
+          "start_at": 1794456000,
+          "start_local": "2026-11-12T12:00:00+08:00",
+          "status": "pending",
+          "title": "合成竞争预约"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 4.9364580772817135
+  },
+  {
+    "phase": "create-13",
+    "path": "/api/bookings",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794463200,
+          "end_local": "2026-11-12T14:00:00+08:00",
+          "id": 14,
+          "owner_display_name": "合成成员",
+          "owner_id": 1,
+          "purpose": "合成用途",
+          "room": {
+            "capacity": 20,
+            "id": 1,
+            "location": "合成测试楼",
+            "name": "合成会议室"
+          },
+          "start_at": 1794456000,
+          "start_local": "2026-11-12T12:00:00+08:00",
+          "status": "pending",
+          "title": "合成竞争预约"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 9.17612505145371
+  },
+  {
+    "phase": "create-14",
+    "path": "/api/bookings",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794463200,
+          "end_local": "2026-11-12T14:00:00+08:00",
+          "id": 15,
+          "owner_display_name": "合成成员",
+          "owner_id": 1,
+          "purpose": "合成用途",
+          "room": {
+            "capacity": 20,
+            "id": 1,
+            "location": "合成测试楼",
+            "name": "合成会议室"
+          },
+          "start_at": 1794456000,
+          "start_local": "2026-11-12T12:00:00+08:00",
+          "status": "pending",
+          "title": "合成竞争预约"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 6.53012515977025
+  },
+  {
+    "phase": "create-15",
+    "path": "/api/bookings",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794463200,
+          "end_local": "2026-11-12T14:00:00+08:00",
+          "id": 16,
+          "owner_display_name": "合成成员",
+          "owner_id": 1,
+          "purpose": "合成用途",
+          "room": {
+            "capacity": 20,
+            "id": 1,
+            "location": "合成测试楼",
+            "name": "合成会议室"
+          },
+          "start_at": 1794456000,
+          "start_local": "2026-11-12T12:00:00+08:00",
+          "status": "pending",
+          "title": "合成竞争预约"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 5.458165891468525
+  },
+  {
+    "phase": "create-16",
+    "path": "/api/bookings",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794463200,
+          "end_local": "2026-11-12T14:00:00+08:00",
+          "id": 17,
+          "owner_display_name": "合成成员",
+          "owner_id": 1,
+          "purpose": "合成用途",
+          "room": {
+            "capacity": 20,
+            "id": 1,
+            "location": "合成测试楼",
+            "name": "合成会议室"
+          },
+          "start_at": 1794456000,
+          "start_local": "2026-11-12T12:00:00+08:00",
+          "status": "pending",
+          "title": "合成竞争预约"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 5.5117919109761715
+  },
+  {
+    "phase": "create-17",
+    "path": "/api/bookings",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794463200,
+          "end_local": "2026-11-12T14:00:00+08:00",
+          "id": 18,
+          "owner_display_name": "合成成员",
+          "owner_id": 1,
+          "purpose": "合成用途",
+          "room": {
+            "capacity": 20,
+            "id": 1,
+            "location": "合成测试楼",
+            "name": "合成会议室"
+          },
+          "start_at": 1794456000,
+          "start_local": "2026-11-12T12:00:00+08:00",
+          "status": "pending",
+          "title": "合成竞争预约"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 4.470708081498742
+  },
+  {
+    "phase": "create-18",
+    "path": "/api/bookings",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794463200,
+          "end_local": "2026-11-12T14:00:00+08:00",
+          "id": 19,
+          "owner_display_name": "合成成员",
+          "owner_id": 1,
+          "purpose": "合成用途",
+          "room": {
+            "capacity": 20,
+            "id": 1,
+            "location": "合成测试楼",
+            "name": "合成会议室"
+          },
+          "start_at": 1794456000,
+          "start_local": "2026-11-12T12:00:00+08:00",
+          "status": "pending",
+          "title": "合成竞争预约"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 5.230457987636328
+  },
+  {
+    "phase": "create-19",
+    "path": "/api/bookings",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794463200,
+          "end_local": "2026-11-12T14:00:00+08:00",
+          "id": 20,
+          "owner_display_name": "合成成员",
+          "owner_id": 1,
+          "purpose": "合成用途",
+          "room": {
+            "capacity": 20,
+            "id": 1,
+            "location": "合成测试楼",
+            "name": "合成会议室"
+          },
+          "start_at": 1794456000,
+          "start_local": "2026-11-12T12:00:00+08:00",
+          "status": "pending",
+          "title": "合成竞争预约"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 6.448833039030433
+  },
+  {
+    "phase": "unrelated-booking",
+    "path": "/api/bookings",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794466800,
+          "end_local": "2026-11-12T15:00:00+08:00",
+          "id": 21,
+          "owner_display_name": "合成成员",
+          "owner_id": 1,
+          "purpose": "合成用途",
+          "room": {
+            "capacity": 20,
+            "id": 1,
+            "location": "合成测试楼",
+            "name": "合成会议室"
+          },
+          "start_at": 1794463200,
+          "start_local": "2026-11-12T14:00:00+08:00",
+          "status": "pending",
+          "title": "合成竞争预约"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 6.013458129018545
+  },
+  {
+    "phase": "admin-race-target",
+    "path": "/api/bookings",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794463200,
+          "end_local": "2026-11-12T14:00:00+08:00",
+          "id": 22,
+          "owner_display_name": "合成成员",
+          "owner_id": 1,
+          "purpose": "合成用途",
+          "room": {
+            "capacity": 20,
+            "id": 1,
+            "location": "合成测试楼",
+            "name": "合成会议室"
+          },
+          "start_at": 1794456000,
+          "start_local": "2026-11-12T12:00:00+08:00",
+          "status": "pending",
+          "title": "合成竞争预约"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 4.412834066897631
+  },
+  {
+    "phase": "fault-target",
+    "path": "/api/bookings",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794463200,
+          "end_local": "2026-11-12T14:00:00+08:00",
+          "id": 23,
+          "owner_display_name": "合成成员",
+          "owner_id": 1,
+          "purpose": "合成用途",
+          "room": {
+            "capacity": 20,
+            "id": 1,
+            "location": "合成测试楼",
+            "name": "合成会议室"
+          },
+          "start_at": 1794456000,
+          "start_local": "2026-11-12T12:00:00+08:00",
+          "status": "pending",
+          "title": "合成竞争预约"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 8.906875038519502
+  },
+  {
+    "phase": "fault-before",
+    "path": "/api/admin/bookings/23/cancel",
+    "http_status": 500,
+    "response": {
+      "error": {
+        "code": "INTERNAL_ERROR",
+        "conflicts": [],
+        "fields": {},
+        "message": "操作未完成，请稍后重试。"
+      },
+      "ok": false
+    },
+    "duration_ms": 5.99358300678432
+  },
+  {
+    "phase": "repeat-with-before-writer",
+    "path": "/api/admin/bookings/1/cancel",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "attendees": 5,
+        "cancel_reason": "HTTP 合成管理原因",
+        "cancelled_at": 1794448800,
+        "cancelled_by_display_name": "合成管理员",
+        "cancelled_by_id": 2,
+        "cancelled_local": "2026-11-12T10:00:00+08:00",
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "end_at": 1794463200,
+        "end_local": "2026-11-12T14:00:00+08:00",
+        "id": 1,
+        "owner_display_name": "合成成员",
+        "owner_id": 1,
+        "purpose": "合成用途",
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "合成测试楼",
+          "name": "合成会议室"
+        },
+        "start_at": 1794456000,
+        "start_local": "2026-11-12T12:00:00+08:00",
+        "status": "cancelled",
+        "title": "合成竞争预约"
+      },
+      "ok": true
+    },
+    "duration_ms": 4.247291944921017
+  },
+  {
+    "phase": "fault-after",
+    "path": "/api/admin/bookings/23/cancel",
+    "http_status": 500,
+    "response": {
+      "error": {
+        "code": "INTERNAL_ERROR",
+        "conflicts": [],
+        "fields": {},
+        "message": "操作未完成，请稍后重试。"
+      },
+      "ok": false
+    },
+    "duration_ms": 4.844666924327612
+  },
+  {
+    "phase": "repeat-with-after-writer",
+    "path": "/api/admin/bookings/1/cancel",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "attendees": 5,
+        "cancel_reason": "HTTP 合成管理原因",
+        "cancelled_at": 1794448800,
+        "cancelled_by_display_name": "合成管理员",
+        "cancelled_by_id": 2,
+        "cancelled_local": "2026-11-12T10:00:00+08:00",
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "end_at": 1794463200,
+        "end_local": "2026-11-12T14:00:00+08:00",
+        "id": 1,
+        "owner_display_name": "合成成员",
+        "owner_id": 1,
+        "purpose": "合成用途",
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "合成测试楼",
+          "name": "合成会议室"
+        },
+        "start_at": 1794456000,
+        "start_local": "2026-11-12T12:00:00+08:00",
+        "status": "cancelled",
+        "title": "合成竞争预约"
+      },
+      "ok": true
+    },
+    "duration_ms": 5.3096250630915165
+  },
+  {
+    "phase": "fault-commit",
+    "path": "/api/admin/bookings/23/cancel",
+    "http_status": 500,
+    "response": {
+      "error": {
+        "code": "INTERNAL_ERROR",
+        "conflicts": [],
+        "fields": {},
+        "message": "操作未完成，请稍后重试。"
+      },
+      "ok": false
+    },
+    "duration_ms": 3.9097080007195473
+  },
+  {
+    "phase": "repeat-with-commit-writer",
+    "path": "/api/admin/bookings/1/cancel",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "attendees": 5,
+        "cancel_reason": "HTTP 合成管理原因",
+        "cancelled_at": 1794448800,
+        "cancelled_by_display_name": "合成管理员",
+        "cancelled_by_id": 2,
+        "cancelled_local": "2026-11-12T10:00:00+08:00",
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "end_at": 1794463200,
+        "end_local": "2026-11-12T14:00:00+08:00",
+        "id": 1,
+        "owner_display_name": "合成成员",
+        "owner_id": 1,
+        "purpose": "合成用途",
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "合成测试楼",
+          "name": "合成会议室"
+        },
+        "start_at": 1794456000,
+        "start_local": "2026-11-12T12:00:00+08:00",
+        "status": "cancelled",
+        "title": "合成竞争预约"
+      },
+      "ok": true
+    },
+    "duration_ms": 5.711040925234556
+  },
+  {
+    "phase": "cancel-after-restart",
+    "path": "/api/admin/bookings/23/cancel",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "attendees": 5,
+        "cancel_reason": "HTTP 合成管理原因",
+        "cancelled_at": 1794448800,
+        "cancelled_by_display_name": "合成管理员",
+        "cancelled_by_id": 2,
+        "cancelled_local": "2026-11-12T10:00:00+08:00",
+        "created_at": 1794448800,
+        "created_local": "2026-11-12T10:00:00+08:00",
+        "end_at": 1794463200,
+        "end_local": "2026-11-12T14:00:00+08:00",
+        "id": 23,
+        "owner_display_name": "合成成员",
+        "owner_id": 1,
+        "purpose": "合成用途",
+        "room": {
+          "capacity": 20,
+          "id": 1,
+          "location": "合成测试楼",
+          "name": "合成会议室"
+        },
+        "start_at": 1794456000,
+        "start_local": "2026-11-12T12:00:00+08:00",
+        "status": "cancelled",
+        "title": "合成竞争预约"
+      },
+      "ok": true
+    },
+    "duration_ms": 4.767667036503553
+  },
+  {
+    "phase": "replay-old-cancelled-intent",
+    "path": "/api/bookings",
+    "http_status": 200,
+    "response": {
+      "data": {
+        "booking": {
+          "attendees": 5,
+          "cancel_reason": "HTTP 合成管理原因",
+          "cancelled_at": 1794448800,
+          "cancelled_by_display_name": "合成管理员",
+          "cancelled_by_id": 2,
+          "cancelled_local": "2026-11-12T10:00:00+08:00",
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794463200,
+          "end_local": "2026-11-12T14:00:00+08:00",
+          "id": 23,
+          "owner_display_name": "合成成员",
+          "owner_id": 1,
+          "purpose": "合成用途",
+          "room": {
+            "capacity": 20,
+            "id": 1,
+            "location": "合成测试楼",
+            "name": "合成会议室"
+          },
+          "start_at": 1794456000,
+          "start_local": "2026-11-12T12:00:00+08:00",
+          "status": "cancelled",
+          "title": "合成竞争预约"
+        },
+        "replayed": true
+      },
+      "ok": true
+    },
+    "duration_ms": 3.634124994277954
+  }
+]

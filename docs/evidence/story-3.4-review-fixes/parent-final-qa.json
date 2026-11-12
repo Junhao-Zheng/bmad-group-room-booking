@@ -1,0 +1,33 @@
+{
+  "checked_at_utc": "2026-11-12T15:02:29.797578+00:00",
+  "result": "PASS",
+  "python_tests": 208,
+  "unique_python_ids": 208,
+  "javascript_tests": 313,
+  "skips": 0,
+  "reports": [
+    {
+      "file": "docs/evidence/story-3.4-review-fixes/browser/result.json",
+      "run_id": "71823ba97c94d182c1dd43e515c42c76",
+      "result": "PASS",
+      "verified_source_hashes": 58
+    },
+    {
+      "file": "docs/evidence/story-3.4-review-fixes/parent-http/result.json",
+      "run_id": "93a898e9d1b4ebf1c58ed75252d88c6a",
+      "result": "PASS",
+      "verified_source_hashes": 58
+    }
+  ],
+  "review": {
+    "contexts": 3,
+    "findings": 14,
+    "patched_findings": 11,
+    "repair_groups": 8,
+    "rejected_low_findings": 3,
+    "deferred_findings": 0
+  },
+  "mutations": "Python reason=null and JS before=after/reason=none rejected; original source preserved",
+  "visual_qa": "父流程实际检查1280px完整审计表与390px筛选失效截图：前后列/展开内容/原因可读，筛选变化清空旧结果并提示重新查询。表格局部横滚属于已声明范围。",
+  "nfr_scope": "当前版本重跑138权限用例、真实停服新PID重启、前后完整事实和备份。初版联合并发/NFR03证据保留：本轮只改变audit DTO/页面及备份CLI，不改变占用事务、身份服务或可用性查询；不重复宣称初版哈希等于当前全部源码。"
+}

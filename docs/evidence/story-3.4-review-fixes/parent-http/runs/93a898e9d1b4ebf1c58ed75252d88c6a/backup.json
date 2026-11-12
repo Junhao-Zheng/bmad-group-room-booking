@@ -1,0 +1,12 @@
+{
+  "source": "/private/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/audit-restart-9hgbeptt/test.sqlite3",
+  "destination": "/var/folders/3p/6b068jk56tg38yxy_qs97mdm0000gn/T/audit-restart-9hgbeptt/verified-backup.sqlite3",
+  "completed_at_utc": "2026-11-12T15:00:20.455941+00:00",
+  "schema_version": 1,
+  "integrity_check": [
+    "ok"
+  ],
+  "foreign_key_check": [],
+  "permissions": "0600",
+  "matches_live_business_and_relationships": true
+}

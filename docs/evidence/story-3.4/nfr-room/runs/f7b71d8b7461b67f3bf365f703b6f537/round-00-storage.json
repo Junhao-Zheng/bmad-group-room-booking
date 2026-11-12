@@ -1,0 +1,40 @@
+{
+  "rooms": [
+    {
+      "id": 1,
+      "name": "合成竞争房间 00",
+      "location": "测试楼",
+      "capacity": 5,
+      "created_at": 1794448800,
+      "updated_at": 1794448800
+    }
+  ],
+  "reservations": [],
+  "occupancy_slots": [],
+  "audit_events": [
+    {
+      "id": 1,
+      "actor_id": 3,
+      "actor_display_name": "演示管理员",
+      "action": "room.created",
+      "target_type": "room",
+      "target_id": 1,
+      "occurred_at": 1794448800,
+      "before_json": null,
+      "after_json": "{\"capacity\":20,\"id\":1,\"location\":\"测试楼\",\"name\":\"合成竞争房间 00\"}",
+      "reason": null
+    },
+    {
+      "id": 2,
+      "actor_id": 3,
+      "actor_display_name": "演示管理员",
+      "action": "room.updated",
+      "target_type": "room",
+      "target_id": 1,
+      "occurred_at": 1794448800,
+      "before_json": "{\"capacity\":20,\"id\":1,\"location\":\"测试楼\",\"name\":\"合成竞争房间 00\"}",
+      "after_json": "{\"capacity\":5,\"id\":1,\"location\":\"测试楼\",\"name\":\"合成竞争房间 00\"}",
+      "reason": null
+    }
+  ]
+}

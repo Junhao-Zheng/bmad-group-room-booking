@@ -1,0 +1,186 @@
+[
+  {
+    "role": "anonymous",
+    "method": "GET",
+    "path": "/login",
+    "status": 200,
+    "expected": 200,
+    "code": null
+  },
+  {
+    "role": "anonymous",
+    "method": "GET",
+    "path": "/",
+    "status": 302,
+    "expected": 302,
+    "code": null
+  },
+  {
+    "role": "anonymous",
+    "method": "GET",
+    "path": "/my",
+    "status": 302,
+    "expected": 302,
+    "code": null
+  },
+  {
+    "role": "anonymous",
+    "method": "GET",
+    "path": "/admin",
+    "status": 302,
+    "expected": 302,
+    "code": null
+  },
+  {
+    "role": "anonymous",
+    "method": "GET",
+    "path": "/static/app.css",
+    "status": 200,
+    "expected": 200,
+    "code": null
+  },
+  {
+    "role": "anonymous",
+    "method": "GET",
+    "path": "/api/me",
+    "status": 401,
+    "expected": 401,
+    "code": "AUTH_REQUIRED"
+  },
+  {
+    "role": "anonymous",
+    "method": "GET",
+    "path": "/api/rooms",
+    "status": 401,
+    "expected": 401,
+    "code": "AUTH_REQUIRED"
+  },
+  {
+    "role": "anonymous",
+    "method": "GET",
+    "path": "/api/availability?start=bad",
+    "status": 401,
+    "expected": 401,
+    "code": "AUTH_REQUIRED"
+  },
+  {
+    "role": "anonymous",
+    "method": "GET",
+    "path": "/api/schedule?room_id=1&date=2000-01-01",
+    "status": 401,
+    "expected": 401,
+    "code": "AUTH_REQUIRED"
+  },
+  {
+    "role": "anonymous",
+    "method": "GET",
+    "path": "/api/bookings/mine",
+    "status": 401,
+    "expected": 401,
+    "code": "AUTH_REQUIRED"
+  },
+  {
+    "role": "anonymous",
+    "method": "GET",
+    "path": "/api/bookings/1",
+    "status": 401,
+    "expected": 401,
+    "code": "AUTH_REQUIRED"
+  },
+  {
+    "role": "anonymous",
+    "method": "GET",
+    "path": "/api/admin/bookings",
+    "status": 401,
+    "expected": 401,
+    "code": "AUTH_REQUIRED"
+  },
+  {
+    "role": "anonymous",
+    "method": "GET",
+    "path": "/api/admin/blocks",
+    "status": 401,
+    "expected": 401,
+    "code": "AUTH_REQUIRED"
+  },
+  {
+    "role": "anonymous",
+    "method": "GET",
+    "path": "/api/admin/audit",
+    "status": 401,
+    "expected": 401,
+    "code": "AUTH_REQUIRED"
+  },
+  {
+    "role": "anonymous",
+    "method": "POST",
+    "path": "/api/login",
+    "status": 403,
+    "expected": 403,
+    "code": "CSRF_REJECTED"
+  },
+  {
+    "role": "anonymous",
+    "method": "POST",
+    "path": "/api/bookings",
+    "status": 401,
+    "expected": 401,
+    "code": "AUTH_REQUIRED"
+  },
+  {
+    "role": "anonymous",
+    "method": "POST",
+    "path": "/api/bookings/1/cancel",
+    "status": 401,
+    "expected": 401,
+    "code": "AUTH_REQUIRED"
+  },
+  {
+    "role": "anonymous",
+    "method": "POST",
+    "path": "/api/admin/bookings/1/cancel",
+    "status": 401,
+    "expected": 401,
+    "code": "AUTH_REQUIRED"
+  },
+  {
+    "role": "anonymous",
+    "method": "POST",
+    "path": "/api/admin/rooms",
+    "status": 401,
+    "expected": 401,
+    "code": "AUTH_REQUIRED"
+  },
+  {
+    "role": "anonymous",
+    "method": "POST",
+    "path": "/api/admin/rooms/1",
+    "status": 401,
+    "expected": 401,
+    "code": "AUTH_REQUIRED"
+  },
+  {
+    "role": "anonymous",
+    "method": "POST",
+    "path": "/api/admin/blocks",
+    "status": 401,
+    "expected": 401,
+    "code": "AUTH_REQUIRED"
+  },
+  {
+    "role": "anonymous",
+    "method": "POST",
+    "path": "/api/admin/blocks/3/revoke",
+    "status": 401,
+    "expected": 401,
+    "code": "AUTH_REQUIRED"
+  },
+  {
+    "role": "anonymous",
+    "method": "POST",
+    "path": "/api/logout",
+    "status": 401,
+    "expected": 401,
+    "code": "AUTH_REQUIRED"
+  }
+]

@@ -1,4 +1,5 @@
 :root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:#183343;background:#f5f7f8;font-size:16px;line-height:1.5;font-synthesis:none}
+.audit-scroll{max-width:100%;overflow-x:auto;margin-top:24px}.audit-table{border-collapse:collapse;width:100%;min-width:1000px;table-layout:fixed}.audit-table th,.audit-table td{padding:12px;text-align:left;vertical-align:top;border-bottom:1px solid #dde6e8;overflow-wrap:anywhere}.audit-table caption{text-align:left;color:#54707a;padding:8px}.audit-table pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;margin:12px 0}.audit-table summary{cursor:pointer;color:#126d65}.audit-table details{max-width:100%}
 *{box-sizing:border-box}
 body{margin:0;min-width:0}
 a{color:#126d65;text-underline-offset:4px}

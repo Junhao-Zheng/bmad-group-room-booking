@@ -105,6 +105,28 @@ def require_admin(actor: auth.Actor) -> auth.Actor:
     return actor
 
 
+def audit_events(actor: auth.Actor, target_type=None, date=None) -> dict:
+    with db.read_transaction() as conn:
+        now = current_app.config["CLOCK"].now_epoch()
+        require_admin(_require_actor(conn, actor, now))
+        conditions, params = [], []
+        if target_type is not None:
+            if not isinstance(target_type, str) or target_type not in ("room", "booking", "block"):
+                raise DomainError("INVALID_INPUT", "请选择有效的操作对象。", {"target_type": "请选择会议室、预约或停用。"})
+            conditions.append("target_type=?")
+            params.append(target_type)
+        if date is not None:
+            start, end = beijing_day(date)
+            conditions.append("occurred_at>=? AND occurred_at<?")
+            params.extend((start, end))
+        where = " WHERE " + " AND ".join(conditions) if conditions else ""
+        rows = conn.execute(
+            "SELECT id,actor_id,actor_display_name,action,target_type,target_id,occurred_at,"
+            "before_json,after_json,reason FROM audit_events" + where + " ORDER BY occurred_at DESC,id DESC", params,
+        ).fetchall()
+        return dto.list_result([dto.audit_event(row) for row in rows])
+
+
 def _room_duplicate(conn, values: dict, room_id=None) -> None:
     duplicate = conn.execute(
         "SELECT id FROM rooms WHERE name=? AND location=? AND (? IS NULL OR id<>?)",

@@ -1,0 +1,93 @@
+{
+  "recorded_at_utc": "2026-11-12T14:47:39.208009+00:00",
+  "story": "3-4-audit-and-restart",
+  "initial_review_pass": false,
+  "finding_count": 14,
+  "findings": [
+    {
+      "id": "B1",
+      "verdict": "high",
+      "route": "patch",
+      "evidence": "已用隔离临时库复现：失败清理删除既有target-shm；独立评审也复现成功复制删旧WAL/journal。目标命名空间必须先拒绝已有辅助文件，包含源库恰位于目标sidecar路径，清理只处理本次创建物。"
+    },
+    {
+      "id": "B2",
+      "verdict": "low",
+      "route": "reject",
+      "evidence": "进程被强杀可留不完整目标，真实但只会发生在中断路径；没有成功退出或检查报告。现有恢复说明先检查完整性/schema，不能把文件存在当完成。原子发布需新增暂存/发布/清理状态，超出直接修正；本次不加，明确中断边界和新目标重试。"
+    },
+    {
+      "id": "B3",
+      "verdict": "low",
+      "route": "reject",
+      "evidence": "SQLite backup在外部独占锁下可持续等待。生产库WAL、短事务，正常热库已有成功证据；未约定备份完成时限。新增截止时间及策略不是直接校正，暂不加；说明可中断并解除占用后重试，不宣称有超时保证。"
+    },
+    {
+      "id": "B4",
+      "verdict": "low",
+      "route": "patch",
+      "evidence": "空SQLite源实测输出schema_version=0且结构检查ok；这确不能证明应用兼容。README明确CLI只证明SQLite结构一致，应用恢复必须检查schema=1并执行db.check_database，不把结构有效说成可用应用备份；不扩充通用复制工具为schema迁移器。"
+    },
+    {
+      "id": "B5",
+      "verdict": "medium",
+      "route": "patch",
+      "evidence": "主流程复现room.updated/before=null、target_id与after.id不同、capacity=-1仍返回DTO。增加对已证明矛盾的静态检查：action/type、创建/转换before、快照ID、正数容量等；不以当前预约窗口否定合法历史。"
+    },
+    {
+      "id": "B6",
+      "verdict": "medium",
+      "route": "patch",
+      "evidence": "eventShape仅检查snapshot键；嵌套对象或字符串容量可直接进入展示。补对应字段类型和可空类型检查，增加malformed值回归；没有据故障注入输入认定服务当前泄漏真实口令。"
+    },
+    {
+      "id": "B7",
+      "verdict": "low",
+      "route": "reject",
+      "evidence": "默认/仅日期查询需要扫描排序属实，但当前合同明确全量列表，NFR性能指标针对可用性。没有观测到此负载的失败；新增索引及schema更新是性能扩展而非直接校正，保留现有按类型日期索引和已披露无分页边界。"
+    },
+    {
+      "id": "B8",
+      "verdict": "medium",
+      "route": "patch",
+      "evidence": "正常查询后修改筛选时旧结果仍留在新条件下，无当前查询条件说明。按既有管理列表惯例在输入/change时使旧结果失效，提示重新查询；补真实处理器和浏览器断言。"
+    },
+    {
+      "id": "B9",
+      "verdict": "low",
+      "route": "patch",
+      "evidence": "新runner硬编码macOS Chrome，README又声称沿用已有runner安装方式。复用既有的显式路径优先、否则解析Playwright chromium.executablePath方式，不更改CLI公开参数；补无显式路径的解析回归。"
+    },
+    {
+      "id": "B10",
+      "verdict": "medium",
+      "route": "patch",
+      "evidence": "真实浏览器只核键/行数/展开文字，没有独立核实际actor/action/target/time/reason和before/after显示绑定。按API响应逐行逐单元格比较完整内容，并包含取消、撤销和更新记录。"
+    },
+    {
+      "id": "E1",
+      "verdict": "high",
+      "route": "patch",
+      "evidence": "与B1同根；已核源库可以恰占目标sidecar路径，因此清理有删除源库风险。保留独立发现，合并最小命名空间拒绝和不改已有文件测试。"
+    },
+    {
+      "id": "E2",
+      "verdict": "medium",
+      "route": "patch",
+      "evidence": "与B5中before缺失同根；当前dto允许任意action前值null，UI显示创建前。增加creation与before是否null的一致性断言。"
+    },
+    {
+      "id": "V1",
+      "verdict": "medium",
+      "route": "patch",
+      "evidence": "已预验证：将返回reason强制None，5项audit Python仍通过。补各实际动作原因与独立预期/存储事件一致及非null原因DOM断言；保留该mutation应被拒的证据。"
+    },
+    {
+      "id": "V2",
+      "verdict": "medium",
+      "route": "patch",
+      "evidence": "已预验证：before单元格改读after，14项JS仍通过。用值不同的更新/取消事件断言前后列完整值，并在真浏览器展开比较；保留mutation失败证据。"
+    }
+  ],
+  "execution_note": "两个评审先启动；历史pending_init占用一个并发槽，第三层两次派发未启动，在首层完成释放容量后成功新建。三层全部返回后才逐项裁决。未启动尝试不计为评审回合或传输失败。"
+}
