@@ -1,6 +1,6 @@
-# PRD 阶段输入
+# PRD 阶段历史交接输入
 
-这是下一次独立工作流会话的交接说明，不代表 PRD 已经生成或需求评审已经通过。
+这是最初仅完成产品简述时保存的历史交接说明。该阶段后来已实际执行，当前权威需求为[PRD](../_bmad-output/planning-artifacts/PRD.md)；不要把下列历史请求当作仍未执行的任务。PRD的AI技术评审也不代表教师门禁通过。
 
 项目目录：`/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking`。
 

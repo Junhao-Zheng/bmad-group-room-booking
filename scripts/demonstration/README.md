@@ -11,3 +11,5 @@
 正式录制可传`--ffmpeg-executable /实际/ffmpeg路径`。脚本只在独立临时缓存中提供指定编码器，保存其版本/SHA；不修改全局浏览器安装或系统安全设置。本次Playwright下载的FFmpeg未能成功启动（退出137），采用已实际运行通过的imageio-ffmpeg 0.8.1自带FFmpeg 9.0。实际录制与最终解码还须独立通过，预检不证明录像编码器工作。
 
 当前Chrome 157的原生录像与模拟viewport曾出现底部裁切；录制脚本使用原生内容区域，按实测窗口边框尺寸调整至1280×800，再断言页面实际innerWidth/innerHeight并保存几何信息。编码器预检的实际解码帧已确认底部完整，最终视频仍逐章抽帧检查。
+
+`finalize.py --recording 正式录制目录 --narration 旁白.wav --subtitles 字幕.srt --output 新视频.mp4 --evidence 新验证目录`只接受至少600秒的正式录屏PASS记录，输出600秒H.264/AAC字幕视频，做完整解码并抽取12帧。运行它需要imageio-ffmpeg 0.8.1；抽帧之后仍须逐帧人工视觉检查并更新验证记录，不能把脚本PASS当作已经完成视觉检查。
