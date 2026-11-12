@@ -75,3 +75,8 @@ select[aria-invalid="true"]{border:2px solid #a52b37}
 textarea{font:inherit;width:100%;max-width:100%;min-width:0;resize:vertical;padding:12px;border:1px solid #91a5ae;border-radius:8px;color:#183343;background:white}
 textarea[aria-invalid="true"]{border:2px solid #a52b37}
 #booking-new{margin-top:12px}
+.primary-nav{display:flex;gap:20px;flex-wrap:wrap;flex-shrink:0}.primary-nav a{padding:8px 0}.primary-nav a[aria-current="page"]{font-weight:750;text-decoration-thickness:3px}
+.history-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}.history-panel{overflow-wrap:anywhere}
+.history-items{list-style:none;padding:0;margin:24px 0 0}.history-items li{border-top:1px solid #dde6e8;padding:24px 0}.history-items h3{margin:0 0 10px;font-size:19px}.history-items p{margin:8px 0}.history-items button{margin-top:8px;max-width:100%;overflow-wrap:anywhere}
+.booking-fields{margin:24px 0 0}.booking-fields dt{font-size:14px;color:#54707a;margin-top:18px}.booking-fields dd{margin:4px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
+@media(max-width:800px){.header-content{flex-wrap:wrap}.history-layout{grid-template-columns:1fr}.primary-nav{gap:16px}.history-items li:last-child{padding-bottom:0}}

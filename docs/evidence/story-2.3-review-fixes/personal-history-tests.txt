@@ -1,0 +1,15 @@
+test_authentication_precedes_bad_parameters_and_rechecks_session (tests.test_personal_history.PersonalHistoryTests.test_authentication_precedes_bad_parameters_and_rechecks_session) ... ok
+test_exact_start_end_boundaries_in_list_and_detail (tests.test_personal_history.PersonalHistoryTests.test_exact_start_end_boundaries_in_list_and_detail) ... ok
+test_four_filters_exact_contract_descending_ties_and_cancel_priority (tests.test_personal_history.PersonalHistoryTests.test_four_filters_exact_contract_descending_ties_and_cancel_priority) ... ok
+test_html_navigation_logout_fields_and_no_placeholder_mutation (tests.test_personal_history.PersonalHistoryTests.test_html_navigation_logout_fields_and_no_placeholder_mutation) ... ok
+test_latest_database_role_and_names_not_cached_actor_claims (tests.test_personal_history.PersonalHistoryTests.test_latest_database_role_and_names_not_cached_actor_claims) ... ok
+test_query_identity_ignored_and_member_privacy_admin_list_stays_personal (tests.test_personal_history.PersonalHistoryTests.test_query_identity_ignored_and_member_privacy_admin_list_stays_personal) ... ok
+test_read_transaction_one_clock_snapshot_no_writes_and_reopen (tests.test_personal_history.PersonalHistoryTests.test_read_transaction_one_clock_snapshot_no_writes_and_reopen) ... ok
+test_representative_full_dto_values_against_independent_fixed_expectations (tests.test_personal_history.PersonalHistoryTests.test_representative_full_dto_values_against_independent_fixed_expectations) ... ok
+test_session_expiry_between_route_and_service_at_equal_boundary (tests.test_personal_history.PersonalHistoryTests.test_session_expiry_between_route_and_service_at_equal_boundary) ... ok
+test_strict_status_ids_static_mine_route_and_empty_success (tests.test_personal_history.PersonalHistoryTests.test_strict_status_ids_static_mine_route_and_empty_success) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 2.309s
+
+OK

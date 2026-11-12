@@ -1,0 +1,107 @@
+{
+  "result": "PASS",
+  "browser": "157.0.8103.51",
+  "runner": "Playwright 1.58.2",
+  "results": [
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "listWidth": {
+        "document": 1280,
+        "viewport": 1280
+      },
+      "detailWidth": {
+        "document": 1280,
+        "viewport": 1280
+      },
+      "filters": {
+        "pending": [
+          104,
+          103
+        ],
+        "in_progress": [
+          102
+        ],
+        "ended": [
+          101
+        ],
+        "cancelled": [
+          106,
+          105
+        ]
+      },
+      "exact_dto": "PASS",
+      "literal_long_text": "PASS",
+      "keyboard_navigation_detail_logout": "PASS",
+      "list_detail_error_recovery": "PASS",
+      "empty": "PASS",
+      "member_privacy_admin_read": "PASS",
+      "session_expiry": "PASS",
+      "page_errors": []
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "listWidth": {
+        "document": 390,
+        "viewport": 390
+      },
+      "detailWidth": {
+        "document": 390,
+        "viewport": 390
+      },
+      "filters": {
+        "pending": [
+          104,
+          103
+        ],
+        "in_progress": [
+          102
+        ],
+        "ended": [
+          101
+        ],
+        "cancelled": [
+          106,
+          105
+        ]
+      },
+      "exact_dto": "PASS",
+      "literal_long_text": "PASS",
+      "keyboard_navigation_detail_logout": "PASS",
+      "list_detail_error_recovery": "PASS",
+      "empty": "PASS",
+      "member_privacy_admin_read": "PASS",
+      "session_expiry": "PASS",
+      "page_errors": []
+    }
+  ],
+  "storage": {
+    "unchanged": true,
+    "reservations": 9,
+    "slots": 13,
+    "audits": 0
+  },
+  "server": {
+    "command": [
+      "/Users/mima0000/Documents/Codex/2026-11-12/bmad-b/outputs/group-room-booking/.venv/bin/python",
+      "-m",
+      "waitress",
+      "--listen=127.0.0.1:8004",
+      "--threads=8",
+      "--call",
+      "scripts.verify_auth_browser:create_schedule_verification_app"
+    ],
+    "threads": 8,
+    "processes": 1
+  },
+  "run_id": "5113522db86f6440270b590115bfbe1b",
+  "started_at_utc": "2026-11-12T10:09:51.065465+00:00",
+  "artifact_directory": "runs/5113522db86f6440270b590115bfbe1b",
+  "completed": true,
+  "finished_at_utc": "2026-11-12T10:09:57.219745+00:00"
+}

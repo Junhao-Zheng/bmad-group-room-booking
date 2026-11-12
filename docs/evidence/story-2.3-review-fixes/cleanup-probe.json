@@ -1,0 +1,50 @@
+{
+  "result": "PASS",
+  "supported_environment": "macOS/Linux POSIX; actual macOS Chrome exercised",
+  "scenarios": [
+    {
+      "mode": "node_killed",
+      "node_pid": 49597,
+      "groups": [
+        49600
+      ],
+      "observed_pids": [
+        49597,
+        49600,
+        49607,
+        49608,
+        49610,
+        49613,
+        49614,
+        49615,
+        49621
+      ],
+      "browser_version": "157.0.8103.51",
+      "remaining_live_pids": [],
+      "unrelated_process_survived": true,
+      "result": "PASS"
+    },
+    {
+      "mode": "node_timeout",
+      "node_pid": 49623,
+      "groups": [
+        49627
+      ],
+      "observed_pids": [
+        49623,
+        49627,
+        49631,
+        49632,
+        49633,
+        49635,
+        49636,
+        49637,
+        49643
+      ],
+      "browser_version": "157.0.8103.51",
+      "remaining_live_pids": [],
+      "unrelated_process_survived": true,
+      "result": "PASS"
+    }
+  ]
+}

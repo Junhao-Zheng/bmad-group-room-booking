@@ -63,6 +63,22 @@ def home():
     return render_template("home.html", user=auth.current_user(session), rooms=services.list_rooms(actor))
 
 
+@bp.get("/my")
+def my_page():
+    return render_template("my.html", user=auth.current_user(auth.require_session(token())))
+
+
+@bp.get("/api/bookings/mine")
+def my_bookings_api():
+    actor = auth.actor_for_token(token())
+    return jsonify(ok=True, data=services.my_bookings(actor, request.args.get("status")))
+
+
+@bp.get("/api/bookings/<booking_id>")
+def booking_detail_api(booking_id):
+    return jsonify(ok=True, data=services.booking_detail(auth.actor_for_token(token()), booking_id))
+
+
 @bp.get("/api/rooms")
 def rooms_api():
     return jsonify(ok=True, data=services.list_rooms(auth.actor_for_token(token())))

@@ -1,6 +1,6 @@
 # 课题组活动与会议室预约
 
-软件工程管理课程项目。选题及使用对象已由用户确认。Story 1.1—1.3 与 2.1—2.2 已实现预置账号登录、身份显示、退出、会议室目录、共享日程、可用会议室查询、创建预约及原提交意图可靠确认；个人预约管理及管理员能力待后续故事交付。
+软件工程管理课程项目。选题及使用对象已由用户确认。Story 1.1—1.3 与 2.1—2.3 已实现预置账号登录、身份显示、退出、会议室目录、共享日程、可用会议室查询、创建预约、原提交意图可靠确认及个人预约四态查询/完整详情；取消与管理员管理能力待后续故事交付。
 
 本仓库按实际发生的工作保存 BMAD 产物和过程证据。实验 B 按用户转述的教师要求免做，实验 A 保留。人数和截止日期不作为当前阶段的阻塞条件。
 
@@ -150,6 +150,27 @@ node --test tests/test_*js.cjs
 浏览器验证沿用上述 Playwright 1.58.2 安装；未下载匹配 Chromium 时可通过 `--browser-executable /absolute/path/to/chrome` 指定已有浏览器。`--booking` 同时验证登录退出、日程与可用性回归，使用 1280×800 和 390×844 视口。HTTP 验证器使用 20 个不同成员、独立 cookie 会话及不同 key，经 8 线程 Waitress 同时争用同室同槽，保存全部响应、最终预约/槽/审计及审计故障回滚证据；不把锁超时视为占用冲突。完整结果见 [Story 2.1 验证记录](docs/evidence/story-2.1-verification.md)。
 
 Story 2.2 的 HTTP 验证器让 20 个独立客户端复制同一登录凭证，但各自拥有 CookieJar，通过屏障同时提交同一意图，断言 1×201 + 19×200、原 ID 一致及数据库一条预约/一次创建审计。随后实际停止并重启 Waitress，以故障 writer 证实重放不调用审计、失败整体回滚且原失败 key 可重用。`--replay` 浏览器验证涵盖原有登录退出、查询与创建回归，并截断已成功提交的首个响应，保存原键重试与实质编辑新意图的原始网络证据和 key SHA-256，不保存会话凭证。当前 `--booking` 同样验证最新创建/确认行为。原始结果与验收映射见 [Story 2.2 验证记录](docs/evidence/story-2.2-verification.md)。
+
+## 我的预约与完整详情（Story 2.3）
+
+登录后通过顶栏「我的预约」进入 `/my`。页面自动读取本人的记录，可选择全部、待开始、进行中、已结束、已取消并点击「查看预约」。列表按开始时间、编号均倒序；点击「查看详情」读取最新完整业务信息、房间、北京时间和取消事实。未取消、未填写取消原因均有明确含义；姓名、活动名称、用途和原因按纯文本显示。页面提供加载、空记录、错误及重新登录反馈，20 秒请求超时后恢复控件，只在用户主动操作时重试。键盘可依次访问顶栏预约、我的预约、退出；打开详情后焦点移至详情标题。取消操作由后续故事交付。
+
+`GET /api/bookings/mine` 接受可选 `status=pending|in_progress|ended|cancelled`，返回精确 `ListResult<BookingFull>`。缺省为全部；空字符串和其他非法状态返回 400，合法空结果返回 200。个人列表始终限定当前会话用户，忽略客户端的 `user_id`、`owner_id` 等身份选择；管理员的个人列表也只返回本人。`GET /api/bookings/ID` 返回本人或当前数据库角色为管理员可读的 `BookingFull`，他人及合法不存在记录统一 404。路径 ID 按严格正 64 位十进制文本验证，超长数字返回 400。未认证 API 返回 401 JSON，`/my` 跳转登录页；读取服务在短事务内重新核验真实会话，以同一次 Clock 取时确定状态，不写业务/槽/审计。
+
+复跑命令（浏览器安装方法与上文相同）：
+
+```bash
+.venv/bin/python -m unittest discover -s tests -v
+node --test tests/test_*js.cjs
+.venv/bin/python -m scripts.verify_history_browser --output-dir work/history-browser
+.venv/bin/python -m scripts.verify_auth_browser --replay --port 8005 --output-dir work/history-regression-browser
+.venv/bin/python -m scripts.verify_create_booking_http --output-dir work/history-create-regression
+.venv/bin/python -m scripts.verify_replay_intent_http --output-dir work/history-replay-regression
+```
+
+历史浏览器验证使用独立临时文件库、固定测试 Clock、四个随机密码合成账号和只用于测试的历史夹具，默认端口 8004；没有 HTTP 造数或改时钟入口。覆盖 1280×800 和 390×844 的四态筛选、空列表、80/500 字符纯文本、完整详情、拒绝与失效、错误恢复及键盘登录退出。它将每次运行保存在独立 `runs/<run_id>`，总结果中的 `artifact_directory` 指向该次截图、原始 JSON 响应和读取前后数据库快照；只在校验、停服及临时文件清理完成后写 PASS。可加 `--browser-executable /absolute/path/to/chrome` 使用已安装浏览器。测试凭证只存临时目录，不进入仓库。
+
+原始结果及逐项验收映射见 [Story 2.3 验证记录](docs/evidence/story-2.3-verification.md)。本次全量 100 项 Python、44 项 JavaScript 测试，以及历史页面/既有创建重试真实浏览器、20 客户端创建与重放、审计故障和重启回归均通过。
 
 ## AI 使用声明
 

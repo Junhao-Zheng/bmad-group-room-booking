@@ -96,6 +96,55 @@ def list_rooms(actor: auth.Actor) -> dict:
         return dto.list_result([dto.room(row) for row in rows])
 
 
+_BOOKING_DETAIL_SELECT = (
+    "SELECT r.*,u.display_name AS owner_display_name,c.display_name AS cancelled_by_display_name,"
+    "room.name AS room_name,room.location AS room_location,room.capacity AS room_capacity "
+    "FROM reservations r JOIN users u ON u.id=r.user_id "
+    "LEFT JOIN users c ON c.id=r.cancelled_by JOIN rooms room ON room.id=r.room_id "
+)
+
+
+def _full_booking(row, now: int) -> dict:
+    return dto.booking_full(row, {"id": row["room_id"], "name": row["room_name"],
+                                 "location": row["room_location"], "capacity": row["room_capacity"]}, now)
+
+
+def my_bookings(actor: auth.Actor, status=None) -> dict:
+    with db.read_transaction() as conn:
+        now = current_app.config["CLOCK"].now_epoch()
+        actor = _require_actor(conn, actor, now)
+        conditions = {
+            "pending": ("r.cancelled_at IS NULL AND r.start_at>?", (now,)),
+            "in_progress": ("r.cancelled_at IS NULL AND r.start_at<=? AND r.end_at>?", (now, now)),
+            "ended": ("r.cancelled_at IS NULL AND r.end_at<=?", (now,)),
+            "cancelled": ("r.cancelled_at IS NOT NULL", ()),
+        }
+        if status is not None and (not isinstance(status, str) or status not in conditions):
+            raise DomainError("INVALID_INPUT", "请检查预约状态。", {"status": "请选择待开始、进行中、已结束或已取消。"})
+        query = _BOOKING_DETAIL_SELECT + "WHERE r.kind='booking' AND r.user_id=?"
+        parameters = (actor.id,)
+        if status is not None:
+            clause, values = conditions[status]
+            query += " AND " + clause
+            parameters += values
+        rows = conn.execute(query + " ORDER BY r.start_at DESC,r.id DESC", parameters).fetchall()
+        return dto.list_result([_full_booking(row, now) for row in rows])
+
+
+def booking_detail(actor: auth.Actor, booking_id) -> dict:
+    with db.read_transaction() as conn:
+        now = current_app.config["CLOCK"].now_epoch()
+        actor = _require_actor(conn, actor, now)
+        normalized_id = resource_id(booking_id, "booking_id")
+        row = conn.execute(
+            _BOOKING_DETAIL_SELECT + "WHERE r.kind='booking' AND r.id=? AND (r.user_id=? OR ?)",
+            (normalized_id, actor.id, actor.role == "admin"),
+        ).fetchone()
+        if row is None:
+            raise DomainError("NOT_FOUND", "预约不存在或无权查看。")
+        return _full_booking(row, now)
+
+
 def availability(actor: auth.Actor, start, end, attendees) -> dict:
     with db.read_transaction() as conn:
         now = current_app.config["CLOCK"].now_epoch()

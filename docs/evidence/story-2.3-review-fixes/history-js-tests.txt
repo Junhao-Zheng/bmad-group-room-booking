@@ -1,0 +1,25 @@
+✔ history list timeout in headers restores controls and permits explicit retry (4.171125ms)
+✔ history list timeout in body restores controls and permits explicit retry (0.815792ms)
+✔ history network clears results and allows manual recovery (0.790166ms)
+✔ history bad-json clears results and allows manual recovery (0.587791ms)
+✔ status field error focuses enabled select; successful empty filter clears error (0.620959ms)
+✔ detail is plain text, focus moves to heading, and all uncancelled nulls have meaning (1.190083ms)
+✔ detail network restores filters and offers only an explicit read retry (0.859083ms)
+✔ detail bad-json restores filters and offers only an explicit read retry (1.033875ms)
+✔ detail not-found restores filters and offers only an explicit read retry (0.708ms)
+✔ detail timeout restores filters and offers only an explicit read retry (0.933667ms)
+✔ list session loss clears personal data and does not retry automatically (1.269916ms)
+✔ detail session loss clears personal data and does not retry automatically (0.717166ms)
+✔ successful populated keyboard filter restores submit focus after unlocking (0.623917ms)
+✔ successful empty keyboard filter restores submit focus after unlocking (0.481ms)
+✔ complete admin cancellation detail uses each independent label/value (0.614708ms)
+✔ complete member cancellation detail uses each independent label/value (0.524625ms)
+✔ detail can cross a boundary while list retains its stated snapshot until explicit refresh (0.835958ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 67.175416

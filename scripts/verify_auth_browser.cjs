@@ -443,8 +443,12 @@ async function submitAvailability(page) {
         assert.equal(await page.evaluate(() => window.bookingXss), undefined);
         bookingChecks = {width,query_first_blocks_creation:'PASS',creation_first_blocks_query:'PASS',neutral_room_selection_feedback:'PASS',room_selection_accessible_names:'PASS',committed_response_lost:lostResponse,explicit_new_booking:'PASS',created:'PASS',conflict_retains_inputs:'PASS',loading_disables_controls:'PASS',literal_unicode_xss:'PASS',explicit_retry_same_intent:replayEvidence,not_delivered_retry:notDeliveredEvidence,schedule_updated:'PASS'};
       }
-      // Start from the stable header link, then traverse to logout by keyboard.
+      // Start from the brand, traverse both navigation links, then logout by keyboard.
       await page.locator('.brand').focus();
+      await page.keyboard.press('Tab');
+      assert.equal(await page.evaluate(() => document.activeElement.textContent), '预约');
+      await page.keyboard.press('Tab');
+      assert.equal(await page.evaluate(() => document.activeElement.textContent), '我的预约');
       await page.keyboard.press('Tab');
       assert.equal(await page.evaluate(() => document.activeElement.textContent), '退出登录');
       await page.keyboard.press('Enter');

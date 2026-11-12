@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}我的预约 · 课题组活动与会议室预约{% endblock %}
+{% block content %}
+<script src="{{ url_for('static', filename='history.js') }}" defer></script>
+<section class="page-intro">
+  <p class="eyebrow">个人安排</p>
+  <h1>我的预约</h1>
+  <p class="muted">查看自己的活动与完整详情。按开始时间倒序排列，时间均为北京时间。</p>
+  <p id="auth-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>
+  <a id="relogin-link" class="relogin-link" href="{{ url_for('web.login_page') }}" hidden>重新登录</a>
+</section>
+<div class="history-layout">
+  <section class="card history-panel" aria-labelledby="history-title">
+    <h2 id="history-title">预约记录</h2>
+    <form id="history-form">
+      <label for="history-status">预约状态</label>
+      <select id="history-status" name="status" aria-describedby="history-status-error">
+        <option value="">全部状态</option>
+        <option value="pending">待开始</option>
+        <option value="in_progress">进行中</option>
+        <option value="ended">已结束</option>
+        <option value="cancelled">已取消</option>
+      </select>
+      <p id="history-status-error" class="field-error"></p>
+      <button class="button-primary" type="submit">查看预约</button>
+    </form>
+    <p id="history-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>
+    <a id="history-relogin" class="relogin-link" href="{{ url_for('web.login_page') }}" hidden>重新登录后查看</a>
+    <ul id="history-items" class="history-items" aria-label="我的预约记录"></ul>
+    <noscript><p>请启用 JavaScript 以查询预约记录。</p></noscript>
+  </section>
+  <section id="history-detail" class="card history-panel" aria-labelledby="detail-title">
+    <h2 id="detail-title" tabindex="-1">预约详情</h2>
+    <p id="detail-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1">选择一条预约查看完整信息。</p>
+    <a id="detail-relogin" class="relogin-link" href="{{ url_for('web.login_page') }}" hidden>重新登录后查看</a>
+    <dl id="detail-fields" class="booking-fields" hidden></dl>
+    <button id="detail-retry" class="button-secondary" type="button" hidden>重试查看详情</button>
+  </section>
+</div>
+{% endblock %}

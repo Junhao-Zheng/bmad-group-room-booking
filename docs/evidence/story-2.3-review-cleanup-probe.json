@@ -1,0 +1,21 @@
+{
+  "probe": "Playwright real Chrome: kill only Node as subprocess.run timeout would",
+  "node_pid": 47414,
+  "observed_descendant_pids": [
+    47417,
+    47423,
+    47424,
+    47426,
+    47429,
+    47430,
+    47431
+  ],
+  "descendants_present_one_second_after_node_kill": [
+    47417,
+    47423,
+    47424,
+    47426
+  ],
+  "cleanup": "SIGTERM to observed descendants, SIGKILL fallback only same observed Chrome PIDs",
+  "fallback_killed_pids": []
+}

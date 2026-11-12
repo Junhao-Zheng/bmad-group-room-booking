@@ -13,6 +13,10 @@
     <div class="header-content">
       <a class="brand" href="{{ url_for('web.home') }}"><span class="brand-mark" aria-hidden="true">组</span><span>课题组活动<br><small>会议室预约</small></span></a>
       {% if user %}
+      <nav class="primary-nav" aria-label="主要导航">
+        <a href="{{ url_for('web.home') }}"{% if request.endpoint == 'web.home' %} aria-current="page"{% endif %}>预约</a>
+        <a href="{{ url_for('web.my_page') }}"{% if request.endpoint == 'web.my_page' %} aria-current="page"{% endif %}>我的预约</a>
+      </nav>
       <div class="account">
         <span class="account-name">{{ user.display_name }}</span>
         <span class="role">{{ '管理员' if user.role == 'admin' else '成员' }}</span>

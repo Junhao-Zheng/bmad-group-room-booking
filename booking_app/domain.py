@@ -68,8 +68,9 @@ def resource_id(value, field_name: str = "room_id") -> int:
     else:
         valid = False
     if not valid:
-        raise DomainError("INVALID_INPUT", "请检查会议室编号。",
-                          {field_name: "请选择有效的会议室。"})
+        label = "预约" if field_name == "booking_id" else "会议室"
+        raise DomainError("INVALID_INPUT", f"请检查{label}编号。",
+                          {field_name: f"请选择有效的{label}。"})
     return int(value)
 
 
