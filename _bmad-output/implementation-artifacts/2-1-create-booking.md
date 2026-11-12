@@ -2,8 +2,9 @@
 title: '提交有效且不冲突的活动预约'
 type: feature
 created: '2026-11-12'
-status: ready-for-dev
+status: in-progress
 route: dispatch
+baseline_commit: 85263cf6526ea9dab8c359aa59ae04cccc060a9e
 story_key: 2-1-create-booking
 review_loop_iteration: 0
 context:

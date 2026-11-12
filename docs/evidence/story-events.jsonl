@@ -12,3 +12,4 @@
 {"timestamp": "2026-11-12T06:04:22.149875+00:00", "story": "1-3-availability", "from": "review", "to": "done", "actor": "AI root", "head": "5b059c577d95aad51ae2f108decbf2173c640fa7", "post_done_rework": false}
 {"timestamp": "2026-11-12T06:04:22.181132+00:00", "epic": "epic-1", "from_status": "in-progress", "to": "done", "actor": "AI root", "basis": "all three story acceptance/reviews complete", "head": "5b059c577d95aad51ae2f108decbf2173c640fa7"}
 {"timestamp": "2026-11-12T06:14:53.033480+00:00", "story": "2-1-create-booking", "from": "backlog", "to": "ready-for-dev", "actor": "AI root", "head": "911e8c50a3346e853a4e177a80485b2bfb88e127", "post_done_rework": false}
+{"timestamp": "2026-11-12T06:14:53.105085+00:00", "story": "2-1-create-booking", "from": "ready-for-dev", "to": "in-progress", "actor": "AI root", "head": "85263cf6526ea9dab8c359aa59ae04cccc060a9e", "post_done_rework": false}
