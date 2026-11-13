@@ -35,3 +35,7 @@
 12个故事技术验收已完成。最后一批修补的三镜头独立复核和修补后收口已完成，最终史诗技术裁决为accepted，对应行动项已关闭；[证据](evidence/epic-3-followup/review-fixes/verification.md)。原429失败保持历史。视频和演示按用户最新要求暂缓，未制作正式视频；[全新副本安装与完整检查](evidence/delivery/README.md)已通过。已上传私有仓库 [Junhao-Zheng/bmad-group-room-booking](https://github.com/Junhao-Zheng/bmad-group-room-booking)，最新修补main与原sprint-1/sprint-2标签已通过[远端核对](evidence/reviews/final-followup/github-upload.json)。真实人工/课堂要求仍未满足，不宣称全部课程要求已通过。
 
 用户最新范围调整：先不录制视频和演示。这是执行顺序调整，不声称教师免除10分钟录屏要求；录制脚本和历史预检保留，不能充当正式录屏。
+
+## 2026-11-13本人复核新增待办
+
+U-11请求学生提交申请、老师批准后才占用房间。该审批功能超出原直接预约基线，当前尚未实现；审批人范围和用户理由仍在澄清。上文12故事技术完成及208/399测试仅指此前基线，不代表新请求完成。此次为用户真实复核引发的需求变更，不冒充老师实验B临时变更。
