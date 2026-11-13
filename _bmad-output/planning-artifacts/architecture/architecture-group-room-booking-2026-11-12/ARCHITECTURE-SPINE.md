@@ -4,7 +4,7 @@ type: architecture-spine
 purpose: build-substrate
 altitude: feature
 paradigm: layered modular monolith
-scope: 单课题组预约工具全部功能及本地运行边界
+scope: 同一大组共享房间预约工具全部功能及本地运行边界（D-005范围复核）
 status: final
 created: 2026-11-12
 updated: 2026-11-12

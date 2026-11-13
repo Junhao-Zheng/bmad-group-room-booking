@@ -1,0 +1,8 @@
+{
+  "result": "PASS",
+  "scope": "synthetic different representative accounts, same room, Flask test client; no real users or rollout",
+  "first_booking_status": 201,
+  "other_account_overlap_status": 409,
+  "rejection_preserves_database": true,
+  "adjacent_booking_status": 201
+}

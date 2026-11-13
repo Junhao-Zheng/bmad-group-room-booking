@@ -2,7 +2,7 @@
 title: 课题组活动与会议室预约系统架构
 status: final
 created: 2026-11-12
-updated: 2026-11-12
+updated: 2026-11-13
 workflow: bmad-architecture
 mode: create-headless
 evidence_level: verified_technology_and_ai_design_decisions
@@ -16,7 +16,9 @@ evidence_level: verified_technology_and_ai_design_decisions
 
 用户授权 AI 拟定其余规则，所以本文技术选择记为 **AI 设计决策 A-ARCH-01**，不是访谈事实、人类否决 AI 的记录或教师 M2 批准。本阶段保留真实版本核验与评审证据；PRD已结束工作流；三项独立AI架构评审已完成，发现按[修复记录](architecture/architecture-group-room-booking-2026-11-12/review-resolution.md)处理。本文final仅表示架构工作流完成，不表示应用已通过验收或教师M2批准。实验 A 保留，B 免做。
 
-本地原型边界：单课题组、预置账号、单服务进程、单文件数据库、浏览器页面；不提供公网托管、外部通知、账号管理网页、原子改期或硬删除历史。
+本地原型边界：同一大组内共享房间、预置账号、单服务进程、单文件数据库、浏览器页面；不提供公网托管、外部通知、账号管理网页、原子改期或硬删除历史。
+
+2026-11-13范围复核D-005：各导师或负责人以独立账号共用同一目录和占用记录；现有member/admin角色和按房间时段唯一约束支持该范围，无需新增租户/导师组字段或改写ADR。普通学生权限及管理员人选待后续确认；本次不改变本地部署边界，也不代表真实推广完成。
 
 ## 2. 技术基线与官方核验
 
