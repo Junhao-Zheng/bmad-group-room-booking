@@ -6,15 +6,17 @@ from .domain import active_status, local_time
 
 
 _SNAPSHOT_KEYS = {
+    "cancellation_request": {"id", "booking_id", "requester_id", "supervisor_id", "created_at", "status", "decided_at", "decided_by", "reason"},
     "application": {"id", "owner_id", "owner_display_name", "supervisor_id", "supervisor_display_name", "room_id", "title", "purpose", "attendees", "start_at", "end_at", "weeks", "status", "created_at", "decided_at", "decided_by", "decision_reason"},
     "room": {"id", "name", "location", "capacity"},
     "booking": {"id", "room_id", "owner_id", "title", "purpose", "attendees", "start_at", "end_at", "created_at", "cancelled_at", "cancelled_by_id", "cancel_reason"},
     "block": {"id", "room_id", "creator_id", "reason", "start_at", "end_at", "created_at", "revoked_at", "revoked_by_id", "revoke_reason"},
 }
 _AUDIT_ACTION_TYPES = {
+    **{f"cancellation_request.{action}": "cancellation_request" for action in ("created", "approved", "rejected", "superseded")},
     **{f"application.{action}": "application" for action in ("created", "approved", "rejected", "withdrawn")},
     "room.created": "room", "room.updated": "room", "booking.created": "booking",
-    "booking.cancelled_by_member": "booking", "booking.cancelled_by_admin": "booking",
+    "booking.cancelled_by_member": "booking", "booking.cancelled_by_supervisor": "booking", "booking.cancelled_by_admin": "booking",
     "block.created": "block", "block.revoked": "block",
 }
 
@@ -35,7 +37,7 @@ def audit_event(row) -> dict:
         if snapshot["id"] != row["target_id"]:
             raise ValueError("Inconsistent audit target")
         for key, value in snapshot.items():
-            nullable = key in {"cancelled_at", "cancelled_by_id", "cancel_reason", "revoked_at", "revoked_by_id", "revoke_reason", "decided_at", "decided_by", "decision_reason"}
+            nullable = key in {"cancelled_at", "cancelled_by_id", "cancel_reason", "revoked_at", "revoked_by_id", "revoke_reason", "decided_at", "decided_by", "decision_reason", "reason"} and row["target_type"] == "cancellation_request" or key in {"cancelled_at", "cancelled_by_id", "cancel_reason", "revoked_at", "revoked_by_id", "revoke_reason", "decided_at", "decided_by", "decision_reason"}
             if value is None and nullable:
                 continue
             kind = str if key in {"name", "location", "title", "purpose", "reason", "cancel_reason", "revoke_reason", "owner_display_name", "supervisor_display_name", "status", "decision_reason"} else int
@@ -141,3 +143,15 @@ def application_full(row, now):
                 start_local=local_time(row["start_at"]), end_local=local_time(row["end_at"]),
                 expired=row["status"] == "awaiting_approval" and row["start_at"] <= now,
                 reservation_id=row["reservation_id"])
+
+
+def cancellation_snapshot(row):
+    return {key: row[key] for key in _SNAPSHOT_KEYS["cancellation_request"]}
+
+
+def cancellation_full(row, now):
+    return dict(cancellation_snapshot(row), title=row["title"], owner_display_name=row["owner_display_name"],
+                supervisor_display_name=row["supervisor_display_name"], room_name=row["room_name"],
+                start_at=row["start_at"], start_local=local_time(row["start_at"]),
+                end_at=row["end_at"], end_local=local_time(row["end_at"]),
+                expired=row["status"] == "awaiting_approval" and now >= row["start_at"])

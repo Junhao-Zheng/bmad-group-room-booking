@@ -110,7 +110,7 @@ def audit_events(actor: auth.Actor, target_type=None, date=None) -> dict:
         require_admin(_require_actor(conn, actor, now))
         conditions, params = [], []
         if target_type is not None:
-            if not isinstance(target_type, str) or target_type not in ("room", "booking", "block", "application"):
+            if not isinstance(target_type, str) or target_type not in ("room", "booking", "block", "application", "cancellation_request"):
                 raise DomainError("INVALID_INPUT", "请选择有效的操作对象。", {"target_type": "请选择会议室、预约或停用。"})
             conditions.append("target_type=?")
             params.append(target_type)
@@ -296,18 +296,23 @@ def member_cancel_booking(actor: auth.Actor, booking_id) -> dict:
             raise DomainError("FORBIDDEN", "学生已生效预约不能直接取消；请联系本人导师或管理员。")
         if now >= row["start_at"]:
             raise DomainError("TRANSITION_CLOSED", "预约已开始或结束，不能通过本人取消入口取消。")
-        before = dto.booking_snapshot(row)
-        conn.execute("UPDATE reservations SET cancelled_at=?,cancelled_by=?,cancel_reason=NULL WHERE id=?",
-                     (now, actor.id, normalized_id))
-        conn.execute("DELETE FROM occupancy_slots WHERE reservation_id=?", (normalized_id,))
-        row = conn.execute(_BOOKING_DETAIL_SELECT + "WHERE r.id=?", (normalized_id,)).fetchone()
-        current_app.config["AUDIT_WRITER"](conn, {
-            "actor_id": actor.id, "actor_display_name": actor.display_name,
-            "action": "booking.cancelled_by_member", "target_type": "booking", "target_id": normalized_id,
-            "occurred_at": now, "before": before, "after": dto.booking_snapshot(row), "reason": None,
-        })
+        row = _cancel_booking_in_transaction(conn, actor, row, now, None, "booking.cancelled_by_member")
         result = _full_booking(row, now)
     return result
+
+
+def _cancel_booking_in_transaction(conn, actor, row, now, reason, action):
+    before = dto.booking_snapshot(row)
+    conn.execute("UPDATE reservations SET cancelled_at=?,cancelled_by=?,cancel_reason=? WHERE id=?",
+                 (now,actor.id,reason,row["id"]))
+    conn.execute("DELETE FROM occupancy_slots WHERE reservation_id=?",(row["id"],))
+    updated = conn.execute(_BOOKING_DETAIL_SELECT + "WHERE r.id=?",(row["id"],)).fetchone()
+    current_app.config["AUDIT_WRITER"](conn, {
+        "actor_id": actor.id, "actor_display_name": actor.display_name,
+        "action": action, "target_type": "booking", "target_id": row["id"],
+        "occurred_at": now, "before": before, "after": dto.booking_snapshot(updated), "reason": reason,
+    })
+    return updated
 
 
 def admin_cancel_booking(actor: auth.Actor, booking_id, reason) -> dict:
@@ -327,16 +332,9 @@ def admin_cancel_booking(actor: auth.Actor, booking_id, reason) -> dict:
             return _full_booking(row, now)
         if now >= row["end_at"]:
             raise DomainError("TRANSITION_CLOSED", "预约已结束，不能取消。")
-        before = dto.booking_snapshot(row)
-        conn.execute("UPDATE reservations SET cancelled_at=?,cancelled_by=?,cancel_reason=? WHERE id=?",
-                     (now, actor.id, reason, normalized_id))
-        conn.execute("DELETE FROM occupancy_slots WHERE reservation_id=?", (normalized_id,))
-        row = conn.execute(_BOOKING_DETAIL_SELECT + "WHERE r.id=?", (normalized_id,)).fetchone()
-        current_app.config["AUDIT_WRITER"](conn, {
-            "actor_id": actor.id, "actor_display_name": actor.display_name,
-            "action": "booking.cancelled_by_admin", "target_type": "booking", "target_id": normalized_id,
-            "occurred_at": now, "before": before, "after": dto.booking_snapshot(row), "reason": reason,
-        })
+        row = _cancel_booking_in_transaction(conn, actor, row, now, reason, "booking.cancelled_by_admin")
+        from . import cancellations
+        cancellations.supersede_pending(conn, actor, normalized_id, now)
         result = _full_booking(row, now)
     return result
 

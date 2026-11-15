@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 11-12-2026 12:22
-last_updated: 11-15-2026 22:05
+last_updated: 11-15-2026 22:06
 project: group-room-booking
 project_key: NOKEY
 tracking_system: file-system
@@ -58,7 +58,7 @@ development_status:
   epic-4: in-progress
   4-1-supervisor-identity: done
   4-2-supervised-booking: done
-  4-3-supervised-cancellation: backlog
+  4-3-supervised-cancellation: in-progress
   4-4-weekly-applications: backlog
   4-5-batch-maintenance: backlog
   epic-4-retrospective: optional

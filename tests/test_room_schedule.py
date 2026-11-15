@@ -311,7 +311,7 @@ class RoomScheduleTests(unittest.TestCase):
         with db.read_transaction(self.database) as conn:
             self.assertEqual([tuple(row) for row in conn.execute("SELECT * FROM reservations ORDER BY id")], before)
             self.assertEqual(conn.execute("SELECT capacity FROM rooms WHERE name='合成演示 · 讨论室 A'").fetchone()[0], 99)
-            self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0], 3)
+            self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0], db.SCHEMA_VERSION)
 
     def test_story_1_1_schema_upgrade_preserves_accounts_and_sessions(self):
         with db.write_transaction(self.database) as conn:
@@ -324,7 +324,7 @@ class RoomScheduleTests(unittest.TestCase):
         with db.read_transaction(self.database) as conn:
             self.assertEqual([tuple(row) for row in conn.execute("SELECT * FROM users ORDER BY id")], users)
             self.assertEqual([tuple(row) for row in conn.execute("SELECT * FROM sessions ORDER BY token_hash")], sessions)
-            self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0], 3)
+            self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0], db.SCHEMA_VERSION)
         self.assert_list_envelope(self.get("/api/rooms"))
         self.assertEqual(self.get("/api/rooms").json["data"], {"items": [], "total": 0})
 

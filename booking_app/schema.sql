@@ -99,9 +99,11 @@ CREATE TABLE IF NOT EXISTS audit_events (
     actor_id INTEGER NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
     actor_display_name TEXT NOT NULL CHECK (length(trim(actor_display_name)) > 0),
     action TEXT NOT NULL CHECK (action IN ('room.created','room.updated','booking.created',
-        'booking.cancelled_by_member','booking.cancelled_by_admin','block.created','block.revoked',
-        'application.created','application.approved','application.rejected','application.withdrawn')),
-    target_type TEXT NOT NULL CHECK (target_type IN ('room','booking','block','application')),
+        'booking.cancelled_by_member','booking.cancelled_by_supervisor','booking.cancelled_by_admin','block.created','block.revoked',
+        'application.created','application.approved','application.rejected','application.withdrawn',
+        'cancellation_request.created','cancellation_request.approved',
+        'cancellation_request.rejected','cancellation_request.superseded')),
+    target_type TEXT NOT NULL CHECK (target_type IN ('room','booking','block','application','cancellation_request')),
     target_id INTEGER NOT NULL CHECK (typeof(target_id) = 'integer' AND target_id > 0),
     occurred_at INTEGER NOT NULL CHECK (typeof(occurred_at) = 'integer'),
     before_json TEXT CHECK (before_json IS NULL OR (json_valid(before_json) AND json_type(before_json) = 'object')),
@@ -150,3 +152,20 @@ CREATE TABLE IF NOT EXISTS booking_supervisors (
        OR (source!='admin' AND supervisor_id IS NOT NULL AND supervisor_display_name IS NOT NULL))
 );
 CREATE INDEX IF NOT EXISTS applications_supervisor ON applications(supervisor_id,created_at,id);
+
+CREATE TABLE IF NOT EXISTS cancellation_requests (
+    id INTEGER PRIMARY KEY,
+    booking_id INTEGER NOT NULL REFERENCES reservations(id) ON DELETE RESTRICT,
+    requester_id INTEGER NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+    supervisor_id INTEGER NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+    created_at INTEGER NOT NULL,
+    status TEXT NOT NULL CHECK(status IN ('awaiting_approval','approved','rejected','superseded')),
+    decided_at INTEGER,
+    decided_by INTEGER REFERENCES users(id) ON DELETE RESTRICT,
+    reason TEXT,
+    CHECK((status='awaiting_approval' AND decided_at IS NULL AND decided_by IS NULL AND reason IS NULL)
+       OR (status!='awaiting_approval' AND decided_at IS NOT NULL AND decided_by IS NOT NULL)),
+    CHECK(status!='rejected' OR (reason IS NOT NULL AND length(trim(reason)) BETWEEN 1 AND 500))
+);
+CREATE UNIQUE INDEX IF NOT EXISTS cancellation_requests_pending ON cancellation_requests(booking_id) WHERE status='awaiting_approval';
+CREATE INDEX IF NOT EXISTS cancellation_requests_supervisor ON cancellation_requests(supervisor_id,created_at,id);

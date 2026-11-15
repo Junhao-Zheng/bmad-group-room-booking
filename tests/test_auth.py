@@ -118,7 +118,7 @@ class AuthTests(unittest.TestCase):
         self.assertEqual([tuple(row) for row in conn.execute("SELECT * FROM users ORDER BY id")], before)
         self.assertEqual(conn.execute("SELECT count(*) FROM sessions").fetchone()[0], 1)
         tables = {r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")}
-        self.assertEqual(tables, {"users", "sessions", "rooms", "reservations", "occupancy_slots", "audit_events", "applications", "application_occurrences", "booking_supervisors"})
+        self.assertEqual(tables, {"users", "sessions", "rooms", "reservations", "occupancy_slots", "audit_events", "applications", "application_occurrences", "booking_supervisors", "cancellation_requests"})
         conn.close()
         for row in before:
             self.assertTrue(row[3].startswith("scrypt:32768:8:1$"))

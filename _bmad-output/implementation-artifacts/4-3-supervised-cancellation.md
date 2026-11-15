@@ -2,8 +2,9 @@
 title: 学生取消申请由本人导师确认
 type: feature
 created: 2026-11-15
-status: draft
+status: in-progress
 route: dispatch
+baseline_commit: 34443922ad2dd2df24e2a8f35cb01d8c83a7b59f
 review_loop_iteration: 0
 context: []
 ---

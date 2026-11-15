@@ -6,7 +6,7 @@ import uuid
 from flask import Blueprint, current_app, g, jsonify, make_response, redirect, render_template, request, url_for
 from werkzeug.exceptions import HTTPException
 
-from . import auth, services, applications
+from . import auth, services, applications, cancellations
 from .domain import DomainError
 
 bp = Blueprint("web", __name__)
@@ -159,6 +159,33 @@ def member_cancel_booking_api(booking_id):
     if request.mimetype != "application/json" or payload() != {}:
         raise DomainError("INVALID_INPUT", "取消本人预约须提交空 JSON 对象，不接受原因或身份字段。")
     return jsonify(ok=True, data=services.member_cancel_booking(actor, booking_id))
+
+
+@bp.post("/api/bookings/<booking_id>/cancellation-requests")
+def create_cancellation_request_api(booking_id):
+    if request.mimetype != "application/json" or payload() != {}:
+        raise DomainError("INVALID_INPUT", "取消申请须提交空 JSON 对象。")
+    result = cancellations.create_request(auth.actor_for_token(token()),booking_id)
+    return jsonify(ok=True,data=result), 200 if result["replayed"] else 201
+
+
+@bp.get("/api/cancellation-requests")
+def cancellation_requests_api():
+    return jsonify(ok=True,data=cancellations.list_requests(auth.actor_for_token(token())))
+
+
+@bp.post("/api/cancellation-requests/<request_id>/approve")
+def approve_cancellation_request_api(request_id):
+    if request.mimetype != "application/json":
+        raise DomainError("INVALID_INPUT", "请使用 JSON 格式提交。")
+    return jsonify(ok=True,data=cancellations.decide_request(auth.actor_for_token(token()),request_id,"approve",payload()))
+
+
+@bp.post("/api/cancellation-requests/<request_id>/reject")
+def reject_cancellation_request_api(request_id):
+    if request.mimetype != "application/json":
+        raise DomainError("INVALID_INPUT", "请使用 JSON 格式提交。")
+    return jsonify(ok=True,data=cancellations.decide_request(auth.actor_for_token(token()),request_id,"reject",payload()))
 
 
 @bp.get("/api/schedule")

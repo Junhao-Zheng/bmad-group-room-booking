@@ -7,8 +7,9 @@ import re
 
 from flask import current_app, g
 
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 REQUIRED_COLUMNS = {
+    "cancellation_requests": {"id", "booking_id", "requester_id", "supervisor_id", "created_at", "status", "decided_at", "decided_by", "reason"},
     "applications": {"id", "owner_id", "owner_display_name", "supervisor_id", "supervisor_display_name", "room_id", "title", "purpose", "attendees", "start_at", "end_at", "weeks", "intent_key", "request_payload", "status", "created_at", "decided_at", "decided_by", "decision_reason"},
     "application_occurrences": {"application_id", "occurrence", "reservation_id"},
     "booking_supervisors": {"reservation_id", "supervisor_id", "supervisor_display_name", "source"},
@@ -158,7 +159,7 @@ def check_critical_schema(conn):
     reference = sqlite3.connect(":memory:")
     try:
         reference.executescript(Path(__file__).with_name("schema.sql").read_text(encoding="utf-8"))
-        for name in ("users", "applications", "application_occurrences", "booking_supervisors", "audit_events", "occupancy_slots"):
+        for name in ("users", "applications", "application_occurrences", "booking_supervisors", "cancellation_requests", "audit_events", "occupancy_slots"):
             expected = reference.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name=?", (name,)).fetchone()[0]
             actual = conn.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name=?", (name,)).fetchone()
             if actual is None or schema_sql_tokens(actual[0]) != schema_sql_tokens(expected):
@@ -169,7 +170,7 @@ def check_critical_schema(conn):
                     for row in connection.execute(f"PRAGMA index_list({name})") if row[2])
             if unique_indexes(conn) != unique_indexes(reference):
                 raise RuntimeError("数据库唯一约束不兼容；启动已停止。")
-        for name in ("reservations_user_intent", "applications_supervisor", "audit_events_target_time"):
+        for name in ("reservations_user_intent", "applications_supervisor", "cancellation_requests_pending", "cancellation_requests_supervisor", "audit_events_target_time"):
             expected = reference.execute("SELECT tbl_name,sql FROM sqlite_master WHERE type='index' AND name=?", (name,)).fetchone()
             actual = conn.execute("SELECT tbl_name,sql FROM sqlite_master WHERE type='index' AND name=?", (name,)).fetchone()
             if actual is None or actual[0] != expected[0] or schema_sql_tokens(actual[1]) != schema_sql_tokens(expected[1]):

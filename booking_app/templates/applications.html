@@ -17,5 +17,11 @@
   <ul id="applications-items" class="history-items" aria-label="申请记录"></ul>
   <noscript><p>请启用 JavaScript 查询申请和处理审批。</p></noscript>
 </section>
+<section id="cancellations-panel" class="card">
+  <h2>取消申请</h2>
+  <button id="cancellations-refresh" type="button">刷新取消申请</button>
+  <p id="cancellations-feedback" class="feedback" role="status" aria-live="polite"></p>
+  <ul id="cancellations-items" class="history-items" aria-label="取消申请记录"></ul>
+</section>
 <script src="{{ url_for('static', filename='applications.js') }}" defer></script>
 {% endblock %}

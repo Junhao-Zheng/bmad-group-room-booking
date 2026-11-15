@@ -238,9 +238,9 @@ class SupervisedBookingTests(unittest.TestCase):
             before={table:[tuple(r) for r in conn.execute(f'SELECT * FROM {table} ORDER BY 1')] for table in old_tables}
         migrate_database(path,backup);db.check_database(path)
         with closing(db.connect(path)) as conn:
-            self.assertEqual(conn.execute('PRAGMA user_version').fetchone()[0],3)
+            self.assertEqual(conn.execute('PRAGMA user_version').fetchone()[0],db.SCHEMA_VERSION)
             self.assertEqual([tuple(r) for r in conn.execute('SELECT role,supervisor_id FROM users ORDER BY id')],[('teacher',None),('member',1)])
-            for table in ('applications','application_occurrences','booking_supervisors'):self.assertEqual(conn.execute(f'SELECT count(*) FROM {table}').fetchone()[0],0)
+            for table in ('applications','application_occurrences','booking_supervisors','cancellation_requests'):self.assertEqual(conn.execute(f'SELECT count(*) FROM {table}').fetchone()[0],0)
             self.assertEqual({table:[tuple(r) for r in conn.execute(f'SELECT * FROM {table} ORDER BY 1')] for table in old_tables},before)
             historical=[dto.audit_event(r) for r in conn.execute('SELECT * FROM audit_events ORDER BY id')]
             self.assertEqual([e['action'] for e in historical],['room.created','booking.created'])

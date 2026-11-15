@@ -175,11 +175,11 @@
     detailFields.replaceChildren();
     for (const [label, value] of fields) { text(detailFields, "dt", label); text(detailFields, "dd", value); }
     detailFields.hidden = false;
-    cancelForm.hidden = !["pending", "cancelled"].includes(booking.status) || (student && booking.status !== "cancelled");
+    cancelForm.hidden = !["pending", "cancelled"].includes(booking.status) || (student && booking.status !== "pending");
     confirm.checked = false;
-    cancelSubmit.textContent = booking.status === "cancelled" ? "再次确认取消状态" : "确认取消本预约";
+    cancelSubmit.textContent = student ? "提交取消申请" : booking.status === "cancelled" ? "再次确认取消状态" : "确认取消本预约";
     announce(cancelFeedback, booking.status === "cancelled" ? "此预约已取消，再次确认不会改变原取消信息。" :
-    (student ? "学生已生效预约不能直接取消，请联系本人导师或管理员。" : booking.status === "pending" ? "" : "预约已开始或结束，不能取消。"));
+    (student ? "申请后预约仍占用，须由本人导师在开始前确认；可在申请与审批页查看处理结果。" : booking.status === "pending" ? "" : "预约已开始或结束，不能取消。"));
   }
   async function loadDetail(id) {
     if (busy) return;
@@ -216,6 +216,22 @@
     event.preventDefault();
     if (busy || cancelForm.hidden || selectedId === undefined || !confirm.checked) return;
     const id = selectedId;
+    if (student) {
+      lock(true);
+      announce(cancelFeedback, `正在提交预约 ${id} 的取消申请…`);
+      try {
+        const response = await fetch(`/api/bookings/${id}/cancellation-requests`, {
+          method:"POST", credentials:"same-origin",
+          headers:{"Content-Type":"application/json",Accept:"application/json","X-CSRF-Token":csrf}, body:"{}",
+        });
+        const result = responseData(response,await response.json());
+        if (!result?.cancellation_request || result.cancellation_request.booking_id !== id) throw Error("Unconfirmed request");
+        announce(cancelFeedback, `取消申请 #${result.cancellation_request.id} 待本人导师确认，预约仍占用。请在“申请与审批”查看处理结果。`);
+      } catch(error) {
+        announce(cancelFeedback,error.api?error.message:"无法确认取消申请结果，请重新查看申请记录。",true);
+      } finally {lock(false);}
+      return;
+    }
     let focusTarget = cancelFeedback;
     lock(true);
     cancelForm.setAttribute("aria-busy", "true");

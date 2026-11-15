@@ -5,3 +5,5 @@
 {"recorded_at_utc": "2026-11-15T13:19:33.438102+00:00", "event": "implementation_followup_observed", "story": "4-1-supervisor-identity", "agent": "implement_identity", "purpose": "独立复核后的路径/身份schema保护、迁移验证及文档修补"}
 {"recorded_at_utc": "2026-11-15T13:25:21.704092+00:00", "event": "story_accepted", "story": "4-1-supervisor-identity", "commit": "b6af1a1cc47e890cfdf59c7ad92f378bdd4235f9", "python_tests": 225, "first_review_pass": false}
 {"recorded_at_utc": "2026-11-15T13:25:21.704092+00:00", "event": "implementation_dispatch_observed", "story": "4-2-supervised-booking", "agent": "implement_booking_approval"}
+{"recorded_at_utc": "2026-11-15T14:07:11+00:00", "event": "story_accepted", "story": "4-2-supervised-booking", "commit": "34443922ad2dd2df24e2a8f35cb01d8c83a7b59f", "python_tests": 243, "js_tests": 414, "first_review_pass": false}
+{"recorded_at_utc": "2026-11-15T14:07:11+00:00", "event": "implementation_dispatch_observed", "story": "4-3-supervised-cancellation", "agent": "implement_cancellation", "note": "登记时间，非推定启动时间"}

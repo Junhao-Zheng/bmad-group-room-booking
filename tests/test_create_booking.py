@@ -352,7 +352,7 @@ class CreateBookingTests(unittest.TestCase):
         db.initialize_database(self.database)
         with db.read_transaction(self.database) as conn:
             self.assertEqual(list(conn.iterdump()),before)
-            self.assertEqual(conn.execute('PRAGMA user_version').fetchone()[0],3)
+            self.assertEqual(conn.execute('PRAGMA user_version').fetchone()[0],db.SCHEMA_VERSION)
         with db.write_transaction(self.database) as conn:
             conn.execute('DROP TABLE audit_events')
         with self.assertRaises(RuntimeError): db.check_database(self.database)

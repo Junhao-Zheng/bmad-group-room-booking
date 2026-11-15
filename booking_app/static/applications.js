@@ -94,5 +94,52 @@
   }
   refresh.addEventListener("click",()=>load());
   retry.addEventListener("click",()=>{if(pendingOperation)decide(pendingOperation);});
+  const cancellationItems=find("cancellations-items"), cancellationFeedback=find("cancellations-feedback"),
+    cancellationRefresh=find("cancellations-refresh");
+  if (!cancellationItems || !cancellationFeedback || !cancellationRefresh) {
+    load();
+    return;
+  }
+  const cancellationLabels={awaiting_approval:"待本人导师确认，预约仍占用",approved:"已确认取消，时段已释放",
+    rejected:"导师已拒绝，预约仍占用",superseded:"管理员已直接取消，申请已终结"};
+  async function loadCancellations() {
+    cancellationFeedback.textContent="正在读取取消申请…";
+    try {
+      const data=await request("/api/cancellation-requests");
+      if(!data||!Array.isArray(data.items)||data.total!==data.items.length)throw Error("Invalid list");
+      cancellationItems.replaceChildren();
+      for(const item of data.items) {
+        if(!Object.hasOwn(cancellationLabels,item.status)||!Number.isSafeInteger(item.id)||!Number.isSafeInteger(item.booking_id))throw Error("Invalid request");
+        const row=text(cancellationItems,"li","");
+        text(row,"h3",`取消申请 #${item.id} · 预约 #${item.booking_id} · ${item.title}`);
+        text(row,"p",cancellationLabels[item.status]+(item.expired?" · 已到开始时间，不能再确认":""));
+        text(row,"p",`${item.room_name} · ${local(item.start_local)} — ${local(item.end_local)}`);
+        text(row,"p",`申请人：${item.owner_display_name} · 本人导师：${item.supervisor_display_name}`);
+        if(item.decided_at!==null)text(row,"p",`处理时间：${new Date(item.decided_at*1000).toLocaleString("zh-CN",{timeZone:"Asia/Shanghai"})} · 处理人编号 ${item.decided_by}`);
+        if(item.reason)text(row,"p",`拒绝原因：${item.reason}`);
+        if(role==="teacher"&&item.supervisor_id===userId&&item.status==="awaiting_approval") {
+          if(!item.expired) {
+            const approve=text(row,"button","确认取消");approve.type="button";
+            approve.addEventListener("click",()=>decideCancellation(item,"approve",{}));
+          }
+          const label=text(row,"label","拒绝原因（1—500 字）"),reason=document.createElement("textarea");
+          reason.id=`cancellation-reason-${item.id}`;reason.rows=3;reason.maxLength=500;label.setAttribute("for",reason.id);row.append(reason);
+          const reject=text(row,"button","拒绝取消");reject.type="button";
+          reject.addEventListener("click",()=>{if(!reason.value.trim()){cancellationFeedback.textContent="请填写拒绝原因。";reason.focus();return;}decideCancellation(item,"reject",{reason:reason.value});});
+        }
+      }
+      cancellationFeedback.textContent=`共 ${data.total} 条取消申请。`;
+    } catch(error) {cancellationFeedback.textContent=error.api?error.message:"取消申请读取失败，请刷新重试。";}
+  }
+  async function decideCancellation(item,action,payload) {
+    cancellationFeedback.textContent="正在处理取消申请…";
+    try {
+      const result=await request(`/api/cancellation-requests/${item.id}/${action}`,{payload});
+      if(result.id!==item.id||result.status!==(action==="approve"?"approved":"rejected"))throw Error("Invalid decision");
+      await loadCancellations();
+    } catch(error) {cancellationFeedback.textContent=error.api?error.message:"处理结果未知，请刷新记录核对后重试。";}
+  }
+  cancellationRefresh.addEventListener("click",loadCancellations);
+  loadCancellations();
   load();
 })();

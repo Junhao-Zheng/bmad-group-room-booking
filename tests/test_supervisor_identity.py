@@ -160,7 +160,7 @@ class SupervisorIdentityTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):db.initialize_database(self.database)
         self.assertEqual(self.snapshot(),before)
         result=migrate_db.migrate_database(self.database,self.backup)
-        self.assertEqual(result['schema_version'],3)
+        self.assertEqual(result['schema_version'],db.SCHEMA_VERSION)
         self.assertEqual(stat.S_IMODE(self.backup.stat().st_mode),0o600)
         self.assertEqual(self.snapshot(self.backup),before)
         after=self.snapshot()
@@ -226,7 +226,7 @@ class SupervisorIdentityTests(unittest.TestCase):
         cmd=[sys.executable,'-m','scripts.migrate_db','--source',str(self.database),'--backup',str(self.backup)]
         run=subprocess.run(cmd,capture_output=True,text=True)
         self.assertEqual(run.returncode,0,run.stderr)
-        self.assertIn('"schema_version": 3',run.stdout)
+        self.assertIn(f'"schema_version": {db.SCHEMA_VERSION}',run.stdout)
         run=subprocess.run(cmd,capture_output=True,text=True)
         self.assertEqual(run.returncode,1)
         for secret in ('preserved-hash','Traceback','legacy-csrf'):

@@ -9,12 +9,12 @@
   let busy = false, blocked = false, generation = 0, controller;
   const object = value => value !== null && typeof value === "object" && !Array.isArray(value);
   const keys = (value, names) => object(value) && Object.keys(value).sort().join(",") === names.split(",").sort().join(",");
-  const actions = {"application.created":"提交申请", "application.approved":"批准申请", "application.rejected":"拒绝申请", "application.withdrawn":"撤回申请","room.created":"新增会议室", "room.updated":"修改会议室", "booking.created":"创建预约",
-    "booking.cancelled_by_member":"本人取消预约", "booking.cancelled_by_admin":"管理员取消预约",
+  const actions = {"cancellation_request.created":"申请取消", "cancellation_request.approved":"确认取消", "cancellation_request.rejected":"拒绝取消", "cancellation_request.superseded":"管理员取消后终结申请", "application.created":"提交申请", "application.approved":"批准申请", "application.rejected":"拒绝申请", "application.withdrawn":"撤回申请","room.created":"新增会议室", "room.updated":"修改会议室", "booking.created":"创建预约",
+    "booking.cancelled_by_member":"本人取消预约", "booking.cancelled_by_supervisor":"导师确认取消预约", "booking.cancelled_by_admin":"管理员取消预约",
     "block.created":"创建停用", "block.revoked":"撤销停用"};
-  const snapshots = {application:"id,owner_id,owner_display_name,supervisor_id,supervisor_display_name,room_id,title,purpose,attendees,start_at,end_at,weeks,status,created_at,decided_at,decided_by,decision_reason",room:"id,name,location,capacity", booking:"id,room_id,owner_id,title,purpose,attendees,start_at,end_at,created_at,cancelled_at,cancelled_by_id,cancel_reason",
+  const snapshots = {cancellation_request:"id,booking_id,requester_id,supervisor_id,created_at,status,decided_at,decided_by,reason",application:"id,owner_id,owner_display_name,supervisor_id,supervisor_display_name,room_id,title,purpose,attendees,start_at,end_at,weeks,status,created_at,decided_at,decided_by,decision_reason",room:"id,name,location,capacity", booking:"id,room_id,owner_id,title,purpose,attendees,start_at,end_at,created_at,cancelled_at,cancelled_by_id,cancel_reason",
     block:"id,room_id,creator_id,reason,start_at,end_at,created_at,revoked_at,revoked_by_id,revoke_reason"};
-  const nullableFields = new Set(["decided_at","decided_by","decision_reason","cancelled_at","cancelled_by_id","cancel_reason","revoked_at","revoked_by_id","revoke_reason"]);
+  const nullableFields = new Set(["decided_at","decided_by","decision_reason","cancelled_at","cancelled_by_id","cancel_reason","revoked_at","revoked_by_id","revoke_reason","reason"]);
   const textFields = new Set(["owner_display_name","supervisor_display_name","status","decision_reason","name","location","title","purpose","reason","cancel_reason","revoke_reason"]);
   function snapshotShape(value, type) {
     return keys(value,snapshots[type]) && Object.entries(value).every(([field,item]) =>

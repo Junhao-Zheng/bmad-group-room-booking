@@ -1,4 +1,4 @@
-"""Explicit, backed-up schema 1/2 → 3 migration; run with the application stopped."""
+"""Explicit, backed-up schema 1/2/3 to 4 migration; run with the application stopped."""
 import argparse
 import json
 from pathlib import Path
@@ -40,11 +40,25 @@ def _validate_v1(conn):
 # Frozen schema 1/2 audit definitions; rebuilding any local variation requires a separate migration.
 _LEGACY_AUDIT_SQL = "CREATE TABLE audit_events (\n    id INTEGER PRIMARY KEY,\n    actor_id INTEGER NOT NULL REFERENCES users(id) ON DELETE RESTRICT,\n    actor_display_name TEXT NOT NULL CHECK (length(trim(actor_display_name)) > 0),\n    action TEXT NOT NULL CHECK (action IN ('room.created','room.updated','booking.created',\n        'booking.cancelled_by_member','booking.cancelled_by_admin','block.created','block.revoked')),\n    target_type TEXT NOT NULL CHECK (target_type IN ('room','booking','block')),\n    target_id INTEGER NOT NULL CHECK (typeof(target_id) = 'integer' AND target_id > 0),\n    occurred_at INTEGER NOT NULL CHECK (typeof(occurred_at) = 'integer'),\n    before_json TEXT CHECK (before_json IS NULL OR (json_valid(before_json) AND json_type(before_json) = 'object')),\n    after_json TEXT NOT NULL CHECK (json_valid(after_json) AND json_type(after_json) = 'object' AND after_json != '{}'),\n    reason TEXT CHECK (reason IS NULL OR length(trim(reason)) BETWEEN 1 AND 500)\n);"
 _LEGACY_AUDIT_INDEX_SQL = 'CREATE INDEX audit_events_target_time ON audit_events(target_type, occurred_at, id);'
+_V3_AUDIT_SQL = """CREATE TABLE audit_events (
+    id INTEGER PRIMARY KEY,
+    actor_id INTEGER NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+    actor_display_name TEXT NOT NULL CHECK (length(trim(actor_display_name)) > 0),
+    action TEXT NOT NULL CHECK (action IN ('room.created','room.updated','booking.created',
+        'booking.cancelled_by_member','booking.cancelled_by_admin','block.created','block.revoked',
+        'application.created','application.approved','application.rejected','application.withdrawn')),
+    target_type TEXT NOT NULL CHECK (target_type IN ('room','booking','block','application')),
+    target_id INTEGER NOT NULL CHECK (typeof(target_id) = 'integer' AND target_id > 0),
+    occurred_at INTEGER NOT NULL CHECK (typeof(occurred_at) = 'integer'),
+    before_json TEXT CHECK (before_json IS NULL OR (json_valid(before_json) AND json_type(before_json) = 'object')),
+    after_json TEXT NOT NULL CHECK (json_valid(after_json) AND json_type(after_json) = 'object' AND after_json != '{}'),
+    reason TEXT CHECK (reason IS NULL OR length(trim(reason)) BETWEEN 1 AND 500)
+);"""
 
 
-def _validate_legacy_audit(conn):
+def _validate_legacy_audit(conn, version):
     actual = conn.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name='audit_events'").fetchone()
-    if actual is None or db.schema_sql_tokens(actual[0]) != db.schema_sql_tokens(_LEGACY_AUDIT_SQL):
+    if actual is None or db.schema_sql_tokens(actual[0]) != db.schema_sql_tokens(_V3_AUDIT_SQL if version == 3 else _LEGACY_AUDIT_SQL):
         raise ValueError("Unrecognized legacy audit definition")
     objects = list(conn.execute("SELECT type,name,sql FROM sqlite_master WHERE tbl_name='audit_events' AND type IN ('trigger','index')"))
     if (len(objects) != 1 or objects[0][0] != 'index' or objects[0][1] != 'audit_events_target_time'
@@ -62,8 +76,8 @@ def migrate_database(source, backup):
     conn = db.connect(source)
     try:
         version = conn.execute("PRAGMA user_version").fetchone()[0]
-        if version not in (1, 2):
-            raise ValueError("Migration requires schema version 1 or 2")
+        if version not in (1, 2, 3):
+            raise ValueError("Migration requires schema version 1, 2 or 3")
         # Restored backup files may use DELETE journaling. Establish WAL before
         # changing schema so journal-mode failure cannot follow a committed upgrade.
         if conn.execute("PRAGMA journal_mode").fetchone()[0] != "wal":
@@ -74,14 +88,25 @@ def migrate_database(source, backup):
         conn.execute("BEGIN IMMEDIATE")
         if version == 1:
             _validate_v1(conn)
-        else:
+        elif version == 2:
             for table in ("users","sessions","rooms","reservations","occupancy_slots","audit_events"):
                 if {r[1] for r in conn.execute(f"PRAGMA table_info({table})")} != db.REQUIRED_COLUMNS[table]:
                     raise ValueError("Unrecognized schema 2 columns")
             db.check_identity_schema(conn)
             _check_integrity(conn)
-        _validate_legacy_audit(conn)
-        if conn.execute("SELECT 1 FROM sqlite_master WHERE name IN ('applications','application_occurrences','booking_supervisors','users_v3','audit_events_v3')").fetchone():
+        else:
+            for table, expected in db.REQUIRED_COLUMNS.items():
+                if table == "cancellation_requests":
+                    continue
+                if {r[1] for r in conn.execute(f"PRAGMA table_info({table})")} != expected:
+                    raise ValueError("Unrecognized schema 3 columns")
+            db.check_identity_schema(conn)
+            _check_integrity(conn)
+        _validate_legacy_audit(conn, version)
+        destinations = ('users_v3','audit_events_v3','cancellation_requests')
+        if version < 3:
+            destinations += ('applications','application_occurrences','booking_supervisors')
+        if conn.execute("SELECT 1 FROM sqlite_master WHERE name IN (" + ','.join('?' for _ in destinations) + ")",destinations).fetchone():
             raise ValueError("Migration destination tables already exist")
         # A separate read-only backup connection sees committed WAL while this
         # writer lock prevents changes between the backup and the migration.
@@ -132,7 +157,7 @@ def main(argv=None):
     try:
         result = migrate_database(args.source, args.backup)
     except (OSError, ValueError, RuntimeError, sqlite3.Error) as error:
-        parser.exit(1, f"Migration failed ({type(error).__name__}); check schema 1/2, integrity and a new independent backup path. No credentials are reported.\n")
+        parser.exit(1, f"Migration failed ({type(error).__name__}); check schema 1/2/3, integrity and a new independent backup path. No credentials are reported.\n")
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0
 
