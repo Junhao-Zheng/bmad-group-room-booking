@@ -19,6 +19,7 @@
 |两轮增量|[Sprint 1](docs/sprints/sprint-1-review.md)、[Sprint 2](docs/sprints/sprint-2-review.md)|
 |需求到实际验证|[追踪矩阵](docs/traceability.md)、[验证索引](docs/verification.md)|
 |人机决策与过程复盘|[真实人工决策](decision-log.md)、[五指标复盘](retrospective.md)|
+|本人复核后的变更方案（待流程选择）|[影响、五个增量及验收计划](_bmad-output/planning-artifacts/sprint-change-proposal-2026-11-15.md)|
 |实验 A|[预登记协议](docs/experiments/experiment-a-protocol.md)、[实测结果](docs/experiment-a-results.md)|
 |贡献与AI使用|[实际贡献及AI声明](docs/ai-use-and-contributions.md)、[可见会话节选](docs/evidence/conversations/README.md)|
 |约10分钟演示（暂缓）|用户要求本轮先不录制视频和演示；[准备记录](docs/demonstration-plan.md)|
