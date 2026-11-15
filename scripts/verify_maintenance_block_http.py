@@ -10,7 +10,7 @@ import tempfile
 import threading
 
 from booking_app import ROOT, db
-from scripts.init_demo import DEMO_IDENTITIES, seed_users
+from tests.legacy_fixture import DEMO_IDENTITIES, seed_users
 from scripts.verify_availability_performance import Client, environment, write_json
 from scripts.verify_create_booking_http import BookingServer, FixedClock
 from scripts.verify_history_browser import source_fingerprints

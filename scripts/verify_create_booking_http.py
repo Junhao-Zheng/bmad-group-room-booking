@@ -11,7 +11,7 @@ import tempfile
 import threading
 
 from booking_app import ROOT, create_app, db
-from scripts.init_demo import seed_users
+from tests.legacy_fixture import seed_users
 from scripts.verify_availability_performance import Client, Server, environment, source_fingerprints, write_json
 from tests.schedule_fixtures import NOW, epoch
 

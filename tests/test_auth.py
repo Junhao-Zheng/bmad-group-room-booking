@@ -19,7 +19,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from booking_app import create_app, check_runtime
 from booking_app import auth, db
 from booking_app.domain import DomainError
-from scripts.init_demo import DEMO_IDENTITIES, seed_users
+from scripts.init_demo import DEMO_IDENTITIES, DEMO_SUPERVISORS, seed_users
+from tests.legacy_fixture import seed_users as seed_legacy_users, DEMO_IDENTITIES as LEGACY_IDENTITIES
 
 ORIGIN = "http://127.0.0.1:8000"
 PASSWORD = "Synthetic-only-passphrase-17"
@@ -34,7 +35,8 @@ class FixedClock:
 
 
 def accounts(password=PASSWORD):
-    return [{"username": name, "display_name": display, "password": password, "role": role}
+    return [{"username": name, "display_name": display, "password": password, "role": role,
+             "supervisor_username": DEMO_SUPERVISORS.get(name)}
             for name, display, role in DEMO_IDENTITIES]
 
 
@@ -43,7 +45,8 @@ class AuthTests(unittest.TestCase):
     def setUpClass(cls):
         cls.fixture = tempfile.TemporaryDirectory()
         cls.fixture_db = Path(cls.fixture.name) / "seed.sqlite3"
-        seed_users(cls.fixture_db, accounts(), FixedClock())
+        seed_legacy_users(cls.fixture_db, [dict(username=n, display_name=d, role=r, password=PASSWORD)
+                                        for n,d,r in LEGACY_IDENTITIES], FixedClock())
 
     @classmethod
     def tearDownClass(cls):
@@ -103,9 +106,9 @@ class AuthTests(unittest.TestCase):
 
     def test_empty_directory_initialization_and_repeat_preserves_accounts_and_sessions(self):
         fresh = Path(self.directory.name) / "new" / "demo.sqlite3"
-        self.assertEqual(seed_users(fresh, accounts(), self.clock), 3)
+        self.assertEqual(seed_users(fresh, accounts(), self.clock), 5)
         with db.write_transaction(fresh) as conn:
-            conn.execute("UPDATE users SET display_name='保留身份', role='admin' WHERE id=1")
+            conn.execute("UPDATE users SET display_name='保留身份', role='admin', supervisor_id=NULL WHERE username='demo_member_a'")
             conn.execute("INSERT INTO sessions VALUES (?,1,'preserved',?,?)", ("f" * 64, self.clock.now, self.clock.now + 600))
         conn = db.connect(fresh)
         before = [tuple(row) for row in conn.execute("SELECT * FROM users ORDER BY id")]
@@ -124,12 +127,13 @@ class AuthTests(unittest.TestCase):
 
     def test_initialization_rejects_invalid_accounts_without_creating_database(self):
         fresh = Path(self.directory.name) / "invalid.sqlite3"
-        for value in [accounts("short"), accounts()[:2], accounts() + [accounts()[0]]]:
+        for value in [accounts("short"), [dict(accounts()[0], supervisor_username=None)], accounts() + [accounts()[0]]]:
             with self.subTest(value=len(value)), self.assertRaises(ValueError):
                 seed_users(fresh, value, self.clock)
             self.assertFalse(fresh.exists())
 
     def test_login_rotates_token_csrf_and_returns_exact_dto_for_each_role(self):
+        seed_users(self.database, accounts(), self.clock)
         for name, display, role in DEMO_IDENTITIES:
             with self.subTest(role=role, name=name):
                 client = self.app.test_client()
@@ -397,6 +401,7 @@ class AuthTests(unittest.TestCase):
         self.assertEqual(len(password.encode()), 1024)
         users = accounts()
         users[0].update(username=username, password=password)
+        seed_users(self.database, accounts(), self.clock)
         self.assertEqual(seed_users(self.database, users, self.clock), 1)
         csrf, _, _ = self.prepare()
         response = self.post("/api/login", csrf, {"username": username, "password": password})

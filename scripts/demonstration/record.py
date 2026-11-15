@@ -5,7 +5,7 @@ from pathlib import Path
 WORK=Path(__file__).resolve().parent
 REPO=WORK.parent.parent
 sys.path.insert(0,str(REPO))
-from scripts.init_demo import DEMO_IDENTITIES, seed_users
+from tests.legacy_fixture import DEMO_IDENTITIES, seed_users
 from tests.history_fixtures import FixedClock
 from tests.schedule_fixtures import NOW
 from booking_app import auth,create_app,db,services

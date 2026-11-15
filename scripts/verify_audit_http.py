@@ -18,7 +18,7 @@ from zoneinfo import ZoneInfo
 from booking_app import ROOT, create_app, db
 from booking_app.domain import SystemClock
 from scripts.backup_db import backup_database
-from scripts.init_demo import DEMO_IDENTITIES, seed_users
+from tests.legacy_fixture import DEMO_IDENTITIES, seed_users
 from scripts.verify_availability_performance import Client, environment, write_json
 from scripts.verify_history_browser import stop_process_group
 
@@ -26,6 +26,7 @@ TABLES=('rooms','reservations','occupancy_slots','audit_events')
 
 def source_hashes():
     files=[p for folder in ('booking_app','scripts') for p in (ROOT/folder).rglob('*') if p.suffix in ('.py','.js','.cjs','.html','.css','.sql')]
+    files += [ROOT / name for name in ('tests/legacy_fixture.py', 'tests/fixtures/schema_v1.sql')]
     return {str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(files)}
 
 def digest(value):
@@ -158,7 +159,7 @@ def run(output,meta):
         users=[dict(username=u,display_name=d,role=r,password=secrets.token_urlsafe(24)) for u,d,r in DEMO_IDENTITIES]
         seed_users(database,users,SystemClock());server=LiveServer(database,temporary)
         try:
-            server.start();write_json(output/'environment.json',environment(server,meta)|dict(server_start=server.command,database_path=str(database),schema_version=1,clock='production SystemClock',fixed_clock_injection=False,
+            server.start();write_json(output/'environment.json',environment(server,meta)|dict(server_start=server.command,database_path=str(database),schema_version=2,clock='production SystemClock',fixed_clock_injection=False,
                 invocation=[sys.executable,'-m','scripts.verify_audit_http',*sys.argv[1:]]))
             clients,payload,record_id=populate(server,users,output)
             before=facts(database);write_json(output/'before-restart.json',evidence_facts(before))

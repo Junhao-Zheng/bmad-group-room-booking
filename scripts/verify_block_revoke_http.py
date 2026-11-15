@@ -12,7 +12,7 @@ import threading
 
 from booking_app import ROOT, create_app, db
 from booking_app.audit import audit_writer
-from scripts.init_demo import seed_users
+from tests.legacy_fixture import seed_users
 from scripts.verify_availability_performance import Client, Server, environment, write_json
 from scripts.verify_create_booking_http import FixedClock
 from scripts.verify_room_management_http import facts
@@ -52,7 +52,7 @@ def source_hashes():
     paths += [ROOT/name for name in (
         'scripts/verify_block_revoke_http.py','scripts/verify_block_revoke_browser.py','scripts/verify_block_revoke_browser.cjs',
         'scripts/verify_create_booking_http.py','scripts/verify_availability_performance.py',
-        'scripts/verify_room_management_http.py','scripts/verify_history_browser.py','scripts/verify_auth_browser.py','scripts/init_demo.py',
+        'scripts/verify_room_management_http.py','scripts/verify_history_browser.py','scripts/verify_auth_browser.py','scripts/init_demo.py', 'scripts/migrate_db.py', 'scripts/backup_db.py', 'tests/legacy_fixture.py', 'tests/fixtures/schema_v1.sql',
         'tests/__init__.py','tests/history_fixtures.py','tests/schedule_fixtures.py','tests/maintenance_contract.py','pyproject.toml','uv.lock')]
     return {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sorted(paths)}
 

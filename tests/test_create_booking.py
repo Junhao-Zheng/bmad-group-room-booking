@@ -12,7 +12,7 @@ from unittest.mock import patch
 from booking_app import auth, create_app, db, services
 from booking_app.audit import audit_writer
 from booking_app.domain import DomainError
-from scripts.init_demo import DEMO_IDENTITIES, seed_users
+from tests.legacy_fixture import DEMO_IDENTITIES, seed_users
 from tests.schedule_fixtures import NOW, epoch, insert_record, assert_slot_integrity
 
 ORIGIN = 'http://127.0.0.1:8000'
@@ -351,7 +351,7 @@ class CreateBookingTests(unittest.TestCase):
         db.initialize_database(self.database)
         with db.read_transaction(self.database) as conn:
             self.assertEqual(list(conn.iterdump()),before)
-            self.assertEqual(conn.execute('PRAGMA user_version').fetchone()[0],1)
+            self.assertEqual(conn.execute('PRAGMA user_version').fetchone()[0],2)
         with db.write_transaction(self.database) as conn:
             conn.execute('DROP TABLE audit_events')
         with self.assertRaises(RuntimeError): db.check_database(self.database)

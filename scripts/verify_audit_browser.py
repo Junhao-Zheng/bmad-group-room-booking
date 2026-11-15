@@ -10,7 +10,7 @@ import sys
 import tempfile
 from booking_app import ROOT
 from booking_app.domain import SystemClock
-from scripts.init_demo import DEMO_IDENTITIES,seed_users
+from tests.legacy_fixture import DEMO_IDENTITIES,seed_users
 from scripts.verify_audit_http import LiveServer,populate,facts,evidence_facts,source_hashes
 from scripts.verify_availability_performance import environment,write_json
 from scripts.verify_history_browser import browser_wrapper,run_driver,environment_metadata
@@ -35,7 +35,7 @@ def run(args,output,meta):
         try:
             server.start();populate(server,users,output);before=facts(database)
             write_json(output/'environment.json',environment(server,meta)|dict(server_start=server.command,browser=environment_metadata(args),
-                clock='production SystemClock',fixed_clock_injection=False,database_path=str(database),schema_version=1,
+                clock='production SystemClock',fixed_clock_injection=False,database_path=str(database),schema_version=2,
                 invocation=[sys.executable,'-m','scripts.verify_audit_browser',*sys.argv[1:]]))
             result=run_driver(['node',str(ROOT/'scripts/verify_audit_browser.cjs'),server.origin,str(credentials),str(output),str(wrapper)],env,registry,timeout=120)
             if result.returncode:raise RuntimeError('Browser verification failed; see safe failure.json')

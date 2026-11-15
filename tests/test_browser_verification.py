@@ -90,7 +90,7 @@ class BrowserVerificationTests(unittest.TestCase):
             root=Path(directory); (root/'booking_app').mkdir()
             app=root/'booking_app/a.py';app.write_text('original')
             helpers=('scripts/verify_auth_browser.py','scripts/verify_auth_browser.cjs',
-                     'scripts/init_demo.py','tests/schedule_fixtures.py')
+                     'scripts/init_demo.py', 'scripts/migrate_db.py', 'scripts/backup_db.py', 'tests/legacy_fixture.py', 'tests/fixtures/schema_v1.sql','tests/schedule_fixtures.py')
             for name in helpers:
                 p=root/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(name)
             with patch.object(runner,'ROOT',root):

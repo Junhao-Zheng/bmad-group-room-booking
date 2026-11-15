@@ -6,9 +6,9 @@ import sqlite3
 
 from flask import current_app, g
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 REQUIRED_COLUMNS = {
-    "users": {"id", "username", "display_name", "password_hash", "role", "created_at"},
+    "users": {"id", "username", "display_name", "password_hash", "role", "created_at", "supervisor_id"},
     "sessions": {"token_hash", "user_id", "csrf_token", "created_at", "expires_at"},
     "rooms": {"id", "name", "location", "capacity", "created_at", "updated_at"},
     "reservations": {"id", "kind", "room_id", "user_id", "title", "purpose", "attendees",
@@ -113,6 +113,35 @@ def initialize_database(database: str | Path) -> None:
     check_database(path)
 
 
+def check_identity_schema(conn) -> None:
+    """Reject missing, altered, or misattached identity guards, including collisions."""
+    expected_names = {"users_supervisor_insert", "users_supervisor_update", "users_teacher_role_update"}
+    statement = ""
+    for line in Path(__file__).with_name("schema.sql").read_text(encoding="utf-8").splitlines(keepends=True):
+        statement += line
+        if not sqlite3.complete_statement(statement):
+            continue
+        sql = statement.strip().removesuffix(";")
+        statement = ""
+        prefix = "CREATE TRIGGER IF NOT EXISTS "
+        if not sql.startswith(prefix):
+            continue
+        name = sql[len(prefix):].split()[0]
+        if name not in expected_names:
+            continue
+        row = conn.execute("SELECT tbl_name,sql FROM sqlite_master WHERE type='trigger' AND name=?", (name,)).fetchone()
+        expected = sql.replace(prefix, "CREATE TRIGGER ", 1)
+        if row is None or row[0] != "users" or row[1] != expected:
+            raise RuntimeError("数据库身份约束不兼容；导师触发器缺失或已修改。")
+        expected_names.remove(name)
+    if expected_names:
+        raise RuntimeError("应用 schema 缺少导师身份约束定义。")
+    if conn.execute("SELECT 1 FROM users s LEFT JOIN users t ON t.id=s.supervisor_id "
+                    "WHERE s.supervisor_id IS NOT NULL AND "
+                    "(s.role!='member' OR t.role IS NULL OR t.role!='teacher' OR s.id=t.id) LIMIT 1").fetchone():
+        raise RuntimeError("数据库存在无效导师归属；启动已停止。")
+
+
 def check_database(database: str | Path) -> None:
     path = Path(database)
     if not path.is_file():
@@ -125,6 +154,7 @@ def check_database(database: str | Path) -> None:
             columns = {row[1] for row in conn.execute(f"PRAGMA table_info({table})")}
             if not required.issubset(columns):
                 raise RuntimeError("数据库 schema 不完整；请核对初始化与应用版本。")
+        check_identity_schema(conn)
         if conn.execute("PRAGMA journal_mode").fetchone()[0] != "wal":
             raise RuntimeError("数据库必须使用 WAL 模式，请重新运行初始化命令。")
     finally:

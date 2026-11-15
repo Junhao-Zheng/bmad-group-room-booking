@@ -8,7 +8,7 @@ import unittest
 
 from booking_app import auth, create_app, db, services
 from booking_app.domain import DomainError, beijing_datetime, positive_integer, query_attendees
-from scripts.init_demo import DEMO_IDENTITIES, seed_users
+from tests.legacy_fixture import DEMO_IDENTITIES, seed_users
 from tests.schedule_fixtures import NOW, assert_slot_integrity, epoch, insert_record, seed_schedule_fixture
 
 ORIGIN = "http://127.0.0.1:8000"

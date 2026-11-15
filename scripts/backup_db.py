@@ -10,15 +10,26 @@ import sqlite3
 from booking_app import default_database
 
 
-def backup_database(source, destination):
+def validate_backup_paths(source, destination):
+    """Reserve disjoint SQLite namespaces before either database is opened."""
     source, destination = Path(source).resolve(strict=True), Path(destination).absolute()
-    if not source.is_file() or source == destination.resolve():
+    suffixes = ("", "-wal", "-shm", "-journal")
+    source_namespace = {Path(str(source) + suffix).resolve() for suffix in suffixes}
+    destination_namespace = {Path(str(destination) + suffix).resolve() for suffix in suffixes}
+    if not source.is_file() or destination.resolve() in source_namespace:
         raise ValueError("Backup requires a source file and a distinct new destination")
     # SQLite may open/remove these names itself. Reject the whole namespace before
     # creating anything, including dangling symlinks and a source at a sidecar path.
-    for suffix in ("", "-wal", "-shm", "-journal"):
+    for suffix in suffixes:
         if os.path.lexists(str(destination) + suffix):
             raise FileExistsError("Backup destination namespace already exists")
+    if source_namespace & destination_namespace:
+        raise ValueError("Backup source and destination namespaces overlap")
+    return source, destination
+
+
+def backup_database(source, destination):
+    source, destination = validate_backup_paths(source, destination)
     # O_EXCL also rejects symlinks and existing files; never truncate a source or backup.
     descriptor = os.open(destination, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
     os.close(descriptor)

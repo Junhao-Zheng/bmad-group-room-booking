@@ -82,3 +82,19 @@ class BackupTests(unittest.TestCase):
         self.assertEqual(run.returncode,0,run.stderr);self.assertIn('"schema_version": 1',run.stdout)
         failed=subprocess.run([sys.executable,'-m','scripts.backup_db','--source',str(self.source),str(self.target)],capture_output=True,text=True)
         self.assertEqual(failed.returncode,1);self.assertIn('FileExistsError',failed.stderr)
+
+    def test_source_sidecar_destinations_and_directory_aliases_rejected_before_open(self):
+        alias=Path(self.directory.name)/'alias'
+        alias.symlink_to(Path(self.directory.name),target_is_directory=True)
+        namespace=lambda: {suffix: Path(str(self.source)+suffix).read_bytes()
+                           for suffix in ('','-wal','-shm','-journal') if Path(str(self.source)+suffix).exists()}
+        before=namespace()
+        for folder in (self.source.parent,alias):
+            for suffix in ('-wal','-shm','-journal'):
+                with self.subTest(folder=folder,suffix=suffix), patch('scripts.backup_db.sqlite3.connect') as connect:
+                    with self.assertRaises(ValueError):backup_database(self.source,folder/(self.source.name+suffix))
+                    connect.assert_not_called()
+                self.assertEqual(namespace(),before)
+        backup_database(self.source,self.target)
+        with closing(sqlite3.connect(self.target)) as backup:
+            self.assertEqual(backup.execute('SELECT * FROM records').fetchall(),[(1,'committed WAL')])

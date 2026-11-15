@@ -1,0 +1,12 @@
+✔ stalled response headers aborts at 20 seconds and restores manual controls (5.536209ms)
+✔ stalled response body aborts at 20 seconds and restores manual controls (0.93175ms)
+✔ login field failure unlocks credentials before focus and preserves submitted values (0.943167ms)
+✔ login network failure unlocks credentials before focus and preserves submitted values (1.213834ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 68.515792

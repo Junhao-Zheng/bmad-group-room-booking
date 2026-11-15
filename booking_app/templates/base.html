@@ -20,7 +20,7 @@
       </nav>
       <div class="account">
         <span class="account-name">{{ user.display_name }}</span>
-        <span class="role">{{ '管理员' if user.role == 'admin' else '成员' }}</span>
+        <span class="role">{{ {'admin': '管理员', 'teacher': '导师', 'member': '学生'}[user.role] }}</span>
         <form id="logout-form" action="{{ url_for('web.logout_api') }}" method="post">
           <input type="hidden" name="csrf_token" value="{{ user.csrf_token }}">
           <button class="button-secondary" type="submit">退出登录</button>

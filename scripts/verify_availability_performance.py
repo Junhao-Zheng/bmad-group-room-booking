@@ -28,7 +28,7 @@ import urllib.request
 from zoneinfo import ZoneInfo
 
 from booking_app import ROOT, db
-from scripts.init_demo import seed_users
+from tests.legacy_fixture import seed_users
 
 SEED = 20261112
 BASE_LOCAL = datetime(2026, 11, 12, 8, tzinfo=ZoneInfo("Asia/Shanghai"))

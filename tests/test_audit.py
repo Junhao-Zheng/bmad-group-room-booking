@@ -10,8 +10,8 @@ from unittest.mock import patch
 from booking_app import auth, db, services
 from booking_app.domain import DomainError, beijing_day
 from tests import test_auth as auth_test
-from tests.test_auth import FixedClock, accounts, ORIGIN
-from scripts.init_demo import seed_users
+from tests.test_auth import FixedClock, ORIGIN, PASSWORD
+from tests.legacy_fixture import seed_users, DEMO_IDENTITIES
 from tests.schedule_fixtures import NOW
 
 AUDIT_KEYS = {'id','actor_id','actor_display_name','action','target_type','target_id','occurred_at','occurred_local','before','after','reason'}
@@ -21,7 +21,8 @@ class AuditTests(unittest.TestCase):
     def setUpClass(cls):
         cls.fixture = tempfile.TemporaryDirectory()
         cls.fixture_db = Path(cls.fixture.name)/'seed.sqlite3'
-        seed_users(cls.fixture_db, accounts(), FixedClock(NOW))
+        seed_users(cls.fixture_db, [dict(username=n,display_name=d,role=r,password=PASSWORD)
+                                   for n,d,r in DEMO_IDENTITIES], FixedClock(NOW))
     @classmethod
     def tearDownClass(cls): cls.fixture.cleanup()
     setUp = auth_test.AuthTests.setUp

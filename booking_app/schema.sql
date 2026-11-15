@@ -3,9 +3,25 @@ CREATE TABLE IF NOT EXISTS users (
     username TEXT NOT NULL UNIQUE CHECK (length(trim(username)) > 0),
     display_name TEXT NOT NULL CHECK (length(trim(display_name)) > 0),
     password_hash TEXT NOT NULL,
-    role TEXT NOT NULL CHECK (role IN ('member', 'admin')),
-    created_at INTEGER NOT NULL
+    role TEXT NOT NULL CHECK (role IN ('member', 'teacher', 'admin')),
+    created_at INTEGER NOT NULL,
+    supervisor_id INTEGER REFERENCES users(id) ON DELETE RESTRICT,
+    CHECK (supervisor_id IS NULL OR (role = 'member' AND supervisor_id != id))
 );
+
+CREATE TRIGGER IF NOT EXISTS users_supervisor_insert BEFORE INSERT ON users
+WHEN NEW.supervisor_id IS NOT NULL AND NOT EXISTS
+    (SELECT 1 FROM users WHERE id=NEW.supervisor_id AND role='teacher')
+BEGIN SELECT RAISE(ABORT, 'Supervisor must be a teacher'); END;
+
+CREATE TRIGGER IF NOT EXISTS users_supervisor_update BEFORE UPDATE OF supervisor_id, role ON users
+WHEN NEW.supervisor_id IS NOT NULL AND NOT EXISTS
+    (SELECT 1 FROM users WHERE id=NEW.supervisor_id AND role='teacher')
+BEGIN SELECT RAISE(ABORT, 'Supervisor must be a teacher'); END;
+
+CREATE TRIGGER IF NOT EXISTS users_teacher_role_update BEFORE UPDATE OF role ON users
+WHEN NEW.role != 'teacher' AND EXISTS (SELECT 1 FROM users WHERE supervisor_id=OLD.id)
+BEGIN SELECT RAISE(ABORT, 'Referenced teacher role cannot change'); END;
 
 CREATE TABLE IF NOT EXISTS sessions (
     token_hash TEXT PRIMARY KEY NOT NULL CHECK (length(token_hash) = 64),

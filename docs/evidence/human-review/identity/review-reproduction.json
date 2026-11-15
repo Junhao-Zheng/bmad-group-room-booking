@@ -1,0 +1,19 @@
+[
+  {
+    "variant": "source_journal_backup",
+    "compatibility_check_passed": true,
+    "backup_exists": false
+  },
+  {
+    "variant": "trigger_name_collision",
+    "compatibility_check_passed": true,
+    "backup_exists": true,
+    "student_to_admin_binding_accepted": true
+  },
+  {
+    "variant": "missing_identity_trigger",
+    "compatibility_check_passed": true,
+    "backup_exists": true,
+    "student_to_admin_binding_accepted": true
+  }
+]

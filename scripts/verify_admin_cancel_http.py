@@ -13,7 +13,7 @@ import threading
 
 from booking_app import ROOT, create_app, db
 from booking_app.audit import audit_writer
-from scripts.init_demo import seed_users
+from tests.legacy_fixture import seed_users
 from scripts.verify_availability_performance import Client, Server, environment, write_json
 from scripts.verify_create_booking_http import FixedClock
 from scripts.verify_history_browser import facts
@@ -71,7 +71,7 @@ def checked_storage(database):
 
 
 def fingerprints():
-    helpers = ('scripts/init_demo.py', 'scripts/verify_availability_performance.py',
+    helpers = ('scripts/init_demo.py', 'scripts/migrate_db.py', 'scripts/backup_db.py', 'tests/legacy_fixture.py', 'tests/fixtures/schema_v1.sql', 'scripts/verify_availability_performance.py',
                'scripts/verify_create_booking_http.py', 'scripts/verify_history_browser.py',
                'scripts/verify_auth_browser.py', 'tests/__init__.py',
                'tests/history_fixtures.py', 'tests/schedule_fixtures.py')

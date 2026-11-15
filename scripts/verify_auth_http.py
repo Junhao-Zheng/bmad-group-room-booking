@@ -19,7 +19,7 @@ import urllib.error
 import urllib.request
 
 from booking_app import ROOT, auth, db
-from scripts.init_demo import DEMO_IDENTITIES
+from scripts.init_demo import DEMO_IDENTITIES, DEMO_SUPERVISORS
 
 
 def run(port=8000):
@@ -34,12 +34,12 @@ def run(port=8000):
         credentials = path / "demo.credentials.json"
         credentials.touch(mode=0o600)
         credentials.write_text(json.dumps({"users": [
-            {"username": name, "display_name": display, "role": role, "password": password}
+            {"username": name, "display_name": display, "role": role, "password": password, "supervisor_username": DEMO_SUPERVISORS.get(name)}
             for name, display, role in DEMO_IDENTITIES
         ]}), encoding="utf-8")
         env = dict(os.environ, BOOKING_DB_PATH=str(database), APP_ORIGIN=origin,
                    COOKIE_SECURE="false", TRUSTED_HOSTS="127.0.0.1")
-        for expected in (3, 0):
+        for expected in (5, 0):
             result = subprocess.run([sys.executable, "-m", "scripts.init_demo", "--credentials-file", str(credentials)],
                                     env=env, cwd=ROOT, text=True, capture_output=True, check=True)
             assert f"新增 {expected} 个账号" in result.stdout
@@ -107,7 +107,7 @@ def run(port=8000):
                 assert request(clients[1][0], "/api/me")[0] == 200
                 conn = db.connect(database)
                 try:
-                    assert conn.execute("SELECT count(*) FROM users").fetchone()[0] == 3
+                    assert conn.execute("SELECT count(*) FROM users").fetchone()[0] == 5
                     assert conn.execute("SELECT count(*) FROM sessions WHERE user_id IS NOT NULL").fetchone()[0] == 1
                 finally:
                     conn.close()
@@ -120,10 +120,10 @@ def run(port=8000):
             for csrf, raw in sessions:
                 assert csrf not in log and raw not in log and auth.token_digest(raw) not in log
         print(json.dumps({
-            "result": "PASS", "initialization_added_counts": [3, 0], "requests": samples,
+            "result": "PASS", "initialization_added_counts": [5, 0], "requests": samples,
             "http_isolation": {"parent": {key: os.environ.get(key) for key in ("COOKIE_SECURE", "TRUSTED_HOSTS")},
                                "child": {key: env[key] for key in ("COOKIE_SECURE", "TRUSTED_HOSTS", "APP_ORIGIN")}},
-            "final_users": 3, "final_authenticated_sessions": 1, "credential_log_check": "PASS",
+            "final_users": 5, "final_authenticated_sessions": 1, "credential_log_check": "PASS",
             "runtime": {"python": platform.python_version(), "sqlite": sqlite3.sqlite_version,
                         "platform": platform.platform(), "machine": platform.machine(),
                         "logical_cpu_count": os.cpu_count(),

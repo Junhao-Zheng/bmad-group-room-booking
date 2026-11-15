@@ -17,7 +17,7 @@ import tempfile
 import time
 
 from booking_app import ROOT
-from scripts.init_demo import DEMO_IDENTITIES
+from tests.legacy_fixture import DEMO_IDENTITIES, seed_users
 
 
 def create_schedule_verification_app():
@@ -133,8 +133,7 @@ def run_browser(args):
         env = dict(os.environ, BOOKING_DB_PATH=str(temporary / "booking.sqlite3"), APP_ORIGIN=origin,
                    COOKIE_SECURE="false", TRUSTED_HOSTS="127.0.0.1",
                    NODE_PATH=str(args.playwright_root.resolve()))
-        subprocess.run([sys.executable, "-m", "scripts.init_demo", "--credentials-file", str(credentials)],
-                       cwd=ROOT, env=env, check=True, capture_output=True, text=True)
+        seed_users(temporary / "booking.sqlite3", json.loads(credentials.read_text())["users"])
         if args.schedule:
             from tests.schedule_fixtures import seed_schedule_fixture
             seed_schedule_fixture(temporary / "booking.sqlite3")
@@ -194,7 +193,7 @@ def source_fingerprints():
     app_files = sorted(path for path in (ROOT / 'booking_app').rglob('*')
                        if path.is_file() and path.suffix in {'.py','.sql','.js','.css','.html'})
     helpers = [ROOT / path for path in ('scripts/verify_auth_browser.py',
-        'scripts/verify_auth_browser.cjs', 'scripts/init_demo.py', 'tests/schedule_fixtures.py')]
+        'scripts/verify_auth_browser.cjs', 'scripts/init_demo.py', 'scripts/migrate_db.py', 'scripts/backup_db.py', 'tests/legacy_fixture.py', 'tests/fixtures/schema_v1.sql', 'tests/schedule_fixtures.py')]
     def hashes(paths):
         return {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
     return {'app_source_files_sha256': hashes(app_files), 'verification_source_files_sha256': hashes(helpers)}

@@ -11,7 +11,7 @@ import tempfile
 import threading
 
 from booking_app import ROOT, db
-from scripts.init_demo import seed_users
+from tests.legacy_fixture import seed_users
 from scripts.verify_availability_performance import Client, environment, source_fingerprints, write_json
 from scripts.verify_create_booking_http import BookingServer, FixedClock, storage
 from tests.schedule_fixtures import NOW
@@ -132,7 +132,7 @@ def main():
         meta['verification_dependencies_sha256'] = {
             name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest() for name in (
                 'scripts/verify_create_booking_http.py', 'scripts/verify_availability_performance.py',
-                'scripts/init_demo.py', 'tests/schedule_fixtures.py',
+                'scripts/init_demo.py', 'scripts/migrate_db.py', 'scripts/backup_db.py', 'tests/legacy_fixture.py', 'tests/fixtures/schema_v1.sql', 'tests/schedule_fixtures.py',
             )
         }
         report=run(args.output_dir,meta)

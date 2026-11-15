@@ -14,7 +14,7 @@ from types import SimpleNamespace
 
 from booking_app import ROOT, db
 from booking_app.audit import audit_writer
-from scripts.init_demo import DEMO_IDENTITIES, seed_users
+from tests.legacy_fixture import DEMO_IDENTITIES, seed_users
 from scripts.verify_availability_performance import environment, write_json
 from scripts.verify_block_revoke_http import source_hashes
 from scripts.verify_create_booking_http import FixedClock

@@ -11,7 +11,7 @@ from zoneinfo import ZoneInfo
 
 from booking_app import ROOT, db
 from booking_app.domain import SystemClock
-from scripts.init_demo import DEMO_IDENTITIES, seed_users
+from tests.legacy_fixture import DEMO_IDENTITIES, seed_users
 from scripts.verify_audit_http import LiveServer, facts, evidence_facts, source_hashes
 from scripts.verify_availability_performance import write_json
 from scripts.verify_history_browser import browser_wrapper, run_driver, environment_metadata

@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 11-12-2026 12:22
-last_updated: 11-13-2026 00:19
+last_updated: 11-15-2026 21:24
 project: group-room-booking
 project_key: NOKEY
 tracking_system: file-system
@@ -55,6 +55,13 @@ development_status:
   3-3-revoke-block: done
   3-4-audit-and-restart: done
   epic-3-retrospective: done
+  epic-4: in-progress
+  4-1-supervisor-identity: done
+  4-2-supervised-booking: backlog
+  4-3-supervised-cancellation: backlog
+  4-4-weekly-applications: backlog
+  4-5-batch-maintenance: backlog
+  epic-4-retrospective: optional
 action_items:
   - id: "epic-1-retro-item-1-后续页面验证同时覆盖等待与跨表单焦点-实际值绑定-失败报告先失效"
     epic: 1

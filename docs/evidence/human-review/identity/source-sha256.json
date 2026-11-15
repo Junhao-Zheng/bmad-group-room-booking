@@ -1,0 +1,10 @@
+{
+  "booking_app/schema.sql": "1c72ededdf0100f64e9a23d646471f422c03c9c32a96b228871ebe3be2090e73",
+  "booking_app/db.py": "7ecaad46b32dfd031444c876409458c977c9132de70fc9bf0897a16d254b362e",
+  "booking_app/templates/base.html": "8ad7b42759dd26a8dcd4ca92a8c7019523160593ddd713ebb9a2e104a81b1bda",
+  "scripts/init_demo.py": "b7efecb3750ba6d6badee532bd4d82bb5e27293e6bee2cdd0cb104aa6e40096b",
+  "scripts/migrate_db.py": "db2c2a7d214e37ee4eeac4f1c6444ed3a858d50536c3b76fb080060df0050920",
+  "tests/test_supervisor_identity.py": "39a42562bcc1cd71e5ec206f2f23545d20e5fbc7412d4760e708c3c00b5cfe85",
+  "tests/legacy_fixture.py": "15349e790b126b654852a80d32225c4ee2b0da5533c854fca3021398786508a3",
+  "tests/fixtures/schema_v1.sql": "7becf070ca3daf2c6437de6cda6cb1f0edd47badc15e1a081cd95735b666f4c7"
+}
