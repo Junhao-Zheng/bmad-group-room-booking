@@ -1,0 +1,295 @@
+[
+  {
+    "path": "/api/admin/rooms",
+    "actor": "demo_admin",
+    "status": 201,
+    "expected": 201,
+    "response": {
+      "data": {
+        "capacity": 12,
+        "id": 1,
+        "location": "合成地点",
+        "name": "审批测试室"
+      },
+      "ok": true
+    }
+  },
+  {
+    "path": "/api/applications",
+    "actor": "demo_member_a",
+    "status": 201,
+    "expected": 201,
+    "response": {
+      "data": {
+        "application": {
+          "attendees": 3,
+          "created_at": 1794751322,
+          "decided_at": null,
+          "decided_by": null,
+          "decision_reason": null,
+          "end_at": 1794798000,
+          "end_local": "2026-11-16T11:00:00+08:00",
+          "expired": false,
+          "id": 1,
+          "owner_display_name": "演示成员甲",
+          "owner_id": 3,
+          "purpose": "私有研究讨论",
+          "reservation_id": null,
+          "room": {
+            "capacity": 12,
+            "id": 1,
+            "location": "合成地点",
+            "name": "审批测试室"
+          },
+          "room_id": 1,
+          "start_at": 1794794400,
+          "start_local": "2026-11-16T10:00:00+08:00",
+          "status": "awaiting_approval",
+          "supervisor_display_name": "演示导师甲",
+          "supervisor_id": 1,
+          "title": "审批端到端测试",
+          "weeks": 1
+        },
+        "replayed": false
+      },
+      "ok": true
+    }
+  },
+  {
+    "path": "/api/applications/1",
+    "actor": "demo_teacher_b",
+    "status": 404,
+    "expected": 404,
+    "response": {
+      "error": {
+        "code": "NOT_FOUND",
+        "conflicts": [],
+        "fields": {},
+        "message": "申请不存在或无权查看。"
+      },
+      "ok": false
+    }
+  },
+  {
+    "path": "/api/applications/1/approve",
+    "actor": "demo_teacher_b",
+    "status": 404,
+    "expected": 404,
+    "response": {
+      "error": {
+        "code": "NOT_FOUND",
+        "conflicts": [],
+        "fields": {},
+        "message": "申请不存在或无权查看。"
+      },
+      "ok": false
+    }
+  },
+  {
+    "path": "/api/applications/1/approve",
+    "actor": "demo_admin",
+    "status": 403,
+    "expected": 403,
+    "response": {
+      "error": {
+        "code": "FORBIDDEN",
+        "conflicts": [],
+        "fields": {},
+        "message": "仅本人导师可审批，学生仅可撤回本人的待审申请。"
+      },
+      "ok": false
+    }
+  },
+  {
+    "path": "/api/bookings",
+    "actor": "demo_member_a",
+    "status": 403,
+    "expected": 403,
+    "response": {
+      "error": {
+        "code": "FORBIDDEN",
+        "conflicts": [],
+        "fields": {},
+        "message": "学生请提交申请并等待本人导师审批。"
+      },
+      "ok": false
+    }
+  },
+  {
+    "path": "/api/applications/1/approve",
+    "actor": "demo_teacher_a",
+    "status": 200,
+    "expected": 200,
+    "response": {
+      "data": {
+        "attendees": 3,
+        "created_at": 1794751322,
+        "decided_at": 1794751322,
+        "decided_by": 1,
+        "decision_reason": null,
+        "end_at": 1794798000,
+        "end_local": "2026-11-16T11:00:00+08:00",
+        "expired": false,
+        "id": 1,
+        "owner_display_name": "演示成员甲",
+        "owner_id": 3,
+        "purpose": "私有研究讨论",
+        "reservation_id": 1,
+        "room": {
+          "capacity": 12,
+          "id": 1,
+          "location": "合成地点",
+          "name": "审批测试室"
+        },
+        "room_id": 1,
+        "start_at": 1794794400,
+        "start_local": "2026-11-16T10:00:00+08:00",
+        "status": "approved",
+        "supervisor_display_name": "演示导师甲",
+        "supervisor_id": 1,
+        "title": "审批端到端测试",
+        "weeks": 1
+      },
+      "ok": true
+    }
+  },
+  {
+    "path": "/api/bookings/1/cancel",
+    "actor": "demo_member_a",
+    "status": 403,
+    "expected": 403,
+    "response": {
+      "error": {
+        "code": "FORBIDDEN",
+        "conflicts": [],
+        "fields": {},
+        "message": "学生已生效预约不能直接取消；请联系本人导师或管理员。"
+      },
+      "ok": false
+    }
+  },
+  {
+    "path": "/api/schedule?room_id=1&date=2026-11-16",
+    "actor": "demo_teacher_b",
+    "status": 200,
+    "expected": 200,
+    "response": {
+      "data": {
+        "items": [
+          {
+            "kind": "booking",
+            "record": {
+              "end_at": 1794798000,
+              "end_local": "2026-11-16T11:00:00+08:00",
+              "owner_display_name": "演示成员甲",
+              "room_id": 1,
+              "room_name": "审批测试室",
+              "start_at": 1794794400,
+              "start_local": "2026-11-16T10:00:00+08:00",
+              "status": "pending",
+              "supervisor_display_name": "演示导师甲",
+              "supervisor_source": "application",
+              "title": "审批端到端测试"
+            }
+          }
+        ],
+        "total": 1
+      },
+      "ok": true
+    }
+  },
+  {
+    "path": "/api/bookings/1",
+    "actor": "demo_teacher_b",
+    "status": 404,
+    "expected": 404,
+    "response": {
+      "error": {
+        "code": "NOT_FOUND",
+        "conflicts": [],
+        "fields": {},
+        "message": "预约不存在或无权查看。"
+      },
+      "ok": false
+    }
+  },
+  {
+    "path": "/api/applications",
+    "actor": "demo_member_a",
+    "status": 200,
+    "expected": 200,
+    "response": {
+      "data": {
+        "application": {
+          "attendees": 3,
+          "created_at": 1794751322,
+          "decided_at": 1794751322,
+          "decided_by": 1,
+          "decision_reason": null,
+          "end_at": 1794798000,
+          "end_local": "2026-11-16T11:00:00+08:00",
+          "expired": false,
+          "id": 1,
+          "owner_display_name": "演示成员甲",
+          "owner_id": 3,
+          "purpose": "私有研究讨论",
+          "reservation_id": 1,
+          "room": {
+            "capacity": 12,
+            "id": 1,
+            "location": "合成地点",
+            "name": "审批测试室"
+          },
+          "room_id": 1,
+          "start_at": 1794794400,
+          "start_local": "2026-11-16T10:00:00+08:00",
+          "status": "approved",
+          "supervisor_display_name": "演示导师甲",
+          "supervisor_id": 1,
+          "title": "审批端到端测试",
+          "weeks": 1
+        },
+        "replayed": true
+      },
+      "ok": true
+    }
+  },
+  {
+    "path": "/api/applications/1/approve",
+    "actor": "demo_teacher_a",
+    "status": 200,
+    "expected": 200,
+    "response": {
+      "data": {
+        "attendees": 3,
+        "created_at": 1794751322,
+        "decided_at": 1794751322,
+        "decided_by": 1,
+        "decision_reason": null,
+        "end_at": 1794798000,
+        "end_local": "2026-11-16T11:00:00+08:00",
+        "expired": false,
+        "id": 1,
+        "owner_display_name": "演示成员甲",
+        "owner_id": 3,
+        "purpose": "私有研究讨论",
+        "reservation_id": 1,
+        "room": {
+          "capacity": 12,
+          "id": 1,
+          "location": "合成地点",
+          "name": "审批测试室"
+        },
+        "room_id": 1,
+        "start_at": 1794794400,
+        "start_local": "2026-11-16T10:00:00+08:00",
+        "status": "approved",
+        "supervisor_display_name": "演示导师甲",
+        "supervisor_id": 1,
+        "title": "审批端到端测试",
+        "weeks": 1
+      },
+      "ok": true
+    }
+  }
+]

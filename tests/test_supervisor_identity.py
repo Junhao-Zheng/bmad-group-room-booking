@@ -29,7 +29,7 @@ class SupervisorIdentityTests(unittest.TestCase):
     def snapshot(self, path=None):
         with closing(db.connect(path or self.database)) as conn:
             return {name: [tuple(r) for r in conn.execute(f'SELECT * FROM {name} ORDER BY 1')]
-                    for name in db.REQUIRED_COLUMNS}
+                    for name in ('users','sessions','rooms','reservations','occupancy_slots','audit_events')}
 
     def legacy_history(self, schema=None):
         with closing(db.connect(self.database)) as conn:
@@ -160,10 +160,13 @@ class SupervisorIdentityTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):db.initialize_database(self.database)
         self.assertEqual(self.snapshot(),before)
         result=migrate_db.migrate_database(self.database,self.backup)
-        self.assertEqual(result['schema_version'],2)
+        self.assertEqual(result['schema_version'],3)
         self.assertEqual(stat.S_IMODE(self.backup.stat().st_mode),0o600)
         self.assertEqual(self.snapshot(self.backup),before)
         after=self.snapshot()
+        with closing(db.connect(self.database)) as conn:
+            for table in ('applications','application_occurrences','booking_supervisors'):
+                self.assertEqual(conn.execute(f'SELECT count(*) FROM {table}').fetchone()[0],0)
         self.assertEqual([r[:-1] for r in after.pop('users')],before.pop('users'))
         self.assertEqual(after,before)
         with closing(db.connect(self.database)) as conn:
@@ -223,7 +226,7 @@ class SupervisorIdentityTests(unittest.TestCase):
         cmd=[sys.executable,'-m','scripts.migrate_db','--source',str(self.database),'--backup',str(self.backup)]
         run=subprocess.run(cmd,capture_output=True,text=True)
         self.assertEqual(run.returncode,0,run.stderr)
-        self.assertIn('"schema_version": 2',run.stdout)
+        self.assertIn('"schema_version": 3',run.stdout)
         run=subprocess.run(cmd,capture_output=True,text=True)
         self.assertEqual(run.returncode,1)
         for secret in ('preserved-hash','Traceback','legacy-csrf'):

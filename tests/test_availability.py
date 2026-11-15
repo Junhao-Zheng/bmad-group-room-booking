@@ -178,7 +178,7 @@ class AvailabilityTests(unittest.TestCase):
     def test_legal_30_minutes_4_hours_and_30_day_equality(self):
         for start, end in [("2026-11-12T12:00", "2026-11-12T12:30"),
                            ("2026-11-12T12:00", "2026-11-12T16:00"),
-                           ("2026-12-12T09:30", "2026-12-12T10:00")]:
+                           ("2026-11-19T09:30", "2026-11-19T10:00")]:
             self.assertEqual(self.query(start, end).status_code, 200)
 
     def test_invalid_window_boundaries_have_field_errors(self):
@@ -188,7 +188,7 @@ class AvailabilityTests(unittest.TestCase):
             ("2026-11-12T12:00", "2026-11-12T12:00", "end"),
             ("2026-11-12T12:00", "2026-11-12T11:30", "end"),
             ("2026-11-12T12:00", "2026-11-12T16:30", "end"),
-            ("2026-12-12T10:00", "2026-12-12T10:30", "end"),
+            ("2026-11-19T10:00", "2026-11-19T10:30", "end"),
             ("2026-11-12T23:30", "2026-11-13T00:00", "end"),
             ("2026-11-12T23:30", "2026-11-13T00:30", "end"),
         ]:

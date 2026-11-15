@@ -222,6 +222,9 @@ class BlockRevokeTests(unittest.TestCase):
         self.assertEqual(self.facts(), before); self.assertEqual(self.revoke().status_code, 200)
 
     def test_release_all_occupancy_schedule_availability_without_restoring_cancelled_booking(self):
+        # 本用例验证导师直订；其余用例仍保留真实学生角色。
+        with db.write_transaction(self.database) as conn:
+            conn.execute("UPDATE users SET role='teacher' WHERE id=1")
         before = self.facts(); self.assertEqual(self.revoke().status_code, 200)
         rows = self.client.get('/api/schedule?room_id=20&date=2026-11-12', base_url=ORIGIN).json['data']['items']
         self.assertFalse(any(row['kind']=='block' and row['record']['id']==113 for row in rows))

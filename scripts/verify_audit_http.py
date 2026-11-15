@@ -18,7 +18,8 @@ from zoneinfo import ZoneInfo
 from booking_app import ROOT, create_app, db
 from booking_app.domain import SystemClock
 from scripts.backup_db import backup_database
-from tests.legacy_fixture import DEMO_IDENTITIES, seed_users
+# 当前直接创建/本人直接取消场景使用合成导师；学生审批另有独立runner。
+from tests.direct_booking_fixture import DEMO_IDENTITIES, seed_users
 from scripts.verify_availability_performance import Client, environment, write_json
 from scripts.verify_history_browser import stop_process_group
 
@@ -26,7 +27,7 @@ TABLES=('rooms','reservations','occupancy_slots','audit_events')
 
 def source_hashes():
     files=[p for folder in ('booking_app','scripts') for p in (ROOT/folder).rglob('*') if p.suffix in ('.py','.js','.cjs','.html','.css','.sql')]
-    files += [ROOT / name for name in ('tests/legacy_fixture.py', 'tests/fixtures/schema_v1.sql')]
+    files += [ROOT / name for name in ('tests/legacy_fixture.py', 'tests/direct_booking_fixture.py', 'tests/fixtures/schema_v1.sql')]
     return {str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(files)}
 
 def digest(value):

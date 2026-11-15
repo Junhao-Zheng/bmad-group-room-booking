@@ -9,6 +9,7 @@ CANCEL_REASON = '<svg onload="window.historyXss=3">合成管理员取消原因'
 FULL_KEYS = {'id', 'room', 'title', 'purpose', 'attendees', 'owner_id', 'owner_display_name',
              'start_at', 'start_local', 'end_at', 'end_local', 'status', 'created_at', 'created_local',
              'cancelled_at', 'cancelled_local', 'cancelled_by_id', 'cancelled_by_display_name', 'cancel_reason'}
+FULL_KEYS |= {'supervisor_id','supervisor_display_name','supervisor_source','application_id','approved_at','approved_by'}
 
 class FixedClock:
     def __init__(self): self.now, self.calls = NOW, 0

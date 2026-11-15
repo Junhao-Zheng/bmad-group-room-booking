@@ -132,8 +132,8 @@ def validate_booking_window(start_at: int, end_at: int, now: int) -> None:
         fields["end"] = "结束时间必须晚于开始时间。"
     elif end_at - start_at < 1800 or end_at - start_at > 14400:
         fields["end"] = "时长须为 30 分钟至 4 小时。"
-    if end_at > now + 30 * 86400:
-        fields["end"] = "结束时间不能超过当前时刻起 30 天。"
+    if end_at > now + 7 * 86400:
+        fields["end"] = "结束时间不能超过当前时刻起 7 天。"
     if fields:
         raise DomainError("INVALID_INPUT", "请检查起止时间。", fields)
     # Reject out-of-window dates before formatting: year 0001 Beijing can map

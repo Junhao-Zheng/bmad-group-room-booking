@@ -87,3 +87,7 @@
 {"timestamp": "2026-11-15T12:58:35.224999+00:00", "story": "4-1-supervisor-identity", "from": "ready-for-dev", "to": "in-progress", "actor": "AI root", "head": "d585c190febd59ea3fd09ec2dd959052937e53c0", "post_done_rework": false}
 {"timestamp": "2026-11-15T13:11:23.218875+00:00", "story": "4-1-supervisor-identity", "from": "in-progress", "to": "review", "actor": "AI root", "head": "d585c190febd59ea3fd09ec2dd959052937e53c0", "post_done_rework": false}
 {"timestamp": "2026-11-15T13:24:12.191508+00:00", "story": "4-1-supervisor-identity", "from": "review", "to": "done", "actor": "AI root", "head": "d585c190febd59ea3fd09ec2dd959052937e53c0", "post_done_rework": false}
+{"timestamp": "2026-11-15T13:24:30.455866+00:00", "story": "4-2-supervised-booking", "from": "backlog", "to": "ready-for-dev", "actor": "AI root", "head": "b6af1a1cc47e890cfdf59c7ad92f378bdd4235f9", "post_done_rework": false}
+{"timestamp": "2026-11-15T13:24:30.493612+00:00", "story": "4-2-supervised-booking", "from": "ready-for-dev", "to": "in-progress", "actor": "AI root", "head": "b6af1a1cc47e890cfdf59c7ad92f378bdd4235f9", "post_done_rework": false}
+{"timestamp": "2026-11-15T13:44:29.561570+00:00", "story": "4-2-supervised-booking", "from": "in-progress", "to": "review", "actor": "AI root", "head": "b6af1a1cc47e890cfdf59c7ad92f378bdd4235f9", "post_done_rework": false}
+{"timestamp": "2026-11-15T14:05:17.082367+00:00", "story": "4-2-supervised-booking", "from": "review", "to": "done", "actor": "AI root", "head": "b6af1a1cc47e890cfdf59c7ad92f378bdd4235f9", "post_done_rework": false}

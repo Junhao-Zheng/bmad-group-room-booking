@@ -277,6 +277,9 @@ class RoomManagementTests(unittest.TestCase):
         self.assertEqual(self.facts(),before)
 
     def test_old_successful_intent_replays_after_cancel_and_capacity_reduction(self):
+        # 本用例验证导师直订；其余用例仍保留真实学生角色。
+        with db.write_transaction(self.database) as conn:
+            conn.execute("UPDATE users SET role='teacher' WHERE id=1")
         member,identity=self.login('demo_member_a');headers={'Origin':ORIGIN,'X-CSRF-Token':identity['csrf_token']}
         payload=dict(room_id=2,title='原预约',purpose='保留',attendees=10,start='2026-11-13T12:00',end='2026-11-13T13:00',intent_key='room-replay-original-intent')
         first=member.post('/api/bookings',base_url=ORIGIN,headers=headers,json=payload)

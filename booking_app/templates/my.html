@@ -5,6 +5,7 @@
 <section class="page-intro">
   <p class="eyebrow">个人安排</p>
   <h1>我的预约</h1>
+  <p><a href="{{ url_for('web.applications_page') }}">查看我的申请与审批记录</a> · 本页显示已经生效的预约。</p>
   <p class="muted">查看自己的活动与完整详情。按开始时间倒序排列，时间均为北京时间。</p>
   <p id="auth-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>
   <a id="relogin-link" class="relogin-link" href="{{ url_for('web.login_page') }}" hidden>重新登录</a>

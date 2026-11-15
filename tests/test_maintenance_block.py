@@ -110,6 +110,9 @@ class MaintenanceBlockTests(unittest.TestCase):
         response=self.post(self.payload(room_id=10,start='2026-11-12T11:30',end='2026-11-12T12:00'))
         self.assertEqual(response.status_code,201);self.assertEqual(self.facts()['reservations'][:-1],before['reservations'])
     def test_booking_against_created_block_rejected_and_adjacent_allowed(self):
+        # 本用例验证导师直订；其余用例仍保留真实学生角色。
+        with db.write_transaction(self.database) as conn:
+            conn.execute("UPDATE users SET role='teacher' WHERE id=1")
         created=self.post(self.payload(start='2026-11-13T10:00',end='2026-11-13T15:00')).json['data']
         member,identity=self.login('demo_member_a');headers={'Origin':ORIGIN,'X-CSRF-Token':identity['csrf_token']}
         payload=dict(room_id=30,start='2026-11-13T14:30',end='2026-11-13T15:30',title='测试',purpose='私密',attendees=5,intent_key='block-overlap-booking')

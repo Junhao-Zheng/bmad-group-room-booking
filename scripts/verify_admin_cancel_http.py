@@ -13,7 +13,8 @@ import threading
 
 from booking_app import ROOT, create_app, db
 from booking_app.audit import audit_writer
-from tests.legacy_fixture import seed_users
+# 当前直接创建/本人直接取消场景使用合成导师；学生审批另有独立runner。
+from tests.direct_booking_fixture import seed_users
 from scripts.verify_availability_performance import Client, Server, environment, write_json
 from scripts.verify_create_booking_http import FixedClock
 from scripts.verify_history_browser import facts
@@ -71,7 +72,7 @@ def checked_storage(database):
 
 
 def fingerprints():
-    helpers = ('scripts/init_demo.py', 'scripts/migrate_db.py', 'scripts/backup_db.py', 'tests/legacy_fixture.py', 'tests/fixtures/schema_v1.sql', 'scripts/verify_availability_performance.py',
+    helpers = ('scripts/init_demo.py', 'scripts/migrate_db.py', 'scripts/backup_db.py', 'tests/legacy_fixture.py', 'tests/direct_booking_fixture.py', 'tests/fixtures/schema_v1.sql', 'scripts/verify_availability_performance.py',
                'scripts/verify_create_booking_http.py', 'scripts/verify_history_browser.py',
                'scripts/verify_auth_browser.py', 'tests/__init__.py',
                'tests/history_fixtures.py', 'tests/schedule_fixtures.py')
@@ -89,10 +90,10 @@ def run(output, meta):
         return status, body
     with tempfile.TemporaryDirectory(prefix='grb-admin-cancel-http-') as directory:
         database = Path(directory) / 'test.sqlite3'
-        users = [dict(username='race_member', display_name='合成成员', role='member', password=secrets.token_urlsafe(24)),
+        users = [dict(username='race_member', display_name='合成成员', role='teacher', password=secrets.token_urlsafe(24)),
                  dict(username='race_admin', display_name='合成管理员', role='admin', password=secrets.token_urlsafe(24))]
         rival = dict(username='rival_admin', display_name='合成管理员乙', role='admin', password=secrets.token_urlsafe(24))
-        seed_users(database, users + [dict(username='other_member', display_name='合成成员乙', role='member',
+        seed_users(database, users + [dict(username='other_member', display_name='合成成员乙', role='teacher',
                                          password=secrets.token_urlsafe(24)), rival], FixedClock())
         with db.write_transaction(database) as conn:
             conn.execute("INSERT INTO rooms VALUES(1,'合成会议室','合成测试楼',20,?,?)", (NOW, NOW))

@@ -3,11 +3,15 @@
 from contextlib import contextmanager
 from pathlib import Path
 import sqlite3
+import re
 
 from flask import current_app, g
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 REQUIRED_COLUMNS = {
+    "applications": {"id", "owner_id", "owner_display_name", "supervisor_id", "supervisor_display_name", "room_id", "title", "purpose", "attendees", "start_at", "end_at", "weeks", "intent_key", "request_payload", "status", "created_at", "decided_at", "decided_by", "decision_reason"},
+    "application_occurrences": {"application_id", "occurrence", "reservation_id"},
+    "booking_supervisors": {"reservation_id", "supervisor_id", "supervisor_display_name", "source"},
     "users": {"id", "username", "display_name", "password_hash", "role", "created_at", "supervisor_id"},
     "sessions": {"token_hash", "user_id", "csrf_token", "created_at", "expires_at"},
     "rooms": {"id", "name", "location", "capacity", "created_at", "updated_at"},
@@ -142,6 +146,38 @@ def check_identity_schema(conn) -> None:
         raise RuntimeError("数据库存在无效导师归属；启动已停止。")
 
 
+def schema_sql_tokens(sql):
+    """Compare known definitions without treating spaces inside SQL literals as formatting."""
+    tokens = re.findall(r"'(?:''|[^'])*'|\"(?:\"\"|[^\"])*\"|[A-Za-z_][A-Za-z_0-9]*|[^\s]", sql)
+    return tuple(token if token.startswith("'") else token.strip('"').lower()
+                 for token in tokens if token != ';')
+
+
+def check_critical_schema(conn):
+    """Column names alone cannot prove CHECK, FK, primary-key or unique guarantees."""
+    reference = sqlite3.connect(":memory:")
+    try:
+        reference.executescript(Path(__file__).with_name("schema.sql").read_text(encoding="utf-8"))
+        for name in ("users", "applications", "application_occurrences", "booking_supervisors", "audit_events", "occupancy_slots"):
+            expected = reference.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name=?", (name,)).fetchone()[0]
+            actual = conn.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name=?", (name,)).fetchone()
+            if actual is None or schema_sql_tokens(actual[0]) != schema_sql_tokens(expected):
+                raise RuntimeError("数据库关键表约束不兼容；启动已停止。")
+            def unique_indexes(connection):
+                return sorted((row[2], row[3], row[4], tuple(tuple(part)[1:] for part in connection.execute(
+                    'PRAGMA index_xinfo("' + row[1].replace('"', '""') + '")')))
+                    for row in connection.execute(f"PRAGMA index_list({name})") if row[2])
+            if unique_indexes(conn) != unique_indexes(reference):
+                raise RuntimeError("数据库唯一约束不兼容；启动已停止。")
+        for name in ("reservations_user_intent", "applications_supervisor", "audit_events_target_time"):
+            expected = reference.execute("SELECT tbl_name,sql FROM sqlite_master WHERE type='index' AND name=?", (name,)).fetchone()
+            actual = conn.execute("SELECT tbl_name,sql FROM sqlite_master WHERE type='index' AND name=?", (name,)).fetchone()
+            if actual is None or actual[0] != expected[0] or schema_sql_tokens(actual[1]) != schema_sql_tokens(expected[1]):
+                raise RuntimeError("数据库关键索引不兼容；启动已停止。")
+    finally:
+        reference.close()
+
+
 def check_database(database: str | Path) -> None:
     path = Path(database)
     if not path.is_file():
@@ -155,6 +191,7 @@ def check_database(database: str | Path) -> None:
             if not required.issubset(columns):
                 raise RuntimeError("数据库 schema 不完整；请核对初始化与应用版本。")
         check_identity_schema(conn)
+        check_critical_schema(conn)
         if conn.execute("PRAGMA journal_mode").fetchone()[0] != "wal":
             raise RuntimeError("数据库必须使用 WAL 模式，请重新运行初始化命令。")
     finally:

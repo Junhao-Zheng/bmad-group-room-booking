@@ -38,6 +38,7 @@ function harness({combined=false,transform=source=>source}={}){
   const environment={AbortController,URLSearchParams,CustomEvent:class {constructor(type,options){this.type=type;this.detail=options.detail;}},document,
     window:{setTimeout(fn,ms){timers.set(++timer,{fn,ms});return timer;},clearTimeout(id){timers.delete(id);}},
     fetch:(url,options)=>{fetches.push({url,options});return impl(url,options);}};
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../booking_app/static/contracts.js'),'utf8'),environment);
   if(combined){
     for(const id of ['room-fields','room-script-unavailable','room-form','admin-rooms','room-form-title','room-submit','room-cancel','room-confirm','rooms-refresh','room-feedback','rooms-feedback','room-conflicts','room-relogin'])n[id]=node(id);
     for(const name of ['name','location','capacity']){const input=n['room-'+name]=node('room-'+name);input.name=name;input.value=String(block.room[name]);n['room-'+name+'-error']=node();n['room-form'].append(input);}
@@ -238,7 +239,8 @@ function fixtures(kind){return ['pending','in_progress','ended',kind==='bookings
   const common={id:200+i,room:{id:30+i,name:`房间${i}<img>`,location:`地点${i}`,capacity:10+i},start_at:block.start_at+i*3600,end_at:block.end_at+i*3600,
     start_local:`2026-11-${13+i}T10:00:00+08:00`,end_local:`2026-11-${14+i}T16:00:00+08:00`,status,created_at:block.created_at-i*86400,created_local:`2026-11-0${9-i}T08:30:00+08:00`};
   const terminal=kind==='bookings'?'cancelled':'revoked';Object.assign(common,{[terminal+'_at']:i===3?1794445000:null,[terminal+'_local']:i===3?'2026-11-11T09:30:00+08:00':null,[terminal+'_by_id']:i===3?9:null,[terminal+'_by_display_name']:i===3?'操作人<svg>':null,[kind==='bookings'?'cancel_reason':'revoke_reason']:i===3?'终态原因<script>':null});
-  return {...common,...(kind==='bookings'?{title:`标题${i}`,purpose:`私密用途${i}`,attendees:2+i,owner_id:1+i,owner_display_name:`预约人${i}`}:{reason:`维护原因${i}`,creator_id:7+i,creator_display_name:`创建者${i}`})};
+  for(const field of ['start','end','created',terminal]) if(common[field+'_local']!==null) common[field+'_at']=Date.parse(common[field+'_local'])/1000;
+  return {...common,...(kind==='bookings'?{supervisor_id:null,supervisor_display_name:null,supervisor_source:'legacy',application_id:null,approved_at:null,approved_by:null,title:`标题${i}`,purpose:`私密用途${i}`,attendees:2+i,owner_id:1+i,owner_display_name:`预约人${i}`}:{reason:`维护原因${i}`,creator_id:7+i,creator_display_name:`创建者${i}`})};
 });}
 for(const kind of ['bookings','blocks'])test(`all four ${kind} states render every row, label and distinct complete value`,async()=>{
   const rows=fixtures(kind),ui=harness();ui.setFetch(async()=>ok({items:rows,total:rows.length}));await ui.load(kind);assertRendered(visibleRows(ui,kind),rows,kind);restored(ui);
@@ -300,8 +302,10 @@ for(const code of ['STORE_BUSY','AUTH_REQUIRED','FORBIDDEN'])test(`admin cancel 
 test('admin cancel repeated member cancellation accepts original null reason and unsafe ID never posts',async()=>{
   const ui=await cancellationUI();const row=adminBooking('cancelled');row.cancel_reason=null;row.cancelled_by_id=row.owner_id;
   ui.setFetch(async(_url,options)=>ok(options.method?row:{items:[row],total:1}));await ui.cancel();cancelRestored(ui);assert.match(ui.n['admin-cancel-summary'].textContent,/本人取消，无原因/);
-  ui.setFetch(async()=>ok({items:[{...row,id:Number('9223372036854775807')}],total:1}));await ui.load('bookings');ui.choose();
-  assert.match(ui.n['admin-bookings-feedback'].textContent,/无法安全提交/);
+  ui.setFetch(async()=>ok({items:[{...row,id:Number('9223372036854775807')}],total:1}));await ui.load('bookings');
+  assert.equal(ui.n['admin-bookings-items'].children.length,0);assertDisarmed(ui);
+  const count=ui.fetches.length;await ui.cancel();assert.equal(ui.fetches.length,count);
+  assert.match(ui.n['admin-bookings-feedback'].textContent,/查询失败/);
 });
 
 function assertDisarmed(ui){
@@ -320,10 +324,11 @@ test('manual booking requery disarms selected target before response, even for e
   const pending=ui.load('bookings');assertDisarmed(ui);release(ok({items:[],total:0}));await pending;
   assertDisarmed(ui);await ui.cancel();assert.equal(ui.fetches.length,2);
 });
-test('unsafe booking click clears previously armed safe booking and retains draft',async()=>{
-  const ui=harness();ui.setFetch(async()=>ok({items:[adminBooking(),{...adminBooking(),id:Number('9223372036854775807')}],total:2}));
-  await ui.load('bookings');ui.choose(0);ui.n['admin-cancel-reason'].value='维护 <script>';ui.n['admin-cancel-confirm'].checked=true;
-  ui.choose(1);assertDisarmed(ui);await ui.cancel();assert.equal(ui.fetches.length,1);
+test('unsafe booking response clears previously armed safe booking and retains draft',async()=>{
+  const ui=await cancellationUI();ui.n['admin-cancel-confirm'].checked=true;
+  ui.setFetch(async()=>ok({items:[adminBooking(),{...adminBooking(),id:Number('9223372036854775807')}],total:2}));
+  await ui.load('bookings');assert.equal(ui.n['admin-bookings-items'].children.length,0);
+  assertDisarmed(ui);await ui.cancel();assert.equal(ui.fetches.length,2);
 });
 for(const code of ['TRANSITION_CLOSED','NOT_FOUND'])test(`admin cancellation ${code} clears target and requires query instead of retry`,async()=>{
   const ui=await cancellationUI();ui.setFetch(async()=>fail(code));await ui.cancel();assertDisarmed(ui);

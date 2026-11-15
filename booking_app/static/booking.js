@@ -3,6 +3,9 @@
   "use strict";
   const form = document.querySelector("#booking-form");
   if (!form) return;
+  const isApplication = form.getAttribute("data-application") === "true";
+  const noun = isApplication ? "申请" : "预约";
+  const recordKey = isApplication ? "application" : "booking";
   const panel = document.querySelector("#booking-panel");
   const button = form.querySelector("button[type=submit]");
   const feedback = document.querySelector("#booking-feedback");
@@ -30,8 +33,8 @@
     intentKey = randomKey();
     unknown = completed = false;
     confirmedId = undefined;
-    button.textContent = "确认预约";
-    announce("内容已更改，将提交新预约意图。", false, false);
+    button.textContent = isApplication ? "提交申请" : "确认预约";
+    announce(`内容已更改，将提交新${noun}意图。`, false, false);
   }
   inputs.forEach(input => input.addEventListener("input", () => {
     if (selected && !pending) syncIntent();
@@ -59,26 +62,11 @@
   }
 
   function validBooking(value) {
-    const fullKeys = ["id", "room", "title", "purpose", "attendees", "owner_id", "owner_display_name", "start_at", "start_local",
-      "end_at", "end_local", "status", "created_at", "created_local", "cancelled_at", "cancelled_local",
-      "cancelled_by_id", "cancelled_by_display_name", "cancel_reason"];
-    const positive = number => Number.isSafeInteger(number) && number > 0;
-    const pair = (epoch, local) => Number.isSafeInteger(epoch) && localTime(local) && Date.parse(local) / 1000 === epoch;
-    if (!keys(value, fullKeys) || !keys(value.room, ["id", "name", "location", "capacity"])
-        || ![value.id, value.owner_id, value.attendees, value.room.id, value.room.capacity].every(positive)
-        || ![value.room.name, value.room.location, value.purpose, value.owner_display_name].every(text => typeof text === "string")
-        || !["pending", "in_progress", "ended", "cancelled"].includes(value.status)
-        || !pair(value.start_at, value.start_local) || !pair(value.end_at, value.end_local)
-        || !pair(value.created_at, value.created_local)) return false;
-    if (value.status === "cancelled") return pair(value.cancelled_at, value.cancelled_local)
-      && positive(value.cancelled_by_id) && typeof value.cancelled_by_display_name === "string"
-      && (value.cancel_reason === null || typeof value.cancel_reason === "string");
-    return [value.cancelled_at, value.cancelled_local, value.cancelled_by_id, value.cancelled_by_display_name,
-      value.cancel_reason].every(field => field === null);
+    return window.BookingContracts[recordKey](value);
   }
 
   function announce(message, error = false, focus = true) {
-    feedback.textContent = message + (earlierUnknown ? " 先前提交的预约结果仍未确认，请核对原安排。" : "");
+    feedback.textContent = message + (earlierUnknown ? ` 先前提交的${noun}结果仍未确认，请核对原${noun}。` : "");
     feedback.classList.toggle("error", error);
     feedback.setAttribute("role", error ? "alert" : "status");
     if (focus) feedback.focus();
@@ -86,8 +74,8 @@
 
   function unconfirmedMessage() {
     return confirmedId !== undefined
-      ? `原预约 #${confirmedId} 已确认，本次当前状态未刷新。请点击「重试确认原预约」。`
-      : "原预约结果仍未确认，可能已成功。请点击「重试确认原预约」，相同内容会沿用原提交标识。";
+      ? `原${noun} #${confirmedId} 已确认，本次当前状态未刷新。请点击「重试确认原${noun}」。`
+      : `原${noun}结果仍未确认，${isApplication ? "可能已提交；申请需本人导师批准才占用会议室" : "可能已成功"}。请点击「重试确认原${noun}」，相同内容会沿用原提交标识。`;
   }
 
   window.selectBookingRoom = (room, query) => {
@@ -103,11 +91,11 @@
     selected = {room_id: room.id, start: query.start, end: query.end, attendees: Number(query.attendees)};
     syncIntent();
     button.disabled = false;
-    button.textContent = unknown ? "重试确认原预约" : completed ? "再次确认原预约" : "确认预约";
+    button.textContent = unknown ? `重试确认原${noun}` : completed ? `再次确认原${noun}` : (isApplication ? "提交申请" : "确认预约");
     panel.hidden = false;
     document.querySelector("#booking-conditions").textContent =
       `${room.name} · ${room.location} · ${query.start.replace("T", " ")} — ${query.end.replace("T", " ")}（北京时间） · ${query.attendees} 人`;
-    if (!completed && !unknown && !wasUnknown) announce("填写活动名称和用途后确认预约。");
+    if (!completed && !unknown && !wasUnknown) announce(isApplication ? "填写活动名称和用途后提交申请，尚未占用会议室。" : "填写活动名称和用途后确认预约。");
     relogin.hidden = true;
     inputs.forEach(input => { input.disabled = false; });
     for (const name of ["title", "purpose"]) {
@@ -121,7 +109,7 @@
     event.preventDefault();
     if (!selected || pending) return;
     if (availabilityForm.getAttribute("aria-busy") === "true") {
-      announce("可用会议室仍在查询，请稍候再提交预约。");
+      announce(`可用会议室仍在查询，请稍候再提交${noun}。`);
       return;
     }
     syncIntent();
@@ -138,12 +126,12 @@
       form.elements[name].removeAttribute("aria-invalid");
       document.getElementById(`booking-${name}-error`).textContent = "";
     }
-    announce("正在提交预约，请稍候…");
+    announce(`正在提交${noun}，请稍候…`);
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 20000);
     let invalidInput;
     try {
-      const response = await fetch("/api/bookings", {
+      const response = await fetch(isApplication ? "/api/applications" : "/api/bookings", {
         method: "POST", credentials: "same-origin", signal: controller.signal,
         headers: {"Content-Type": "application/json", "X-CSRF-Token": form.elements.csrf_token.value},
         body: JSON.stringify(payload),
@@ -171,9 +159,9 @@
         return;
       }
       if (![200, 201].includes(response.status) || !keys(body, ["ok", "data"]) || body.ok !== true
-          || !keys(body.data, ["booking", "replayed"]) || body.data.replayed !== (response.status === 200)
-          || !object(body.data.booking)) throw new Error("Unconfirmed response");
-      const booking = body.data.booking;
+          || !keys(body.data, [recordKey, "replayed"]) || body.data.replayed !== (response.status === 200)
+          || !object(body.data[recordKey])) throw new Error("Unconfirmed response");
+      const booking = body.data[recordKey];
       if (!Number.isSafeInteger(booking.id) || booking.id < 1
           || typeof booking.title !== "string" || !strip(booking.title) || Array.from(booking.title).length > 80
           || !localTime(booking.start_local) || !localTime(booking.end_local)
@@ -181,20 +169,20 @@
       if (!validBooking(booking)) throw new Error("Unconfirmed booking contract");
       document.querySelector("#booking-conditions").textContent =
         `${booking.room.name} · ${booking.room.location} · ${booking.start_local.slice(0, 16).replace("T", " ")} — ${booking.end_local.slice(0, 16).replace("T", " ")}（北京时间） · ${booking.attendees} 人`;
-      const status = {pending: "待开始", in_progress: "进行中", ended: "已结束", cancelled: "已取消"}[booking.status];
-      announce(`${body.data.replayed ? "已确认原预约" : "预约成功"} · ${status} · 编号 ${booking.id} · ${booking.title} · ${booking.start_local.slice(0, 16).replace("T", " ")} — ${booking.end_local.slice(0, 16).replace("T", " ")}（北京时间）`);
+      const status = {awaiting_approval: "待本人导师审批", approved: "已批准", rejected: "已拒绝", withdrawn: "已撤回", pending: "待开始", in_progress: "进行中", ended: "已结束", cancelled: "已取消"}[booking.status];
+      announce(`${isApplication ? (body.data.replayed ? "已确认原申请" : "申请已提交，尚未占用") : (body.data.replayed ? "已确认原预约" : "预约成功")} · ${status} · 编号 ${booking.id} · ${booking.title} · ${booking.start_local.slice(0, 16).replace("T", " ")} — ${booking.end_local.slice(0, 16).replace("T", " ")}（北京时间）`);
       unknown = false;
       completed = true;
       confirmedId = booking.id;
     } catch {
       unknown = true;
-      announce(`未能确认预约结果，输入已保留；${unconfirmedMessage()}`, true);
+      announce(`未能确认${noun}结果，输入已保留；${unconfirmedMessage()}`, true);
     } finally {
       window.clearTimeout(timeout);
       pending = false;
       controls.forEach((input, index) => { input.disabled = states[index]; });
       button.disabled = false;
-      button.textContent = unknown ? "重试确认原预约" : completed ? "再次确认原预约" : "确认预约";
+      button.textContent = unknown ? `重试确认原${noun}` : completed ? `再次确认原${noun}` : (isApplication ? "提交申请" : "确认预约");
       form.removeAttribute("aria-busy");
       if (invalidInput) invalidInput.focus();
     }

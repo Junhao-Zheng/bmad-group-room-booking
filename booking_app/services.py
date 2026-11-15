@@ -27,9 +27,7 @@ def create_booking(actor: auth.Actor, payload: dict) -> dict:
         actor = _require_actor(conn, actor, now)
         values, intent_key = normalize_booking_payload(payload)
         previous = conn.execute(
-            "SELECT r.*,u.display_name AS owner_display_name,c.display_name AS cancelled_by_display_name "
-            "FROM reservations r JOIN users u ON u.id=r.user_id LEFT JOIN users c ON c.id=r.cancelled_by "
-            "WHERE r.kind='booking' AND r.user_id=? AND r.intent_key=?", (actor.id, intent_key),
+            _BOOKING_DETAIL_SELECT + "WHERE r.kind='booking' AND r.user_id=? AND r.intent_key=?", (actor.id, intent_key),
         ).fetchone()
         if previous is not None:
             if json.loads(previous["request_payload"]) != values:
@@ -38,6 +36,8 @@ def create_booking(actor: auth.Actor, payload: dict) -> dict:
             # Rebuild current facts, before any new-booking time/capacity/occupancy rules.
             # Exiting the transaction commits even this read-only replay; no audit is emitted.
             return {"booking": dto.booking_full(previous, room, now), "replayed": True}
+        if actor.role not in ("teacher", "admin"):
+            raise DomainError("FORBIDDEN", "学生请提交申请并等待本人导师审批。")
         room = conn.execute("SELECT id,name,location,capacity FROM rooms WHERE id=?", (values["room_id"],)).fetchone()
         if room is None:
             raise DomainError("NOT_FOUND", "会议室不存在，请重新选择。")
@@ -75,11 +75,10 @@ def create_booking(actor: auth.Actor, payload: dict) -> dict:
                     and str(error) == "UNIQUE constraint failed: occupancy_slots.room_id, occupancy_slots.slot_start"):
                 raise DomainError("OCCUPANCY_CONFLICT", "该会议室的时段已被占用，请重新查询可用会议室。") from None
             raise
-        row = conn.execute(
-            "SELECT r.*,u.display_name AS owner_display_name,c.display_name AS cancelled_by_display_name "
-            "FROM reservations r JOIN users u ON u.id=r.user_id LEFT JOIN users c ON c.id=r.cancelled_by WHERE r.id=?",
-            (booking_id,),
-        ).fetchone()
+        conn.execute("INSERT INTO booking_supervisors VALUES(?,?,?,?)", (booking_id,
+                     actor.id if actor.role == "teacher" else None,
+                     actor.display_name if actor.role == "teacher" else None, actor.role))
+        row = conn.execute(_BOOKING_DETAIL_SELECT + "WHERE r.id=?", (booking_id,)).fetchone()
         current_app.config["AUDIT_WRITER"](conn, {
             "actor_id": actor.id, "actor_display_name": actor.display_name, "action": "booking.created",
             "target_type": "booking", "target_id": booking_id, "occurred_at": now,
@@ -111,7 +110,7 @@ def audit_events(actor: auth.Actor, target_type=None, date=None) -> dict:
         require_admin(_require_actor(conn, actor, now))
         conditions, params = [], []
         if target_type is not None:
-            if not isinstance(target_type, str) or target_type not in ("room", "booking", "block"):
+            if not isinstance(target_type, str) or target_type not in ("room", "booking", "block", "application"):
                 raise DomainError("INVALID_INPUT", "请选择有效的操作对象。", {"target_type": "请选择会议室、预约或停用。"})
             conditions.append("target_type=?")
             params.append(target_type)
@@ -231,9 +230,14 @@ def update_room(actor: auth.Actor, room_id, payload: dict) -> dict:
 
 _BOOKING_DETAIL_SELECT = (
     "SELECT r.*,u.display_name AS owner_display_name,c.display_name AS cancelled_by_display_name,"
-    "room.name AS room_name,room.location AS room_location,room.capacity AS room_capacity "
+    "room.name AS room_name,room.location AS room_location,room.capacity AS room_capacity, "
+    "bs.supervisor_id,bs.supervisor_display_name,bs.source AS supervisor_source, "
+    "ao.application_id,a.decided_at AS approved_at,a.decided_by AS approved_by "
     "FROM reservations r JOIN users u ON u.id=r.user_id "
     "LEFT JOIN users c ON c.id=r.cancelled_by JOIN rooms room ON room.id=r.room_id "
+    "LEFT JOIN booking_supervisors bs ON bs.reservation_id=r.id "
+    "LEFT JOIN application_occurrences ao ON ao.reservation_id=r.id "
+    "LEFT JOIN applications a ON a.id=ao.application_id "
 )
 
 
@@ -288,6 +292,8 @@ def member_cancel_booking(actor: auth.Actor, booking_id) -> dict:
         # Ownership precedes idempotence, including for administrators using this entry point.
         if row["cancelled_at"] is not None:
             return _full_booking(row, now)
+        if actor.role == "member":
+            raise DomainError("FORBIDDEN", "学生已生效预约不能直接取消；请联系本人导师或管理员。")
         if now >= row["start_at"]:
             raise DomainError("TRANSITION_CLOSED", "预约已开始或结束，不能通过本人取消入口取消。")
         before = dto.booking_snapshot(row)
@@ -363,8 +369,8 @@ def booking_detail(actor: auth.Actor, booking_id) -> dict:
         actor = _require_actor(conn, actor, now)
         normalized_id = resource_id(booking_id, "booking_id")
         row = conn.execute(
-            _BOOKING_DETAIL_SELECT + "WHERE r.kind='booking' AND r.id=? AND (r.user_id=? OR ?)",
-            (normalized_id, actor.id, actor.role == "admin"),
+            _BOOKING_DETAIL_SELECT + "WHERE r.kind='booking' AND r.id=? AND (r.user_id=? OR ? OR (? AND bs.supervisor_id=? AND u.supervisor_id=?))",
+            (normalized_id, actor.id, actor.role == "admin", actor.role == "teacher", actor.id, actor.id),
         ).fetchone()
         if row is None:
             raise DomainError("NOT_FOUND", "预约不存在或无权查看。")
@@ -445,8 +451,10 @@ def schedule(actor: auth.Actor, room_id, date) -> dict:
             raise DomainError("NOT_FOUND", "会议室不存在，请重新选择。")
         rows = conn.execute(
             "SELECT r.id,r.kind,r.room_id,room.name AS room_name,r.title,"
-            "u.display_name AS owner_display_name,r.reason,r.start_at,r.end_at "
+            "u.display_name AS owner_display_name,r.reason,r.start_at,r.end_at, "
+            "bs.supervisor_display_name,bs.source AS supervisor_source "
             "FROM reservations r JOIN rooms room ON room.id=r.room_id JOIN users u ON u.id=r.user_id "
+            "LEFT JOIN booking_supervisors bs ON bs.reservation_id=r.id "
             "WHERE r.room_id=? AND r.cancelled_at IS NULL AND r.start_at<? AND ?<r.end_at "
             "ORDER BY r.start_at,r.id", (normalized_id, day_end, day_start),
         ).fetchall()

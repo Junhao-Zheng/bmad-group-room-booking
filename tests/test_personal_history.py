@@ -98,7 +98,7 @@ class PersonalHistoryTests(unittest.TestCase):
         self.assertEqual(self.data(self.get('/api/bookings/104'))['title'], TITLE)
 
     def test_representative_full_dto_values_against_independent_fixed_expectations(self):
-        common = dict(owner_id=1, owner_display_name='演示成员甲', attendees=5,
+        common = dict(supervisor_id=None,supervisor_display_name=None,supervisor_source='legacy',application_id=None,approved_at=None,approved_by=None,owner_id=1, owner_display_name='演示成员甲', attendees=5,
                       created_at=1794362400, created_local='2026-11-11T10:00:00+08:00')
         expected = [
             dict(common, id=104, room=dict(id=2, name='合成历史乙', location='演示楼 202', capacity=20),

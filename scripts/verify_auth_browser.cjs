@@ -57,12 +57,12 @@ async function submitAvailability(page) {
       assert.equal(loginRequests, 1);
       await page.unroute('**/api/login');
       assert.ok((await page.locator('.account-name').textContent()).includes(users[0].display_name));
-      assert.equal(await page.locator('.role').textContent(), '成员');
+      assert.equal(await page.locator('.role').textContent(), '导师');
       const me = await context.request.get(`${origin}/api/me`);
       assert.equal(me.status(), 200);
       const identity = (await me.json()).data;
       assert.equal(identity.display_name, users[0].display_name);
-      assert.equal(identity.role, 'member');
+      assert.equal(identity.role, 'teacher');
       const oldCookie = (await context.cookies()).find(cookie => cookie.name === 'grb_session');
       assert.ok(oldCookie);
       const homeWidth = await page.evaluate(() => ({document:document.documentElement.scrollWidth,viewport:innerWidth}));
@@ -122,7 +122,7 @@ async function submitAvailability(page) {
         const common = ['room_id','room_name','start_at','start_local','end_at','end_local','status'];
         for (const item of schedule.items) {
           assert.deepEqual(Object.keys(item).sort(), ['kind','record']);
-          assert.deepEqual(Object.keys(item.record).sort(), [...common,...(item.kind === 'booking' ? ['title','owner_display_name'] : ['id','reason'])].sort());
+          assert.deepEqual(Object.keys(item.record).sort(), [...common,...(item.kind === 'booking' ? ['title','owner_display_name','supervisor_display_name','supervisor_source'] : ['id','reason'])].sort());
         }
         const dom = await page.content();
         for (const privateValue of ['PRIVATE_PURPOSE_NEVER_SHARED','PRIVATE_CANCELLATION_NEVER_SHARED',users[1].username]) assert.ok(!dom.includes(privateValue));
@@ -394,7 +394,8 @@ async function submitAvailability(page) {
         assert.equal(network[0].request.intent_key_sha256,network[1].request.intent_key_sha256);
         const fullKeys=['id','room','title','purpose','attendees','owner_id','owner_display_name','start_at','start_local',
           'end_at','end_local','status','created_at','created_local','cancelled_at','cancelled_local',
-          'cancelled_by_id','cancelled_by_display_name','cancel_reason'].sort();
+          'cancelled_by_id','cancelled_by_display_name','cancel_reason',
+          'supervisor_id','supervisor_display_name','supervisor_source','application_id','approved_at','approved_by'].sort();
         assert.deepEqual(Object.keys(network[1].body.data.booking).sort(),fullKeys);
         assert.deepEqual(Object.keys(network[1].body.data.booking.room).sort(),['id','name','location','capacity'].sort());
         await competing.evaluate(() => window.scrollTo(0, 0));
@@ -488,6 +489,8 @@ async function submitAvailability(page) {
       assert.equal(await page.evaluate(() => document.activeElement.textContent), '预约');
       await page.keyboard.press('Tab');
       assert.equal(await page.evaluate(() => document.activeElement.textContent), '我的预约');
+      await page.keyboard.press('Tab');
+      assert.equal(await page.evaluate(() => document.activeElement.textContent), '申请与审批');
       await page.keyboard.press('Tab');
       assert.equal(await page.evaluate(() => document.activeElement.textContent), '退出登录');
       await page.keyboard.press('Enter');

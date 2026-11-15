@@ -10,7 +10,8 @@ import tempfile
 import threading
 
 from booking_app import ROOT, db
-from tests.legacy_fixture import DEMO_IDENTITIES, seed_users
+# 当前直接创建/本人直接取消场景使用合成导师；学生审批另有独立runner。
+from tests.direct_booking_fixture import DEMO_IDENTITIES, seed_users
 from scripts.verify_availability_performance import Client, environment, write_json
 from scripts.verify_create_booking_http import BookingServer, FixedClock
 from scripts.verify_history_browser import source_fingerprints

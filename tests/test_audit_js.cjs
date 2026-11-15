@@ -120,3 +120,22 @@ for(const fixture of displayedFixtures)for(const side of ['before','after'])for(
   ui.setFetch(async()=>ok([event,malformed]));await ui.submit();restored(ui);
   assert.equal(ui.n['audit-items'].children.length,0);assert.match(ui.n['audit-feedback'].textContent,/未能读取.*条件已保留/);assert.equal(ui.n['audit-date'].value,'2026-11-12');
 });
+
+
+const applicationSnapshot={id:21,owner_id:7,owner_display_name:'学生 <img>',supervisor_id:3,supervisor_display_name:'导师',room_id:1,title:'审批讨论',purpose:'完整用途',attendees:4,start_at:1800,end_at:3600,weeks:1,status:'awaiting_approval',created_at:100,decided_at:null,decided_by:null,decision_reason:null};
+const applicationEvents=['created','approved','rejected','withdrawn'].map((action,index)=>({...event,id:21+index,action:`application.${action}`,target_type:'application',target_id:21,
+  before:action==='created'?null:applicationSnapshot,
+  after:action==='created'?applicationSnapshot:{...applicationSnapshot,status:action,decided_at:200,decided_by:action==='withdrawn'?7:3,decision_reason:action==='rejected'?'拒绝原因 <script>':null},
+  reason:action==='rejected'?'拒绝原因 <script>':null}));
+test('application created approved rejected withdrawn audit events render exact full snapshots and reasons',async()=>{
+  const ui=harness();ui.setFetch(async()=>ok(applicationEvents));await ui.submit();restored(ui);
+  const rows=ui.n['audit-items'].children;assert.equal(rows.length,4);
+  const labels=['提交申请','批准申请','拒绝申请','撤回申请'];
+  applicationEvents.forEach((item,index)=>{
+    const cells=rows[index].children;assert.equal(cells.length,6);
+    assert.equal(cellContent(cells[2]),`${labels[index]} · ${item.action}\napplication #21`);
+    if(item.before===null)assert.equal(cellContent(cells[3]),'无（创建前）');else assert.deepEqual(JSON.parse(cellContent(cells[3])),item.before);
+    assert.deepEqual(JSON.parse(cellContent(cells[4])),item.after);assert.equal(cellContent(cells[5]),item.reason??'无');
+  });
+  assert.match(ui.n['audit-items'].textContent,/学生 <img>/);assert.match(ui.n['audit-items'].textContent,/拒绝原因 <script>/);
+});

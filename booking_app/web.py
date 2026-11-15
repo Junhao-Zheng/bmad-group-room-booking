@@ -6,7 +6,7 @@ import uuid
 from flask import Blueprint, current_app, g, jsonify, make_response, redirect, render_template, request, url_for
 from werkzeug.exceptions import HTTPException
 
-from . import auth, services
+from . import auth, services, applications
 from .domain import DomainError
 
 bp = Blueprint("web", __name__)
@@ -249,3 +249,32 @@ def install_handlers(app):
         app.logger.error("request_id=%s action=%s error_type=%s",
                          getattr(g, "request_id", "unassigned"), request.endpoint or "unmatched", type(error).__name__)
         return domain_error(DomainError("INTERNAL_ERROR", "操作未完成，请稍后重试。"))
+
+
+@bp.get("/applications")
+def applications_page():
+    return render_template("applications.html",user=auth.current_user(auth.require_session(token())))
+
+
+@bp.route("/api/applications", methods=["GET", "POST"])
+def applications_api():
+    actor = auth.actor_for_token(token())
+    if request.method == "GET":
+        return jsonify(ok=True,data=applications.list_applications(actor))
+    if request.mimetype != "application/json":
+        raise DomainError("INVALID_INPUT", "请使用 JSON 格式提交申请。")
+    result = applications.create_application(actor,payload())
+    return jsonify(ok=True,data=result), 200 if result["replayed"] else 201
+
+
+@bp.get("/api/applications/<application_id>")
+def application_detail_api(application_id):
+    return jsonify(ok=True,data=applications.application_detail(auth.actor_for_token(token()),application_id))
+
+
+@bp.post("/api/applications/<application_id>/<action>")
+def application_decision_api(application_id,action):
+    actor = auth.actor_for_token(token())
+    if request.mimetype != "application/json":
+        raise DomainError("INVALID_INPUT", "请使用 JSON 格式提交审批。")
+    return jsonify(ok=True,data=applications.decide_application(actor,application_id,action,payload()))

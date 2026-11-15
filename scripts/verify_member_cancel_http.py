@@ -10,7 +10,8 @@ import tempfile
 import threading
 
 from booking_app import ROOT, db
-from tests.legacy_fixture import seed_users
+# 当前直接创建/本人直接取消场景使用合成导师；学生审批另有独立runner。
+from tests.direct_booking_fixture import seed_users
 from scripts.verify_availability_performance import Client, environment, write_json
 from scripts.verify_create_booking_http import BookingServer, FixedClock
 from scripts.verify_history_browser import facts, source_fingerprints
@@ -65,8 +66,8 @@ def collect_race_responses(futures, output, database):
 def run(output,meta):
     with tempfile.TemporaryDirectory(prefix='grb-cancel-http-') as directory:
         database=Path(directory)/'booking.sqlite3'
-        user=dict(username='cancel_synthetic',display_name='合成取消成员',role='member',password=secrets.token_urlsafe(24))
-        seed_users(database,[user,dict(username='other_synthetic',display_name='合成成员乙',role='member',password=secrets.token_urlsafe(24)),
+        user=dict(username='cancel_synthetic',display_name='合成取消成员',role='teacher',password=secrets.token_urlsafe(24))
+        seed_users(database,[user,dict(username='other_synthetic',display_name='合成成员乙',role='teacher',password=secrets.token_urlsafe(24)),
             dict(username='admin_synthetic',display_name='合成管理员',role='admin',password=secrets.token_urlsafe(24))],FixedClock())
         with db.write_transaction(database) as conn: conn.execute("INSERT INTO rooms VALUES(1,'合成取消会议室','测试楼',20,?,?)",(NOW,NOW))
         payload=dict(room_id=1,title='合成取消活动',purpose='测试用途',attendees=5,start='2026-11-12T12:00',

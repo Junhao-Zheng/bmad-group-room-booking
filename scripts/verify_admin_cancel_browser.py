@@ -29,7 +29,7 @@ def source_fingerprints():
     helpers = [ROOT / path for path in (
         'scripts/verify_admin_cancel_browser.py', 'scripts/verify_admin_cancel_browser.cjs',
         'scripts/verify_history_browser.py',
-        'scripts/verify_auth_browser.py', 'scripts/init_demo.py', 'scripts/migrate_db.py', 'scripts/backup_db.py', 'tests/legacy_fixture.py', 'tests/fixtures/schema_v1.sql',
+        'scripts/verify_auth_browser.py', 'scripts/init_demo.py', 'scripts/migrate_db.py', 'scripts/backup_db.py', 'tests/legacy_fixture.py', 'tests/direct_booking_fixture.py', 'tests/fixtures/schema_v1.sql',
         'tests/history_fixtures.py', 'tests/schedule_fixtures.py')]
     def hashes(paths):
         return {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}

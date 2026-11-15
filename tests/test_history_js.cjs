@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const path = require('node:path');
-const booking = {id:104,title:'<img src=x onerror="evil()">',purpose:'<script>evil()</script>',attendees:5,
+const booking = {supervisor_id:null,supervisor_display_name:null,supervisor_source:'legacy',application_id:null,approved_at:null,approved_by:null,start_at:1794456000,end_at:1794459600,created_at:1794362400,id:104,title:'<img src=x onerror="evil()">',purpose:'<script>evil()</script>',attendees:5,
   room:{id:2,name:'合成房间',location:'演示楼',capacity:20},owner_id:1,owner_display_name:'成员',
   start_local:'2026-11-12T12:00:00+08:00',end_local:'2026-11-12T13:00:00+08:00',
   created_local:'2026-11-11T10:00:00+08:00',status:'pending',cancelled_at:null,
@@ -13,12 +13,12 @@ const booking = {id:104,title:'<img src=x onerror="evil()">',purpose:'<script>ev
 const expectedFields = [
   ['预约编号','104'],['活动名称','<img src=x onerror="evil()">'],['用途','<script>evil()</script>'],
   ['预计人数','5 人'],['会议室','合成房间'],['会议室编号','2'],['位置','演示楼'],['当前容量','20 人'],
-  ['预约人','成员'],['预约人编号','1'],['开始时间（北京时间）','2026-11-12 12:00:00'],
+  ['所属导师','历史未绑定'],['审批申请编号','无（直接预约或历史记录）'],['批准时间','无'],['批准人编号','无'],['预约人','成员'],['预约人编号','1'],['开始时间（北京时间）','2026-11-12 12:00:00'],
   ['结束时间（北京时间）','2026-11-12 13:00:00'],['状态','待开始'],['创建时间（北京时间）','2026-11-11 10:00:00'],
   ['取消时间（北京时间）','未取消'],['取消操作者','无（未取消）'],['取消操作者编号','无（未取消）'],['取消原因','无（未取消）'],
 ];
 function fieldPairs(fields){
-  assert.equal(fields.children.length,36);
+  assert.equal(fields.children.length,44);
   const result=[];
   for(let i=0;i<fields.children.length;i+=2){
     assert.equal(fields.children[i].tag,'dt');assert.equal(fields.children[i+1].tag,'dd');
@@ -54,9 +54,9 @@ function harness(initialFetch) {
   nodes['logout-form'].elements={csrf_token:{value:'synthetic-csrf'}};
   const form=nodes['history-form'], select=node('history-status'), submit=node('submit','button');
   form.elements={status:select};form.querySelector=()=>submit;
-  vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../booking_app/static/history.js'),'utf8'),{
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../booking_app/static/contracts.js'),'utf8')+'\n'+fs.readFileSync(path.join(__dirname,'../booking_app/static/history.js'),'utf8'),{
     AbortController,URLSearchParams,
-    document:{get activeElement(){return activeElement;},querySelector:selector=>nodes[selector.slice(1)],createElement:tag=>node('',tag)},
+    document:{body:{getAttribute:()=> 'teacher'},get activeElement(){return activeElement;},querySelector:selector=>nodes[selector.slice(1)],createElement:tag=>node('',tag)},
     window:{setTimeout(callback,ms){const id=++timerId;timers.set(id,{callback,ms});return id;},clearTimeout(id){timers.delete(id);}},
     fetch:(url,opts)=>{fetches.push({url,opts});return fetchImpl(url,opts);}
   });
@@ -125,7 +125,7 @@ for(const failure of ['network','bad-json','not-found','timeout']) {
       await ui.filter();assert.equal(ui.fetches.length,2);[...ui.timers.values()][0].callback();
     }
     await pending;restored(ui);assert.equal(ui.nodes['detail-fields'].hidden,true);assert.equal(ui.nodes['detail-retry'].hidden,false);
-    assert.equal(ui.fetches.length,2);ui.setFetch(async()=>ok({...booking,status:'cancelled',cancelled_at:1,
+    assert.equal(ui.fetches.length,2);ui.setFetch(async()=>ok({...booking,status:'cancelled',cancelled_at:1794445200,
       cancelled_local:'2026-11-12T09:00:00+08:00',cancelled_by_id:1,cancelled_by_display_name:'成员'}));
     await ui.retry();restored(ui);assert.match(ui.nodes['detail-fields'].textContent,/未填写（本人取消无需原因）/);
     assert.equal(ui.fetches.length,3);assert.ok(ui.fetches.every(f=>!f.opts.method));
@@ -159,10 +159,10 @@ for(const empty of [false,true]) {
 for(const member of [false,true]) {
   test(`complete ${member?'member':'admin'} cancellation detail uses each independent label/value`,async()=>{
     const ui=harness(async()=>ok(list([booking])));await tick();
-    ui.setFetch(async()=>ok({...booking,status:'cancelled',cancelled_at:1,cancelled_local:'2026-11-12T09:15:42+08:00',
+    ui.setFetch(async()=>ok({...booking,status:'cancelled',cancelled_at:1794446142,cancelled_local:'2026-11-12T09:15:42+08:00',
       cancelled_by_id:member?1:3,cancelled_by_display_name:member?'成员':'管理员',cancel_reason:member?null:'设备检修'}));
     await ui.detail();
-    assert.deepEqual(fieldPairs(ui.nodes['detail-fields']),expectedFields.slice(0,12).concat([
+    assert.deepEqual(fieldPairs(ui.nodes['detail-fields']),expectedFields.slice(0,16).concat([
       ['状态','已取消'],['创建时间（北京时间）','2026-11-11 10:00:00'],['取消时间（北京时间）','2026-11-12 09:15:42'],
       ['取消操作者',member?'成员':'管理员'],['取消操作者编号',member?'1':'3'],
       ['取消原因',member?'未填写（本人取消无需原因）':'设备检修'],

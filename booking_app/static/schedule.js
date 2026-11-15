@@ -69,6 +69,7 @@
         relogin.hidden = error.code !== "AUTH_REQUIRED";
         return;
       }
+      if (!body.data || !Array.isArray(body.data.items) || body.data.total !== body.data.items.length || !body.data.items.every(window.BookingContracts.schedule)) throw new Error("Invalid schedule contract");
       conditions.textContent = `${roomLabel} · ${date}（北京时间）`;
       for (const item of body.data.items) {
         const record = item.record;
@@ -77,6 +78,7 @@
         addText(row, "h4", item.kind === "booking" ? record.title : "会议室停用");
         addText(row, "p", `${record.start_local.slice(0, 16).replace("T", " ")} — ${record.end_local.slice(0, 16).replace("T", " ")}`);
         addText(row, "p", item.kind === "booking" ? `预约人：${record.owner_display_name}` : `原因：${record.reason}`, "muted");
+        if (item.kind === "booking") addText(row, "p", `所属导师：${record.supervisor_display_name ?? (record.supervisor_source === "admin" ? "管理员安排" : "历史未绑定")}`, "muted");
         items.append(row);
       }
       results.hidden = false;

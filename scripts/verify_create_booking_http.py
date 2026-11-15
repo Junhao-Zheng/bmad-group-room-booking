@@ -11,7 +11,8 @@ import tempfile
 import threading
 
 from booking_app import ROOT, create_app, db
-from tests.legacy_fixture import seed_users
+# 当前直接创建/本人直接取消场景使用合成导师；学生审批另有独立runner。
+from tests.direct_booking_fixture import seed_users
 from scripts.verify_availability_performance import Client, Server, environment, source_fingerprints, write_json
 from tests.schedule_fixtures import NOW, epoch
 
@@ -60,7 +61,7 @@ def storage(database):
 def run(output,run):
     with tempfile.TemporaryDirectory(prefix='grb-create-http-') as temp:
         database=Path(temp)/'booking.sqlite3'
-        users=[dict(username=f'create_synthetic_{i:02}',display_name=f'合成成员 {i:02}',role='member',
+        users=[dict(username=f'create_synthetic_{i:02}',display_name=f'合成成员 {i:02}',role='teacher',
                     password=secrets.token_urlsafe(24)) for i in range(20)]
         seed_users(database,users+[dict(username='fixture_admin',display_name='合成管理员',role='admin',password=secrets.token_urlsafe(24))],FixedClock())
         with db.write_transaction(database) as conn:

@@ -31,8 +31,9 @@
     typeof room.location === "string" && Number.isInteger(room.capacity) && room.capacity >= 1 && room.capacity <= 1000;
   const commonKeys = "id,room,start_at,start_local,end_at,end_local,status,created_at,created_local";
   function recordShape(row, kind) {
+    if (kind === "bookings" && !window.BookingContracts.booking(row)) return false;
     const booking = kind === "bookings", prefix = booking ? "cancelled" : "revoked", reason = booking ? "cancel_reason" : "revoke_reason";
-    const own = booking ? "title,purpose,attendees,owner_id,owner_display_name" : "creator_id,creator_display_name,reason";
+    const own = booking ? "title,purpose,attendees,owner_id,owner_display_name,supervisor_id,supervisor_display_name,supervisor_source,application_id,approved_at,approved_by" : "creator_id,creator_display_name,reason";
     if (!exact(row, `${commonKeys},${own},${prefix}_at,${prefix}_local,${prefix}_by_id,${prefix}_by_display_name,${reason}`) ||
         !id(row.id) || !roomShape(row.room) || ![row.start_at,row.end_at,row.created_at].every(Number.isInteger) ||
         ![row.start_local,row.end_local,row.created_local].every(local) || row.start_at >= row.end_at ||

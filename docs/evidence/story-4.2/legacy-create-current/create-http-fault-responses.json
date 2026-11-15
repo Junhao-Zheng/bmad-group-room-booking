@@ -1,0 +1,59 @@
+[
+  {
+    "phase": "audit_failure",
+    "http_status": 500,
+    "response": {
+      "error": {
+        "code": "INTERNAL_ERROR",
+        "conflicts": [],
+        "fields": {},
+        "message": "操作未完成，请稍后重试。"
+      },
+      "ok": false
+    },
+    "duration_ms": 2.814957872033119
+  },
+  {
+    "phase": "same_key_after_failure_and_restart",
+    "http_status": 201,
+    "response": {
+      "data": {
+        "booking": {
+          "application_id": null,
+          "approved_at": null,
+          "approved_by": null,
+          "attendees": 10,
+          "cancel_reason": null,
+          "cancelled_at": null,
+          "cancelled_by_display_name": null,
+          "cancelled_by_id": null,
+          "cancelled_local": null,
+          "created_at": 1794448800,
+          "created_local": "2026-11-12T10:00:00+08:00",
+          "end_at": 1794549600,
+          "end_local": "2026-11-13T14:00:00+08:00",
+          "id": 2,
+          "owner_display_name": "合成成员 00",
+          "owner_id": 1,
+          "purpose": "仅用于测试",
+          "room": {
+            "capacity": 20,
+            "id": 1,
+            "location": "测试楼",
+            "name": "合成并发会议室"
+          },
+          "start_at": 1794542400,
+          "start_local": "2026-11-13T12:00:00+08:00",
+          "status": "pending",
+          "supervisor_display_name": "合成成员 00",
+          "supervisor_id": 1,
+          "supervisor_source": "teacher",
+          "title": "合成并发活动 🧪"
+        },
+        "replayed": false
+      },
+      "ok": true
+    },
+    "duration_ms": 2.9558329842984676
+  }
+]

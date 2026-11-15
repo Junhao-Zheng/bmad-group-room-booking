@@ -12,7 +12,7 @@ from unittest.mock import patch
 from booking_app import auth, create_app, db, services
 from booking_app.audit import audit_writer
 from booking_app.domain import DomainError
-from tests.legacy_fixture import DEMO_IDENTITIES, seed_users
+from tests.direct_booking_fixture import DEMO_IDENTITIES, seed_users
 from tests.history_fixtures import FULL_KEYS, FixedClock, seed_history_fixture
 from tests.schedule_fixtures import NOW, epoch, assert_slot_integrity
 

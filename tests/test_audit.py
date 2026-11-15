@@ -11,7 +11,7 @@ from booking_app import auth, db, services
 from booking_app.domain import DomainError, beijing_day
 from tests import test_auth as auth_test
 from tests.test_auth import FixedClock, ORIGIN, PASSWORD
-from tests.legacy_fixture import seed_users, DEMO_IDENTITIES
+from tests.direct_booking_fixture import seed_users, DEMO_IDENTITIES
 from tests.schedule_fixtures import NOW
 
 AUDIT_KEYS = {'id','actor_id','actor_display_name','action','target_type','target_id','occurred_at','occurred_local','before','after','reason'}

@@ -48,6 +48,7 @@ function harness(initialFetch) {
     },
     fetch: (url, options) => { fetches.push({url, options}); return fetchImplementation(url, options); },
   });
+  vm.runInContext(fs.readFileSync(path.join(__dirname, '../booking_app/static/contracts.js'), 'utf8'), context);
   vm.runInContext(fs.readFileSync(path.join(__dirname, '../booking_app/static/schedule.js'), 'utf8'), context);
   assert.equal(typeof submitHandler, 'function');
   return {
@@ -159,7 +160,7 @@ test('pending conditions cannot be edited and a field error focuses the restored
   assert.equal(ui.form.getAttribute('aria-busy'), undefined);
 });
 
-for (const records of [[],[{kind:'block',record:{status:'pending',start_local:'2026-11-12T12:00:00+08:00',end_local:'2026-11-12T12:30:00+08:00',reason:'合成维护 <检查设备>'}}]]) {
+for (const records of [[],[{kind:'block',record:{id:1,room_id:10,room_name:'合成会议室',start_at:1794456000,end_at:1794457800,status:'pending',start_local:'2026-11-12T12:00:00+08:00',end_local:'2026-11-12T12:30:00+08:00',reason:'合成维护 <检查设备>'}}]]) {
   test(`schedule success with ${records.length} items restores button focus and exact reason`,async()=>{
     const ui=harness(async()=>success(records));await ui.submit();assertRestored(ui);
     assert.equal(ui.activeElement,ui.button);

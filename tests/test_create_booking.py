@@ -12,7 +12,7 @@ from unittest.mock import patch
 from booking_app import auth, create_app, db, services
 from booking_app.audit import audit_writer
 from booking_app.domain import DomainError
-from tests.legacy_fixture import DEMO_IDENTITIES, seed_users
+from tests.direct_booking_fixture import DEMO_IDENTITIES, seed_users
 from tests.schedule_fixtures import NOW, epoch, insert_record, assert_slot_integrity
 
 ORIGIN = 'http://127.0.0.1:8000'
@@ -20,6 +20,7 @@ PASSWORD = 'Synthetic-create-passphrase'
 FULL_KEYS = {'id','room','title','purpose','attendees','owner_id','owner_display_name','start_at','start_local',
              'end_at','end_local','status','created_at','created_local','cancelled_at','cancelled_local',
              'cancelled_by_id','cancelled_by_display_name','cancel_reason'}
+FULL_KEYS |= {'supervisor_id','supervisor_display_name','supervisor_source','application_id','approved_at','approved_by'}
 SHARED_CONFLICT_KEYS = {'type','room_id','start_at','start_local','end_at','end_local','status'}
 SNAPSHOT_KEYS = {'id','room_id','owner_id','title','purpose','attendees','start_at','end_at','created_at',
                  'cancelled_at','cancelled_by_id','cancel_reason'}
@@ -153,7 +154,7 @@ class CreateBookingTests(unittest.TestCase):
                  ('2026-11-12T12:00','2026-11-12T12:00','end'),
                  ('2026-11-12T12:00','2026-11-12T11:30','end'),
                  ('2026-11-12T12:00','2026-11-12T16:30','end'),
-                 ('2026-12-12T10:00','2026-12-12T10:30','end'),
+                 ('2026-11-19T10:00','2026-11-19T10:30','end'),
                  ('2026-11-12T23:30','2026-11-13T00:00','end')]
         for start,end,field in cases:
             self.error(self.post(start=start,end=end),400,'INVALID_INPUT',field)
@@ -163,7 +164,7 @@ class CreateBookingTests(unittest.TestCase):
         self.assertEqual(self.counts(),(0,0,0))
         for i,(start,end) in enumerate([('2026-11-12T12:00','2026-11-12T12:30'),
                                        ('2026-11-12T13:00','2026-11-12T17:00'),
-                                       ('2026-12-12T09:30','2026-12-12T10:00')]):
+                                       ('2026-11-19T09:30','2026-11-19T10:00')]):
             self.assertEqual(self.post(start=start,end=end,intent_key=f'valid-boundary-{i:03}').status_code,201)
 
     def test_missing_room_capacity_and_huge_counts_do_not_bind_or_serialize(self):
@@ -225,7 +226,7 @@ class CreateBookingTests(unittest.TestCase):
         with self.app.app_context():
             actor=self.actor()
             with db.write_transaction(self.database) as conn:
-                conn.execute("UPDATE users SET display_name='新名字',role='member' WHERE id=?",(actor.id,))
+                conn.execute("UPDATE users SET display_name='新名字',role='teacher' WHERE id=?",(actor.id,))
             self.clock.calls=0
             result=services.create_booking(replace(actor,display_name='过期名字',role='admin'),self.payload())
             self.assertEqual(self.clock.calls,1)
@@ -263,13 +264,13 @@ class CreateBookingTests(unittest.TestCase):
                 self.assertEqual(after,before)
         self.clock.now=NOW
 
-    def test_real_member_with_stale_admin_actor_gets_only_shared_conflict(self):
+    def test_real_teacher_with_stale_admin_actor_gets_only_shared_conflict(self):
         with db.write_transaction(self.database) as conn:
             insert_record(conn,100,1,'2026-11-12T12:00','2026-11-12T14:00')
         before=self.counts()
         with self.app.app_context():
             actor=self.actor()
-            self.assertEqual(actor.role,'member')
+            self.assertEqual(actor.role,'teacher')
             with self.assertRaises(DomainError) as caught:
                 services.create_booking(replace(actor,role='admin'),self.payload())
             self.assertEqual(caught.exception.code,'OCCUPANCY_CONFLICT')
@@ -351,7 +352,7 @@ class CreateBookingTests(unittest.TestCase):
         db.initialize_database(self.database)
         with db.read_transaction(self.database) as conn:
             self.assertEqual(list(conn.iterdump()),before)
-            self.assertEqual(conn.execute('PRAGMA user_version').fetchone()[0],2)
+            self.assertEqual(conn.execute('PRAGMA user_version').fetchone()[0],3)
         with db.write_transaction(self.database) as conn:
             conn.execute('DROP TABLE audit_events')
         with self.assertRaises(RuntimeError): db.check_database(self.database)

@@ -3,7 +3,7 @@
     "purpose": "精确合同样例；各案例独立，非实测响应或同一数据库同时状态",
     "clock_at": 1794456000,
     "clock_local": "2026-11-12T12:00:00+08:00",
-    "contract": "architecture.md §§4—7"
+    "contract": "architecture.md §§4—7 + approved story 4.2; schema3; ordinary booking ends within 7 days; block remains 30 days"
   },
   "booking_created": {
     "http_status": 201,
@@ -22,7 +22,7 @@
           "purpose": "讨论实验结果",
           "attendees": 6,
           "owner_id": 1,
-          "owner_display_name": "成员甲",
+          "owner_display_name": "导师甲",
           "start_at": 1794531600,
           "start_local": "2026-11-13T09:00:00+08:00",
           "end_at": 1794535200,
@@ -34,7 +34,13 @@
           "cancelled_local": null,
           "cancelled_by_id": null,
           "cancelled_by_display_name": null,
-          "cancel_reason": null
+          "cancel_reason": null,
+          "supervisor_id": 1,
+          "supervisor_display_name": "导师甲",
+          "supervisor_source": "teacher",
+          "application_id": null,
+          "approved_at": null,
+          "approved_by": null
         },
         "replayed": false
       }
@@ -57,7 +63,7 @@
           "purpose": "讨论实验结果",
           "attendees": 6,
           "owner_id": 1,
-          "owner_display_name": "成员甲",
+          "owner_display_name": "导师甲",
           "start_at": 1794531600,
           "start_local": "2026-11-13T09:00:00+08:00",
           "end_at": 1794535200,
@@ -69,7 +75,13 @@
           "cancelled_local": null,
           "cancelled_by_id": null,
           "cancelled_by_display_name": null,
-          "cancel_reason": null
+          "cancel_reason": null,
+          "supervisor_id": 1,
+          "supervisor_display_name": "导师甲",
+          "supervisor_source": "teacher",
+          "application_id": null,
+          "approved_at": null,
+          "approved_by": null
         },
         "replayed": true
       }
@@ -103,7 +115,13 @@
         "cancelled_local": "2026-11-12T11:30:00+08:00",
         "cancelled_by_id": 3,
         "cancelled_by_display_name": "管理员",
-        "cancel_reason": "课程会议调整"
+        "cancel_reason": "课程会议调整",
+        "supervisor_id": null,
+        "supervisor_display_name": null,
+        "supervisor_source": "legacy",
+        "application_id": null,
+        "approved_at": null,
+        "approved_by": null
       }
     }
   },
@@ -135,7 +153,13 @@
         "cancelled_local": "2026-11-12T11:30:00+08:00",
         "cancelled_by_id": 1,
         "cancelled_by_display_name": "成员甲",
-        "cancel_reason": null
+        "cancel_reason": null,
+        "supervisor_id": null,
+        "supervisor_display_name": null,
+        "supervisor_source": "legacy",
+        "application_id": null,
+        "approved_at": null,
+        "approved_by": null
       }
     }
   },
@@ -168,7 +192,13 @@
           "cancelled_local": "2026-11-12T11:30:00+08:00",
           "cancelled_by_id": 3,
           "cancelled_by_display_name": "管理员",
-          "cancel_reason": "课程会议调整"
+          "cancel_reason": "课程会议调整",
+          "supervisor_id": null,
+          "supervisor_display_name": null,
+          "supervisor_source": "legacy",
+          "application_id": null,
+          "approved_at": null,
+          "approved_by": null
         },
         "replayed": true
       }
@@ -294,7 +324,13 @@
             "cancelled_local": "2026-11-12T11:30:00+08:00",
             "cancelled_by_id": 3,
             "cancelled_by_display_name": "管理员",
-            "cancel_reason": "课程会议调整"
+            "cancel_reason": "课程会议调整",
+            "supervisor_id": null,
+            "supervisor_display_name": null,
+            "supervisor_source": "legacy",
+            "application_id": null,
+            "approved_at": null,
+            "approved_by": null
           }
         ],
         "total": 1
@@ -403,7 +439,9 @@
               "end_local": "2026-11-13T10:00:00+08:00",
               "status": "pending",
               "room_id": 1,
-              "room_name": "讨论室A"
+              "room_name": "讨论室A",
+              "supervisor_display_name": null,
+              "supervisor_source": "legacy"
             }
           },
           {
@@ -422,6 +460,187 @@
           }
         ],
         "total": 2
+      }
+    }
+  },
+  "application_created": {
+    "http_status": 201,
+    "body": {
+      "ok": true,
+      "data": {
+        "application": {
+          "id": 1,
+          "owner_id": 2,
+          "owner_display_name": "学生甲",
+          "supervisor_id": 3,
+          "supervisor_display_name": "导师甲",
+          "room_id": 1,
+          "title": "研究讨论",
+          "purpose": "讨论实验结果",
+          "attendees": 3,
+          "start_at": 1794531600,
+          "end_at": 1794535200,
+          "weeks": 1,
+          "status": "awaiting_approval",
+          "created_at": 1794448800,
+          "decided_at": null,
+          "decided_by": null,
+          "decision_reason": null,
+          "room": {
+            "id": 1,
+            "name": "讨论室A",
+            "location": "科研楼301",
+            "capacity": 12
+          },
+          "start_local": "2026-11-13T09:00:00+08:00",
+          "end_local": "2026-11-13T10:00:00+08:00",
+          "expired": false,
+          "reservation_id": null
+        },
+        "replayed": false
+      }
+    }
+  },
+  "application_approved": {
+    "http_status": 200,
+    "body": {
+      "ok": true,
+      "data": {
+        "id": 1,
+        "owner_id": 2,
+        "owner_display_name": "学生甲",
+        "supervisor_id": 3,
+        "supervisor_display_name": "导师甲",
+        "room_id": 1,
+        "title": "研究讨论",
+        "purpose": "讨论实验结果",
+        "attendees": 3,
+        "start_at": 1794531600,
+        "end_at": 1794535200,
+        "weeks": 1,
+        "status": "approved",
+        "created_at": 1794448800,
+        "decided_at": 1794448900,
+        "decided_by": 3,
+        "decision_reason": null,
+        "room": {
+          "id": 1,
+          "name": "讨论室A",
+          "location": "科研楼301",
+          "capacity": 12
+        },
+        "start_local": "2026-11-13T09:00:00+08:00",
+        "end_local": "2026-11-13T10:00:00+08:00",
+        "expired": false,
+        "reservation_id": 42
+      }
+    }
+  },
+  "application_replayed_after_approval": {
+    "http_status": 200,
+    "body": {
+      "ok": true,
+      "data": {
+        "application": {
+          "id": 1,
+          "owner_id": 2,
+          "owner_display_name": "学生甲",
+          "supervisor_id": 3,
+          "supervisor_display_name": "导师甲",
+          "room_id": 1,
+          "title": "研究讨论",
+          "purpose": "讨论实验结果",
+          "attendees": 3,
+          "start_at": 1794531600,
+          "end_at": 1794535200,
+          "weeks": 1,
+          "status": "approved",
+          "created_at": 1794448800,
+          "decided_at": 1794448900,
+          "decided_by": 3,
+          "decision_reason": null,
+          "room": {
+            "id": 1,
+            "name": "讨论室A",
+            "location": "科研楼301",
+            "capacity": 12
+          },
+          "start_local": "2026-11-13T09:00:00+08:00",
+          "end_local": "2026-11-13T10:00:00+08:00",
+          "expired": false,
+          "reservation_id": 42
+        },
+        "replayed": true
+      }
+    }
+  },
+  "application_rejected": {
+    "http_status": 200,
+    "body": {
+      "ok": true,
+      "data": {
+        "id": 1,
+        "owner_id": 2,
+        "owner_display_name": "学生甲",
+        "supervisor_id": 3,
+        "supervisor_display_name": "导师甲",
+        "room_id": 1,
+        "title": "研究讨论",
+        "purpose": "讨论实验结果",
+        "attendees": 3,
+        "start_at": 1794531600,
+        "end_at": 1794535200,
+        "weeks": 1,
+        "status": "rejected",
+        "created_at": 1794448800,
+        "decided_at": 1794448900,
+        "decided_by": 3,
+        "decision_reason": "请先补齐讨论材料",
+        "room": {
+          "id": 1,
+          "name": "讨论室A",
+          "location": "科研楼301",
+          "capacity": 12
+        },
+        "start_local": "2026-11-13T09:00:00+08:00",
+        "end_local": "2026-11-13T10:00:00+08:00",
+        "expired": false,
+        "reservation_id": null
+      }
+    }
+  },
+  "application_withdrawn": {
+    "http_status": 200,
+    "body": {
+      "ok": true,
+      "data": {
+        "id": 1,
+        "owner_id": 2,
+        "owner_display_name": "学生甲",
+        "supervisor_id": 3,
+        "supervisor_display_name": "导师甲",
+        "room_id": 1,
+        "title": "研究讨论",
+        "purpose": "讨论实验结果",
+        "attendees": 3,
+        "start_at": 1794531600,
+        "end_at": 1794535200,
+        "weeks": 1,
+        "status": "withdrawn",
+        "created_at": 1794448800,
+        "decided_at": 1794448900,
+        "decided_by": 2,
+        "decision_reason": null,
+        "room": {
+          "id": 1,
+          "name": "讨论室A",
+          "location": "科研楼301",
+          "capacity": 12
+        },
+        "start_local": "2026-11-13T09:00:00+08:00",
+        "end_local": "2026-11-13T10:00:00+08:00",
+        "expired": false,
+        "reservation_id": null
       }
     }
   }

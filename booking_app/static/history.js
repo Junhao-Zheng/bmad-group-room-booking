@@ -20,6 +20,7 @@
   const cancelSubmit = document.querySelector("#cancel-submit");
   const cancelFeedback = document.querySelector("#cancel-feedback");
   const csrf = document.querySelector("#logout-form").elements.csrf_token.value;
+  const student = document.body.getAttribute("data-role") === "member";
   const labels = {pending: "待开始", in_progress: "进行中", ended: "已结束", cancelled: "已取消"};
   let busy = false, selectedId;
 
@@ -91,6 +92,7 @@
     return true;
   }
   function renderList(result) {
+    if (!result || !Array.isArray(result.items) || result.total !== result.items.length || !result.items.every(window.BookingContracts.booking)) throw new Error("Invalid booking list");
     items.replaceChildren();
       for (const booking of result.items) {
         const row = document.createElement("li");
@@ -148,6 +150,7 @@
     }
   }
   function renderDetail(booking) {
+    if (!window.BookingContracts.booking(booking)) throw new Error("Invalid booking detail");
     if (![booking.attendees, booking.room?.capacity].every(value => Number.isInteger(value) && value > 0))
       throw new Error("Incomplete booking quantities");
     const cancelled = booking.cancelled_at !== null;
@@ -155,6 +158,10 @@
       ["预约编号", booking.id], ["活动名称", booking.title], ["用途", booking.purpose],
       ["预计人数", `${booking.attendees} 人`], ["会议室", booking.room.name],
       ["会议室编号", booking.room.id], ["位置", booking.room.location], ["当前容量", `${booking.room.capacity} 人`],
+      ["所属导师", booking.supervisor_display_name ?? (booking.supervisor_source === "admin" ? "管理员安排" : "历史未绑定")],
+      ["审批申请编号", booking.application_id ?? "无（直接预约或历史记录）"],
+      ["批准时间", booking.approved_at === null ? "无" : new Date(booking.approved_at * 1000).toLocaleString("zh-CN", {timeZone:"Asia/Shanghai"})],
+      ["批准人编号", booking.approved_by ?? "无"],
       ["预约人", booking.owner_display_name], ["预约人编号", booking.owner_id],
       ["开始时间（北京时间）", local(booking.start_local)], ["结束时间（北京时间）", local(booking.end_local)],
       ["状态", labels[booking.status]], ["创建时间（北京时间）", local(booking.created_local)],
@@ -168,11 +175,11 @@
     detailFields.replaceChildren();
     for (const [label, value] of fields) { text(detailFields, "dt", label); text(detailFields, "dd", value); }
     detailFields.hidden = false;
-    cancelForm.hidden = !["pending", "cancelled"].includes(booking.status);
+    cancelForm.hidden = !["pending", "cancelled"].includes(booking.status) || (student && booking.status !== "cancelled");
     confirm.checked = false;
     cancelSubmit.textContent = booking.status === "cancelled" ? "再次确认取消状态" : "确认取消本预约";
     announce(cancelFeedback, booking.status === "cancelled" ? "此预约已取消，再次确认不会改变原取消信息。" :
-    (booking.status === "pending" ? "" : "预约已开始或结束，不能取消。"));
+    (student ? "学生已生效预约不能直接取消，请联系本人导师或管理员。" : booking.status === "pending" ? "" : "预约已开始或结束，不能取消。"));
   }
   async function loadDetail(id) {
     if (busy) return;

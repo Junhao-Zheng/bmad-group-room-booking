@@ -20,7 +20,7 @@ ORIGIN = "http://127.0.0.1:8000"
 PASSWORD = "Synthetic-query-only-passphrase"
 ROOM_KEYS = {"id", "name", "location", "capacity"}
 COMMON_KEYS = {"room_id", "room_name", "start_at", "start_local", "end_at", "end_local", "status"}
-BOOKING_KEYS = COMMON_KEYS | {"title", "owner_display_name"}
+BOOKING_KEYS = COMMON_KEYS | {"title", "owner_display_name", "supervisor_display_name", "supervisor_source"}
 BLOCK_KEYS = COMMON_KEYS | {"id", "reason"}
 
 
@@ -109,6 +109,9 @@ class RoomScheduleTests(unittest.TestCase):
         for room in result.json["data"]["items"]:
             self.assertEqual(set(room), ROOM_KEYS)
             for key, value in room.items():
+                if key == "supervisor_display_name":
+                    self.assertIsNone(value)  # 历史无绑定，不猜测导师
+                    continue
                 self.assertIs(type(value), int if key in {"id", "capacity"} else str)
         with self.app.app_context():
             self.assertEqual(services.list_rooms(self.actor()), result.json["data"])
@@ -154,6 +157,9 @@ class RoomScheduleTests(unittest.TestCase):
             self.assertEqual(set(item["record"]), BOOKING_KEYS if item["kind"] == "booking" else BLOCK_KEYS)
             self.assertIs(type(item["kind"]), str)
             for key, value in item["record"].items():
+                if key == "supervisor_display_name":
+                    self.assertIsNone(value)  # 历史无绑定，不猜测导师
+                    continue
                 self.assertIs(type(value), int if key in {"id", "room_id", "start_at", "end_at"} else str)
             self.assertEqual(item["record"]["room_id"], 10)
             self.assertEqual(item["record"]["room_name"], "合成 A")
@@ -305,7 +311,7 @@ class RoomScheduleTests(unittest.TestCase):
         with db.read_transaction(self.database) as conn:
             self.assertEqual([tuple(row) for row in conn.execute("SELECT * FROM reservations ORDER BY id")], before)
             self.assertEqual(conn.execute("SELECT capacity FROM rooms WHERE name='合成演示 · 讨论室 A'").fetchone()[0], 99)
-            self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0], 2)
+            self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0], 3)
 
     def test_story_1_1_schema_upgrade_preserves_accounts_and_sessions(self):
         with db.write_transaction(self.database) as conn:
@@ -318,7 +324,7 @@ class RoomScheduleTests(unittest.TestCase):
         with db.read_transaction(self.database) as conn:
             self.assertEqual([tuple(row) for row in conn.execute("SELECT * FROM users ORDER BY id")], users)
             self.assertEqual([tuple(row) for row in conn.execute("SELECT * FROM sessions ORDER BY token_hash")], sessions)
-            self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0], 2)
+            self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0], 3)
         self.assert_list_envelope(self.get("/api/rooms"))
         self.assertEqual(self.get("/api/rooms").json["data"], {"items": [], "total": 0})
 

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}申请与审批 · 课题组活动与会议室预约{% endblock %}
+{% block content %}
+<section class="page-intro">
+  <h1>申请与审批</h1>
+  <p>待审申请尚未占用会议室；仅本人导师批准后生效。所有时间均为北京时间。</p>
+  {% if user.role == 'admin' %}<p>管理员可查看全部申请，不能代替导师审批。</p>{% endif %}
+  <p><a href="{{ url_for('web.home') }}">提交新申请 / 预约</a> · <a href="{{ url_for('web.my_page') }}">查看已生效预约</a></p>
+  <p id="auth-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>
+  <a id="relogin-link" href="{{ url_for('web.login_page') }}" hidden>重新登录</a>
+</section>
+<section id="applications-panel" class="card">
+  <button id="applications-refresh" type="button">刷新申请记录</button>
+  <p id="applications-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>
+  <a id="applications-relogin" href="{{ url_for('web.login_page') }}" hidden>重新登录后查看</a>
+  <button id="applications-retry" type="button" hidden>重试确认原操作</button>
+  <ul id="applications-items" class="history-items" aria-label="申请记录"></ul>
+  <noscript><p>请启用 JavaScript 查询申请和处理审批。</p></noscript>
+</section>
+<script src="{{ url_for('static', filename='applications.js') }}" defer></script>
+{% endblock %}

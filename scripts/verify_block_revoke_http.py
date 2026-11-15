@@ -12,7 +12,8 @@ import threading
 
 from booking_app import ROOT, create_app, db
 from booking_app.audit import audit_writer
-from tests.legacy_fixture import seed_users
+# 当前直接创建/本人直接取消场景使用合成导师；学生审批另有独立runner。
+from tests.direct_booking_fixture import seed_users
 from scripts.verify_availability_performance import Client, Server, environment, write_json
 from scripts.verify_create_booking_http import FixedClock
 from scripts.verify_room_management_http import facts
@@ -52,7 +53,7 @@ def source_hashes():
     paths += [ROOT/name for name in (
         'scripts/verify_block_revoke_http.py','scripts/verify_block_revoke_browser.py','scripts/verify_block_revoke_browser.cjs',
         'scripts/verify_create_booking_http.py','scripts/verify_availability_performance.py',
-        'scripts/verify_room_management_http.py','scripts/verify_history_browser.py','scripts/verify_auth_browser.py','scripts/init_demo.py', 'scripts/migrate_db.py', 'scripts/backup_db.py', 'tests/legacy_fixture.py', 'tests/fixtures/schema_v1.sql',
+        'scripts/verify_room_management_http.py','scripts/verify_history_browser.py','scripts/verify_auth_browser.py','scripts/init_demo.py', 'scripts/migrate_db.py', 'scripts/backup_db.py', 'tests/legacy_fixture.py', 'tests/direct_booking_fixture.py', 'tests/fixtures/schema_v1.sql',
         'tests/__init__.py','tests/history_fixtures.py','tests/schedule_fixtures.py','tests/maintenance_contract.py','pyproject.toml','uv.lock')]
     return {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sorted(paths)}
 
@@ -67,7 +68,7 @@ def run(output):
     with tempfile.TemporaryDirectory(prefix='revoke-http-') as directory:
         database = Path(directory)/'test.sqlite3'
         users = [dict(username=f'revoke_admin_{i}',display_name=f'合成撤销管理员 {i}',role='admin',password=secrets.token_urlsafe(24)) for i in (1,2)]
-        members = [dict(username=f'revoke_member_{i}',display_name=f'合成成员 {i}',role='member',password=secrets.token_urlsafe(24)) for i in (1,2)]
+        members = [dict(username=f'revoke_member_{i}',display_name=f'合成成员 {i}',role='teacher',password=secrets.token_urlsafe(24)) for i in (1,2)]
         seed_users(database, users + members, FixedClock())
         with db.write_transaction(database) as conn:
             conn.execute("INSERT INTO rooms VALUES(1,'合成并发会议室','测试楼',20,?,?)", (NOW, NOW))

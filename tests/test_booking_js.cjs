@@ -5,7 +5,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 const {webcrypto} = require('node:crypto');
 
-function harness(initialFetch) {
+function harness(initialFetch, isApplication=false) {
   let active, implementation=initialFetch, timerId=0;
   const fetches=[],timers=new Map();
   function node(id='') {
@@ -20,6 +20,7 @@ function harness(initialFetch) {
       dispatch(event){return listeners.get(event)?.({preventDefault(){}});}};
   }
   const form=node('booking-form'),button=node('submit');
+  form.setAttribute('data-application',String(isApplication));
   const inputs={title:node('booking-name'),purpose:node('booking-purpose'),csrf_token:node('csrf')};
   inputs.csrf_token.value='synthetic-csrf';inputs.title.value='  中文 🧪 <img>  ';inputs.purpose.value='用途';
   form.elements=inputs;form.querySelector=()=>button;
@@ -32,10 +33,10 @@ function harness(initialFetch) {
   availabilityForm.querySelector=selector=>selector==='button[type=submit]'?others[3]:others.find(n=>n.getAttribute('aria-invalid')==='true');
   const window={crypto:webcrypto,setTimeout(cb,ms){const id=++timerId;timers.set(id,{cb,ms});return id;},clearTimeout(id){timers.delete(id);}};
   const context=vm.createContext({Uint8Array,AbortController,URLSearchParams,window,
-    document:{querySelector:s=>s==='#booking-form'?form:s==='#availability-form'?availabilityForm:nodes[s.slice(1)],
+    document:{body:{getAttribute:()=> 'teacher'},querySelector:s=>s==='#booking-form'?form:s==='#availability-form'?availabilityForm:nodes[s.slice(1)],
       querySelectorAll:()=>others,getElementById:id=>nodes[id],createElement:()=>node()},
     fetch:(url,options)=>{fetches.push({url,options});return implementation(url,options);}});
-  for(const file of ['availability.js','booking.js']) vm.runInContext(fs.readFileSync(path.join(__dirname,'../booking_app/static',file),'utf8'),context);
+  for(const file of ['contracts.js','availability.js','booking.js']) vm.runInContext(fs.readFileSync(path.join(__dirname,'../booking_app/static',file),'utf8'),context);
   const select=(room={},query={})=>window.selectBookingRoom({id:1,name:'合成 <房间>',location:'101',...room},
       {start:'2026-11-12T12:00',end:'2026-11-12T13:00',attendees:'5',...query});
   return {form,button,inputs,nodes,others,fetches,timers,select,availabilityForm,get active(){return active;},
@@ -46,7 +47,7 @@ const successBody=(replayed=false)=>({ok:true,data:{booking:{id:7,title:'<img>�
   start_at:Date.parse('2026-11-12T12:00:00+08:00')/1000,start_local:'2026-11-12T12:00:00+08:00',
   end_at:Date.parse('2026-11-12T13:00:00+08:00')/1000,end_local:'2026-11-12T13:00:00+08:00',
   created_at:Date.parse('2026-11-12T10:00:00+08:00')/1000,created_local:'2026-11-12T10:00:00+08:00',
-  cancelled_at:null,cancelled_local:null,cancelled_by_id:null,cancelled_by_display_name:null,cancel_reason:null},replayed}});
+  cancelled_at:null,cancelled_local:null,cancelled_by_id:null,cancelled_by_display_name:null,cancel_reason:null,supervisor_id:null,supervisor_display_name:null,supervisor_source:'legacy',application_id:null,approved_at:null,approved_by:null},replayed}});
 const success=(replayed=false)=>({ok:true,status:replayed?200:201,json:async()=>successBody(replayed)});
 const statuses={INVALID_INPUT:400,AUTH_REQUIRED:401,CSRF_REJECTED:403,STORE_BUSY:503,OCCUPANCY_CONFLICT:409,CAPACITY_CONFLICT:409,INTERNAL_ERROR:500};
 const failure=(code,fields={})=>({ok:false,status:statuses[code]||500,json:async()=>({ok:false,error:{code,message:code,fields,conflicts:[]}})});
@@ -289,4 +290,24 @@ test('replay refreshes room name and location in confirmation conditions without
   assert.match(ui.nodes['booking-conditions'].textContent,/新会议室名称 · 新楼层 · 2026-11-12 12:00 — 2026-11-12 13:00（北京时间） · 5 人/);
   assert.deepEqual(JSON.parse(ui.fetches[0].options.body),JSON.parse(ui.fetches[1].options.body));
   assert.equal(ui.inputs.title.value,'  中文 🧪 <img>  ');
+});
+
+
+test('student application wording preserves intent without implying direct occupancy',async()=>{
+  const ui=harness(async()=>{throw Error('unknown');},true);ui.select();
+  assert.match(ui.nodes['booking-feedback'].textContent,/提交申请.*尚未占用/);assert.equal(ui.button.textContent,'提交申请');
+  await ui.submit();assert.equal(ui.fetches[0].url,'/api/applications');
+  assert.match(ui.nodes['booking-feedback'].textContent,/未能确认申请结果.*可能已提交.*导师批准才占用/);
+  assert.doesNotMatch(ui.nodes['booking-feedback'].textContent,/原预约|可能已成功|预约成功/);assert.equal(ui.button.textContent,'重试确认原申请');
+  const intent=JSON.parse(ui.fetches[0].options.body).intent_key;
+  const booking=successBody().data.booking;
+  const application={id:7,owner_id:1,owner_display_name:'学生',supervisor_id:3,supervisor_display_name:'导师',room_id:1,room:booking.room,
+    title:booking.title,purpose:booking.purpose,attendees:5,start_at:booking.start_at,end_at:booking.end_at,start_local:booking.start_local,end_local:booking.end_local,
+    weeks:1,status:'awaiting_approval',created_at:booking.created_at,decided_at:null,decided_by:null,decision_reason:null,expired:false,reservation_id:null};
+  ui.setFetch(async()=>({ok:true,status:200,json:async()=>({ok:true,data:{application,replayed:true}})}));await ui.submit();
+  assert.equal(JSON.parse(ui.fetches[1].options.body).intent_key,intent);assert.match(ui.nodes['booking-feedback'].textContent,/已确认原申请.*待本人导师审批/);assert.equal(ui.button.textContent,'再次确认原申请');
+  ui.setFetch(async()=>{throw Error('lost read');});await ui.submit();assert.match(ui.nodes['booking-feedback'].textContent,/原申请 #7 已确认/);assert.doesNotMatch(ui.nodes['booking-feedback'].textContent,/原预约/);
+  ui.inputs.title.value='新申请';ui.inputs.title.dispatch('input');assert.match(ui.nodes['booking-feedback'].textContent,/新申请意图/);assert.equal(ui.button.textContent,'提交申请');
+  ui.nodes['booking-new'].dispatch('click');ui.select();await ui.submit();
+  ui.inputs.title.value='又一申请';ui.inputs.title.dispatch('input');assert.match(ui.nodes['booking-feedback'].textContent,/先前提交的申请结果仍未确认/);
 });

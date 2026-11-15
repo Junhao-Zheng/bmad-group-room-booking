@@ -5,9 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}课题组活动与会议室预约{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+  <script src="{{ url_for('static', filename='contracts.js') }}" defer></script>
   <script src="{{ url_for('static', filename='auth.js') }}" defer></script>
 </head>
-<body>
+<body data-role="{{ user.role if user else '' }}" data-user-id="{{ user.id if user else '' }}">
   <a class="skip-link" href="#main">跳到主要内容</a>
   <header class="site-header">
     <div class="header-content">
@@ -16,6 +17,7 @@
       <nav class="primary-nav" aria-label="主要导航">
         <a href="{{ url_for('web.home') }}"{% if request.endpoint == 'web.home' %} aria-current="page"{% endif %}>预约</a>
         <a href="{{ url_for('web.my_page') }}"{% if request.endpoint == 'web.my_page' %} aria-current="page"{% endif %}>我的预约</a>
+        <a href="{{ url_for('web.applications_page') }}"{% if request.endpoint == 'web.applications_page' %} aria-current="page"{% endif %}>申请与审批</a>
         {% if user.role == 'admin' %}<a href="{{ url_for('web.admin_page') }}"{% if request.endpoint == 'web.admin_page' %} aria-current="page"{% endif %}>管理</a>{% endif %}
       </nav>
       <div class="account">

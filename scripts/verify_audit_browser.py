@@ -10,7 +10,8 @@ import sys
 import tempfile
 from booking_app import ROOT
 from booking_app.domain import SystemClock
-from tests.legacy_fixture import DEMO_IDENTITIES,seed_users
+# 当前直接创建/本人直接取消场景使用合成导师；学生审批另有独立runner。
+from tests.direct_booking_fixture import DEMO_IDENTITIES,seed_users
 from scripts.verify_audit_http import LiveServer,populate,facts,evidence_facts,source_hashes
 from scripts.verify_availability_performance import environment,write_json
 from scripts.verify_history_browser import browser_wrapper,run_driver,environment_metadata
