@@ -11,7 +11,9 @@
   const feedback = document.querySelector("#booking-feedback");
   const relogin = document.querySelector("#booking-relogin");
   const availabilityForm = document.querySelector("#availability-form");
-  const inputs = [form.elements.title, form.elements.purpose];
+  const weeksInput = form.elements.weeks;
+  const dates = document.querySelector("#booking-dates");
+  const inputs = [form.elements.title, form.elements.purpose, ...(weeksInput ? [weeksInput] : [])];
   const newButton = document.querySelector("#booking-new");
   let selected, signature, intentKey, pending = false, unknown = false, completed = false;
   let confirmedId, earlierUnknown = false;
@@ -23,7 +25,21 @@
     return Array.from(random, value => value.toString(16).padStart(2, "0")).join("");
   }
   function currentSignature() {
-    return JSON.stringify({...selected, title: strip(form.elements.title.value), purpose: strip(form.elements.purpose.value)});
+    return JSON.stringify({...selected, title: strip(form.elements.title.value), purpose: strip(form.elements.purpose.value),
+      ...(weeksInput ? {weeks: Number(weeksInput.value)} : {})});
+  }
+  function showDates() {
+    if (!dates || !selected) return;
+    dates.replaceChildren();
+    const count = Number(weeksInput.value);
+    for (let index = 0; index < count; index++) {
+      const start = new Date(`${selected.start}:00+08:00`).getTime() + index * 604800000;
+      const end = new Date(`${selected.end}:00+08:00`).getTime() + index * 604800000;
+      const local = value => new Date(value + 28800000).toISOString().slice(0, 16).replace("T", " ");
+      const row = document.createElement("li");
+      row.textContent = `第 ${index + 1} 周 · ${local(start)} — ${local(end)}`;
+      dates.append(row);
+    }
   }
   function syncIntent() {
     const next = currentSignature();
@@ -37,8 +53,9 @@
     announce(`内容已更改，将提交新${noun}意图。`, false, false);
   }
   inputs.forEach(input => input.addEventListener("input", () => {
-    if (selected && !pending) syncIntent();
+    if (selected && !pending) { syncIntent(); if (input === weeksInput) showDates(); }
   }));
+  if (weeksInput) weeksInput.addEventListener("change", () => {if (selected && !pending) {syncIntent();showDates();}});
   newButton.addEventListener("click", () => {
     if (pending) return;
     if (unknown && confirmedId === undefined) earlierUnknown = true;
@@ -46,6 +63,8 @@
     unknown = completed = false;
     confirmedId = undefined;
     inputs.forEach(input => { input.value = ""; });
+    if (weeksInput) weeksInput.value = "1";
+    if (dates) dates.replaceChildren();
     panel.hidden = true;
     availabilityForm.elements.start.focus();
   });
@@ -95,6 +114,7 @@
     panel.hidden = false;
     document.querySelector("#booking-conditions").textContent =
       `${room.name} · ${room.location} · ${query.start.replace("T", " ")} — ${query.end.replace("T", " ")}（北京时间） · ${query.attendees} 人`;
+    showDates();
     if (!completed && !unknown && !wasUnknown) announce(isApplication ? "填写活动名称和用途后提交申请，尚未占用会议室。" : "填写活动名称和用途后确认预约。");
     relogin.hidden = true;
     inputs.forEach(input => { input.disabled = false; });
@@ -113,7 +133,11 @@
       return;
     }
     syncIntent();
-    const payload = {...selected, intent_key: intentKey, title: form.elements.title.value, purpose: form.elements.purpose.value};
+    const weekly = weeksInput && Number(weeksInput.value) > 1;
+    const applicationRequest = isApplication || weekly;
+    const responseKey = applicationRequest ? "application" : "booking";
+    const payload = {...selected, intent_key: intentKey, title: form.elements.title.value, purpose: form.elements.purpose.value,
+      ...(weeksInput && applicationRequest ? {weeks: Number(weeksInput.value)} : {})};
     pending = true;
     button.disabled = true;
     const controls = [...inputs, newButton, ...document.querySelectorAll("#availability-form input, #availability-form button, .booking-select")];
@@ -131,7 +155,7 @@
     const timeout = window.setTimeout(() => controller.abort(), 20000);
     let invalidInput;
     try {
-      const response = await fetch(isApplication ? "/api/applications" : "/api/bookings", {
+      const response = await fetch(applicationRequest ? "/api/applications" : "/api/bookings", {
         method: "POST", credentials: "same-origin", signal: controller.signal,
         headers: {"Content-Type": "application/json", "X-CSRF-Token": form.elements.csrf_token.value},
         body: JSON.stringify(payload),
@@ -147,7 +171,9 @@
         const error = body.error;
         const otherFields = Object.entries(error.fields || {})
           .filter(([name]) => !["title", "purpose"].includes(name)).map(([, message]) => message);
-        announce([error.message, ...otherFields, ...(unknown || completed ? [unconfirmedMessage()] : [])].join(" "), true);
+        const conflictDates = error.conflicts.map(item => item?.start_local?.slice(0,10)).filter(Boolean);
+        announce([error.message, ...otherFields, ...(conflictDates.length ? [`冲突日期：${[...new Set(conflictDates)].join("、")}`] : []),
+          ...(unknown || completed ? [unconfirmedMessage()] : [])].join(" "), true);
         for (const name of ["title", "purpose"]) {
           if (error.fields && error.fields[name]) {
             form.elements[name].setAttribute("aria-invalid", "true");
@@ -159,18 +185,18 @@
         return;
       }
       if (![200, 201].includes(response.status) || !keys(body, ["ok", "data"]) || body.ok !== true
-          || !keys(body.data, [recordKey, "replayed"]) || body.data.replayed !== (response.status === 200)
-          || !object(body.data[recordKey])) throw new Error("Unconfirmed response");
-      const booking = body.data[recordKey];
+          || !keys(body.data, [responseKey, "replayed"]) || body.data.replayed !== (response.status === 200)
+          || !object(body.data[responseKey])) throw new Error("Unconfirmed response");
+      const booking = body.data[responseKey];
       if (!Number.isSafeInteger(booking.id) || booking.id < 1
           || typeof booking.title !== "string" || !strip(booking.title) || Array.from(booking.title).length > 80
           || !localTime(booking.start_local) || !localTime(booking.end_local)
           || booking.start_local >= booking.end_local) throw new Error("Unconfirmed response");
-      if (!validBooking(booking)) throw new Error("Unconfirmed booking contract");
+      if (!window.BookingContracts[responseKey](booking)) throw new Error("Unconfirmed booking contract");
       document.querySelector("#booking-conditions").textContent =
         `${booking.room.name} · ${booking.room.location} · ${booking.start_local.slice(0, 16).replace("T", " ")} — ${booking.end_local.slice(0, 16).replace("T", " ")}（北京时间） · ${booking.attendees} 人`;
       const status = {awaiting_approval: "待本人导师审批", approved: "已批准", rejected: "已拒绝", withdrawn: "已撤回", pending: "待开始", in_progress: "进行中", ended: "已结束", cancelled: "已取消"}[booking.status];
-      announce(`${isApplication ? (body.data.replayed ? "已确认原申请" : "申请已提交，尚未占用") : (body.data.replayed ? "已确认原预约" : "预约成功")} · ${status} · 编号 ${booking.id} · ${booking.title} · ${booking.start_local.slice(0, 16).replace("T", " ")} — ${booking.end_local.slice(0, 16).replace("T", " ")}（北京时间）`);
+      announce(`${isApplication ? (body.data.replayed ? "已确认原申请" : "申请已提交，尚未占用") : (body.data.replayed ? "已确认原预约" : "预约成功")} · ${status} · 编号 ${booking.id} · ${booking.title} · ${booking.weeks || 1} 周 · ${booking.start_local.slice(0, 16).replace("T", " ")} — ${booking.end_local.slice(0, 16).replace("T", " ")}（北京时间）`);
       unknown = false;
       completed = true;
       confirmedId = booking.id;

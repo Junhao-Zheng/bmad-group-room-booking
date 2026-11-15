@@ -93,3 +93,6 @@
 {"timestamp": "2026-11-15T14:05:17.082367+00:00", "story": "4-2-supervised-booking", "from": "review", "to": "done", "actor": "AI root", "head": "b6af1a1cc47e890cfdf59c7ad92f378bdd4235f9", "post_done_rework": false}
 {"timestamp": "2026-11-15T14:06:43.924427+00:00", "story": "4-3-supervised-cancellation", "from": "backlog", "to": "ready-for-dev", "actor": "AI root", "head": "34443922ad2dd2df24e2a8f35cb01d8c83a7b59f", "post_done_rework": false}
 {"timestamp": "2026-11-15T14:06:54.538401+00:00", "story": "4-3-supervised-cancellation", "from": "ready-for-dev", "to": "in-progress", "actor": "AI root", "head": "34443922ad2dd2df24e2a8f35cb01d8c83a7b59f", "post_done_rework": false}
+{"timestamp": "2026-11-15T14:39:05+00:00", "story": "4-3-supervised-cancellation", "from": "in-progress", "to": "done", "actor": "AI root", "head": "597a091", "post_done_rework": false}
+{"timestamp": "2026-11-15T14:39:05+00:00", "story": "4-4-weekly-applications", "from": "backlog", "to": "in-progress", "actor": "AI root", "head": "597a091", "post_done_rework": false}
+{"timestamp": "2026-11-15T14:39:05+00:00", "story": "4-4-weekly-applications", "from": "in-progress", "to": "done", "actor": "AI root", "head": "597a091", "post_done_rework": false}

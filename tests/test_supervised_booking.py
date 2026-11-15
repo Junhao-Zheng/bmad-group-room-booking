@@ -156,7 +156,9 @@ class SupervisedBookingTests(unittest.TestCase):
     def test_students_cannot_direct_book_or_cancel_but_legacy_replays_survive(self):
         self.assert_code('FORBIDDEN',services.create_booking,self.student,self.payload)
         self.assert_code('INVALID_INPUT',applications.create_application,self.student,self.payload|{'supervisor_id':self.other.id})
-        self.assert_code('INVALID_INPUT',applications.create_application,self.student,self.payload|{'weeks':2})
+        weekly=self.create(intent_key='weekly-policy-check-0001',weeks=2)
+        self.assertEqual(len(weekly['occurrences']),2)
+        self.assertIsNone(weekly['occurrences'][1]['reservation_id'])
         item=self.decide(self.create());before=self.facts()
         self.assert_code('FORBIDDEN',services.member_cancel_booking,self.student,item['reservation_id']);self.assertEqual(self.facts(),before)
         self.call(services.admin_cancel_booking,self.admin,item['reservation_id'],'管理员取消')

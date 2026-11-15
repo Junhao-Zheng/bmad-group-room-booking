@@ -7,3 +7,5 @@
 {"recorded_at_utc": "2026-11-15T13:25:21.704092+00:00", "event": "implementation_dispatch_observed", "story": "4-2-supervised-booking", "agent": "implement_booking_approval"}
 {"recorded_at_utc": "2026-11-15T14:07:11+00:00", "event": "story_accepted", "story": "4-2-supervised-booking", "commit": "34443922ad2dd2df24e2a8f35cb01d8c83a7b59f", "python_tests": 243, "js_tests": 414, "first_review_pass": false}
 {"recorded_at_utc": "2026-11-15T14:07:11+00:00", "event": "implementation_dispatch_observed", "story": "4-3-supervised-cancellation", "agent": "implement_cancellation", "note": "登记时间，非推定启动时间"}
+{"recorded_at_utc": "2026-11-15T14:39:05+00:00", "event": "story_accepted", "story": "4-3-supervised-cancellation", "commit": "597a091", "python_tests": 247, "js_suite": "all existing files pass", "first_review_pass": false}
+{"recorded_at_utc": "2026-11-15T14:39:05+00:00", "event": "story_accepted", "story": "4-4-weekly-applications", "python_tests": 254, "js_suite": "all existing files pass", "browser_viewports": [1280,390], "first_review_pass": false}

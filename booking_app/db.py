@@ -7,7 +7,7 @@ import re
 
 from flask import current_app, g
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 REQUIRED_COLUMNS = {
     "cancellation_requests": {"id", "booking_id", "requester_id", "supervisor_id", "created_at", "status", "decided_at", "decided_by", "reason"},
     "applications": {"id", "owner_id", "owner_display_name", "supervisor_id", "supervisor_display_name", "room_id", "title", "purpose", "attendees", "start_at", "end_at", "weeks", "intent_key", "request_payload", "status", "created_at", "decided_at", "decided_by", "decision_reason"},
@@ -154,11 +154,11 @@ def schema_sql_tokens(sql):
                  for token in tokens if token != ';')
 
 
-def check_critical_schema(conn):
+def check_critical_schema(conn, reference_schema=None):
     """Column names alone cannot prove CHECK, FK, primary-key or unique guarantees."""
     reference = sqlite3.connect(":memory:")
     try:
-        reference.executescript(Path(__file__).with_name("schema.sql").read_text(encoding="utf-8"))
+        reference.executescript(reference_schema or Path(__file__).with_name("schema.sql").read_text(encoding="utf-8"))
         for name in ("users", "applications", "application_occurrences", "booking_supervisors", "cancellation_requests", "audit_events", "occupancy_slots"):
             expected = reference.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name=?", (name,)).fetchone()[0]
             actual = conn.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name=?", (name,)).fetchone()

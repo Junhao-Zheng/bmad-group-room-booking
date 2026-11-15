@@ -36,6 +36,9 @@ def create_booking(actor: auth.Actor, payload: dict) -> dict:
             # Rebuild current facts, before any new-booking time/capacity/occupancy rules.
             # Exiting the transaction commits even this read-only replay; no audit is emitted.
             return {"booking": dto.booking_full(previous, room, now), "replayed": True}
+        if conn.execute("SELECT 1 FROM applications WHERE owner_id=? AND intent_key=?",
+                        (actor.id, intent_key)).fetchone():
+            raise DomainError("IDEMPOTENCY_MISMATCH", "提交标识已用于周期申请或预约，请核对原记录。")
         if actor.role not in ("teacher", "admin"):
             raise DomainError("FORBIDDEN", "学生请提交申请并等待本人导师审批。")
         room = conn.execute("SELECT id,name,location,capacity FROM rooms WHERE id=?", (values["room_id"],)).fetchone()

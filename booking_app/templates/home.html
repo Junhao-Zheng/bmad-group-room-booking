@@ -60,6 +60,14 @@
       <p id="booking-purpose-hint" class="field-hint">去除首尾空白后 1—500 个字符，仅本人、本人导师及管理员可见。</p>
       <p id="booking-purpose-error" class="field-error"></p>
     </div>
+    <div class="form-field">
+      <label for="booking-weeks">连续周数</label>
+      <select id="booking-weeks" name="weeks">
+        {% for count in range(1, 9) %}<option value="{{ count }}">{{ count }} 周</option>{% endfor %}
+      </select>
+      <p class="field-hint">每周同一时段；首场须在未来 7 天内。整组仅在全部时段空闲时生效。</p>
+    </div>
+    <ol id="booking-dates" class="history-items" aria-label="连续预约日期"></ol>
     <button class="button-primary" type="submit" disabled>{{ '提交申请' if user.role == 'member' else '确认预约' }}</button>
     <button id="booking-new" class="button-secondary" type="button">{{ '开始新申请' if user.role == 'member' else '开始新预约' }}</button>
   </form>

@@ -15,8 +15,10 @@
   function bookingOrigin(v) {
     if (v.supervisor_source === "application") return id(v.supervisor_id) && v.owner_id !== v.supervisor_id &&
       id(v.application_id) && integer(v.approved_at) && v.approved_by === v.supervisor_id;
-    if (![v.application_id,v.approved_at,v.approved_by].every(x => x === null)) return false;
-    return v.supervisor_source === "teacher" ? id(v.supervisor_id) && v.supervisor_id === v.owner_id : v.supervisor_id === null;
+    const directOrigin = v.application_id === null
+      ? [v.approved_at,v.approved_by].every(x => x === null)
+      : id(v.application_id) && integer(v.approved_at) && v.approved_by === v.owner_id;
+    return directOrigin && (v.supervisor_source === "teacher" ? id(v.supervisor_id) && v.supervisor_id === v.owner_id : v.supervisor_id === null);
   }
   function booking(v) {
     return keys(v,"id,room,title,purpose,attendees,owner_id,owner_display_name,start_at,start_local,end_at,end_local,status,created_at,created_local,cancelled_at,cancelled_local,cancelled_by_id,cancelled_by_display_name,cancel_reason,supervisor_id,supervisor_display_name,supervisor_source,application_id,approved_at,approved_by") &&
@@ -28,9 +30,16 @@
         [v.cancelled_at,v.cancelled_local,v.cancelled_by_id,v.cancelled_by_display_name,v.cancel_reason].every(x => x === null));
   }
   function application(v) {
-    return keys(v,"id,owner_id,owner_display_name,supervisor_id,supervisor_display_name,room_id,title,purpose,attendees,start_at,end_at,weeks,status,created_at,decided_at,decided_by,decision_reason,room,start_local,end_local,expired,reservation_id") &&
-      [v.id,v.owner_id,v.supervisor_id,v.room_id,v.attendees].every(id) && room(v.room) && v.room.id === v.room_id &&
-      [v.owner_display_name,v.supervisor_display_name,v.title,v.purpose].every(text) && v.weeks === 1 && integer(v.created_at) &&
+    const names="id,owner_id,owner_display_name,supervisor_id,supervisor_display_name,room_id,title,purpose,attendees,start_at,end_at,weeks,status,created_at,decided_at,decided_by,decision_reason,room,start_local,end_local,expired,reservation_id";
+    if (!(keys(v,names) || keys(v,names+",occurrences"))) return false;
+    if (!(integer(v.weeks) && v.weeks >= 1 && v.weeks <= 8 && (v.weeks === 1) === !Object.hasOwn(v,"occurrences"))) return false;
+    if (v.weeks > 1 && (!Array.isArray(v.occurrences) || v.occurrences.length !== v.weeks || !v.occurrences.every((item,index) =>
+      keys(item,"occurrence,start_at,end_at,start_local,end_local,reservation_id,status") && item.occurrence === index+1 &&
+      pair(item.start_at,item.start_local) && pair(item.end_at,item.end_local) &&
+      item.start_at === v.start_at+index*604800 && item.end_at === v.end_at+index*604800 &&
+      (v.status === "approved" ? id(item.reservation_id) && ["pending","in_progress","ended","cancelled"].includes(item.status) : item.reservation_id === null && item.status === null)))) return false;
+    return [v.id,v.owner_id,v.supervisor_id,v.room_id,v.attendees].every(id) && room(v.room) && v.room.id === v.room_id &&
+      [v.owner_display_name,v.supervisor_display_name,v.title,v.purpose].every(text) && integer(v.created_at) &&
       pair(v.start_at,v.start_local) && pair(v.end_at,v.end_local) && v.end_at > v.start_at && typeof v.expired === "boolean" &&
       ["awaiting_approval","approved","rejected","withdrawn"].includes(v.status) && nullable(v.decision_reason,text) &&
       (v.status === "awaiting_approval" ? [v.decided_at,v.decided_by,v.decision_reason,v.reservation_id].every(x => x === null) :

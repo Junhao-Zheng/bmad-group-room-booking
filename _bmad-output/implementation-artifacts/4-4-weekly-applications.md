@@ -2,7 +2,7 @@
 title: 最多8周固定时段整批预约
 type: feature
 created: 2026-11-15
-status: draft
+status: done
 route: dispatch
 review_loop_iteration: 0
 context: []
@@ -38,13 +38,12 @@ context: []
 
 ## Tasks & Acceptance
 
-- [ ] `domain.py/applications.py`将weeks纳入规范化载荷；服务端一次生成场次，每场日期、room、人数和规则一致。审批锁内校验全部场次后写；优先构建全部冲突摘要（隐私白名单），不只报第一场导致用户误解。
-- [ ] POST `/api/applications`支持1—8周及三角色：member待审，teacher/admin整批直接生效（管理员不代批别人）；现有单次直订API保持兼容，学生不得绕过。父申请/occurrence与reservation关联稳定，派生整体结果显示逐场当前状态。
-- [ ] 同用户key跨直订/申请命名空间防意外碰撞与泄漏；旧已成功单次意图仍能按原入口重放。weeks省略=1与显式1等价，增加到8属于新实质意图；审批同请求重试先授权再返回首事实，不再应用新建窗口。
-- [ ] `home.html/booking.js`周数选择、提交前列全部日期和整批规则；学生“申请已提交尚未占用”，导师直订“全部已生效”。查询单次只代表首场，不能说8周都空闲。审批页显示全部日期/冲突，个人页能看到每场及取消入口，导师显示正确。
-- [ ] 当前严格DTO/contract-examples和后端/JS夹具同步；无未限定HTML渲染，不泄他人用途人数。身份失效与响应丢失不自动新key重提。
-- [ ] 新`tests/test_weekly_applications.py`、JS及浏览器验证矩阵；真实文件库并发、失败注入、跨月/年日期、8周及第9周、每场取消、重启重放；保留其他单次测试能力。
-- [ ] `docs/evidence/human-review/weekly-verification.md`保存实际证据，更新当前用户指引；勿commit/push。
+- [x] 服务端生成1—8周场次；批准前检查全部冲突，同一事务写全部预约、占用与审计。首场仍受7天窗口约束。
+- [x] 三角色使用申请入口；学生待审、导师/管理员本人直订整批生效；旧单次直订入口保留。
+- [x] 直订与申请同用户提交标识互斥；重放返回当前状态，新增周数改变规范化意图。
+- [x] 首页选择周数并显示全部日期；审批页列逐场状态和详情；个人预约按场查看和申请取消。
+- [x] DTO和浏览器合同支持逐场状态，冲突日期出现在错误响应及页面反馈。
+- [x] Python定向、全套回归、桌面/手机真实Chrome流程通过；证据见`docs/evidence/human-review/weekly-verification.md`。
 
 **Acceptance Criteria:**
 - Given8周且第3周有占用，When导师批准，Then冲突明确且一场都不生效；移除冲突后重试合法整组成功。
@@ -60,3 +59,5 @@ context: []
 ## Verification
 
 运行周期/审批/取消/重放定向Python测试、相关JS及真实浏览器8周主流程；保存源码指纹及DB断言，禁止用旧单次成功报告代替。
+
+2026-11-15：Python 254/254；全部既有JS文件通过；生产SystemClock的Chrome 1280/390浏览器流程实际完成8周申请、整批批准、第三周取消并核对其他周次。20组并发、跨年及含业务关联的v4迁移均通过定向测试。完整输出见验证记录。

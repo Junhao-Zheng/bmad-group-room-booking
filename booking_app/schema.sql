@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS applications (
     attendees INTEGER NOT NULL CHECK(typeof(attendees)='integer' AND attendees>0),
     start_at INTEGER NOT NULL CHECK(start_at%1800=0),
     end_at INTEGER NOT NULL CHECK(end_at%1800=0 AND end_at>start_at),
-    weeks INTEGER NOT NULL DEFAULT 1 CHECK(weeks=1),
+    weeks INTEGER NOT NULL DEFAULT 1 CHECK(typeof(weeks)='integer' AND weeks BETWEEN 1 AND 8),
     intent_key TEXT NOT NULL CHECK(length(intent_key) BETWEEN 16 AND 80),
     request_payload TEXT NOT NULL,
     status TEXT NOT NULL CHECK(status IN ('awaiting_approval','approved','rejected','withdrawn')),
@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS applications (
 );
 CREATE TABLE IF NOT EXISTS application_occurrences (
     application_id INTEGER NOT NULL REFERENCES applications(id) ON DELETE RESTRICT,
-    occurrence INTEGER NOT NULL CHECK(occurrence=1),
+    occurrence INTEGER NOT NULL CHECK(occurrence BETWEEN 1 AND 8),
     reservation_id INTEGER NOT NULL UNIQUE REFERENCES reservations(id) ON DELETE RESTRICT,
     PRIMARY KEY(application_id,occurrence)
 );

@@ -20,7 +20,7 @@
       const body=await response.json();
       if (!response.ok) {
         if (!body || body.ok!==false || !body.error || typeof body.error.code!=="string" || typeof body.error.message!=="string") throw Error("Unknown response");
-        throw Object.assign(Error(body.error.message),{api:true,code:body.error.code});
+        throw Object.assign(Error(body.error.message),{api:true,code:body.error.code,conflicts:body.error.conflicts});
       }
       if (!body || Object.keys(body).sort().join(",")!=="data,ok" || body.ok!==true) throw Error("Unknown response");
       return body.data;
@@ -41,17 +41,20 @@
       text(row,"p",labels[item.status]+(item.expired?" · 已过开始时间，不能批准":""));
       text(row,"p",`${item.room.name} · ${item.room.location} · ${item.attendees} 人`);
       text(row,"p",`${local(item.start_local)} — ${local(item.end_local)}`);
+      if(item.occurrences)for(const occurrence of item.occurrences) {
+        text(row,"p",`第 ${occurrence.occurrence} 周 · ${local(occurrence.start_local)} — ${local(occurrence.end_local)} · ${occurrence.reservation_id===null?"尚未占用":`预约 #${occurrence.reservation_id}（${occurrence.status}）`}`);
+      }
       text(row,"p",`申请人：${item.owner_display_name} · 本人导师：${item.supervisor_display_name}`);
       text(row,"p",`用途：${item.purpose}`);
       if(item.decided_at!==null) text(row,"p",`处理时间：${new Date(item.decided_at*1000).toLocaleString("zh-CN",{timeZone:"Asia/Shanghai"})} · 处理人编号 ${item.decided_by}`);
       if(item.decision_reason!==null) text(row,"p",`拒绝原因：${item.decision_reason}`);
-      if(item.reservation_id!==null) text(row,"p",`生效预约编号：${item.reservation_id}；学生可在“我的预约”查看，导师可查看下方预约详情。`);
-      if(item.reservation_id!==null) {
-        const detail=text(row,"button","查看生效预约详情"); detail.type="button";
+      if(item.reservation_id!==null && !item.occurrences) text(row,"p",`生效预约编号：${item.reservation_id}；学生可在“我的预约”查看，导师可查看下方预约详情。`);
+      for(const bookingId of item.occurrences ? item.occurrences.map(value=>value.reservation_id).filter(Boolean) : item.reservation_id!==null?[item.reservation_id]:[]) {
+        const detail=text(row,"button",item.occurrences?`查看第 ${item.occurrences.find(value=>value.reservation_id===bookingId).occurrence} 周预约详情`:"查看生效预约详情"); detail.type="button";
         const detailResult=text(row,"p",""); detailResult.hidden=true;
         detail.addEventListener("click",async()=>{
           if(busy||blocked)return;detailResult.textContent="";detailResult.hidden=true;lock(true);say("正在读取预约详情…");
-          try{const booking=await request(`/api/bookings/${item.reservation_id}`);if(!window.BookingContracts.booking(booking)||booking.id!==item.reservation_id||booking.application_id!==item.id)throw Error("Invalid booking");
+          try{const booking=await request(`/api/bookings/${bookingId}`);if(!window.BookingContracts.booking(booking)||booking.id!==bookingId||booking.application_id!==item.id)throw Error("Invalid booking");
             detailResult.textContent=`预约 #${booking.id} · ${booking.title} · ${booking.purpose} · ${booking.status} · 审批申请 #${booking.application_id}`;detailResult.hidden=false;say("已读取生效预约详情。");
           }catch(error){if(!identityLost(error))say(error.api?error.message:"未能读取预约详情，请重试。",true);}finally{lock(false);}
         });
@@ -86,7 +89,7 @@
       render(displayedItems.map(item=>item.id===result.id?result:item));say(refreshMessage);
     }catch(error){
       if(!identityLost(error)){
-        if(error.api){pendingOperation=null;list.replaceChildren();refreshMessage=error.message+" 原列表已清空，正在核对最新状态。";say(refreshMessage,true);}
+        if(error.api){pendingOperation=null;list.replaceChildren();const dates=Array.isArray(error.conflicts)?error.conflicts.map(item=>item.start_local?.slice(0,10)).filter(Boolean):[];refreshMessage=error.message+(dates.length?` 冲突日期：${[...new Set(dates)].join("、")}。`:"")+" 原列表已清空，正在核对最新状态。";say(refreshMessage,true);}
         else{retry.hidden=false;say("结果未知，可能已成功。请点击重试确认原操作；将保留原申请与原原因。",true);}
       }
     }finally{lock(false);}
