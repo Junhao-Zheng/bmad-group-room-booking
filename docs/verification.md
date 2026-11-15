@@ -2,6 +2,12 @@
 
 原始初稿、失败日志和各次修补证据保留；PASS只表示对应版本和定义的断言通过。各故事测试规模不能相加，最终Python按unittest唯一ID计数，JS按Node实际测试数量计数。
 
+## 当前Epic 4验收
+
+本机schema v6、合成账号的新增流程分别见[身份](evidence/human-review/identity-verification.md)、[审批](evidence/human-review/booking-verification.md)、[取消](evidence/human-review/cancellation-verification.md)、[8周周期](evidence/human-review/weekly-verification.md)、[批量维护](evidence/human-review/maintenance-verification.md)。截至2026-11-15，完整回归260项Python、414项JS均通过；真实Chrome桌面1280×900和手机390×844完成申请、审批、逐场取消、批量停用及撤销。当前schema v6的真实Waitress重启验证覆盖周期申请/审批、取消申请/确认及批量维护重放；运行`.venv/bin/python -m scripts.verify_epic4_restart --output-dir work/rerun/epic-4-restart`。下文原208项及性能报告均为旧版本证据。
+
+当前浏览器复跑命令：`.venv/bin/python -m scripts.verify_supervised_booking_browser --browser-executable '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --output-dir work/rerun/epic-4-browser`。
+
 ## 本地基本回归
 
 在README初始化依赖后运行：

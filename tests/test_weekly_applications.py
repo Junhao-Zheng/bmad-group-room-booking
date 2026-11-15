@@ -138,6 +138,7 @@ class WeeklyTests(unittest.TestCase):
     def test_version_four_migration_preserves_history(self):
         legacy=Path(self.temp.name)/'v4.sqlite3'
         schema=Path(db.__file__).with_name('schema.sql').read_text()
+        schema=schema.split('CREATE TABLE IF NOT EXISTS maintenance_previews')[0]
         schema=schema.replace("CHECK(typeof(weeks)='integer' AND weeks BETWEEN 1 AND 8)","CHECK(weeks=1)")
         schema=schema.replace('CHECK(occurrence BETWEEN 1 AND 8)','CHECK(occurrence=1)')
         with closing(db.connect(legacy)) as conn:

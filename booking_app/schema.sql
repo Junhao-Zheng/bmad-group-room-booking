@@ -169,3 +169,20 @@ CREATE TABLE IF NOT EXISTS cancellation_requests (
 );
 CREATE UNIQUE INDEX IF NOT EXISTS cancellation_requests_pending ON cancellation_requests(booking_id) WHERE status='awaiting_approval';
 CREATE INDEX IF NOT EXISTS cancellation_requests_supervisor ON cancellation_requests(supervisor_id,created_at,id);
+
+CREATE TABLE IF NOT EXISTS maintenance_previews (
+    id INTEGER PRIMARY KEY,
+    token_hash TEXT NOT NULL UNIQUE CHECK(length(token_hash)=64),
+    actor_id INTEGER NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+    room_id INTEGER NOT NULL REFERENCES rooms(id) ON DELETE RESTRICT,
+    start_at INTEGER NOT NULL CHECK(typeof(start_at)='integer' AND start_at%1800=0),
+    end_at INTEGER NOT NULL CHECK(typeof(end_at)='integer' AND end_at%1800=0 AND end_at>start_at),
+    reason TEXT NOT NULL CHECK(length(trim(reason)) BETWEEN 1 AND 500),
+    affected_json TEXT NOT NULL CHECK(json_valid(affected_json) AND json_type(affected_json)='array'),
+    created_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL CHECK(expires_at>created_at),
+    block_id INTEGER REFERENCES reservations(id) ON DELETE RESTRICT,
+    confirmed_at INTEGER,
+    CHECK((block_id IS NULL AND confirmed_at IS NULL) OR (block_id IS NOT NULL AND confirmed_at IS NOT NULL))
+);
+CREATE INDEX IF NOT EXISTS maintenance_previews_actor ON maintenance_previews(actor_id,created_at,id);

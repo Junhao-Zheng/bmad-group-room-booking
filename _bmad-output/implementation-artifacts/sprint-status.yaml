@@ -55,12 +55,12 @@ development_status:
   3-3-revoke-block: done
   3-4-audit-and-restart: done
   epic-3-retrospective: done
-  epic-4: in-progress
+  epic-4: done
   4-1-supervisor-identity: done
   4-2-supervised-booking: done
   4-3-supervised-cancellation: done
   4-4-weekly-applications: done
-  4-5-batch-maintenance: backlog
+  4-5-batch-maintenance: done
   epic-4-retrospective: optional
 action_items:
   - id: "epic-1-retro-item-1-后续页面验证同时覆盖等待与跨表单焦点-实际值绑定-失败报告先失效"

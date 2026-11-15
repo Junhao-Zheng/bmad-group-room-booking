@@ -1,6 +1,6 @@
 # 需求与验收追踪矩阵
 
-编号引用规划基线。功能是否完成以故事状态、实际测试输出和对应评审记录共同判断；12张故事均已完成技术验收；下列证据按其实际版本保存，未将历史测试数相加。
+下表保留原12张故事的规划基线和当时证据。当前规则按PRD v2和下方Epic4增量映射判断；例如旧FR-09的30天预约、旧FR-14的成员直取消已被新版替代。每项历史证据只对应实际测试版本，不把历次测试数相加。
 
 |需求|主要设计依据|故事|主要验证入口|
 |---|---|---|---|
@@ -32,3 +32,16 @@
 |NFR-04 持久追溯|ADR-04/07/08|3.4整体验收|实际停止/新PID重启、字段/数量/事件关联比对、旧意图及审计失败；[用例](../tests/test_audit.py) / [证据](evidence/story-3.4-verification.md)|
 
 每行的用例是主要入口，跨故事矩阵和实际HTTP/浏览器补证见[验证索引](verification.md)。实验X/Y的冻结初稿表现与修复后的产品验收分开记录。最终通过结论仍需结合全量执行日志，不能仅由文件存在推断。
+
+## Epic 4 当前规则与证据
+
+|当前需求|故事|主要验证入口|
+|---|---|---|
+|FR-01/04 预置导师账号、学生归属及服务端权限|4.1|[身份验证](evidence/human-review/identity-verification.md)、[用例](../tests/test_auth.py)|
+|FR-06—13/20 学生申请零占用、本人导师审批、7天窗口、共享导师与详情分级|4.2|[审批验证](evidence/human-review/booking-verification.md)、[用例](../tests/test_supervised_booking.py)|
+|FR-14/15/21 学生取消申请与导师开始前确认、管理员有理由干预|4.3|[取消验证](evidence/human-review/cancellation-verification.md)、[用例](../tests/test_supervised_cancellation.py)|
+|FR-08—13/23/24 首场7天内、最多8周、整批批准或冲突保留待审、逐场取消|4.4|[周期验证](evidence/human-review/weekly-verification.md)、[用例](../tests/test_weekly_applications.py)|
+|FR-18/19/21 预览后一次原因原子取消并停用、撤销不恢复|4.5|[批量停用验证](evidence/human-review/maintenance-verification.md)、[用例](../tests/test_batch_maintenance.py)|
+|NFR-01/02/04 新流程竞争、权限、故障回滚与持久历史|4.1—4.5|上述定向用例及[最终验证](verification.md)；旧版性能和重启证据仅属其测试版本|
+
+Epic4的需求条文以[PRD v2](../_bmad-output/planning-artifacts/PRD.md)为准，旧表只用于版本化追溯。

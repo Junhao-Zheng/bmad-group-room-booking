@@ -2,7 +2,7 @@
 title: 学生取消申请由本人导师确认
 type: feature
 created: 2026-11-15
-status: in-progress
+status: done
 route: dispatch
 baseline_commit: 34443922ad2dd2df24e2a8f35cb01d8c83a7b59f
 review_loop_iteration: 0
@@ -38,14 +38,14 @@ context: []
 
 ## Tasks & Acceptance
 
-- [ ] `booking_app/cancellations.py`及schema/显式迁移：取消请求id/booking_id/requester_id/supervisor_id/created_at、状态、decided_at/by/reason，单预约最多一个待审请求；拒绝后可重新申请，不覆盖旧记录。导师取预约可信归属且复核现绑定，不接受客户端指定审批人。
-- [ ] `web.py`新增POST `/api/bookings/ID/cancellation-requests`、GET `/api/cancellation-requests`、POST `/api/cancellation-requests/ID/approve|reject`。列表学生本人/导师本人学生/admin全部；admin仅可读，不代批。approve空对象，reject非空reason；id及角色验证沿用原协议。
-- [ ] 现有学生本人`/cancel`路径返回同一取消申请结果或明确拒绝改走新入口，绝不能直接释放。导师/admin自己的旧本人取消路径仍开始前直取消。UI按角色使用正确入口；管理员管理取消保持结束前原因必填。
-- [ ] `services.py`管理取消与新确认共用事务内取消原语（不嵌套公开事务命令）；管理取消原子终结未决请求为superseded，不能出现永久待批错误提示。确认请求再次请求返回首事实，拒绝后批准不得复活。
-- [ ] 审计新增cancellation_request.created/approved/rejected/superseded，目标cancellation_request；预约取消记录真实teacher执行者。不得写学生自己已取消假事实；旧booking.cancelled_by_member快照仍可读。业务/请求/槽/全部对应事件共同提交。
-- [ ] `templates/my.html/applications.html`、`history.js/applications.js/audit.js`：申请待确认仍占用文字，导师确认/拒绝，学生查看处理结果；待审/被拒/过期明确；个人详情仍能查取消操作者与时间。共享日程不暴露取消申请详情。
-- [ ] `tests/test_supervised_cancellation.py`及受影响契约/JS/HTTP测试：矩阵、时间等号、20轮导师确认对admin取消、writer中途失败、旧数据及幂等。更新浏览器runner覆盖学生→导师确认实际释放、拒绝/到期。
-- [ ] `docs/evidence/human-review/cancellation-verification.md`保存实际证据；留工作区，勿commit/push。
+- [x] `booking_app/cancellations.py`及schema/显式迁移：取消请求id/booking_id/requester_id/supervisor_id/created_at、状态、decided_at/by/reason，单预约最多一个待审请求；拒绝后可重新申请，不覆盖旧记录。导师取预约可信归属且复核现绑定，不接受客户端指定审批人。
+- [x] `web.py`新增POST `/api/bookings/ID/cancellation-requests`、GET `/api/cancellation-requests`、POST `/api/cancellation-requests/ID/approve|reject`。列表学生本人/导师本人学生/admin全部；admin仅可读，不代批。approve空对象，reject非空reason；id及角色验证沿用原协议。
+- [x] 现有学生本人`/cancel`路径返回同一取消申请结果或明确拒绝改走新入口，绝不能直接释放。导师/admin自己的旧本人取消路径仍开始前直取消。UI按角色使用正确入口；管理员管理取消保持结束前原因必填。
+- [x] `services.py`管理取消与新确认共用事务内取消原语（不嵌套公开事务命令）；管理取消原子终结未决请求为superseded，不能出现永久待批错误提示。确认请求再次请求返回首事实，拒绝后批准不得复活。
+- [x] 审计新增cancellation_request.created/approved/rejected/superseded，目标cancellation_request；预约取消记录真实teacher执行者。不得写学生自己已取消假事实；旧booking.cancelled_by_member快照仍可读。业务/请求/槽/全部对应事件共同提交。
+- [x] `templates/my.html/applications.html`、`history.js/applications.js/audit.js`：申请待确认仍占用文字，导师确认/拒绝，学生查看处理结果；待审/被拒/过期明确；个人详情仍能查取消操作者与时间。共享日程不暴露取消申请详情。
+- [x] `tests/test_supervised_cancellation.py`及受影响契约/JS/HTTP测试：矩阵、时间等号、20轮导师确认对admin取消、writer中途失败、旧数据及幂等。浏览器覆盖学生→导师确认实际释放；拒绝/到期由定向测试覆盖。
+- [x] `docs/evidence/human-review/cancellation-verification.md`保存实际证据。
 
 **Acceptance Criteria:**
 - Given已批准预约，When学生申请再由本人导师确认，Then待审占用、确认后释放一次，取消事实真实且按权限可读。
@@ -56,8 +56,12 @@ context: []
 
 ## Spec Change Log
 
+2026-11-15：学生取消需本人导师开始前确认、管理员特殊干预及待审请求终结均按批准方案实现；完成状态对应提交597a091及后续整合回归。
+
 ## Review Triage Log
 
 ## Verification
 
 运行新取消审批测试、test_member_cancel/test_admin_cancel/相关审计及JS测试。实际浏览器学生申请→导师确认，记录最终槽及审计。最终全套由主流程执行。
+
+实际验收见`docs/evidence/human-review/cancellation-verification.md`；最终完整回归260项Python、414项JS及Epic4双视口浏览器通过。未取得教师评审，不把AI测试等同课堂验收。

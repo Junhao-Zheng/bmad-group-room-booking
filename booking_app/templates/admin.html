@@ -3,6 +3,7 @@
 {% block content %}
 <script src="{{ url_for('static', filename='rooms.js') }}" defer></script>
 <script src="{{ url_for('static', filename='blocks.js') }}" defer></script>
+<script src="{{ url_for('static', filename='batch_maintenance.js') }}" defer></script>
 <script src="{{ url_for('static', filename='audit.js') }}" defer></script>
 <section class="page-intro">
   <p class="eyebrow">管理员</p><h1>会议室管理</h1>
@@ -40,9 +41,30 @@
     <noscript><p>请启用 JavaScript 以新增或修改会议室。</p></noscript>
   </section>
 </div>
+<section class="card admin-section" aria-labelledby="batch-title">
+  <h2 id="batch-title">维修停用与冲突预约</h2>
+  <form id="batch-form">
+    <div class="form-field"><label for="batch-room_id">停用会议室</label><select id="batch-room_id" name="room_id" required><option value="">请选择会议室</option>{% for room in rooms['items'] %}<option value="{{ room.id }}">{{ room.name }} · {{ room.location }}</option>{% endfor %}</select></div>
+    <div class="availability-fields">
+      <div class="form-field"><label for="batch-start">开始（北京时间）</label><input id="batch-start" name="start" type="datetime-local" step="1800" required></div>
+      <div class="form-field"><label for="batch-end">结束（北京时间）</label><input id="batch-end" name="end" type="datetime-local" step="1800" required></div>
+    </div>
+    <div class="form-field"><label for="batch-reason">停用及取消原因</label><textarea id="batch-reason" name="reason" rows="3" required maxlength="500"></textarea></div>
+    <button id="batch-preview" class="button-secondary" type="submit">预览受影响预约</button>
+  </form>
+  <p id="batch-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>
+  <a id="batch-relogin" class="relogin-link" href="{{ url_for('web.login_page') }}" hidden>重新登录</a>
+  <div id="batch-review" hidden>
+    <h3>待确认的停用</h3>
+    <p id="batch-summary" class="notice"></p>
+    <ul id="batch-affected" class="history-items" aria-label="将取消的预约"></ul>
+    <label class="room-confirm-label" for="batch-confirm"><input id="batch-confirm" type="checkbox">我已核对受影响预约和同一取消原因</label>
+    <button id="batch-submit" class="button-primary" type="button">确认取消并停用</button>
+  </div>
+</section>
 <section class="card admin-section" aria-labelledby="block-form-title">
-  <h2 id="block-form-title">创建维护停用</h2>
-  <p class="muted">时间均为北京时间，须晚于当前时刻并在未来 30 天内。半小时刻度，允许跨日及超过 4 小时；已有安排不会被自动取消。</p>
+  <h2 id="block-form-title">仅空闲时段停用</h2>
+  <p class="muted">时间均为北京时间，须晚于当前时刻并在未来 30 天内。半小时刻度，允许跨日及超过 4 小时；若已有预约，请使用上方预览确认流程。</p>
   <button id="block-rooms-refresh" type="button" class="button-secondary">刷新会议室选项</button>
   <p id="block-rooms-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>
   <p id="block-script-unavailable" class="notice">停用创建尚未启用。请等待脚本加载；若未启用 JavaScript 或脚本加载失败，请启用后重新打开管理页。</p>

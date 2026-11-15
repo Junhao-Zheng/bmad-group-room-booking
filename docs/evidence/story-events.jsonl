@@ -96,3 +96,4 @@
 {"timestamp": "2026-11-15T14:39:05+00:00", "story": "4-3-supervised-cancellation", "from": "in-progress", "to": "done", "actor": "AI root", "head": "597a091", "post_done_rework": false}
 {"timestamp": "2026-11-15T14:39:05+00:00", "story": "4-4-weekly-applications", "from": "backlog", "to": "in-progress", "actor": "AI root", "head": "597a091", "post_done_rework": false}
 {"timestamp": "2026-11-15T14:39:05+00:00", "story": "4-4-weekly-applications", "from": "in-progress", "to": "done", "actor": "AI root", "head": "597a091", "post_done_rework": false}
+{"timestamp": "2026-11-15T15:10:59+00:00", "story": "4-5-batch-maintenance", "from": "backlog", "to": "done", "actor": "AI root", "head": "584c734", "post_done_rework": false}

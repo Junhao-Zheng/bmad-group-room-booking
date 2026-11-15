@@ -1,6 +1,6 @@
 ---
 title: 课题组活动与会议室预约系统架构
-status: revision-in-progress
+status: final-with-epic-4-addendum
 created: 2026-11-12
 updated: 2026-11-15
 workflow: bmad-architecture
@@ -10,7 +10,7 @@ evidence_level: verified_technology_and_ai_design_decisions
 
 # 课题组活动与会议室预约系统架构
 
-> 2026-11-15修订中：以下v1完整协议保留为旧基线追踪，涉及角色、预约窗口、审批、周期、共享字段和批量维护的条款已被[获批变更方案](sprint-change-proposal-2026-11-15.md)、PRD v2与Epic4故事合同替代。身份增量已实现schema2、teacher及supervisor_id，显式迁移；其余新协议随实际实现收口，不能把旧字段/动作白名单当成新版禁止扩展。原8 ADR继续保留其取舍背景，新增实现必须沿用分层、写事务、唯一槽、持久幂等、会话/CSRF、隐私和审计原子性。
+> 以下v1协议保留为旧基线追踪。涉及角色、预约窗口、审批、周期、共享字段和批量维护的条款，现以[获批变更方案](sprint-change-proposal-2026-11-15.md)、[PRD v2](PRD.md)及Epic4故事合同为准。新增流程已在schema v6实现，显式迁移支持已知schema 1—5；不能把旧字段/动作白名单当成新版禁止扩展。原8项ADR继续保留取舍背景，当前实现沿用分层、写事务、唯一槽、持久幂等、会话/CSRF、隐私和审计原子性。
 
 
 ## 1. 范围、依据与决策性质

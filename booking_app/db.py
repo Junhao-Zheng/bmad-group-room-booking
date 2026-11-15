@@ -7,8 +7,9 @@ import re
 
 from flask import current_app, g
 
-SCHEMA_VERSION = 5
+SCHEMA_VERSION = 6
 REQUIRED_COLUMNS = {
+    "maintenance_previews": {"id", "token_hash", "actor_id", "room_id", "start_at", "end_at", "reason", "affected_json", "created_at", "expires_at", "block_id", "confirmed_at"},
     "cancellation_requests": {"id", "booking_id", "requester_id", "supervisor_id", "created_at", "status", "decided_at", "decided_by", "reason"},
     "applications": {"id", "owner_id", "owner_display_name", "supervisor_id", "supervisor_display_name", "room_id", "title", "purpose", "attendees", "start_at", "end_at", "weeks", "intent_key", "request_payload", "status", "created_at", "decided_at", "decided_by", "decision_reason"},
     "application_occurrences": {"application_id", "occurrence", "reservation_id"},
@@ -154,12 +155,14 @@ def schema_sql_tokens(sql):
                  for token in tokens if token != ';')
 
 
-def check_critical_schema(conn, reference_schema=None):
+def check_critical_schema(conn, reference_schema=None, exclude=frozenset()):
     """Column names alone cannot prove CHECK, FK, primary-key or unique guarantees."""
     reference = sqlite3.connect(":memory:")
     try:
         reference.executescript(reference_schema or Path(__file__).with_name("schema.sql").read_text(encoding="utf-8"))
-        for name in ("users", "applications", "application_occurrences", "booking_supervisors", "cancellation_requests", "audit_events", "occupancy_slots"):
+        for name in ("users", "applications", "application_occurrences", "booking_supervisors", "cancellation_requests", "maintenance_previews", "audit_events", "occupancy_slots"):
+            if name in exclude:
+                continue
             expected = reference.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name=?", (name,)).fetchone()[0]
             actual = conn.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name=?", (name,)).fetchone()
             if actual is None or schema_sql_tokens(actual[0]) != schema_sql_tokens(expected):
@@ -170,7 +173,9 @@ def check_critical_schema(conn, reference_schema=None):
                     for row in connection.execute(f"PRAGMA index_list({name})") if row[2])
             if unique_indexes(conn) != unique_indexes(reference):
                 raise RuntimeError("数据库唯一约束不兼容；启动已停止。")
-        for name in ("reservations_user_intent", "applications_supervisor", "cancellation_requests_pending", "cancellation_requests_supervisor", "audit_events_target_time"):
+        for name in ("reservations_user_intent", "applications_supervisor", "cancellation_requests_pending", "cancellation_requests_supervisor", "maintenance_previews_actor", "audit_events_target_time"):
+            if name == "maintenance_previews_actor" and "maintenance_previews" in exclude:
+                continue
             expected = reference.execute("SELECT tbl_name,sql FROM sqlite_master WHERE type='index' AND name=?", (name,)).fetchone()
             actual = conn.execute("SELECT tbl_name,sql FROM sqlite_master WHERE type='index' AND name=?", (name,)).fetchone()
             if actual is None or actual[0] != expected[0] or schema_sql_tokens(actual[1]) != schema_sql_tokens(expected[1]):

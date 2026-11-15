@@ -1,6 +1,6 @@
 ---
 title: 课题组活动与会议室预约 PRD
-status: approved-implementation-in-progress
+status: approved-implemented-course-prototype
 created: 2026-11-12
 updated: 2026-11-15
 workflow: bmad-prd
@@ -11,7 +11,7 @@ evidence_level: user_confirmed_topic_and_audience_with_ai_design_decisions
 
 # 课题组活动与会议室预约 PRD
 
-> **当前需求修订 v2（2026-11-15）**：U-38/U-39已批准本人复核变更方案。下列当前业务条款已更新；产品实现和新验收仍进行中。旧v1需求与208/399测试保存在Git历史，不能证明v2已完成。原实验A及Sprint标签不改写。
+> **当前需求修订 v2（2026-11-15）**：U-38/U-39已批准本人复核变更方案。下列当前业务条款已在本机课程原型中实现；实际验证见[验证索引](../../docs/verification.md)。旧v1需求与208/399测试保存在Git历史，不能证明v2已完成。原实验A及Sprint标签不改写。
 
 
 ## 0. 文档用途与证据边界
@@ -20,7 +20,7 @@ evidence_level: user_confirmed_topic_and_audience_with_ai_design_decisions
 
 依据：[产品简述](product-brief.md)、[简述补充规则](briefs/brief-group-room-booking-2026-11-12/addendum.md)、[课程范围](../../docs/course-scope.md)、[人工决策日志](../../decision-log.md)。用户已确认选题、使用对象为课题组，并授权 AI 拟定其余规则。下文 `[ASSUMPTION H-*]` 是继承假设，`[ASSUMPTION A-*]` 是本阶段 AI 设计决策；它们可作为课程原型基线，但不是访谈结论或人工逐项批准。
 
-本文件v2状态表示需求方案获准、实现进行中，不表示教师M1门禁通过。实验 A 保留、实验 B 免做；本阶段不提供实验结果、组员贡献或不存在的人类评审记录。
+本文件v2状态表示需求方案获准且本机技术原型已实现，不表示教师M1门禁通过。实验 A 保留、实验 B 免做；不编造组员贡献或不存在的人类评审记录。
 
 ## 1. 产品目标与范围
 

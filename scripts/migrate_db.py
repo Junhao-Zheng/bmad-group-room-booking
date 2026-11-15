@@ -1,4 +1,4 @@
-"""Explicit, backed-up schema 1/2/3/4 to 5 migration; run with the application stopped."""
+"""Explicit, backed-up schema 1/2/3/4/5 to 6 migration; run with the application stopped."""
 import argparse
 import json
 from pathlib import Path
@@ -76,8 +76,8 @@ def migrate_database(source, backup):
     conn = db.connect(source)
     try:
         version = conn.execute("PRAGMA user_version").fetchone()[0]
-        if version not in (1, 2, 3, 4):
-            raise ValueError("Migration requires schema version 1, 2, 3 or 4")
+        if version not in (1, 2, 3, 4, 5):
+            raise ValueError("Migration requires schema version 1, 2, 3, 4 or 5")
         # Restored backup files may use DELETE journaling. Establish WAL before
         # changing schema so journal-mode failure cannot follow a committed upgrade.
         if conn.execute("PRAGMA journal_mode").fetchone()[0] != "wal":
@@ -96,20 +96,21 @@ def migrate_database(source, backup):
             _check_integrity(conn)
         else:
             for table, expected in db.REQUIRED_COLUMNS.items():
-                if table == "cancellation_requests" and version == 3:
+                if table == "maintenance_previews" or table == "cancellation_requests" and version == 3:
                     continue
                 if {r[1] for r in conn.execute(f"PRAGMA table_info({table})")} != expected:
                     raise ValueError("Unrecognized schema 3/4 columns")
             db.check_identity_schema(conn)
             _check_integrity(conn)
-            if version == 4:
+            if version in (4,5):
                 old_schema = Path(db.__file__).with_name("schema.sql").read_text(encoding="utf-8")
-                old_schema = old_schema.replace("CHECK(typeof(weeks)='integer' AND weeks BETWEEN 1 AND 8)", "CHECK(weeks=1)")
-                old_schema = old_schema.replace("CHECK(occurrence BETWEEN 1 AND 8)", "CHECK(occurrence=1)")
-                db.check_critical_schema(conn, old_schema)
+                if version == 4:
+                    old_schema = old_schema.replace("CHECK(typeof(weeks)='integer' AND weeks BETWEEN 1 AND 8)", "CHECK(weeks=1)")
+                    old_schema = old_schema.replace("CHECK(occurrence BETWEEN 1 AND 8)", "CHECK(occurrence=1)")
+                db.check_critical_schema(conn, old_schema, exclude={"maintenance_previews"})
         if version < 4:
             _validate_legacy_audit(conn, version)
-        destinations = ['users_v3', 'audit_events_v3', 'applications_old', 'application_occurrences_old']
+        destinations = ['users_v3', 'audit_events_v3', 'applications_old', 'application_occurrences_old', 'maintenance_previews']
         if version < 4:
             destinations.append('cancellation_requests')
         if version < 3:
@@ -138,12 +139,12 @@ def migrate_database(source, backup):
             conn.execute("INSERT INTO audit_events_v3 SELECT * FROM audit_events")
             conn.execute("DROP TABLE audit_events")
             conn.execute("ALTER TABLE audit_events_v3 RENAME TO audit_events")
-        if version >= 3:
+        if version in (3, 4):
             conn.execute("ALTER TABLE application_occurrences RENAME TO application_occurrences_old")
             conn.execute("ALTER TABLE applications RENAME TO applications_old")
         for sql in statements:
             conn.execute(sql)
-        if version >= 3:
+        if version in (3, 4):
             conn.execute("INSERT INTO applications SELECT * FROM applications_old")
             conn.execute("INSERT INTO application_occurrences SELECT * FROM application_occurrences_old")
             conn.execute("DROP TABLE application_occurrences_old")
@@ -168,13 +169,13 @@ def migrate_database(source, backup):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--source", required=True, type=Path, help="Explicit path to a stopped schema 1, 2, 3 or 4 database")
+    parser.add_argument("--source", required=True, type=Path, help="Explicit path to a stopped schema 1, 2, 3, 4 or 5 database")
     parser.add_argument("--backup", required=True, type=Path, help="New independent backup file; never overwritten")
     args = parser.parse_args(argv)
     try:
         result = migrate_database(args.source, args.backup)
     except (OSError, ValueError, RuntimeError, sqlite3.Error) as error:
-        parser.exit(1, f"Migration failed ({type(error).__name__}); check schema 1/2/3/4, integrity and a new independent backup path. No credentials are reported.\n")
+        parser.exit(1, f"Migration failed ({type(error).__name__}); check schema 1/2/3/4/5, integrity and a new independent backup path. No credentials are reported.\n")
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0
 

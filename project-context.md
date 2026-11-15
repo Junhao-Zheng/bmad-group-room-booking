@@ -2,13 +2,13 @@
 project_name: group-room-booking
 created: 2026-11-12
 updated: 2026-11-15
-status: approved-implementation-in-progress
+status: approved-implemented-course-prototype
 source: _bmad-output/planning-artifacts/architecture.md
 ---
 
 # 实现上下文与必须遵守的规则
 
-2026-11-15规则修订依据U-38/U-39批准方案，描述Epic4必须达到的目标；尚未通过的新增能力不视为完成。旧规则版本与原实验A保持Git历史。
+2026-11-15规则修订依据U-38/U-39批准方案，描述Epic4当前实现必须持续遵守的合同。五个新增故事已完成本机技术验证；教师门禁和真实试用仍另行核对。旧规则版本与原实验A保持Git历史。
 
 读 [PRD](_bmad-output/planning-artifacts/PRD.md)、[架构](_bmad-output/planning-artifacts/architecture.md) 与 [spine](_bmad-output/planning-artifacts/architecture/architecture-group-room-booking-2026-11-12/ARCHITECTURE-SPINE.md) 后再实现。以下是具体规则，不替代上游协议。
 

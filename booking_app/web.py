@@ -6,7 +6,7 @@ import uuid
 from flask import Blueprint, current_app, g, jsonify, make_response, redirect, render_template, request, url_for
 from werkzeug.exceptions import HTTPException
 
-from . import auth, services, applications, cancellations
+from . import auth, services, applications, cancellations, maintenance
 from .domain import DomainError
 
 bp = Blueprint("web", __name__)
@@ -104,6 +104,23 @@ def create_block_api():
     if request.mimetype != "application/json":
         raise DomainError("INVALID_INPUT", "请使用 JSON 格式提交停用资料。")
     return jsonify(ok=True, data=services.create_block(actor, payload())), 201
+
+
+@bp.post("/api/admin/blocks/preview")
+def preview_block_api():
+    actor = services.require_admin(auth.actor_for_token(token()))
+    if request.mimetype != "application/json":
+        raise DomainError("INVALID_INPUT", "请使用 JSON 格式提交停用预览。")
+    return jsonify(ok=True, data=maintenance.preview(actor, payload())), 201
+
+
+@bp.post("/api/admin/blocks/confirm")
+def confirm_block_api():
+    actor = services.require_admin(auth.actor_for_token(token()))
+    if request.mimetype != "application/json":
+        raise DomainError("INVALID_INPUT", "请使用 JSON 格式确认停用。")
+    result = maintenance.confirm(actor, payload())
+    return jsonify(ok=True, data=result), 200 if result["replayed"] else 201
 
 
 @bp.get("/api/admin/bookings")
