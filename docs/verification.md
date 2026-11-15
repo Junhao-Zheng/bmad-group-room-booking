@@ -4,7 +4,7 @@
 
 ## 当前Epic 4验收
 
-本机schema v6、合成账号的新增流程分别见[身份](evidence/human-review/identity-verification.md)、[审批](evidence/human-review/booking-verification.md)、[取消](evidence/human-review/cancellation-verification.md)、[8周周期](evidence/human-review/weekly-verification.md)、[批量维护](evidence/human-review/maintenance-verification.md)。截至2026-11-15，完整回归260项Python、414项JS均通过；真实Chrome桌面1280×900和手机390×844完成申请、审批、逐场取消、批量停用及撤销。当前schema v6的真实Waitress重启验证覆盖周期申请/审批、取消申请/确认及批量维护重放；运行`.venv/bin/python -m scripts.verify_epic4_restart --output-dir work/rerun/epic-4-restart`。下文原208项及性能报告均为旧版本证据。
+本机schema v6、合成账号的新增流程分别见[身份](evidence/human-review/identity-verification.md)、[审批](evidence/human-review/booking-verification.md)、[取消](evidence/human-review/cancellation-verification.md)、[8周周期](evidence/human-review/weekly-verification.md)、[批量维护](evidence/human-review/maintenance-verification.md)。截至2026-11-15，完整回归260项Python、414项JS均通过；真实Chrome桌面1280×900和手机390×844完成申请、审批、逐场取消、批量停用及撤销。当前schema v6的真实Waitress重启验证覆盖周期申请/审批、取消申请/确认及批量维护重放；运行`.venv/bin/python -m scripts.verify_epic4_restart --output-dir work/rerun/epic-4-restart`。当前版NFR-03按[新负载原始证据](evidence/human-review/epic4-performance/README.md)通过，200次测量P95为16.893ms、0错误；下文原208项和21.501ms报告均为旧版本证据。
 
 当前浏览器复跑命令：`.venv/bin/python -m scripts.verify_supervised_booking_browser --browser-executable '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --output-dir work/rerun/epic-4-browser`。
 
@@ -35,7 +35,7 @@ npm install --prefix work/browser-tools --no-save playwright@1.58.2
 |---|---|---|
 |NFR-01 一致性|20个不同意图恰1成功19冲突；20同意图同一记录；三种两请求竞争各20轮，核对最终完整状态|`scripts.verify_create_booking_http`、`scripts.verify_replay_intent_http`、`scripts.verify_room_management_http`、`scripts.verify_maintenance_block_http`、`scripts.verify_admin_cancel_http`|
 |NFR-02 认证隐私|匿名/过期/退出/成员甲乙/admin直接API矩阵，服务层新鲜身份，Origin/CSRF，精确DTO、纯文本和无凭据业务输出|最终权限矩阵及各故事安全用例；真浏览器和HTTP证据|
-|NFR-03 查询性能|10房间1000记录，10认证客户端，20预热、200完整样本，最近秩P95≤1000ms|`scripts.verify_availability_performance`|
+|NFR-03 查询性能|10房间1000记录，10认证客户端，20预热、200完整样本，最近秩P95≤1000ms|`scripts.verify_availability_performance`；[当前版结果](evidence/human-review/epic4-performance/performance-result.json)|
 |NFR-04 持久追溯|实际停进程、新PID重启，业务/槽/审计/旧成功意图一致，审计失败完全回滚|最终重启报告及各写入故障测试|
 
 性能负载包含4种实际SQL查询和1种人数超容量的空集快速路径（占20%），查询跨度30分钟；不把该结果扩展为最坏4小时查询或生产容量保证。并发客户端屏障证明同时发出请求，不宣称每轮均直接观测服务器锁等待。单独真实锁等待测试另外记录明确同步与时钟边界。

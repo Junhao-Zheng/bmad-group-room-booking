@@ -201,7 +201,7 @@ def measure(clients, fixture, output_dir, run_id):
     samples = []
 
     def one(index, phase, client, barrier):
-        local = (BASE_LOCAL + timedelta(days=1 + index % 10)).replace(hour=9 + index % 3)
+        local = (BASE_LOCAL + timedelta(days=1 + index % 6)).replace(hour=9 + index % 3)
         end = local + timedelta(minutes=30)
         attendees = [5, 15, 25, 100, 1001][index % 5]
         query = dict(start=local.strftime("%Y-%m-%dT%H:%M"), end=end.strftime("%Y-%m-%dT%H:%M"), attendees=attendees)
@@ -266,7 +266,7 @@ def measure(clients, fixture, output_dir, run_id):
         "errors": errors, "wrong_results": wrong, "error_rate": errors / len(samples),
         "all_220_responses_match_exact_fixture_dto": wrong == 0,
         "strict_json_types_checked": True, "by_query_path": by_path,
-        "load_scope": "Registered 30-minute queries: 80% SQL availability, 20% attendees=1001 fast path; not a 4-hour/long-block worst-case benchmark",
+        "load_scope": "Registered 30-minute queries within the current seven-day window: 80% SQL availability, 20% attendees=1001 fast path; not a 4-hour/long-block worst-case benchmark",
         "p95_ms": ordered[rank - 1], "nearest_rank": rank, "nearest_rank_formula": "ceil(0.95 * 200) = 190; sorted_ms[189]",
         "min_ms": ordered[0], "max_ms": ordered[-1], "threshold_ms": 1000,
         "sorted_measured_ms": ordered, "samples_sha256": hashlib.sha256(raw_path.read_bytes()).hexdigest(),

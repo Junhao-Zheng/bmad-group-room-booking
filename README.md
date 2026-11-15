@@ -39,7 +39,7 @@ node --test tests/test_*js.cjs
   --output-dir work/rerun/epic-4-browser
 ```
 
-测试使用临时库和合成账号，不修改默认演示库。新流程证据见[导师身份](docs/evidence/human-review/identity-verification.md)、[申请审批](docs/evidence/human-review/booking-verification.md)、[取消确认](docs/evidence/human-review/cancellation-verification.md)、[周期预约](docs/evidence/human-review/weekly-verification.md)、[批量停用](docs/evidence/human-review/maintenance-verification.md)。完整历史及旧版性能、重启报告见[验证索引](docs/verification.md)；旧证据只对应其当时源码，不冒充当前版本的性能或恢复结论。
+测试使用临时库和合成账号，不修改默认演示库。新流程证据见[导师身份](docs/evidence/human-review/identity-verification.md)、[申请审批](docs/evidence/human-review/booking-verification.md)、[取消确认](docs/evidence/human-review/cancellation-verification.md)、[周期预约](docs/evidence/human-review/weekly-verification.md)、[批量停用](docs/evidence/human-review/maintenance-verification.md)及[当前版NFR03性能](docs/evidence/human-review/epic4-performance/README.md)。完整历史见[验证索引](docs/verification.md)；旧证据只对应其当时源码。
 
 当前schema v6的真实服务重启检查可运行`.venv/bin/python -m scripts.verify_epic4_restart --output-dir work/rerun/epic-4-restart`；它使用全新临时数据库、独立Waitress进程和真实系统时钟，核对8周审批、取消确认、批量停用重放与撤销后的历史。
 
@@ -67,4 +67,4 @@ node --test tests/test_*js.cjs
 |实验A与AI使用|[实验结果](docs/experiment-a-results.md)、[AI及贡献声明](docs/ai-use-and-contributions.md)|
 |暂缓的正式录屏|[演示准备](docs/demonstration-plan.md)|
 
-本项目是本地课程原型：单 SQLite 写入者、无主动消息通知、无公网部署、无分页。旧版 NFR03 曾在规定合成负载下测得 200 样本 P95 为 21.501ms；当前新增业务未重新测该负载，不据此声称生产性能。
+本项目是本地课程原型：单 SQLite 写入者、无主动消息通知、无公网部署、无分页。当前版NFR03在7天窗口、规定合成负载下测得200样本P95为16.893ms、0错误；不据此声称生产性能。

@@ -42,6 +42,7 @@
 |FR-14/15/21 学生取消申请与导师开始前确认、管理员有理由干预|4.3|[取消验证](evidence/human-review/cancellation-verification.md)、[用例](../tests/test_supervised_cancellation.py)|
 |FR-08—13/23/24 首场7天内、最多8周、整批批准或冲突保留待审、逐场取消|4.4|[周期验证](evidence/human-review/weekly-verification.md)、[用例](../tests/test_weekly_applications.py)|
 |FR-18/19/21 预览后一次原因原子取消并停用、撤销不恢复|4.5|[批量停用验证](evidence/human-review/maintenance-verification.md)、[用例](../tests/test_batch_maintenance.py)|
-|NFR-01/02/04 新流程竞争、权限、故障回滚与持久历史|4.1—4.5|上述定向用例及[最终验证](verification.md)；旧版性能和重启证据仅属其测试版本|
+|NFR-01/02/04 新流程竞争、权限、故障回滚与持久历史|4.1—4.5|上述定向用例及[最终验证](verification.md)；旧版重启证据仅属其测试版本|
+|NFR-03 当前7天窗口内查询性能|4.2整合|[当前版200样本结果](evidence/human-review/epic4-performance/README.md)；10房间、1000记录、10客户端|
 
 Epic4的需求条文以[PRD v2](../_bmad-output/planning-artifacts/PRD.md)为准，旧表只用于版本化追溯。

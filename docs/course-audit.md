@@ -12,7 +12,7 @@
 |至少3史诗、12故事|[史诗](../_bmad-output/planning-artifacts/epics.md)、[状态](../_bmad-output/implementation-artifacts/sprint-status.yaml)|原3史诗12故事及新增Epic4五故事均有规格、实现和测试|
 |至少8条实现规则|[project-context](../project-context.md)16条|数量满足；原规则中的旧30天描述应按PRD v2和决策D-007理解|
 |两冲刺、版本化过程|[Sprint 1](sprints/sprint-1-review.md)、[Sprint 2](sprints/sprint-2-review.md)、故事事件与Git|有压缩完成的两次增量及版本记录；不声称真实四周课堂经历|
-|源码、测试和NFR|[应用](../booking_app/)、[验证索引](verification.md)|当前260项Python、414项JS全通过；Epic4真实Chrome双视口通过；旧性能和重启报告仅属旧版本|
+|源码、测试和NFR|[应用](../booking_app/)、[验证索引](verification.md)|当前260项Python、414项JS全通过；Epic4真实Chrome双视口及新版重启通过；当前7天窗口的NFR03测得200样本P95 16.893ms、0错误|
 |至少15条决策、5次人工否决/实质修改|[决策日志](../decision-log.md)23条；D-005/006/007/010/012/015/017为7项实质修改|已记录用户原话及可核对改动；D-021/022/023无另述个人理由，是否逐条计入完整决策由教师判定|
 |复盘五指标、实验A|[复盘](../retrospective.md)、[实验A结果](experiment-a-results.md)|有原始协议、两个分支、实测与局限；实验操作者是AI，不能冒充同一学生或核验不可见模型版本；B按用户转述免做|
 |README、贡献、AI声明、约10分钟演示|[运行说明](../README.md)、[AI及贡献](ai-use-and-contributions.md)、[演示准备](demonstration-plan.md)|运行说明、AI声明已有；真实组员分工和正式录屏/演示未完成|
