@@ -64,7 +64,7 @@ node --test tests/test_*js.cjs
 |两次增量与复盘|[Sprint 1](docs/sprints/sprint-1-review.md)、[Sprint 2](docs/sprints/sprint-2-review.md)、[五指标复盘](retrospective.md)|
 |需求到证据|[追踪矩阵](docs/traceability.md)、[验证索引](docs/verification.md)|
 |真实人机判断|[决策日志](decision-log.md)、[用户原话索引](docs/evidence/user-inputs.md)|
-|实验A与AI使用|[实验结果](docs/experiment-a-results.md)、[AI及贡献声明](docs/ai-use-and-contributions.md)|
+|实验A与AI使用|[实验结果](docs/experiment-a-results.md)、[AI及贡献声明](docs/ai-use-and-contributions.md)、[三人分工](docs/team-contribution-plan.md)|
 |暂缓的正式录屏|[演示准备](docs/demonstration-plan.md)|
 
 本项目是本地课程原型：单 SQLite 写入者、无主动消息通知、无公网部署、无分页。当前版NFR03在7天窗口、规定合成负载下测得200样本P95为16.893ms、0错误；不据此声称生产性能。
