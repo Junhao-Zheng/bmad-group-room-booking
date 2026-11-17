@@ -1,8 +1,8 @@
 # 课题组活动与会议室预约
 
-软件工程管理课程的本机原型，重点展示 BMAD 需求、架构、故事拆分、敏捷增量、真实人机决策和验证过程。实验 A 的原始对照记录保留；按用户转述的教师安排，实验 B 免做、课堂临时变更不再下发。正式视频和演示依用户要求暂缓。
+面向课题组及大组共用会议室的预约原型。学生提交申请，由所属导师审批；导师可直接预约。系统处理时间冲突、周期预约、取消确认和维修停用。仓库同时保存 BMAD 需求、架构、故事与敏捷过程材料。
 
-**当前技术状态（2026-11-15）：** Epic 4 五个新增故事已实现。完整回归为 260 项 Python、414 项 JavaScript，均通过；真实 Chrome 在 1280px 和 390px 视口走通学生申请、导师审批、8 周整批预约、逐场取消、管理员批量停用与撤销。数据库 schema 为 v6。课程教师门禁、真实组员贡献和正式录屏尚无可核验证据，见[逐项课程核对](docs/course-audit.md)。
+**当前状态：** 预约、审批、周期预约、取消和批量停用流程已实现；260 项 Python 测试和 414 项 JavaScript 测试通过，并在桌面与手机视口完成浏览器验证。数据库 schema 为 v6。课程交付进度见[核对表](docs/course-audit.md)；正式录屏暂缓。
 
 ## 本地运行
 
@@ -63,12 +63,12 @@ node --test tests/test_*js.cjs
 |故事与状态|[史诗](_bmad-output/planning-artifacts/epics.md)、[Sprint状态](_bmad-output/implementation-artifacts/sprint-status.yaml)|
 |两次增量与复盘|[Sprint 1](docs/sprints/sprint-1-review.md)、[Sprint 2](docs/sprints/sprint-2-review.md)、[五指标复盘](retrospective.md)|
 |需求到证据|[追踪矩阵](docs/traceability.md)、[验证索引](docs/verification.md)|
-|真实人机判断|[决策日志](decision-log.md)、[用户原话索引](docs/evidence/user-inputs.md)|
-|实验A与AI使用|[实验结果](docs/experiment-a-results.md)、[AI及贡献声明](docs/ai-use-and-contributions.md)、[三人分工](docs/team-contribution-plan.md)|
+|需求决策|[决策日志](decision-log.md)、[原始意见索引](docs/evidence/user-inputs.md)|
+|实验与分工|[实验A结果](docs/experiment-a-results.md)、[三人分工](docs/team-contribution-plan.md)|
 |暂缓的正式录屏|[演示准备](docs/demonstration-plan.md)|
 
 本项目是本地课程原型：单 SQLite 写入者、无主动消息通知、无公网部署、无分页。当前版NFR03在7天窗口、规定合成负载下测得200样本P95为16.893ms、0错误；不据此声称生产性能。
 
 ## AI 使用声明
 
-本项目使用 Codex 桌面宿主与 BMAD Method 6.12.1。AI参与需求和架构草拟、代码与测试编写、独立复核、实验记录整理；郑俊豪提供真实场景并参与业务规则决策。宿主未向本项目返回可核验的精确服务端模型版本，故暂记为“未获知”，不猜填版本号。三人责任分配、已知实际贡献和关键会话证据分别见[分工表](docs/team-contribution-plan.md)、[AI使用与贡献说明](docs/ai-use-and-contributions.md)和[会话索引](docs/evidence/conversations/README.md)。
+项目使用 Codex 桌面版（精确模型版本未获知）和 BMAD Method 6.12.1 辅助编写文档、代码、测试与评审材料。郑俊豪提供实际场景并决定业务规则。使用范围、实际贡献和关键会话记录见[完整说明](docs/ai-use-and-contributions.md)及[会话索引](docs/evidence/conversations/README.md)。
