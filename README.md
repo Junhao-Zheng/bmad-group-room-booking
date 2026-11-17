@@ -68,3 +68,7 @@ node --test tests/test_*js.cjs
 |暂缓的正式录屏|[演示准备](docs/demonstration-plan.md)|
 
 本项目是本地课程原型：单 SQLite 写入者、无主动消息通知、无公网部署、无分页。当前版NFR03在7天窗口、规定合成负载下测得200样本P95为16.893ms、0错误；不据此声称生产性能。
+
+## AI 使用声明
+
+本项目使用 Codex 桌面宿主与 BMAD Method 6.12.1。AI参与需求和架构草拟、代码与测试编写、独立复核、实验记录整理；郑俊豪提供真实场景并参与业务规则决策。宿主未向本项目返回可核验的精确服务端模型版本，故暂记为“未获知”，不猜填版本号。三人责任分配、已知实际贡献和关键会话证据分别见[分工表](docs/team-contribution-plan.md)、[AI使用与贡献说明](docs/ai-use-and-contributions.md)和[会话索引](docs/evidence/conversations/README.md)。

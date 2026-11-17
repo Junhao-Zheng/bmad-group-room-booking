@@ -15,7 +15,7 @@
 |源码、测试和NFR|[应用](../booking_app/)、[验证索引](verification.md)|当前260项Python、414项JS全通过；Epic4真实Chrome双视口及新版重启通过；当前7天窗口的NFR03测得200样本P95 16.893ms、0错误|
 |至少15条决策、5次人工否决/实质修改|[决策日志](../decision-log.md)23条；D-005/006/007/010/012/015/017为7项实质修改|已记录用户原话及可核对改动；D-021/022/023无另述个人理由，是否逐条计入完整决策由教师判定|
 |复盘五指标、实验A|[复盘](../retrospective.md)、[实验A结果](experiment-a-results.md)|有原始协议、两个分支、实测与局限；实验操作者是AI，不能冒充同一学生或核验不可见模型版本；B按用户转述免做|
-|README、贡献、AI声明、约10分钟演示|[运行说明](../README.md)、[AI及贡献](ai-use-and-contributions.md)、[三人分工](team-contribution-plan.md)、[演示准备](demonstration-plan.md)|运行说明、AI声明已有；三人姓名及全项目责任范围已分配，实际贡献记录及正式录屏/演示未完成|
+|README、贡献、AI声明、约10分钟演示|[运行说明与AI声明](../README.md)、[AI及贡献](ai-use-and-contributions.md)、[三人分工](team-contribution-plan.md)、[演示准备](demonstration-plan.md)|README已如实披露AI工具和不可核验的精确模型版本；三人姓名及全项目责任范围已分配，实际贡献记录及正式录屏/演示未完成|
 
 ## 本轮新增规则闭环
 
