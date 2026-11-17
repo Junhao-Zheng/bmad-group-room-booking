@@ -120,7 +120,7 @@ class BatchMaintenanceTests(unittest.TestCase):
 
     def test_version_five_migration_preserves_weekly_history(self):
         legacy=Path(self.temp.name)/'v5.sqlite3'
-        schema=Path(db.__file__).with_name('schema.sql').read_text()
+        schema=Path(db.__file__).with_name('schema_v6.sql').read_text()
         schema=schema.split('CREATE TABLE IF NOT EXISTS maintenance_previews')[0]
         with closing(db.connect(legacy)) as conn:
             conn.execute('PRAGMA journal_mode=WAL');conn.executescript(schema);conn.execute('PRAGMA user_version=5')

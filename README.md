@@ -2,16 +2,16 @@
 
 面向课题组及大组共用会议室的预约原型。学生提交申请，由所属导师审批；导师可直接预约。系统处理时间冲突、周期预约、取消确认和维修停用。仓库同时保存 BMAD 需求、架构、故事与敏捷过程材料。
 
-**当前状态：** 预约、审批、周期预约、取消和批量停用流程已实现；260 项 Python 测试和 415 项 JavaScript 测试通过，并在桌面与手机视口完成浏览器验证。数据库 schema 为 v6。课程交付进度见[核对表](docs/course-audit.md)；正式录屏暂缓。
+**当前状态：** 预约、审批、周期预约、取消和批量停用流程已实现；262 项 Python 测试和 415 项 JavaScript 测试通过，并在桌面与手机视口完成浏览器验证。数据库 schema 为 v7。课程交付进度见[核对表](docs/course-audit.md)；正式录屏暂缓。
 
 ## 本地运行
 
-需要 Python 3.12.14、SQLite >=3.51.3、可用的 `Asia/Shanghai` 时区和 `uv`。以下命令在本项目目录执行；首次初始化会逐一隐藏输入五个演示账号的口令（至少12字符），不会内置或提交共享口令。
+需要 Python 3.12.14、SQLite >=3.51.3、可用的 `Asia/Shanghai` 时区和 `uv`。以下命令在本项目目录执行；全新数据库首次初始化会逐一隐藏输入五个演示账号的口令（至少12字符），不会内置或提交共享口令；本工作区已从 v6 复制升级的 v7 演示库沿用原账号口令。
 
 ```bash
 uv python install 3.12.14
 uv sync --frozen --python 3.12.14
-export BOOKING_DB_PATH="$PWD/instance/course-demo-v6.sqlite3"
+export BOOKING_DB_PATH="$PWD/instance/course-demo-v7.sqlite3"
 uv run --frozen python -m scripts.init_demo
 uv run --frozen python -m scripts.seed_demo_rooms
 uv run --frozen waitress-serve --listen=127.0.0.1:8000 --threads=8 --call booking_app:create_app
@@ -24,7 +24,7 @@ uv run --frozen waitress-serve --listen=127.0.0.1:8000 --threads=8 --call bookin
 ## 当前规则
 
 - 学生提交申请后不占用房间，由本人导师批准后才生效。导师本人可直接预约；管理员不能代导师审批学生申请。
-- 普通预约及周期首场须在未来 7 天内结束；会议室每天 08:00—22:00 开放，至少 3 人，每场按半小时选择、同日 30 分钟至 4 小时。一次可选每周同一时段最多 8 周，任何一周冲突则整组暂不批准、零占用，并显示冲突日期。
+- 普通预约及周期首场须在未来 7 天内结束；会议室每天 08:00—22:00 开放，至少 3 人，每场可按任意整分钟选择、同日 30 分钟至 4 小时。一次可选每周同一时段最多 8 周，任何一周冲突则整组暂不批准、零占用，并显示冲突日期。
 - 学生对已批准预约提出取消申请后仍占用时段；本人导师须在开始前确认才释放。周期预约获批后逐场取消。管理员说明原因可直接取消未结束预约。
 - 管理员可预览维修影响的预约，一次填写原因并确认后，在同一事务批量取消实际重叠的预约并停用。预览后占用变化须重新预览；撤销停用不自动恢复旧预约。停用窗口保持未来 30 天。
 - 共享日程显示活动、预约人及所属导师；学生看本人完整记录，导师看本人和自己学生的完整记录，管理员看全部。其他登录者仅看共享日程；历史记录在课程期间不自动清理。系统只协调已登记安排，无法阻止线下未登记的跨导师冲突。
@@ -52,11 +52,11 @@ node --test tests/test_*js.cjs
   --output-dir work/rerun/epic-4-browser
 ```
 
-测试使用临时库和合成账号，不修改默认演示库。新流程证据见[导师身份](docs/evidence/human-review/identity-verification.md)、[申请审批](docs/evidence/human-review/booking-verification.md)、[取消确认](docs/evidence/human-review/cancellation-verification.md)、[周期预约](docs/evidence/human-review/weekly-verification.md)、[批量停用](docs/evidence/human-review/maintenance-verification.md)及[当前版NFR03性能](docs/evidence/human-review/epic4-performance/README.md)。完整历史见[验证索引](docs/verification.md)；旧证据只对应其当时源码。
+测试使用临时库和合成账号，不修改默认演示库。新流程证据见[导师身份](docs/evidence/human-review/identity-verification.md)、[申请审批](docs/evidence/human-review/booking-verification.md)、[取消确认](docs/evidence/human-review/cancellation-verification.md)、[周期预约](docs/evidence/human-review/weekly-verification.md)、[批量停用](docs/evidence/human-review/maintenance-verification.md)及[当前版NFR03性能](docs/evidence/human-review/epic4-performance/README.md)。本次任意分钟与 v7 升级见[试用反馈验证](docs/evidence/feedback-2026-11-17.md)。完整历史见[验证索引](docs/verification.md)；旧证据只对应其当时源码。
 
-当前schema v6的真实服务重启检查可运行`.venv/bin/python -m scripts.verify_epic4_restart --output-dir work/rerun/epic-4-restart`；它使用全新临时数据库、独立Waitress进程和真实系统时钟，核对8周审批、取消确认、批量停用重放与撤销后的历史。
+当前schema v7的真实服务重启检查可运行`.venv/bin/python -m scripts.verify_epic4_restart --output-dir work/rerun/epic-4-restart`；它使用全新临时数据库、独立Waitress进程和真实系统时钟，核对8周审批、取消确认、批量停用重放与撤销后的历史。
 
-本项目是本地课程原型：单 SQLite 写入者、无主动消息通知、无公网部署、无分页。当前版NFR03在7天窗口、规定合成负载下测得200样本P95为16.893ms、0错误；不据此声称生产性能。
+本项目是本地课程原型：单 SQLite 写入者、无主动消息通知、无公网部署、无分页。当前v7版NFR03在7天窗口、规定合成负载下测得200样本P95为19.772ms、0错误；不据此声称生产性能。
 
 ## AI 使用声明
 

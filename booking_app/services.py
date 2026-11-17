@@ -6,7 +6,7 @@ import sqlite3
 from flask import current_app
 
 from . import auth, db, dto
-from .domain import DomainError, auth_required, beijing_day, booking_interval, query_attendees, resource_id
+from .domain import DomainError, auth_required, beijing_day, booking_interval, full_half_hour_slots, query_attendees, resource_id
 from .domain import normalize_booking_payload, normalize_room_payload, validate_booking_window
 from .domain import normalize_block_payload, normalize_revoke_payload, normalized_text, validate_block_window
 
@@ -72,7 +72,7 @@ def create_booking(actor: auth.Actor, payload: dict) -> dict:
         try:
             conn.executemany("INSERT INTO occupancy_slots(room_id,slot_start,reservation_id) VALUES(?,?,?)",
                              [(values["room_id"], slot, booking_id)
-                              for slot in range(values["start_at"], values["end_at"], 1800)])
+                              for slot in full_half_hour_slots(values["start_at"], values["end_at"])])
         except sqlite3.IntegrityError as error:
             if (error.sqlite_errorcode in (sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY, sqlite3.SQLITE_CONSTRAINT_UNIQUE)
                     and str(error) == "UNIQUE constraint failed: occupancy_slots.room_id, occupancy_slots.slot_start"):
@@ -434,10 +434,9 @@ def availability(actor: auth.Actor, start, end, attendees) -> dict:
         rows = conn.execute(
             "SELECT room.id,room.name,room.location,room.capacity FROM rooms room "
             "WHERE room.capacity>=? AND NOT EXISTS ("
-            "SELECT 1 FROM occupancy_slots s JOIN reservations r ON r.id=s.reservation_id "
-            "AND r.room_id=s.room_id WHERE s.room_id=room.id AND r.cancelled_at IS NULL "
-            "AND s.slot_start>=? AND s.slot_start<?) ORDER BY room.name,room.location,room.id",
-            (count, start_at, end_at),
+            "SELECT 1 FROM reservations r WHERE r.room_id=room.id AND r.cancelled_at IS NULL "
+            "AND r.start_at<? AND ?<r.end_at) ORDER BY room.name,room.location,room.id",
+            (count, end_at, start_at),
         ).fetchall()
         return dto.list_result([dto.room(row) for row in rows])
 

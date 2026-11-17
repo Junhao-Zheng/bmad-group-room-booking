@@ -7,7 +7,7 @@ import re
 
 from flask import current_app, g
 
-SCHEMA_VERSION = 6
+SCHEMA_VERSION = 7
 REQUIRED_COLUMNS = {
     "maintenance_previews": {"id", "token_hash", "actor_id", "room_id", "start_at", "end_at", "reason", "affected_json", "created_at", "expires_at", "block_id", "confirmed_at"},
     "cancellation_requests": {"id", "booking_id", "requester_id", "supervisor_id", "created_at", "status", "decided_at", "decided_by", "reason"},

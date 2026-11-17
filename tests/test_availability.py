@@ -157,6 +157,29 @@ class AvailabilityTests(unittest.TestCase):
                 # The first slot is free; a later booking/block alone excludes room 10.
                 self.assert_success(self.query(start, end), expected)
 
+    def test_arbitrary_minute_booking_uses_exact_interval_not_coarse_slots(self):
+        teacher_client = self.app.test_client()
+        teacher = self.login(teacher_client, "demo_admin")
+        payload = dict(room_id=30, title="分钟边界", purpose="讨论", attendees=3,
+                       start="2026-11-12T12:10", end="2026-11-12T12:40",
+                       intent_key="minute-interval-test-001")
+        response = teacher_client.post("/api/bookings", base_url=ORIGIN,
+            headers={"Origin": ORIGIN, "X-CSRF-Token": teacher["csrf_token"]}, json=payload)
+        self.assertEqual(response.status_code, 201, response.text)
+        self.assertNotIn(30, self.ids(start="2026-11-12T12:20", end="2026-11-12T12:50"))
+        self.assertIn(30, self.ids(start="2026-11-12T12:40", end="2026-11-12T13:10"))
+        self.assertIn(30, self.ids(start="2026-11-12T11:40", end="2026-11-12T12:10"))
+        conflict = teacher_client.post("/api/bookings", base_url=ORIGIN,
+            headers={"Origin": ORIGIN, "X-CSRF-Token": teacher["csrf_token"]},
+            json=payload | {"start":"2026-11-12T12:35", "end":"2026-11-12T13:05",
+                            "intent_key":"minute-interval-test-002"})
+        self.assertEqual(conflict.status_code, 409, conflict.text)
+        with db.read_transaction(self.database) as conn:
+            slots = [row[0] for row in conn.execute(
+                "SELECT slot_start FROM occupancy_slots WHERE reservation_id=?",
+                (response.json["data"]["booking"]["id"],))]
+        self.assertEqual(slots, [])  # No complete half-hour lies inside 12:10—12:40.
+
     def test_name_location_sort_overrides_reverse_ids_with_exact_dto(self):
         with db.write_transaction(self.database) as conn:
             conn.execute("UPDATE rooms SET name='合成 Z',location='演示楼 999' WHERE id=10")
@@ -176,6 +199,7 @@ class AvailabilityTests(unittest.TestCase):
 
     def test_legal_30_minutes_4_hours_and_30_day_equality(self):
         for start, end in [("2026-11-12T12:00", "2026-11-12T12:30"),
+                           ("2026-11-12T12:10", "2026-11-12T12:40"),
                            ("2026-11-12T12:00", "2026-11-12T16:00"),
                            ("2026-11-13T08:00", "2026-11-13T08:30"),
                            ("2026-11-13T21:30", "2026-11-13T22:00"),
@@ -201,7 +225,7 @@ class AvailabilityTests(unittest.TestCase):
 
     def test_strict_time_format_and_date_invalidity_never_500(self):
         for value in ["", "2026-2-01T12:00", "2026-11-12 12:00", "2026-11-12T1:00",
-                      "2026-11-12T12:15", "2026-11-12T12:00:00", "2026-11-12T12:00+08:00",
+                      "2026-11-12T12:00:00", "2026-11-12T12:00+08:00",
                       "2026-11-12T12:00Z", "2026-11-12T12:00 ", "2026-11-12T24:00",
                       "2026-02-29T12:00", "2026-13-01T12:00", "0000-01-01T00:00",
                       "２０２６-１１-１２T１２:００", "9" * 10000]:
@@ -281,7 +305,7 @@ class AvailabilityTests(unittest.TestCase):
             self.assertIn(f'for="{name}"', page.text)
             self.assertIn(f'id="{name}-error"', page.text)
             self.assertRegex(page.text, rf'<input id="{name}"[^>]*\brequired\b')
-        self.assertEqual(page.text.count('type="datetime-local" step="1800"'), 2)
+        self.assertEqual(page.text.count('type="datetime-local" step="60"'), 2)
         self.assertIn('type="number" min="3" step="1"', page.text)
         self.assertIn("查询不锁定资源", page.text)
         with db.write_transaction(self.database) as conn:

@@ -26,7 +26,7 @@ def snapshot(database):
     with db.read_transaction(database) as conn:
         assert conn.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
         assert conn.execute("PRAGMA foreign_key_check").fetchall() == []
-        assert conn.execute("PRAGMA user_version").fetchone()[0] == db.SCHEMA_VERSION == 6
+        assert conn.execute("PRAGMA user_version").fetchone()[0] == db.SCHEMA_VERSION
         rows = {table: [dict(row) for row in conn.execute(f"SELECT * FROM {table} ORDER BY 1")]
                 for table in TABLES}
     encoded = json.dumps(rows, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()
@@ -130,7 +130,7 @@ def run(output):
             assert call(student, f"/api/bookings/{later_id}")["status"] == "cancelled"
             assert call(student, f"/api/bookings/{untouched_id}")["status"] != "cancelled"
             assert len(set(server.pids)) == 6
-            report = {"result": "PASS", "schema_version": 6, "clock": "production SystemClock",
+            report = {"result": "PASS", "schema_version": db.SCHEMA_VERSION, "clock": "production SystemClock",
                       "distinct_processes": True,
                       "checks": ["eight-week approval", "preview survives restart",
                                  "application and approval replay", "batch confirm survives restart",

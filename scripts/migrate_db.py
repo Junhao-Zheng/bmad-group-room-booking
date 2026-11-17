@@ -76,8 +76,8 @@ def migrate_database(source, backup):
     conn = db.connect(source)
     try:
         version = conn.execute("PRAGMA user_version").fetchone()[0]
-        if version not in (1, 2, 3, 4, 5):
-            raise ValueError("Migration requires schema version 1, 2, 3, 4 or 5")
+        if version not in (1, 2, 3, 4, 5, 6):
+            raise ValueError("Migration requires schema version 1 through 6")
         # Restored backup files may use DELETE journaling. Establish WAL before
         # changing schema so journal-mode failure cannot follow a committed upgrade.
         if conn.execute("PRAGMA journal_mode").fetchone()[0] != "wal":
@@ -102,15 +102,17 @@ def migrate_database(source, backup):
                     raise ValueError("Unrecognized schema 3/4 columns")
             db.check_identity_schema(conn)
             _check_integrity(conn)
-            if version in (4,5):
-                old_schema = Path(db.__file__).with_name("schema.sql").read_text(encoding="utf-8")
+            if version in (4,5,6):
+                old_schema = Path(db.__file__).with_name("schema_v6.sql").read_text(encoding="utf-8")
                 if version == 4:
                     old_schema = old_schema.replace("CHECK(typeof(weeks)='integer' AND weeks BETWEEN 1 AND 8)", "CHECK(weeks=1)")
                     old_schema = old_schema.replace("CHECK(occurrence BETWEEN 1 AND 8)", "CHECK(occurrence=1)")
-                db.check_critical_schema(conn, old_schema, exclude={"maintenance_previews"})
+                db.check_critical_schema(conn, old_schema, exclude={"maintenance_previews"} if version < 6 else set())
         if version < 4:
             _validate_legacy_audit(conn, version)
-        destinations = ['users_v3', 'audit_events_v3', 'applications_old', 'application_occurrences_old', 'maintenance_previews']
+        destinations = ['users_v3', 'audit_events_v3', 'applications_old', 'application_occurrences_old', 'reservations_v7', 'applications_v7']
+        if version < 6:
+            destinations.append('maintenance_previews')
         if version < 4:
             destinations.append('cancellation_requests')
         if version < 3:
@@ -150,6 +152,19 @@ def migrate_database(source, backup):
             conn.execute("DROP TABLE application_occurrences_old")
             conn.execute("DROP TABLE applications_old")
             conn.execute(next(sql for sql in statements if sql.startswith("CREATE INDEX IF NOT EXISTS applications_supervisor")))
+        # SQLite cannot alter CHECK constraints in place. Rebuild both tables while
+        # foreign keys are disabled inside this single migration transaction.
+        for table in ("reservations", "applications"):
+            create_sql = next(sql for sql in statements if sql.startswith(f"CREATE TABLE IF NOT EXISTS {table} "))
+            temporary = f"{table}_v7"
+            conn.execute(create_sql.replace(f"IF NOT EXISTS {table}", temporary, 1))
+            conn.execute(f"INSERT INTO {temporary} SELECT * FROM {table}")
+            conn.execute(f"DROP TABLE {table}")
+            conn.execute(f"ALTER TABLE {temporary} RENAME TO {table}")
+        for sql in statements:
+            if sql.startswith("CREATE ") and " INDEX IF NOT EXISTS " in sql and (
+                    " ON reservations(" in sql or " ON applications(" in sql):
+                conn.execute(sql)
         conn.execute(f"PRAGMA user_version={db.SCHEMA_VERSION}")
         db.check_identity_schema(conn)
         db.check_critical_schema(conn)

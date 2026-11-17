@@ -11,18 +11,18 @@
 <section class="card availability-panel" aria-labelledby="availability-title">
   <p class="section-label">可用会议室</p>
   <h2 id="availability-title">按时段和人数找房间</h2>
-  <p class="muted" id="availability-hint">北京时间 08:00—22:00 开放，至少 3 人。请选择未来 7 天内、同一天的 30 分钟至 4 小时时段，起止分钟为 00 或 30。查询不锁定资源。</p>
+  <p class="muted" id="availability-hint">北京时间 08:00—22:00 开放，至少 3 人。可按任意整分钟选择未来 7 天内、同一天的 30 分钟至 4 小时时段。查询不锁定资源。</p>
   <noscript><p class="notice">查询可用会议室需要启用 JavaScript；会议室目录仍可阅读。</p></noscript>
   <form id="availability-form" action="{{ url_for('web.availability_api') }}" method="get" aria-describedby="availability-hint" novalidate>
     <div class="availability-fields">
       <div class="form-field">
         <label for="start">开始时间（北京时间）</label>
-        <input id="start" name="start" type="datetime-local" step="1800" required aria-describedby="start-error">
+        <input id="start" name="start" type="datetime-local" step="60" required aria-describedby="start-error">
         <p id="start-error" class="field-error"></p>
       </div>
       <div class="form-field">
         <label for="end">结束时间（北京时间）</label>
-        <input id="end" name="end" type="datetime-local" step="1800" required aria-describedby="end-error">
+        <input id="end" name="end" type="datetime-local" step="60" required aria-describedby="end-error">
         <p id="end-error" class="field-error"></p>
       </div>
       <div class="form-field">

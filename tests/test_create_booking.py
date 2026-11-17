@@ -158,7 +158,7 @@ class CreateBookingTests(unittest.TestCase):
                  ('2026-11-12T23:30','2026-11-13T00:00','end')]
         for start,end,field in cases:
             self.error(self.post(start=start,end=end),400,'INVALID_INPUT',field)
-        for value in ['2026-11-12T12:15','2026-2-01T12:00','2026-02-29T12:00','2026-11-12T12:00:00',
+        for value in ['2026-2-01T12:00','2026-02-29T12:00','2026-11-12T12:00:00',
                       '2026-11-12T12:00+08:00','2026-11-12 12:00','0001-01-01T00:00','9999-12-31T23:30',None,True]:
             self.error(self.post(start=value),400,'INVALID_INPUT')
         self.assertEqual(self.counts(),(0,0,0))

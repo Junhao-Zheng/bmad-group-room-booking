@@ -13,7 +13,7 @@ const users=JSON.parse(fs.readFileSync(credentialsFile,'utf8')).users;
       async function settle(page) {await page.waitForFunction(()=>document.querySelector('#applications-panel').getAttribute('aria-busy')==='false');}
       const student=await login('demo_member_a'),teacher=await login('demo_teacher_a'),other=await login('demo_teacher_b'),admin=await login('demo_admin');
       const day=new Date(Date.now()+8*3600000+(index+1)*86400000).toISOString().slice(0,10);
-      const page=student.page;await page.locator('#start').fill(day+'T10:00');await page.locator('#end').fill(day+'T11:00');await page.locator('#attendees').fill('3');
+      const page=student.page;await page.locator('#start').fill(day+'T10:10');await page.locator('#end').fill(day+'T11:10');await page.locator('#attendees').fill('3');
       await page.locator('#availability-form button').click();await page.locator('.booking-select').first().click();
       await page.locator('#booking-name').fill('学生讨论 <img src=x>');await page.locator('#booking-purpose').fill('私有用途：研究讨论');
       // Lose the first committed response, then verify the UI retries the original intent.

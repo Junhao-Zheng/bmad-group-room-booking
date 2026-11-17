@@ -106,20 +106,20 @@ def active_status(start_at: int, end_at: int, now: int) -> str:
 
 
 def beijing_datetime(value, field_name: str) -> int:
-    """Parse one strict half-hour local input; also reusable for future blocks."""
+    """Parse a Beijing local timestamp with whole-minute precision."""
     from datetime import datetime
     import re
     from zoneinfo import ZoneInfo
 
     try:
         if (not isinstance(value, str) or len(value) != 16
-                or not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:(00|30)", value)):
+                or not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}", value)):
             raise ValueError
         local = datetime.fromisoformat(value).replace(tzinfo=ZoneInfo("Asia/Shanghai"))
         return int(local.timestamp())
     except (ValueError, OverflowError, OSError):
         raise DomainError("INVALID_INPUT", "请检查查询时间。", {
-            field_name: "请输入有效的北京时间（YYYY-MM-DDTHH:MM），分钟仅限 00 或 30。",
+            field_name: "请输入有效的北京时间（YYYY-MM-DDTHH:MM）。",
         }) from None
 
 
@@ -147,6 +147,12 @@ def validate_booking_window(start_at: int, end_at: int, now: int) -> None:
             "start": "会议室开放时间为 08:00—22:00，请在此范围内预约。",
             "end": "会议室开放时间为 08:00—22:00，请在此范围内预约。",
         })
+
+
+def full_half_hour_slots(start_at: int, end_at: int) -> range:
+    """Legacy slot index only stores complete half-hours; intervals remain authoritative."""
+    first = ((start_at + 1799) // 1800) * 1800
+    return range(first, end_at - 1799, 1800)
 
 
 def booking_interval(start, end, now: int) -> tuple[int, int]:
@@ -250,6 +256,9 @@ def normalize_block_payload(payload) -> dict:
             fields.update(error.fields)
     if fields:
         raise DomainError("INVALID_INPUT", "请检查停用信息。", fields)
+    for name in ("start", "end"):
+        if values[name + "_at"] % 1800:
+            raise DomainError("INVALID_INPUT", "请检查停用信息。", {name: "停用时间仍须选择整点或半点。"})
     return values
 
 

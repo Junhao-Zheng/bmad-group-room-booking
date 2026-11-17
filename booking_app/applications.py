@@ -3,7 +3,7 @@ import json
 import secrets
 from flask import current_app
 from . import auth, db, dto, services
-from .domain import DomainError, local_time, normalize_booking_payload, normalized_text, resource_id, validate_booking_window
+from .domain import DomainError, full_half_hour_slots, local_time, normalize_booking_payload, normalized_text, resource_id, validate_booking_window
 
 _SELECT = ("SELECT a.*,room.name AS room_name,room.location AS room_location,room.capacity AS room_capacity,"
            "o.reservation_id FROM applications a JOIN rooms room ON room.id=a.room_id "
@@ -68,7 +68,7 @@ def _approve(conn, actor, row, now):
             json.dumps(values, sort_keys=True, ensure_ascii=False, separators=(",", ":")), now))
         booking_id = inserted.lastrowid
         conn.executemany("INSERT INTO occupancy_slots VALUES(?,?,?)",
-            [(row["room_id"], slot, booking_id) for slot in range(start, end, 1800)])
+            [(row["room_id"], slot, booking_id) for slot in full_half_hour_slots(start, end)])
         source = "application" if actor.role == "teacher" and actor.id != row["owner_id"] else actor.role
         conn.execute("INSERT INTO booking_supervisors VALUES(?,?,?,?)", (booking_id,
             row["supervisor_id"] if source != "admin" else None,

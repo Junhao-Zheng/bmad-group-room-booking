@@ -182,9 +182,9 @@ async function submitAvailability(page) {
           assert.equal(await page.locator(`label[for=${name}]`).count(), 1);
           assert.equal(await page.locator(`#${name}`).evaluate(input => input.required), true);
         }
-        assert.equal(await page.locator('#start').getAttribute('step'), '1800');
-        assert.equal(await page.locator('#end').getAttribute('step'), '1800');
-        assert.equal(await page.locator('#attendees').getAttribute('min'), '1');
+        assert.equal(await page.locator('#start').getAttribute('step'), '60');
+        assert.equal(await page.locator('#end').getAttribute('step'), '60');
+        assert.equal(await page.locator('#attendees').getAttribute('min'), '3');
         await submitAvailability(page);
         await page.waitForFunction(() => document.querySelector('#start').getAttribute('aria-invalid') === 'true');
         assert.equal(await page.evaluate(() => document.activeElement.id), 'start');
@@ -488,7 +488,7 @@ async function submitAvailability(page) {
       await page.keyboard.press('Tab');
       assert.equal(await page.evaluate(() => document.activeElement.textContent), '预约');
       await page.keyboard.press('Tab');
-      assert.equal(await page.evaluate(() => document.activeElement.textContent), '我的预约');
+      assert.equal(await page.evaluate(() => document.activeElement.textContent), '已生效预约');
       await page.keyboard.press('Tab');
       assert.equal(await page.evaluate(() => document.activeElement.textContent), '申请与审批');
       await page.keyboard.press('Tab');

@@ -5,6 +5,7 @@ import json
 from zoneinfo import ZoneInfo
 
 from booking_app import db
+from booking_app.domain import full_half_hour_slots
 
 TITLE = '<img src=x onerror="window.fixtureXss=1">合成活动'
 OWNER = '<script>window.fixtureXss=2</script>演示乙'
@@ -66,7 +67,7 @@ def assert_slot_integrity(test, database):
     try:
         test.assertEqual(conn.execute("PRAGMA foreign_key_check").fetchall(), [])
         for row in conn.execute("SELECT id,room_id,start_at,end_at,cancelled_at FROM reservations"):
-            expected = [] if row["cancelled_at"] is not None else list(range(row["start_at"], row["end_at"], 1800))
+            expected = [] if row["cancelled_at"] is not None else list(full_half_hour_slots(row["start_at"], row["end_at"]))
             actual = conn.execute("SELECT room_id,slot_start FROM occupancy_slots WHERE reservation_id=? ORDER BY slot_start", (row["id"],)).fetchall()
             test.assertEqual([(slot["room_id"], slot["slot_start"]) for slot in actual], [(row["room_id"], slot) for slot in expected])
     finally:

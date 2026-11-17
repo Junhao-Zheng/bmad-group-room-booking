@@ -102,7 +102,7 @@
     if (!Number.isSafeInteger(room.id) || room.id < 1 || !/^[1-9][0-9]*$/.test(query.attendees)
         || !Number.isSafeInteger(Number(query.attendees))
         || ![query.start, query.end].every(value => typeof value === "string"
-          && /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:(00|30)$/.test(value))) {
+          && /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}$/.test(value))) {
       announce("查询结果格式无效，请重新查询会议室。", true);
       return;
     }
