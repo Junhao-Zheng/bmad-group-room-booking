@@ -29,6 +29,19 @@ uv run --frozen waitress-serve --listen=127.0.0.1:8000 --threads=8 --call bookin
 - 管理员可预览维修影响的预约，一次填写原因并确认后，在同一事务批量取消实际重叠的预约并停用。预览后占用变化须重新预览；撤销停用不自动恢复旧预约。停用窗口保持未来 30 天。
 - 共享日程显示活动、预约人及所属导师；学生看本人完整记录，导师看本人和自己学生的完整记录，管理员看全部。其他登录者仅看共享日程；历史记录在课程期间不自动清理。系统只协调已登记安排，无法阻止线下未登记的跨导师冲突。
 
+## 课程材料
+
+|内容|入口|
+|---|---|
+|需求与范围|[产品简述](_bmad-output/planning-artifacts/product-brief.md)、[PRD](_bmad-output/planning-artifacts/PRD.md)|
+|架构与8项ADR|[架构](_bmad-output/planning-artifacts/architecture.md)|
+|故事与状态|[史诗](_bmad-output/planning-artifacts/epics.md)、[Sprint状态](_bmad-output/implementation-artifacts/sprint-status.yaml)|
+|两次增量与复盘|[Sprint 1](docs/sprints/sprint-1-review.md)、[Sprint 2](docs/sprints/sprint-2-review.md)、[五指标复盘](retrospective.md)|
+|需求到证据|[追踪矩阵](docs/traceability.md)、[验证索引](docs/verification.md)|
+|需求决策|[决策日志](decision-log.md)、[原始意见索引](docs/evidence/user-inputs.md)|
+|实验与分工|[实验A结果](docs/experiment-a-results.md)、[三人分工](docs/team-contribution-plan.md)|
+|暂缓的正式录屏|[演示准备](docs/demonstration-plan.md)|
+
 ## 验证
 
 ```bash
@@ -43,32 +56,8 @@ node --test tests/test_*js.cjs
 
 当前schema v6的真实服务重启检查可运行`.venv/bin/python -m scripts.verify_epic4_restart --output-dir work/rerun/epic-4-restart`；它使用全新临时数据库、独立Waitress进程和真实系统时钟，核对8周审批、取消确认、批量停用重放与撤销后的历史。
 
-## 旧库升级
-
-应用不会自动迁移。当前迁移脚本支持已知 schema 1–5 到 v6；先停服并确认无其他写入进程，在**独立副本**上验证，迁移会用 SQLite backup API 创建新的、权限 600 的迁移前备份。路径须是两个尚未复用的独立文件，不能用源文件或其 sidecar 作备份目标。
-
-```bash
-.venv/bin/python -m scripts.backup_db --source /absolute/old.sqlite3 /absolute/private/test-copy.sqlite3
-.venv/bin/python -m scripts.migrate_db --source /absolute/private/test-copy.sqlite3 --backup /absolute/private/before-v6.sqlite3
-```
-
-旧学生若没有导师归属，迁移不会猜测或补写；管理员须通过受控账号配置另行建立合规关系。迁移保留旧预约、占用、审计及已存在的申请/取消历史；失败事务回滚，不应把“备份文件存在”当作成功迁移。旧 schema 1 独立回退实例及原版说明可从 Git 历史提交 `d585c19` 查看。
-
-## 课程材料
-
-|内容|入口|
-|---|---|
-|需求与范围|[产品简述](_bmad-output/planning-artifacts/product-brief.md)、[PRD](_bmad-output/planning-artifacts/PRD.md)|
-|架构与8项ADR|[架构](_bmad-output/planning-artifacts/architecture.md)|
-|故事与状态|[史诗](_bmad-output/planning-artifacts/epics.md)、[Sprint状态](_bmad-output/implementation-artifacts/sprint-status.yaml)|
-|两次增量与复盘|[Sprint 1](docs/sprints/sprint-1-review.md)、[Sprint 2](docs/sprints/sprint-2-review.md)、[五指标复盘](retrospective.md)|
-|需求到证据|[追踪矩阵](docs/traceability.md)、[验证索引](docs/verification.md)|
-|需求决策|[决策日志](decision-log.md)、[原始意见索引](docs/evidence/user-inputs.md)|
-|实验与分工|[实验A结果](docs/experiment-a-results.md)、[三人分工](docs/team-contribution-plan.md)|
-|暂缓的正式录屏|[演示准备](docs/demonstration-plan.md)|
-
 本项目是本地课程原型：单 SQLite 写入者、无主动消息通知、无公网部署、无分页。当前版NFR03在7天窗口、规定合成负载下测得200样本P95为16.893ms、0错误；不据此声称生产性能。
 
 ## AI 使用声明
 
-项目使用 Codex 桌面版（精确模型版本未获知）和 BMAD Method 6.12.1 辅助编写文档、代码、测试与评审材料。郑俊豪提供实际场景并决定业务规则。使用范围、实际贡献和关键会话记录见[完整说明](docs/ai-use-and-contributions.md)及[会话索引](docs/evidence/conversations/README.md)。
+项目使用 Codex 桌面版（精确模型版本未获知）和 BMAD Method 6.12.1 辅助编写文档、代码、测试与评审材料。项目负责人提供实际场景并决定业务规则。使用范围、实际贡献和关键会话记录见[完整说明](docs/ai-use-and-contributions.md)及[会话索引](docs/evidence/conversations/README.md)。
