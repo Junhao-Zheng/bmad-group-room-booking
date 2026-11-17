@@ -7,7 +7,25 @@
   const role=document.body.getAttribute("data-role"), userId=Number(document.body.getAttribute("data-user-id"));
   const csrf=find("logout-form").elements.csrf_token.value;
   const labels={awaiting_approval:"待本人导师审批（尚未占用）",approved:"已批准",rejected:"已拒绝",withdrawn:"已撤回"};
-  let busy=false, blocked=false, pendingOperation=null, displayedItems=[];
+  let busy=false, blocked=false, pendingOperation=null, displayedItems=[], allItems=[];
+  const appStatus=find("applications-status"), appRoom=find("applications-room"), appDate=find("applications-date");
+  function fillRooms(select, items, idKey, nameKey) {
+    if(!select)return;
+    const selected=select.value;select.replaceChildren();
+    const all=document.createElement("option");all.value="";all.textContent="全部会议室";select.append(all);
+    const seen=new Set();
+    for(const item of items){const id=String(idKey(item));if(seen.has(id))continue;seen.add(id);
+      const option=document.createElement("option");option.value=id;option.textContent=nameKey(item);select.append(option);}
+    select.value=selected;
+  }
+  function showApplications() {
+    if(blocked){list.replaceChildren();return;}
+    const visible=allItems.filter(item=>(!appStatus?.value||(appStatus.value==="processed"?item.status!=="awaiting_approval":item.status===appStatus.value))
+      &&(!appRoom?.value||String(item.room.id)===appRoom.value)
+      &&(!appDate?.value||item.start_local.slice(0,10)===appDate.value));
+    render(visible);say(`显示 ${visible.length} / ${allItems.length} 条申请；待审批排在前面。`);
+  }
+  for(const filter of [appStatus,appRoom,appDate])filter?.addEventListener("change",showApplications);
   const text=(parent,tag,value) => {const node=document.createElement(tag); node.textContent=value; parent.append(node); return node;};
   const local=value => value.replace("T"," ").replace("+08:00","");
   function say(message,error=false) {feedback.textContent=message; feedback.setAttribute("role",error?"alert":"status");feedback.classList.toggle("error",error);feedback.focus();}
@@ -28,8 +46,8 @@
   }
   function identityLost(error,prefix="") {
     if(!["AUTH_REQUIRED","CSRF_REJECTED"].includes(error.code))return false;
-    blocked=true;
-    list.replaceChildren(); relogin.hidden=false; retry.hidden=true; pendingOperation=null;
+    blocked=true;allItems=[];displayedItems=[];
+    list.replaceChildren();cancellationItems?.replaceChildren(); relogin.hidden=false; retry.hidden=true; pendingOperation=null;
     say(prefix+(error.code==="CSRF_REJECTED"?"页面验证已失效，操作已停用。请重新登录后打开本页。":"登录已失效，申请详情已清空。请重新登录后查看。"),true);return true;
   }
   function render(items) {
@@ -77,7 +95,9 @@
     if(busy||blocked)return;lock(true);relogin.hidden=true;say(prefix+"正在读取申请记录…");
     try{const result=await request("/api/applications");
       if(!result||Object.keys(result).sort().join(",")!=="items,total"||!Array.isArray(result.items)||result.total!==result.items.length||!result.items.every(window.BookingContracts.application))throw Error("Invalid applications");
-      render(result.items);say(prefix+`共 ${result.total} 条申请。`+(pendingOperation?" 原操作结果尚未确认，请点击重试确认原操作。":""));
+      allItems=[...result.items].sort((a,b)=>Number(b.status==="awaiting_approval")-Number(a.status==="awaiting_approval")||b.id-a.id);
+      fillRooms(appRoom,allItems,item=>item.room.id,item=>item.room.name);
+      showApplications();if(prefix||pendingOperation)say(prefix+`共 ${result.total} 条申请。`+(pendingOperation?" 原操作结果尚未确认，请点击重试确认原操作。":""));
     }catch(error){if(!identityLost(error,prefix))say(prefix+(error.api?error.message:"列表刷新失败，请重试。"),true);}finally{lock(false);}
   }
   async function decide(operation) {
@@ -99,6 +119,16 @@
   retry.addEventListener("click",()=>{if(pendingOperation)decide(pendingOperation);});
   const cancellationItems=find("cancellations-items"), cancellationFeedback=find("cancellations-feedback"),
     cancellationRefresh=find("cancellations-refresh");
+  const cancelStatus=find("cancellations-status"),cancelRoom=find("cancellations-room"),cancelDate=find("cancellations-date");
+  function filterCancellations(){
+    if(blocked){cancellationItems.replaceChildren();return;}
+    let visible=0;
+    for(const row of cancellationItems.children){const match=(!cancelStatus?.value||(cancelStatus.value==="processed"?row.dataset.status!=="awaiting_approval":row.dataset.status===cancelStatus.value))
+      &&(!cancelRoom?.value||row.dataset.roomId===cancelRoom.value)&&(!cancelDate?.value||row.dataset.date===cancelDate.value);
+      row.hidden=!match;if(match)visible++;}
+    cancellationFeedback.textContent=`显示 ${visible} / ${cancellationItems.children.length} 条取消申请；待确认排在前面。`;
+  }
+  for(const filter of [cancelStatus,cancelRoom,cancelDate])filter?.addEventListener("change",filterCancellations);
   if (!cancellationItems || !cancellationFeedback || !cancellationRefresh) {
     load();
     return;
@@ -111,9 +141,11 @@
       const data=await request("/api/cancellation-requests");
       if(!data||!Array.isArray(data.items)||data.total!==data.items.length)throw Error("Invalid list");
       cancellationItems.replaceChildren();
-      for(const item of data.items) {
+      fillRooms(cancelRoom,data.items,item=>item.room_id,item=>item.room_name);
+      for(const item of [...data.items].sort((a,b)=>Number(b.status==="awaiting_approval")-Number(a.status==="awaiting_approval")||b.id-a.id)) {
         if(!Object.hasOwn(cancellationLabels,item.status)||!Number.isSafeInteger(item.id)||!Number.isSafeInteger(item.booking_id))throw Error("Invalid request");
         const row=text(cancellationItems,"li","");
+        row.dataset.cancellationId=String(item.id);row.dataset.status=item.status;row.dataset.roomId=String(item.room_id);row.dataset.date=item.start_local.slice(0,10);
         text(row,"h3",`取消申请 #${item.id} · 预约 #${item.booking_id} · ${item.title}`);
         text(row,"p",cancellationLabels[item.status]+(item.expired?" · 已到开始时间，不能再确认":""));
         text(row,"p",`${item.room_name} · ${local(item.start_local)} — ${local(item.end_local)}`);
@@ -131,8 +163,8 @@
           reject.addEventListener("click",()=>{if(!reason.value.trim()){cancellationFeedback.textContent="请填写拒绝原因。";reason.focus();return;}decideCancellation(item,"reject",{reason:reason.value});});
         }
       }
-      cancellationFeedback.textContent=`共 ${data.total} 条取消申请。`;
-    } catch(error) {cancellationFeedback.textContent=error.api?error.message:"取消申请读取失败，请刷新重试。";}
+      filterCancellations();
+    } catch(error) {if(error.code==="AUTH_REQUIRED")identityLost(error);cancellationFeedback.textContent=error.api?error.message:"取消申请读取失败，请刷新重试。";}
   }
   async function decideCancellation(item,action,payload) {
     cancellationFeedback.textContent="正在处理取消申请…";

@@ -51,6 +51,9 @@ class CancellationTests(unittest.TestCase):
         created=self.call(cancellations.create_request,self.student,self.booking_id)
         self.assertFalse(created['replayed']);request=created['cancellation_request']
         self.assertEqual(request['status'],'awaiting_approval')
+        self.assertEqual(request['room_id'],1)
+        self.assertEqual(self.call(cancellations.list_requests,self.teacher)['items'][0]['id'],request['id'])
+        self.assertEqual(self.call(cancellations.list_requests,self.other)['total'],0)
         self.assertEqual(len(self.facts()['occupancy_slots']),2)
         self.assertTrue(self.call(cancellations.create_request,self.student,self.booking_id)['replayed'])
         approved=self.call(cancellations.decide_request,self.teacher,request['id'],'approve',{})

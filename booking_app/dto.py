@@ -151,7 +151,7 @@ def cancellation_snapshot(row):
 
 def cancellation_full(row, now):
     return dict(cancellation_snapshot(row), title=row["title"], owner_display_name=row["owner_display_name"],
-                supervisor_display_name=row["supervisor_display_name"], room_name=row["room_name"],
+                supervisor_display_name=row["supervisor_display_name"], room_id=row["room_id"], room_name=row["room_name"],
                 start_at=row["start_at"], start_local=local_time(row["start_at"]),
                 end_at=row["end_at"], end_local=local_time(row["end_at"]),
                 expired=row["status"] == "awaiting_approval" and now >= row["start_at"])

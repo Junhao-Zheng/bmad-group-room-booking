@@ -1,18 +1,18 @@
 {% extends "base.html" %}
-{% block title %}我的预约 · 课题组活动与会议室预约{% endblock %}
+{% block title %}已生效预约 · 课题组活动与会议室预约{% endblock %}
 {% block content %}
 <script src="{{ url_for('static', filename='history.js') }}" defer></script>
 <section class="page-intro">
   <p class="eyebrow">个人安排</p>
-  <h1>我的预约</h1>
-  <p><a href="{{ url_for('web.applications_page') }}">查看我的申请与审批记录</a> · 本页显示已经生效的预约。</p>
+  <h1>已生效预约</h1>
+  <p><a href="{{ url_for('web.applications_page') }}">查看待批准和已处理的申请</a> · 本页只显示已经生效的预约。</p>
   <p class="muted">查看自己的活动与完整详情。按开始时间倒序排列，时间均为北京时间。</p>
   <p id="auth-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>
   <a id="relogin-link" class="relogin-link" href="{{ url_for('web.login_page') }}" hidden>重新登录</a>
 </section>
 <div class="history-layout">
   <section class="card history-panel" aria-labelledby="history-title">
-    <h2 id="history-title">预约记录</h2>
+    <h2 id="history-title">预约记录（含已取消）</h2>
     <form id="history-form">
       <label for="history-status">预约状态</label>
       <select id="history-status" name="status" aria-describedby="history-status-error">
@@ -23,6 +23,8 @@
         <option value="cancelled">已取消</option>
       </select>
       <p id="history-status-error" class="field-error"></p>
+      <label for="history-room">会议室</label><select id="history-room"><option value="">全部会议室</option></select>
+      <label for="history-date">日期</label><input id="history-date" type="date">
       <button class="button-primary" type="submit">查看预约</button>
     </form>
     <p id="history-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>

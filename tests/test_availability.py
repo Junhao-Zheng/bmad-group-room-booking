@@ -35,7 +35,7 @@ class AvailabilityTests(unittest.TestCase):
         ], FixedClock())
         seed_schedule_fixture(cls.fixture_db)
         with db.write_transaction(cls.fixture_db) as conn:
-            insert_record(conn, 201, 20, "2026-11-13T23:00", "2026-11-15T01:00", kind="block")
+            insert_record(conn, 201, 20, "2026-11-13T20:00", "2026-11-15T09:00", kind="block")
             insert_record(conn, 202, 10, "2026-11-12T12:00", "2026-11-12T13:00", cancelled=True)
 
     @classmethod
@@ -141,8 +141,7 @@ class AvailabilityTests(unittest.TestCase):
         self.assertEqual(self.ids(start="2026-11-12T11:30", end="2026-11-12T12:00"), [10, 20, 30])
         # Active bookings end at 11:30; cancelled booking and revoked block occupy 12:00.
         self.assertEqual(self.ids(), [10, 20, 30])
-        self.assertEqual(self.ids(start="2026-11-12T22:30", end="2026-11-12T23:00"), [10, 20, 30])
-        self.assertEqual(self.ids(start="2026-11-12T23:00", end="2026-11-12T23:30"), [20, 30])
+        self.assert_error(self.query(start="2026-11-12T22:30", end="2026-11-12T23:00"), field="end")
 
     def test_only_later_slots_occupied_by_booking_or_block_exclude_room(self):
         with db.write_transaction(self.database) as conn:
@@ -153,7 +152,7 @@ class AvailabilityTests(unittest.TestCase):
         ]
         for start, end in [("2026-11-12T12:30", "2026-11-12T13:30"),
                            ("2026-11-12T12:00", "2026-11-12T16:00"),
-                           ("2026-11-12T22:30", "2026-11-12T23:30")]:
+                           ("2026-11-12T12:30", "2026-11-12T14:30")]:
             with self.subTest(start=start, end=end):
                 # The first slot is free; a later booking/block alone excludes room 10.
                 self.assert_success(self.query(start, end), expected)
@@ -169,15 +168,17 @@ class AvailabilityTests(unittest.TestCase):
         ])
 
     def test_cross_day_block_excludes_every_covered_day_and_releases_at_end(self):
-        for start, end in [("2026-11-13T23:00", "2026-11-13T23:30"),
+        for start, end in [("2026-11-13T20:00", "2026-11-13T20:30"),
                            ("2026-11-14T12:00", "2026-11-14T12:30"),
-                           ("2026-11-15T00:30", "2026-11-15T01:00")]:
+                           ("2026-11-15T08:30", "2026-11-15T09:00")]:
             self.assertEqual(self.ids(start=start, end=end), [10, 30])
-        self.assertEqual(self.ids(start="2026-11-15T01:00", end="2026-11-15T01:30"), [10, 20, 30])
+        self.assertEqual(self.ids(start="2026-11-15T09:00", end="2026-11-15T09:30"), [10, 20, 30])
 
     def test_legal_30_minutes_4_hours_and_30_day_equality(self):
         for start, end in [("2026-11-12T12:00", "2026-11-12T12:30"),
                            ("2026-11-12T12:00", "2026-11-12T16:00"),
+                           ("2026-11-13T08:00", "2026-11-13T08:30"),
+                           ("2026-11-13T21:30", "2026-11-13T22:00"),
                            ("2026-11-19T09:30", "2026-11-19T10:00")]:
             self.assertEqual(self.query(start, end).status_code, 200)
 
@@ -188,6 +189,9 @@ class AvailabilityTests(unittest.TestCase):
             ("2026-11-12T12:00", "2026-11-12T12:00", "end"),
             ("2026-11-12T12:00", "2026-11-12T11:30", "end"),
             ("2026-11-12T12:00", "2026-11-12T16:30", "end"),
+            ("2026-11-13T05:30", "2026-11-13T06:30", "start"),
+            ("2026-11-13T07:30", "2026-11-13T08:00", "start"),
+            ("2026-11-13T21:30", "2026-11-13T22:30", "end"),
             ("2026-11-19T10:00", "2026-11-19T10:30", "end"),
             ("2026-11-12T23:30", "2026-11-13T00:00", "end"),
             ("2026-11-12T23:30", "2026-11-13T00:30", "end"),
@@ -222,13 +226,15 @@ class AvailabilityTests(unittest.TestCase):
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(response.json["data"], {"items": [], "total": 0})
         self.assert_error(self.query(start="bad", attendees="9" * 10000), field="start")
-        for value in [None, True, False, 1.0, [], {}, 0, -1, "2"]:
+        for value in [None, True, False, 1.0, [], {}, 0, 1, 2, -1, "2"]:
             with self.assertRaises(DomainError):
                 positive_integer(value)
         for value in [None, True, False, 1.0, [], {}, 0, -1]:
             with self.assertRaises(DomainError):
                 query_attendees(value)
         self.assertEqual(positive_integer(10**10000), 10**10000)
+        for count in ("1", "2"):
+            self.assert_error(self.query(attendees=count), field="attendees")
         with self.app.app_context():
             actor = self.actor()
             self.assertEqual(services.availability(actor, "2026-11-12T12:00", "2026-11-12T12:30", 10**10000), {"items": [], "total": 0})
@@ -276,7 +282,7 @@ class AvailabilityTests(unittest.TestCase):
             self.assertIn(f'id="{name}-error"', page.text)
             self.assertRegex(page.text, rf'<input id="{name}"[^>]*\brequired\b')
         self.assertEqual(page.text.count('type="datetime-local" step="1800"'), 2)
-        self.assertIn('type="number" min="1" step="1"', page.text)
+        self.assertIn('type="number" min="3" step="1"', page.text)
         self.assertIn("查询不锁定资源", page.text)
         with db.write_transaction(self.database) as conn:
             conn.execute("DELETE FROM occupancy_slots")

@@ -1,15 +1,22 @@
 {% extends "base.html" %}
-{% block title %}申请与审批 · 课题组活动与会议室预约{% endblock %}
+{% block title %}{{ '申请记录' if user.role == 'member' else '申请与审批' }} · 课题组活动与会议室预约{% endblock %}
 {% block content %}
 <section class="page-intro">
-  <h1>申请与审批</h1>
+  <h1>{{ '申请记录' if user.role == 'member' else '申请与审批' }}</h1>
   <p>待审申请尚未占用会议室；仅本人导师批准后生效。所有时间均为北京时间。</p>
+  {% if user.role == 'teacher' %}<p>这里只显示您本人及所属学生的申请；取消申请也只由对应导师确认。</p>{% endif %}
   {% if user.role == 'admin' %}<p>管理员可查看全部申请，不能代替导师审批。</p>{% endif %}
   <p><a href="{{ url_for('web.home') }}">提交新申请 / 预约</a> · <a href="{{ url_for('web.my_page') }}">查看已生效预约</a></p>
   <p id="auth-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>
   <a id="relogin-link" href="{{ url_for('web.login_page') }}" hidden>重新登录</a>
 </section>
 <section id="applications-panel" class="card">
+  <h2>预约申请</h2>
+  <div class="list-filters">
+    <div><label for="applications-status">状态</label><select id="applications-status"><option value="">全部</option><option value="awaiting_approval">待审批</option><option value="processed">已处理</option></select></div>
+    <div><label for="applications-room">会议室</label><select id="applications-room"><option value="">全部会议室</option></select></div>
+    <div><label for="applications-date">日期</label><input id="applications-date" type="date"></div>
+  </div>
   <button id="applications-refresh" type="button">刷新申请记录</button>
   <p id="applications-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></p>
   <a id="applications-relogin" href="{{ url_for('web.login_page') }}" hidden>重新登录后查看</a>
@@ -19,6 +26,11 @@
 </section>
 <section id="cancellations-panel" class="card">
   <h2>取消申请</h2>
+  <div class="list-filters">
+    <div><label for="cancellations-status">状态</label><select id="cancellations-status"><option value="">全部</option><option value="awaiting_approval">待确认</option><option value="processed">已处理</option></select></div>
+    <div><label for="cancellations-room">会议室</label><select id="cancellations-room"><option value="">全部会议室</option></select></div>
+    <div><label for="cancellations-date">日期</label><input id="cancellations-date" type="date"></div>
+  </div>
   <button id="cancellations-refresh" type="button">刷新取消申请</button>
   <p id="cancellations-feedback" class="feedback" role="status" aria-live="polite"></p>
   <ul id="cancellations-items" class="history-items" aria-label="取消申请记录"></ul>

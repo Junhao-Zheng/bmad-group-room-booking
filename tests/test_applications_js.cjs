@@ -8,9 +8,10 @@ function harness(role='teacher',fetcher) {
     get textContent(){return this._text+this.children.map(c=>c.textContent).join('');},set textContent(v){this._text=String(v);this.children=[];},
     setAttribute(k,v){attrs.set(k,String(v));},getAttribute:k=>attrs.get(k),classList:{toggle(){}},
     append(c){this.children.push(c);},replaceChildren(){this.children=[];},focus(){active=this;},
-    addEventListener(k,cb){listeners[k]=cb;},click(){return listeners.click?.({preventDefault(){}});},
+    addEventListener(k,cb){listeners[k]=cb;},click(){return listeners.click?.({preventDefault(){}});},change(){return listeners.change?.();},
     querySelectorAll(selector){const tags=selector.split(',');return this.children.flatMap(c=>[...(tags.includes(c.tag)?[c]:[]),...c.querySelectorAll(selector)]);}};if(id)nodes[id]=n;return n;}
   const panel=node('section','applications-panel');for(const [id,tag] of [['applications-items','ul'],['applications-feedback','p'],['applications-refresh','button'],['applications-retry','button'],['applications-relogin','a']])panel.append(node(tag,id));
+  for(const id of ['applications-status','applications-room','applications-date'])panel.append(node(id==='applications-date'?'input':'select',id));
   const docBody=node('body');docBody.setAttribute('data-role',role);docBody.setAttribute('data-user-id',role==='member'?'2':role==='teacher'?'3':'4');
   nodes['logout-form']={elements:{csrf_token:{value:'test-csrf'}}};let implementation=fetcher||(()=>body({items:[app],total:1}));
   const window={setTimeout:()=>1,clearTimeout(){}};
@@ -55,6 +56,15 @@ test('expired awaiting application has no approval button',async()=>{
 });
 
 const approvedApp={...app,status:'approved',decided_at:1794448900,decided_by:3,reservation_id:7};
+test('pending applications lead and status, room and date filters narrow the list',async()=>{
+  const processed={...approvedApp,id:2,room_id:2,room:{...app.room,id:2,name:'第二间'}};
+  const h=harness('teacher',()=>body({items:[processed,{...app,id:1},{...app,id:3}],total:3}));await flush();
+  const headings=()=>h.nodes['applications-items'].children.map(row=>row.children.find(child=>child.tag==='h2')?.textContent);
+  assert.deepEqual(headings(),['申请 #3 · 讨论 <img src=x>','申请 #1 · 讨论 <img src=x>','申请 #2 · 讨论 <img src=x>']);
+  h.nodes['applications-status'].value='processed';h.nodes['applications-status'].change();assert.equal(h.nodes['applications-items'].children.length,1);
+  h.nodes['applications-status'].value='';h.nodes['applications-room'].value='2';h.nodes['applications-room'].change();assert.equal(h.nodes['applications-items'].children.length,1);
+  h.nodes['applications-date'].value='2026-11-14';h.nodes['applications-date'].change();assert.equal(h.nodes['applications-items'].children.length,0);
+});
 const approvedBooking={id:7,owner_id:2,owner_display_name:'学生',supervisor_id:3,supervisor_display_name:'导师 <img>',supervisor_source:'application',application_id:1,approved_at:1794448900,approved_by:3,
   room:app.room,title:app.title,purpose:app.purpose,attendees:3,start_at:app.start_at,end_at:app.end_at,start_local:app.start_local,end_local:app.end_local,status:'pending',created_at:1794448900,created_local:'2026-11-12T10:01:40+08:00',cancelled_at:null,cancelled_local:null,cancelled_by_id:null,cancelled_by_display_name:null,cancel_reason:null};
 const failure=(code,status=409)=>({ok:false,status,json:async()=>({ok:false,error:{code,message:code,fields:{},conflicts:[]}})});

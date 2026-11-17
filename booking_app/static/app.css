@@ -33,6 +33,9 @@ h2{font-size:1.75rem;line-height:1.3;margin:8px 0 12px}
 .section-label{color:#126d65;font-size:14px;font-weight:700}
 .muted{color:#54707a}
 .form-field{margin-top:24px}
+.list-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:20px 0}
+.list-filters>div{min-width:0}
+@media(max-width:700px){.list-filters{grid-template-columns:1fr}}
 label{display:block;font-weight:650;margin-bottom:8px}
 .field-error{margin:6px 0 0;font-size:14px;color:#a52b37;min-height:0}
 .field-error:empty{display:none}

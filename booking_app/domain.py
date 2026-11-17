@@ -142,6 +142,11 @@ def validate_booking_window(start_at: int, end_at: int, now: int) -> None:
         raise DomainError("INVALID_INPUT", "请检查起止时间。", {
             "end": "起止时间须在同一北京时间日期内，次日 00:00 也算跨日。",
         })
+    if local_time(start_at)[11:16] < "08:00" or local_time(end_at)[11:16] > "22:00":
+        raise DomainError("INVALID_INPUT", "请检查起止时间。", {
+            "start": "会议室开放时间为 08:00—22:00，请在此范围内预约。",
+            "end": "会议室开放时间为 08:00—22:00，请在此范围内预约。",
+        })
 
 
 def booking_interval(start, end, now: int) -> tuple[int, int]:
@@ -159,8 +164,8 @@ def booking_interval(start, end, now: int) -> tuple[int, int]:
 
 def positive_integer(value, field_name: str = "attendees") -> int:
     """Strict JSON/service integer rule: bool, float and numeric text are invalid."""
-    if type(value) is not int or value < 1:
-        raise DomainError("INVALID_INPUT", "请检查预计人数。", {field_name: "预计人数须为正整数。"})
+    if type(value) is not int or value < 3:
+        raise DomainError("INVALID_INPUT", "请检查预计人数。", {field_name: "预计人数至少为 3 人。"})
     return value
 
 
@@ -277,8 +282,8 @@ def query_attendees(value) -> int:
     """
     if isinstance(value, str):
         if not value or value[0] == "0" or not all("0" <= char <= "9" for char in value):
-            raise DomainError("INVALID_INPUT", "请检查预计人数。", {"attendees": "预计人数须为无前导零的正整数。"})
+            raise DomainError("INVALID_INPUT", "请检查预计人数。", {"attendees": "预计人数须为无前导零且至少为 3 的整数。"})
         if len(value) > 4 or (len(value) == 4 and value > "1000"):
             return 1001
-        return int(value)
+        return positive_integer(int(value))
     return min(positive_integer(value), 1001)

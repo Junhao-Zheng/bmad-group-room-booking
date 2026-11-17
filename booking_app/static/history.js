@@ -4,6 +4,8 @@
   const form = document.querySelector("#history-form");
   if (!form) return;
   const select = form.elements.status;
+  const roomFilter = document.querySelector("#history-room");
+  const dateFilter = document.querySelector("#history-date");
   const submit = form.querySelector("button[type=submit]");
   const items = document.querySelector("#history-items");
   const feedback = document.querySelector("#history-feedback");
@@ -22,7 +24,7 @@
   const csrf = document.querySelector("#logout-form").elements.csrf_token.value;
   const student = document.body.getAttribute("data-role") === "member";
   const labels = {pending: "待开始", in_progress: "进行中", ended: "已结束", cancelled: "已取消"};
-  let busy = false, selectedId;
+  let busy = false, selectedId, cachedList;
 
   function announce(node, message, error = false, focus = error) {
     node.textContent = message;
@@ -75,6 +77,7 @@
   }
   function expired(error, origin, cancellationSucceeded = false, focus = true) {
     if (error.code !== "AUTH_REQUIRED") return false;
+    cachedList = undefined;
     items.replaceChildren();
     cancelForm.hidden = true;
     announce(cancelFeedback, "");
@@ -107,6 +110,15 @@
         items.append(row);
       }
   }
+  function renderFiltered() {
+    if (!cachedList) return;
+    const visible = cachedList.items.filter(booking =>
+      (!roomFilter?.value || String(booking.room.id) === roomFilter.value) &&
+      (!dateFilter?.value || booking.start_local.slice(0, 10) === dateFilter.value));
+    renderList({items: visible, total: visible.length});
+    announce(feedback, `显示 ${visible.length} / ${cachedList.total} 条预约。`);
+  }
+  for (const filter of [roomFilter, dateFilter]) filter?.addEventListener("change", renderFiltered);
   function listMessage(result, status) {
     return (result.total ? `查询成功，共 ${result.total} 条${status ? labels[status] : ""}预约。` :
       (status ? `暂无${labels[status]}的预约。可选择其他状态查看。` : "你还没有预约记录，可从“预约”页面创建活动。")) +
@@ -116,6 +128,7 @@
     if (event) event.preventDefault();
     if (busy) return;
     const status = select.value;
+    cachedList = undefined;
     items.replaceChildren();
     resetDetail();
     relogin.hidden = true;
@@ -129,9 +142,17 @@
     let invalid = false, succeeded = false;
     try {
       const result = await request(`/api/bookings/mine${status ? `?${new URLSearchParams({status})}` : ""}`, controller.signal);
-      renderList(result);
+      cachedList = result;
+      if (roomFilter) {
+        const selected = roomFilter.value;
+        roomFilter.replaceChildren(new Option("全部会议室", ""));
+        for (const booking of result.items) if (!Array.from(roomFilter.options).some(option => option.value === String(booking.room.id)))
+          roomFilter.add(new Option(`${booking.room.name} · ${booking.room.location}`, String(booking.room.id)));
+        roomFilter.value = selected;
+      }
+      renderFiltered();
       succeeded = true;
-      announce(feedback, listMessage(result, status));
+      if (!roomFilter?.value && !dateFilter?.value) announce(feedback, listMessage(result, status));
     } catch (error) {
       announce(feedback, error.api ? error.message : "未能查询预约，请检查网络后重试。筛选条件已保留。", true);
       expired(error, feedback);
@@ -226,7 +247,7 @@
         });
         const result = responseData(response,await response.json());
         if (!result?.cancellation_request || result.cancellation_request.booking_id !== id) throw Error("Unconfirmed request");
-        announce(cancelFeedback, `取消申请 #${result.cancellation_request.id} 待本人导师确认，预约仍占用。请在“申请与审批”查看处理结果。`);
+        announce(cancelFeedback, `取消申请 #${result.cancellation_request.id} 已提交给 ${result.cancellation_request.supervisor_display_name}，预约仍占用。请在“申请记录”查看处理结果。`);
       } catch(error) {
         announce(cancelFeedback,error.api?error.message:"无法确认取消申请结果，请重新查看申请记录。",true);
       } finally {lock(false);}

@@ -7,7 +7,7 @@ from .domain import DomainError, normalized_text, resource_id
 
 
 _SELECT = (
-    "SELECT c.*,r.title,r.start_at,r.end_at,room.name AS room_name,"
+    "SELECT c.*,r.title,r.room_id,r.start_at,r.end_at,room.name AS room_name,"
     "u.display_name AS owner_display_name,t.display_name AS supervisor_display_name "
     "FROM cancellation_requests c JOIN reservations r ON r.id=c.booking_id "
     "JOIN rooms room ON room.id=r.room_id JOIN users u ON u.id=c.requester_id "

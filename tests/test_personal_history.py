@@ -274,7 +274,7 @@ class PersonalHistoryTests(unittest.TestCase):
         for value in ['我的预约','全部状态','待开始','进行中','已结束','已取消','history.js','csrf_token','auth-feedback','退出登录']:
             self.assertIn(value,page.text)
         self.assertNotIn('取消预约</button>',page.text)
-        self.assertIn('aria-current="page">我的预约',page.text)
+        self.assertIn('aria-current="page">已生效预约',page.text)
         self.assertNotIn('<img src=x',page.text)
 
 if __name__ == '__main__': unittest.main()
